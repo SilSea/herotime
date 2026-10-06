@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config.js";
+import { getContentSet } from "@herotime/content";
 import { parseContent } from "../src/content/content.service.js";
 import { RateLimiter } from "../src/rate-limiter.js";
 import { starterContent } from "./fakes.js";
@@ -136,9 +137,22 @@ describe("parseContent", () => {
     expect(c.heroes.size).toBeGreaterThanOrEqual(2);
   });
 
+  it("keeps every part of the set (a dropped part would silently disable a rule)", () => {
+    const set = getContentSet("prototype");
+    const c = parseContent(set);
+    expect(c.factions.size).toBe(set.factions.length);
+    expect(c.series.size).toBe(set.series.length);
+    expect(c.cards.size).toBe(set.cards.length);
+    expect(c.gauges.size).toBe(set.gauges.length);
+    expect(c.relics.size).toBe(set.relics.length);
+    expect(c.heroes.size).toBe(set.heroes.length);
+    expect(c.factions.size).toBeGreaterThanOrEqual(7);
+  });
+
   it("reports dangling references", () => {
-    const raw = JSON.parse(JSON.stringify({ cards: [...starterContent().cards.values()], heroes: [...starterContent().heroes.values()] }));
-    raw.cards[0].series = "does-not-exist";
+    const base = starterContent();
+    const raw = JSON.parse(JSON.stringify({ factions: [...base.factions.values()], series: [...base.series.values()], gauges: [...base.gauges.values()], relics: [...base.relics.values()], cards: [...base.cards.values()], heroes: [...base.heroes.values()] }));
+    raw.cards.find((c: { series?: string }) => c.series).series = "does-not-exist";
     expect(() => parseContent(raw)).toThrow(/unknown series "does-not-exist"/);
   });
 
@@ -150,6 +164,7 @@ describe("parseContent", () => {
   it("needs two heroes and a shop unit to be playable", () => {
     const base = starterContent();
     const full = {
+      factions: [...base.factions.values()],
       cards: [...base.cards.values()],
       series: [...base.series.values()],
       gauges: [...base.gauges.values()],
@@ -161,5 +176,46 @@ describe("parseContent", () => {
     const gearOnly = { key: "g", name: "g", rank: 1, atk: 0, hp: 1, kind: "GEAR", token: true };
     const heroes = [{ key: "h1", name: "h1" }, { key: "h2", name: "h2" }];
     expect(() => parseContent({ cards: [gearOnly], heroes })).toThrow(/shop unit/);
+  });
+});
+
+describe("playtest settings", () => {
+  const quiet = () => undefined;
+  const dev = { JWT_SECRET: "x".repeat(40) };
+
+  it("uses the prototype set and practice mode in development", () => {
+    const c = loadConfig(dev, quiet);
+    expect(c.contentSet).toBe("prototype");
+    expect(c.practice).toBe(true);
+    expect(c.webDir).toBeUndefined();
+  });
+
+  it("uses the production set and no practice mode in production", () => {
+    const c = loadConfig({ NODE_ENV: "production", JWT_SECRET: "x".repeat(40), CORS_ORIGIN: "https://a.test" }, quiet);
+    expect(c.contentSet).toBe("production");
+    expect(c.practice).toBe(false);
+  });
+
+  it("CONTENT_SET and PRACTICE override those defaults", () => {
+    expect(loadConfig({ ...dev, CONTENT_SET: "production" }, quiet).contentSet).toBe("production");
+    expect(loadConfig({ ...dev, PRACTICE: "0" }, quiet).practice).toBe(false);
+    expect(loadConfig({ NODE_ENV: "production", JWT_SECRET: "x".repeat(40), CORS_ORIGIN: "https://a.test", PRACTICE: "1" }, quiet).practice).toBe(true);
+  });
+
+  it("FACTIONS forces a matchup, FACTIONS_PER_MATCH narrows the random pick, MAX_TURNS caps the game", () => {
+    const c = loadConfig({ ...dev, FACTIONS: "rider, sentai,", FACTIONS_PER_MATCH: "3", MAX_TURNS: "12" }, quiet);
+    expect(c.match).toMatchObject({ fixedFactions: ["rider", "sentai"], factionsPerMatch: 3, maxTurns: 12 });
+    expect(loadConfig({ ...dev, FACTIONS: "" }, quiet).match.fixedFactions).toBeUndefined();
+    expect(() => loadConfig({ ...dev, MAX_TURNS: "x" }, quiet)).toThrow(/non-negative integer/);
+  });
+
+  it("WEB_DIR turns on static file serving", () => {
+    expect(loadConfig({ ...dev, WEB_DIR: "apps/web/public" }, quiet).webDir).toBe("apps/web/public");
+  });
+
+  it("fast mode and a forced matchup combine", () => {
+    const c = loadConfig({ ...dev, HEROTIME_FAST: "1", FACTIONS: "kaijin" }, quiet);
+    expect(c.match.battleMs).toBe(2000);
+    expect(c.match.fixedFactions).toEqual(["kaijin"]);
   });
 });

@@ -5,7 +5,7 @@ import { io, type Socket } from "socket.io-client";
 import { AppModule } from "../src/app.module.js";
 import type { ServerConfig } from "../src/config.js";
 import { ContentService } from "../src/content/content.service.js";
-import { AppIoAdapter } from "../src/io-adapter.js";
+import { configureApp } from "../src/configure-app.js";
 import { InMemoryMatchRepository, InMemoryUserRepository } from "../src/persistence/in-memory.js";
 import type { MatchRepository, UserRepository } from "../src/persistence/repositories.js";
 import { starterContent, testConfig } from "./fakes.js";
@@ -49,14 +49,18 @@ export async function startServer(
   const users = repos?.users ?? new InMemoryUserRepository();
   const matches = repos?.matches ?? new InMemoryMatchRepository();
   const moduleRef = await Test.createTestingModule({
-    imports: [AppModule.forRoot({ config, content: new ContentService(starterContent()), users, matches })],
+    imports: [AppModule.forRoot({ config, content: new ContentService(starterContent(), "prototype"), users, matches })],
   }).compile();
   const app = moduleRef.createNestApplication<NestExpressApplication>();
-  app.useWebSocketAdapter(new AppIoAdapter(app, config));
-  app.enableShutdownHooks();
+  configureApp(app, config);
   await app.listen(0, "127.0.0.1");
   const port = (app.getHttpServer().address() as { port: number }).port;
   return { app, url: `http://127.0.0.1:${port}`, config, users, matches, close: () => app.close() };
+}
+
+/** GET a URL and parse the JSON body. */
+export async function getJson(url: string): Promise<any> {
+  return (await fetch(url)).json();
 }
 
 export async function api(server: { url: string }, path: string, body?: unknown, token?: string) {

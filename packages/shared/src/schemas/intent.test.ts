@@ -63,3 +63,18 @@ describe("auth schemas", () => {
     expect(LoginSchema.safeParse({ username: "rider_01", password: "" }).success).toBe(false);
   });
 });
+
+describe("PracticeSchema", () => {
+  it("accepts nothing, or any mix of the options", async () => {
+    const { PracticeSchema } = await import("../index.js");
+    expect(PracticeSchema.safeParse({}).success).toBe(true);
+    expect(PracticeSchema.safeParse({ factions: ["rider", "sentai"], speed: "fast", bots: 3 }).success).toBe(true);
+  });
+
+  it("rejects bad factions, speeds, bot counts and unknown fields", async () => {
+    const { PracticeSchema } = await import("../index.js");
+    for (const bad of [{ factions: [] }, { factions: [""] }, { factions: "rider" }, { speed: "warp" }, { bots: 0 }, { bots: 8 }, { bots: 2.5 }, { cheat: 1 }, null]) {
+      expect(PracticeSchema.safeParse(bad).success, JSON.stringify(bad)).toBe(false);
+    }
+  });
+});

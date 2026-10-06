@@ -1,14 +1,13 @@
 import "reflect-metadata";
-import { readFileSync } from "node:fs";
 import type { Content } from "@herotime/engine";
 import { loadConfig, type ServerConfig } from "../src/config.js";
+import { getContentSet } from "@herotime/content";
 import { parseContent } from "../src/content/content.service.js";
 import type { Publisher, Timers } from "../src/game/ports.js";
 
-export const STARTER = new URL("../content/starter.json", import.meta.url);
-
+/** The prototype content set, parsed and cross-checked exactly as the server does at startup. */
 export function starterContent(): Content {
-  return parseContent(JSON.parse(readFileSync(STARTER, "utf8")));
+  return parseContent(getContentSet("prototype"));
 }
 
 /** A manual clock: nothing fires until the test calls advance(). */
@@ -69,7 +68,7 @@ export class RecordingPublisher implements Publisher {
 
 export function testConfig(over: Partial<ServerConfig> = {}): ServerConfig {
   const base = loadConfig(
-    { JWT_SECRET: "test-secret-test-secret-test-secret-123", BCRYPT_COST: "4", LOBBY_FILL_MS: "5000" },
+    { JWT_SECRET: "test-secret-test-secret-test-secret-123", BCRYPT_COST: "4", LOBBY_FILL_MS: "5000", CONTENT_SET: "prototype" },
     () => undefined,
   );
   return { ...base, ...over };

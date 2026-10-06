@@ -1,15 +1,14 @@
 import "reflect-metadata";
+import { pathToFileURL } from "node:url";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
-import { AppModule } from "./app.module.js";
+import { AppModule, type AppDeps } from "./app.module.js";
+import { configureApp } from "./configure-app.js";
 import { loadConfig, type ServerConfig } from "./config.js";
 import { ContentService } from "./content/content.service.js";
-import { AppIoAdapter } from "./io-adapter.js";
-import type { AppDeps } from "./app.module.js";
 
 export async function bootstrap(config: ServerConfig = loadConfig()): Promise<NestExpressApplication> {
-  const content = ContentService.fromFile(new URL("../content/starter.json", import.meta.url));
-  const deps: AppDeps = { config, content };
+  const deps: AppDeps = { config, content: ContentService.fromSet(config.contentSet) };
   if (config.databaseUrl) {
     // Loaded lazily so a database-free local run never needs the generated client.
     const { createPrismaClient, PrismaMatchRepository, PrismaUserRepository } = await import("./persistence/prisma.js");
@@ -19,16 +18,13 @@ export async function bootstrap(config: ServerConfig = loadConfig()): Promise<Ne
     deps.onShutdown = () => db.$disconnect();
   }
   const app = await NestFactory.create<NestExpressApplication>(AppModule.forRoot(deps));
-  app.disable("x-powered-by");
-  app.enableCors({ origin: config.corsOrigin });
-  app.useWebSocketAdapter(new AppIoAdapter(app, config));
-  app.enableShutdownHooks();
+  configureApp(app, config);
   await app.listen(config.port, config.host);
   return app;
 }
 
 // Run only when started directly (not when imported by tests).
-if (process.argv[1] && import.meta.url === new URL(`file:///${process.argv[1].replace(/\\/g, "/")}`).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   bootstrap()
     .then((app) => app.getUrl().then((url) => console.log(`herotime server listening on ${url}`)))
     .catch((e: unknown) => {

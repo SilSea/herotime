@@ -1,6 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { RuleError } from "@herotime/engine";
-import type { ServerConfig } from "../config.js";
+import { RuleError, type MatchConfig } from "@herotime/engine";
+import type { PracticeInput } from "@herotime/shared";
+import { FAST_TIMERS, type ServerConfig } from "../config.js";
+import { ContentService } from "../content/content.service.js";
 import { CONFIG, PUBLISHER, TIMERS } from "../tokens.js";
 import { MatchRegistry, type QueuedUser } from "./match.registry.js";
 import type { Publisher, Timers } from "./ports.js";
@@ -25,7 +27,34 @@ export class LobbyService {
     @Inject(PUBLISHER) private readonly publisher: Publisher,
     @Inject(TIMERS) private readonly timers: Timers,
     @Inject(CONFIG) private readonly config: ServerConfig,
+    @Inject(ContentService) private readonly contentService: ContentService,
   ) {}
+
+  /**
+   * Playtesting: skip the queue and start a match for this player right now. The options pick
+   * factions, speed and the number of bots; everything is validated against the live content.
+   */
+  practice(user: QueuedUser, options: PracticeInput = {}): LobbyStatus {
+    if (!this.config.practice) throw new RuleError("practice mode is disabled on this server");
+    if (this.registry.activeFor(user.id)) throw new RuleError("you are already in a match");
+    const known = this.contentService.latest.content.factions;
+    for (const f of options.factions ?? []) {
+      if (!known.has(f)) throw new RuleError(`unknown faction: ${f} (available: ${[...known.keys()].join(", ") || "none"})`);
+    }
+    this.registry.release(user.id);
+    this.leave(user.id);
+
+    const match: Partial<MatchConfig> = {};
+    if (options.factions) match.fixedFactions = options.factions;
+    if (options.speed === "fast") Object.assign(match, FAST_TIMERS);
+    this.registry.startMatch([user], {
+      size: options.bots === undefined ? this.config.lobby.matchSize : options.bots + 1,
+      match,
+    });
+    const status = this.statusFor(user.id);
+    this.publisher.toUser(user.id, "queue:status", status);
+    return status;
+  }
 
   join(user: QueuedUser): LobbyStatus {
     if (this.registry.activeFor(user.id)) throw new RuleError("you are already in a match");

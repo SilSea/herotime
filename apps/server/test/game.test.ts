@@ -12,10 +12,10 @@ function setup(over: Parameters<typeof testConfig>[0] = {}) {
   const timers = new FakeTimers();
   const publisher = new RecordingPublisher();
   const repo = new InMemoryMatchRepository();
-  const content = new ContentService(starterContent());
+  const content = new ContentService(starterContent(), "prototype");
   const config = testConfig({ match: { maxTurns: 4 }, ...over });
   const registry = new MatchRegistry(content, publisher, timers, config, repo);
-  const lobby = new LobbyService(registry, publisher, timers, config);
+  const lobby = new LobbyService(registry, publisher, timers, config, content);
   return { timers, publisher, repo, content, config, registry, lobby };
 }
 
@@ -332,5 +332,74 @@ describe("LobbyService", () => {
 
   it("statusFor is idle for strangers", () => {
     expect(setup().lobby.statusFor("who").state).toBe("idle");
+  });
+});
+
+describe("LobbyService.practice (playtesting)", () => {
+  it("starts a match for the player straight away, with a full table by default", () => {
+    const { lobby, registry, publisher } = setup();
+    const status = lobby.practice(user(1));
+    expect(status).toMatchObject({ state: "playing", ended: false });
+    expect(registry.count).toBe(1);
+    expect(registry.activeFor("u1")?.match.players).toHaveLength(8);
+    expect(publisher.of("u1", "queue:status").at(-1)?.payload.state).toBe("playing");
+  });
+
+  it("the number of bots decides the table size", () => {
+    const { lobby, registry } = setup();
+    lobby.practice(user(1), { bots: 3 });
+    expect(registry.activeFor("u1")?.match.players).toHaveLength(4);
+    lobby.practice(user(2), { bots: 1 });
+    expect(registry.activeFor("u2")?.match.players).toHaveLength(2);
+  });
+
+  it("fixed factions are applied to that match", () => {
+    const { lobby, registry } = setup();
+    lobby.practice(user(1), { factions: ["rider", "kaijin"] });
+    const m = registry.activeFor("u1")?.match;
+    expect([...(m?.env.activeFactions ?? [])].sort()).toEqual(["kaijin", "rider"]);
+    expect(m?.view("u1").factions).toEqual(["kaijin", "rider"]);
+  });
+
+  it("the fast preset shortens hero select, and nothing leaks into later matches", () => {
+    const { lobby, registry, timers } = setup();
+    lobby.practice(user(1), { speed: "fast" });
+    expect(registry.activeFor("u1")?.match.deadline).toBe(timers.now() + 3000);
+
+    lobby.practice(user(2));
+    expect(registry.activeFor("u2")?.match.deadline).toBe(timers.now() + 30_000);
+    lobby.join(user(3));
+    timers.advance(5000);
+    expect(registry.activeFor("u3")?.match.deadline as number).toBeGreaterThan(timers.now() + 20_000);
+  });
+
+  it("leaves the queue when starting a practice match", () => {
+    const { lobby, timers, registry } = setup();
+    lobby.join(user(1));
+    lobby.practice(user(1));
+    expect(lobby.waiting).toBe(0);
+    timers.advance(10_000);
+    expect(registry.count).toBe(1); // the abandoned queue did not start a second match
+  });
+
+  it("rejects unknown factions with the list of real ones, and changes nothing", () => {
+    const { lobby, registry } = setup();
+    expect(() => lobby.practice(user(1), { factions: ["rider", "ghost"] })).toThrow(/unknown faction: ghost \(available: rider, sentai/);
+    expect(registry.count).toBe(0);
+  });
+
+  it("is refused while already playing, but fine again afterwards", () => {
+    const { lobby, registry, timers } = setup();
+    lobby.practice(user(1), { bots: 1 });
+    expect(() => lobby.practice(user(1))).toThrow(/already in a match/);
+    playOut(timers, registry.activeFor("u1") as { ended: boolean });
+    expect(() => lobby.practice(user(1))).not.toThrow();
+    expect(registry.count).toBe(2);
+  });
+
+  it("can be switched off (production)", () => {
+    const { lobby, registry } = setup({ practice: false });
+    expect(() => lobby.practice(user(1))).toThrow(/practice mode is disabled/);
+    expect(registry.count).toBe(0);
   });
 });

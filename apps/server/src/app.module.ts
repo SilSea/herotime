@@ -3,6 +3,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthController, JwtAuthGuard } from "./auth/auth.controller.js";
 import { AuthService } from "./auth/auth.service.js";
 import type { ServerConfig } from "./config.js";
+import { ContentController } from "./content/content.controller.js";
 import { ContentService } from "./content/content.service.js";
 import { GameGateway, SocketPublisher } from "./game/game.gateway.js";
 import { LobbyService } from "./game/lobby.service.js";
@@ -46,7 +47,7 @@ export class AppModule implements OnApplicationShutdown {
           verifyOptions: { algorithms: ["HS256"] },
         }),
       ],
-      controllers: [AuthController],
+      controllers: [AuthController, ContentController],
       providers: [
         { provide: CONFIG, useValue: deps.config },
         { provide: SHUTDOWN_HOOK, useValue: deps.onShutdown },

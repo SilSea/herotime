@@ -10,7 +10,7 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { RuleError } from "@herotime/engine";
-import { IntentSchema } from "@herotime/shared";
+import { IntentSchema, PracticeSchema } from "@herotime/shared";
 import type { Server, Socket } from "socket.io";
 import { AuthService, type PublicUser } from "../auth/auth.service.js";
 import { RateLimiter } from "../rate-limiter.js";
@@ -90,6 +90,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("queue:join")
   onJoin(@ConnectedSocket() socket: GameSocket): Ack {
     return this.guarded(socket, (user) => ({ ok: true, status: this.lobby.join({ id: user.id, name: user.username }) }));
+  }
+
+  @SubscribeMessage("queue:practice")
+  onPractice(@ConnectedSocket() socket: GameSocket, @MessageBody() body: unknown): Ack {
+    return this.guarded(socket, (user) => {
+      const parsed = PracticeSchema.safeParse(body ?? {});
+      if (!parsed.success) return { ok: false, error: "malformed practice options" };
+      return { ok: true, status: this.lobby.practice({ id: user.id, name: user.username }, parsed.data) };
+    });
   }
 
   @SubscribeMessage("queue:leave")

@@ -1,6 +1,16 @@
 import { randomBytes } from "node:crypto";
 import type { MatchConfig } from "@herotime/engine";
 
+/** Every timer squeezed so a whole match takes about a minute. */
+export const FAST_TIMERS: Partial<MatchConfig> = {
+  heroSelectMs: 3_000,
+  recruitBaseMs: 4_000,
+  recruitStepMs: 500,
+  recruitMaxMs: 8_000,
+  relicBonusMs: 1_000,
+  battleMs: 2_000,
+};
+
 export interface ServerConfig {
   port: number;
   host: string;
@@ -14,6 +24,12 @@ export interface ServerConfig {
   /** Per IP (register) or per IP+username (login), per minute. */
   authLimits: { registerPerMin: number; loginPerMin: number };
   match: Partial<MatchConfig>;
+  /** Which content set matches are built from (see @herotime/content). */
+  contentSet: string;
+  /** Lets a player start a match immediately with chosen factions/speed (playtesting). Off in production. */
+  practice: boolean;
+  /** Folder of static web files to serve at /, or undefined for API only. */
+  webDir: string | undefined;
   /** Unset = run with in-memory storage (fine for local play, nothing survives a restart). */
   databaseUrl: string | undefined;
 }
@@ -46,9 +62,11 @@ export function loadConfig(env: Env = process.env, warn: (msg: string) => void =
 
   // HEROTIME_FAST=1 squeezes every timer so a full match plays out in about a minute (dev and e2e).
   const fast = env.HEROTIME_FAST === "1";
-  const match: Partial<MatchConfig> = fast
-    ? { heroSelectMs: 3_000, recruitBaseMs: 4_000, recruitStepMs: 500, recruitMaxMs: 8_000, relicBonusMs: 1_000, battleMs: 2_000 }
-    : {};
+  const match: Partial<MatchConfig> = fast ? { ...FAST_TIMERS } : {};
+  // Handy while experimenting: FACTIONS=rider,sentai forces a matchup, FACTIONS_PER_MATCH=3 narrows the random pick.
+  if (env.FACTIONS) match.fixedFactions = env.FACTIONS.split(",").map((s) => s.trim()).filter(Boolean);
+  if (env.FACTIONS_PER_MATCH) match.factionsPerMatch = int(env.FACTIONS_PER_MATCH, 5);
+  if (env.MAX_TURNS) match.maxTurns = int(env.MAX_TURNS, 40);
 
   return {
     port: int(env.PORT, 3000),
@@ -61,6 +79,9 @@ export function loadConfig(env: Env = process.env, warn: (msg: string) => void =
     lobby: { matchSize: 8, fillAfterMs: int(env.LOBBY_FILL_MS, fast ? 1_000 : 20_000) },
     authLimits: { registerPerMin: int(env.REGISTER_PER_MIN, 10), loginPerMin: int(env.LOGIN_PER_MIN, 10) },
     match,
+    contentSet: env.CONTENT_SET ?? (production ? "production" : "prototype"),
+    practice: env.PRACTICE !== undefined ? env.PRACTICE === "1" : !production,
+    webDir: env.WEB_DIR || undefined,
     databaseUrl: env.DATABASE_URL || undefined,
   };
 }

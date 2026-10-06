@@ -1,6 +1,6 @@
 import { randomInt, randomUUID } from "node:crypto";
 import { Inject, Injectable } from "@nestjs/common";
-import { Match, type Entrant } from "@herotime/engine";
+import { Match, type Entrant, type MatchConfig } from "@herotime/engine";
 import type { ServerConfig } from "../config.js";
 import { ContentService } from "../content/content.service.js";
 import { MATCH_REPOSITORY, type MatchRepository } from "../persistence/repositories.js";
@@ -11,6 +11,13 @@ import type { Publisher, Timers } from "./ports.js";
 export interface QueuedUser {
   id: string;
   name: string;
+}
+
+export interface StartOptions {
+  /** Total players including humans (default: the lobby size). */
+  size?: number;
+  /** Overrides for this match only. */
+  match?: Partial<MatchConfig>;
 }
 
 /** How long a finished match stays available for reconnects and final standings. */
@@ -30,8 +37,8 @@ export class MatchRegistry {
   ) {}
 
   /** Start a match with these humans, filling the rest of the lobby with bots. */
-  startMatch(humans: readonly QueuedUser[]): MatchRunner {
-    const size = this.config.lobby.matchSize;
+  startMatch(humans: readonly QueuedUser[], options: StartOptions = {}): MatchRunner {
+    const size = options.size ?? this.config.lobby.matchSize;
     if (humans.length === 0 || humans.length > size) throw new Error(`a match needs 1-${size} humans`);
 
     const entrants: Entrant[] = humans.map((h) => ({ id: h.id, name: h.name, isBot: false }));
@@ -40,7 +47,13 @@ export class MatchRegistry {
     const { content, version } = this.contentService.latest;
     const seed = randomInt(0, 2 ** 31 - 1);
     const startedAt = new Date(this.timers.now());
-    const match = Match.create({ content, seed, entrants, now: this.timers.now(), config: this.config.match });
+    const match = Match.create({
+      content,
+      seed,
+      entrants,
+      now: this.timers.now(),
+      config: { ...this.config.match, ...options.match },
+    });
 
     const id = randomUUID();
     const runner = new MatchRunner(

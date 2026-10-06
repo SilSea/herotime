@@ -44,3 +44,18 @@ export const LoginSchema = z
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type LoginInput = z.infer<typeof LoginSchema>;
+
+/**
+ * Practice mode (playtesting): start a match right now instead of waiting in the queue, optionally
+ * with fixed factions, a speed preset and a chosen number of bots.
+ */
+export const PracticeSchema = z
+  .object({
+    /** Force exactly these factions. Omit for the normal random subset. */
+    factions: z.array(z.string().min(1).max(40)).min(1).max(10).optional(),
+    speed: z.enum(["normal", "fast"]).optional(),
+    /** Bots to play against (1-7). Omit for a full lobby of 7. */
+    bots: z.number().int().min(1).max(7).optional(),
+  })
+  .strict();
+export type PracticeInput = z.infer<typeof PracticeSchema>;

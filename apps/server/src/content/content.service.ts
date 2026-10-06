@@ -1,10 +1,11 @@
-import { readFileSync } from "node:fs";
 import { Injectable } from "@nestjs/common";
 import { Content } from "@herotime/engine";
-import { CardDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
+import { getContentSet } from "@herotime/content";
+import { CardDef, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
 import { z } from "zod";
 
 const ContentFile = z.object({
+  factions: z.array(FactionDef).default([]),
   cards: z.array(CardDef),
   series: z.array(SeriesDef).default([]),
   gauges: z.array(GaugeDef).default([]),
@@ -33,12 +34,28 @@ export class ContentService {
   private current: Content;
   private version = 1;
 
-  constructor(content: Content) {
+  constructor(content: Content, readonly setName = "custom") {
     this.current = content;
   }
 
-  static fromFile(path: URL | string): ContentService {
-    return new ContentService(parseContent(JSON.parse(readFileSync(path, "utf8"))));
+  /** Everything the web client needs to draw cards, as plain JSON. */
+  snapshot(): Record<string, unknown> {
+    const c = this.current;
+    return {
+      set: this.setName,
+      version: this.version,
+      factions: [...c.factions.values()],
+      series: [...c.series.values()],
+      cards: [...c.cards.values()],
+      gauges: [...c.gauges.values()],
+      relics: [...c.relics.values()],
+      heroes: [...c.heroes.values()],
+    };
+  }
+
+  /** Build from a named set in @herotime/content ("prototype", "production"). */
+  static fromSet(name: string): ContentService {
+    return new ContentService(parseContent(getContentSet(name)), name);
   }
 
   get latest(): { content: Content; version: number } {
