@@ -32,6 +32,8 @@ export interface ServerConfig {
   adminUsers: string[];
   /** Lets a player start a match immediately with chosen factions/speed (playtesting). Off in production. */
   practice: boolean;
+  /** Where uploaded card art is kept (UPLOAD_DIR). Served at /art/. */
+  uploadDir: string;
   /** Folder of static web files to serve at /, or undefined for API only. */
   webDir: string | undefined;
   /** Unset = run with in-memory storage (fine for local play, nothing survives a restart). */
@@ -87,6 +89,7 @@ export function loadConfig(env: Env = process.env, warn: (msg: string) => void =
     contentReseed: env.CONTENT_RESEED === "1",
     adminUsers: (env.ADMIN_USERS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean),
     practice: env.PRACTICE !== undefined ? env.PRACTICE === "1" : !production,
+    uploadDir: env.UPLOAD_DIR || "uploads",
     webDir: env.WEB_DIR || undefined,
     databaseUrl: env.DATABASE_URL || undefined,
   };

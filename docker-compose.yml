@@ -34,8 +34,11 @@ services:
       CONTENT_SET: ${CONTENT_SET:-prototype}
       CONTENT_RESEED: ${CONTENT_RESEED:-0}
       ADMIN_USERS: ${ADMIN_USERS:-}
+      UPLOAD_DIR: /data/uploads
       PRACTICE: ${PRACTICE:-1}
       HEROTIME_FAST: ${HEROTIME_FAST:-0}
+    volumes:
+      - uploads:/data/uploads
     restart: unless-stopped
 
   redis:
@@ -46,3 +49,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

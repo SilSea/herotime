@@ -24,6 +24,7 @@ import { JwtAuthGuard } from "../auth/auth.controller.js";
 import { CONTENT_REPOSITORY, type ContentData, type ContentRepository } from "../persistence/repositories.js";
 import { ContentInvalidError, ContentService, inspectContent, snapshotOf } from "./content.service.js";
 import { simulate } from "./simulate.js";
+import { UploadError, UploadStore } from "./uploads.js";
 
 type AuthedRequest = Request & { user?: PublicUser };
 
@@ -54,6 +55,7 @@ export class AdminController {
   constructor(
     @Inject(ContentService) private readonly content: ContentService,
     @Inject(CONTENT_REPOSITORY) private readonly repo: ContentRepository,
+    @Inject(UploadStore) private readonly uploads: UploadStore,
   ) {}
 
   /** The working copy: the saved draft, or the published version when nobody has started one. */
@@ -127,6 +129,24 @@ export class AdminController {
       content = r.content;
     }
     return { target, ...simulate(content, { matches, seed, budgetMs: 10_000 }) };
+  }
+
+  /** Card art. Send { data: <base64 or data: URL> }; the file name in the reply is what goes in a card's `art`. */
+  @Post("upload")
+  async upload(@Body() body: { data?: unknown } | undefined, @Req() req: AuthedRequest) {
+    try {
+      const saved = await this.uploads.save(body?.data);
+      await this.repo.audit((req.user as PublicUser).id, "content.upload", null, saved);
+      return { file: saved.file, url: `/art/${saved.file}` };
+    } catch (e) {
+      if (e instanceof UploadError) throw new BadRequestException(e.message);
+      throw e;
+    }
+  }
+
+  @Get("uploads")
+  async uploaded() {
+    return { files: (await this.uploads.list()).map((f) => ({ file: f.file, url: `/art/${f.file}`, bytes: f.bytes, at: f.at })) };
   }
 
   @Get("versions")

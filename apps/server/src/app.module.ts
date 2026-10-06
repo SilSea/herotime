@@ -4,6 +4,7 @@ import { AuthController, JwtAuthGuard } from "./auth/auth.controller.js";
 import { AuthService } from "./auth/auth.service.js";
 import type { ServerConfig } from "./config.js";
 import { AdminController, AdminGuard } from "./content/admin.controller.js";
+import { UploadStore } from "./content/uploads.js";
 import { ContentController } from "./content/content.controller.js";
 import { ContentService } from "./content/content.service.js";
 import { GameGateway, SocketPublisher } from "./game/game.gateway.js";
@@ -61,6 +62,7 @@ export class AppModule implements OnApplicationShutdown {
         { provide: CONTENT_REPOSITORY, useValue: deps.contentRepo ?? new InMemoryContentRepository() },
         { provide: ContentService, useValue: deps.content },
         AdminGuard,
+        { provide: UploadStore, useValue: new UploadStore(deps.config.uploadDir) },
         SocketPublisher,
         { provide: PUBLISHER, useExisting: SocketPublisher },
         AuthService,

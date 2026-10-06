@@ -1,7 +1,11 @@
+import { mkdtempSync, rmSync, readdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { newUser, startServer, type TestServer } from "./e2e-helpers.js";
 
 let server: TestServer;
+const uploadDir = mkdtempSync(join(tmpdir(), "herotime-art-"));
 let admin: { token: string; id: string };
 let player: { token: string };
 
@@ -22,12 +26,15 @@ async function call(method: string, path: string, token?: string, body?: unknown
 }
 
 beforeAll(async () => {
-  server = await startServer({ adminUsers: ["boss"] });
+  server = await startServer({ adminUsers: ["boss"], uploadDir });
   admin = await newUser(server, "Boss"); // the list is case-insensitive
   player = await newUser(server);
 }, 30_000);
 
-afterAll(() => server.close());
+afterAll(async () => {
+  await server.close();
+  rmSync(uploadDir, { recursive: true, force: true });
+});
 
 describe("who may edit content", () => {
   it("the role comes from ADMIN_USERS, never from the sign-up request", async () => {
@@ -196,4 +203,60 @@ describe("sandbox simulation", () => {
     expect(refused.body.issues.join()).toMatch(/nope/);
     await call("POST", "/admin/draft/reset", admin.token);
   }, 90_000);
+});
+
+describe("card art upload", () => {
+  // 1x1 transparent PNG
+  const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");
+  const b64 = (b: Buffer): string => b.toString("base64");
+
+  it("is for admins only", async () => {
+    expect((await call("POST", "/admin/upload", undefined, { data: b64(PNG) })).status).toBe(401);
+    expect((await call("POST", "/admin/upload", player.token, { data: b64(PNG) })).status).toBe(403);
+    expect((await call("GET", "/admin/uploads", player.token)).status).toBe(403);
+  });
+
+  it("stores a PNG under a name made from its bytes, serves it, and stores a duplicate once", async () => {
+    const a = await call("POST", "/admin/upload", admin.token, { data: b64(PNG) });
+    expect(a.status).toBe(201);
+    expect(a.body.file).toMatch(/^[0-9a-f]{16}\.png$/);
+    expect(a.body.url).toBe("/art/" + a.body.file);
+    const again = await call("POST", "/admin/upload", admin.token, { data: "data:image/png;base64," + b64(PNG) });
+    expect(again.body.file).toBe(a.body.file);
+    expect(readdirSync(uploadDir)).toEqual([a.body.file]);
+
+    const res = await fetch(server.url + a.body.url);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toMatch(/image\/png/);
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(res.headers.get("cache-control")).toMatch(/immutable/);
+    expect(Buffer.from(await res.arrayBuffer()).equals(PNG)).toBe(true);
+
+    const list = await call("GET", "/admin/uploads", admin.token);
+    expect(list.body.files.map((f: any) => f.file)).toEqual([a.body.file]);
+  });
+
+  it("decides the type from the bytes, not from anything the client says", async () => {
+    const svg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
+    expect((await call("POST", "/admin/upload", admin.token, { data: b64(svg), name: "x.png" })).status).toBe(400);
+    expect((await call("POST", "/admin/upload", admin.token, { data: b64(Buffer.from("just text")) })).status).toBe(400);
+    const disguised = Buffer.concat([Buffer.from("<html>"), PNG]);
+    expect((await call("POST", "/admin/upload", admin.token, { data: b64(disguised) })).status).toBe(400);
+    for (const bad of [undefined, "", 5, "!!!!"]) expect((await call("POST", "/admin/upload", admin.token, { data: bad })).status, String(bad)).toBe(400);
+    const jpg = await call("POST", "/admin/upload", admin.token, { data: b64(Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(20, 1)])) });
+    expect(jpg.body.file).toMatch(/\.jpg$/);
+  });
+
+  it("refuses an image over the size limit before decoding it", async () => {
+    const big = Buffer.concat([PNG, Buffer.alloc(1_600_000)]);
+    const r = await call("POST", "/admin/upload", admin.token, { data: b64(big) });
+    expect(r.status).toBe(400);
+    expect(r.body.message).toMatch(/too large/);
+  });
+
+  it("never turns a client-supplied path into a file path", async () => {
+    expect((await fetch(server.url + "/art/..%2f..%2fpackage.json")).status).toBe(404);
+    expect((await fetch(server.url + "/art/../package.json")).status).toBe(404);
+    expect((await fetch(server.url + "/art/0000000000000000.png")).status).toBe(404);
+  });
 });

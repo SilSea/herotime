@@ -7,6 +7,8 @@ export interface FormEnv {
   refs(kind: RefKind): readonly string[];
   /** Something was edited. */
   changed(): void;
+  /** Upload an image and return the file name to store (absent when uploads are not available). */
+  upload?(file: File): Promise<string>;
 }
 
 /** A starting value for a field that has just been switched on or added. */
@@ -83,6 +85,18 @@ export function renderField(field: Field, value: unknown, set: (v: unknown) => v
     case "text": {
       const el = field.area ? h("textarea", { value: String(value ?? ""), attrs: { rows: "3" } }) : h("input", { type: "text", value: String(value ?? ""), ...(field.placeholder ? { placeholder: field.placeholder } : {}) });
       el.addEventListener("input", () => set(el.value));
+      if (field.upload && env.upload) {
+        const pick = h("input", { type: "file", attrs: { accept: "image/png,image/jpeg,image/gif,image/webp" } });
+        pick.addEventListener("change", () => {
+          const file = pick.files?.[0];
+          if (!file) return;
+          void env.upload?.(file).then((name) => {
+            el.value = name;
+            set(name);
+          }, () => undefined); // the screen already told the user why it failed
+        });
+        return h("div", { class: "upload-row" }, el, pick);
+      }
       return el;
     }
     case "int":

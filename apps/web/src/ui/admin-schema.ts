@@ -16,7 +16,7 @@ export interface Row {
 }
 
 export type Field =
-  | { kind: "text"; area?: boolean; placeholder?: string }
+  | { kind: "text"; area?: boolean; placeholder?: string; /** Offer a file picker that uploads an image and fills in its name. */ upload?: boolean }
   | { kind: "int"; min?: number; max?: number }
   | { kind: "num" }
   | { kind: "bool" }
@@ -178,7 +178,7 @@ const CARD_ROWS: Row[] = [
   { key: "token", field: { kind: "bool" }, hint: "Tokens are never sold in the shop" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
-  { key: "art", field: { kind: "text", placeholder: "image path or URL" }, optional: true },
+  { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
   { key: "effects", field: effects() },
 ];
 
@@ -187,7 +187,7 @@ const HERO_ROWS: Row[] = [
   { key: "name", field: text },
   { key: "armor", field: int(0) },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the power" },
-  { key: "art", field: { kind: "text" }, optional: true },
+  { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
   {
     key: "power",
     field: {
@@ -212,7 +212,7 @@ const RELIC_ROWS: Row[] = [
   { key: "factions", field: { kind: "tags", to: "factions" }, hint: "Offered more to players with these factions" },
   { key: "series", field: { kind: "ref", to: "series" }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
-  { key: "art", field: { kind: "text" }, optional: true },
+  { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
   { key: "effects", field: effects() },
 ];
 

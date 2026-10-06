@@ -71,7 +71,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F6.2** (P0) Effect builder (form จาก descriptor ที่มี test ตรวจว่าตรงกับ zod) + โหมด raw JSON
 - [x] **F6.3** (P0) Live card preview (ข้อความกฎที่สร้างจาก effect อัพเดตตอน Save)
 - [x] **F6.4** (P0) Draft → Publish ContentVersion, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
-- [ ] **F6.5** (P0) Upload รูป
+- [x] **F6.5** (P0) Upload รูป (PNG/JPEG/GIF/WebP ≤ ~1.4 MB, ตรวจชนิดจาก bytes ไม่รับ SVG, ตั้งชื่อไฟล์จาก hash, เก็บใน `UPLOAD_DIR`, เสิร์ฟที่ `/art/`)
 - [x] **F6.6** (P1) Sandbox: bot 8 ตัวเล่นเต็มแมตช์บน draft หรือชุดที่ publish (สูงสุด 300 แมตช์) สรุป hero/faction/การ์ดที่ชนะมากหรือน้อยผิดปกติ (ยังไม่ใช่การเลือกบอร์ด 2 ฝั่งเอง)
 - [~] **F6.7** (P1) Rollback (restore เวอร์ชันเก่าเข้า draft แล้ว publish) + Audit log ทำแล้ว; Diff ยังไม่ทำ
 - [ ] **F6.8** (P2) Stat dashboard (pick rate, win rate ต่อการ์ด)

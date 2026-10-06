@@ -351,7 +351,7 @@ function newEntity(_ctx: Ctx): void {
 
 function entityEditor(ctx: Ctx, entity: Record<string, any>, refs: (k: RefKind) => string[]): HTMLElement {
   const info = entityInfo(ed.kind);
-  const env: FormEnv = { refs, changed: setDirty };
+  const env: FormEnv = { refs, changed: setDirty, upload: (file) => uploadImage(ctx, file) };
 
   const mode = h(
     "div",
@@ -374,6 +374,30 @@ function entityEditor(ctx: Ctx, entity: Record<string, any>, refs: (k: RefKind) 
     body = renderRows(info.rows, entity, env);
   }
   return h("div", null, mode, body);
+}
+
+const MAX_IMAGE_BYTES = 1_400_000;
+
+/** Send a picked image to the server and return the stored file name. */
+async function uploadImage(ctx: Ctx, file: File): Promise<string> {
+  if (file.size > MAX_IMAGE_BYTES) {
+    ctx.toast(`That image is ${Math.round(file.size / 1000)} KB; the limit is about ${Math.round(MAX_IMAGE_BYTES / 1000)} KB`, "error");
+    throw new Error("too large");
+  }
+  const data = await new Promise<string>((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result));
+    r.onerror = () => reject(new Error("could not read the file"));
+    r.readAsDataURL(file);
+  });
+  try {
+    const saved = await ctx.api.adminUpload(token(ctx), data);
+    ctx.toast(`Uploaded ${file.name}`);
+    return saved.file;
+  } catch (e) {
+    ctx.toast(e instanceof Error ? e.message : "upload failed", "error");
+    throw e;
+  }
 }
 
 function applyJson(area: HTMLTextAreaElement, msg: HTMLElement, ctx: Ctx): void {

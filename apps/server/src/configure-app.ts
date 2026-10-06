@@ -9,6 +9,14 @@ export function configureApp(app: NestExpressApplication, config: ServerConfig):
   app.useBodyParser("json", { limit: "4mb" });
   app.enableCors({ origin: config.corsOrigin });
   app.useWebSocketAdapter(new AppIoAdapter(app, config));
+  // Uploaded card art: names are content hashes, so they never change and can be cached for good.
+  app.useStaticAssets(resolve(config.uploadDir), {
+    prefix: "/art/",
+    index: false,
+    immutable: true,
+    maxAge: "365d",
+    setHeaders: (res) => res.setHeader("X-Content-Type-Options", "nosniff"),
+  });
   if (config.webDir) {
     // The playtest client is plain static files; no build server needed.
     app.useStaticAssets(resolve(config.webDir));

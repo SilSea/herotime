@@ -380,3 +380,6 @@ input.bad { border-color: var(--bad); background: #3b1511; }
 .sim-good td { color: #b9f58b; }
 .sim-bad td { color: #ff9a85; }
 .sim-table { min-width: 0; }
+
+.upload-row { display: flex; flex-direction: column; gap: 4px; }
+.upload-row input[type=file] { font-size: 12px; max-width: 420px; }
