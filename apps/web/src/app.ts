@@ -49,6 +49,7 @@ export function startApp(root: HTMLElement): void {
   let replayTurn = 0;
   let content: ContentIndex | undefined;
   let wantedVersion = 0;
+  const pendingIntents = new Set<string>();
 
   const toast = (text: string, kind: "info" | "error" = "info"): void => {
     store.update((s) => addToast(s, text, kind));
@@ -64,9 +65,17 @@ export function startApp(root: HTMLElement): void {
     ix: content as ContentIndex,
     toast,
     async act(intent: Intent) {
-      const ack = await net.intent(intent);
-      if (!ack.ok) toast(ack.error, "error");
-      return ack.ok;
+      // A double click would send the same intent twice; the second one refers to a slot that has already changed.
+      const key = JSON.stringify(intent);
+      if (pendingIntents.has(key)) return false;
+      pendingIntents.add(key);
+      try {
+        const ack = await net.intent(intent);
+        if (!ack.ok) toast(ack.error, "error");
+        return ack.ok;
+      } finally {
+        pendingIntents.delete(key);
+      }
     },
     async refreshContent(version?: number) {
       try {

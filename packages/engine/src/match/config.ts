@@ -17,6 +17,11 @@ export interface MatchConfig {
   heroChoices: number;
   /** Random factions used per match (0 or more than exist = all). Ignored if the content declares none. */
   factionsPerMatch: number;
+  /**
+   * Whether READY from every human ends recruit early. Off by default: the rules say every turn runs its
+   * full clock so all players start the next one together. Tests turn it on to move quickly.
+   */
+  readyEndsRecruit: boolean;
   /** Force exactly these factions (for testing a matchup). Overrides factionsPerMatch. */
   fixedFactions?: string[];
 }
@@ -34,6 +39,7 @@ export const DEFAULT_MATCH_CONFIG: MatchConfig = {
   maxTurns: 40,
   heroChoices: 2,
   factionsPerMatch: 5,
+  readyEndsRecruit: false,
 };
 
 /** Recruit-phase length for a turn: 40s, +5s each turn, capped at 75s. */

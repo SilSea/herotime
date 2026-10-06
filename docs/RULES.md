@@ -14,7 +14,7 @@
 | เลือก Hero | 30s |
 | Recruit เทิร์น 1 | 40s |
 | Recruit เทิร์น 2+ | +5s ทุกเทิร์น สูงสุด 75s (ถึง cap ราวเทิร์น 8) |
-| Battle replay | ยาวสุด 25s ถ้าเกิน replay เร่งเป็น ×2/×4 อัตโนมัติ |
+| Battle | 20s: replay เล่นอัตโนมัติ ถ้า fight ยาวจะเร่งให้จบในเวลา (กดเร่ง ×2/×4 หรือ Skip เองได้) แล้วนับถอยหลังเข้าเทิร์นถัดไป |
 | จบ Recruit | **ไม่มีปุ่ม Ready**: ทุกเทิร์นใช้เวลาเต็ม เมื่อหมดเวลาจะเล่น replay และแสดงนับถอยหลัง "Next turn in" เพื่อเริ่มเทิร์นใหม่พร้อมกัน |
 | ยอมแพ้ | ปุ่ม Surrender ใช้ได้ทุก phase: ออกทันที ได้อันดับล่างสุดของคนที่ยังอยู่ เกมจบเมื่อเหลือคนเดียวหรือไม่เหลือคนจริง |
 
@@ -54,8 +54,8 @@
 | **Mecha** | หุ่นยนต์/ยาน | **Gattai**: Mecha ≥3 ตัวติดกัน รวมร่างตอนเริ่มสู้ |
 | **Kaijin** | สัตว์ประหลาด/ปีศาจ | **Kyodaika**: ตายครั้งแรกฟื้นเป็นร่างยักษ์ |
 | **Grunt** | พลทหารองค์กรร้าย | swarm, token, Last Stand เรียกลูกน้อง |
-| **Ally** | พลเรือน/ทีม support | economy: Energy, ลดราคา, บัฟใน hand |
-| **Dark Rider** | ไรเดอร์ฝ่ายร้าย | sacrifice ยูนิตตัวเองเพื่อขโมย stat/keyword |
+| **Ally** | พลเรือน/ทีม support | economy และ support: ได้ Energy, เพิ่มการ์ดเข้ามือ, บัฟ ally ตอนจบเทิร์น (ลดราคา/บัฟการ์ดในมือ: ยังไม่มีการ์ดที่ทำ) |
+| **Dark Rider** | ไรเดอร์ฝ่ายร้าย | sacrifice: Henshin Call ทำลาย ally สุ่ม 1 ตัว แล้วตัวเองได้ stat ตายตัว (ขโมย stat/keyword ของตัวที่ทำลาย: ยังไม่มี action นี้ใน engine) |
 
 ยูนิต 1 ตัวมีได้หลาย Faction หรือเป็น **Neutral**
 
@@ -115,24 +115,31 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 | Kyodaika | — | ตายครั้งแรก ฟื้นด้วย stat ×2 แต่ไม่มี keyword อื่น |
 | Start of Combat / End of Turn / Avenge(N) | เหมือน HS | trigger มาตรฐาน |
 
-## 8. Hero (ตัวอย่าง)
-- **Rider ผู้เดินทางข้ามเวลา** — Refresh ครั้งแรกของแต่ละเทิร์นฟรี
-- **Red Leader** — 2 Energy: ให้ Sentai 1 ตัวได้สีเพิ่ม 1 สี
+## 8. Hero (ตามที่อยู่ใน prototype set ตอนนี้)
+- **Time Traveler** — passive: Refresh ฟรี 1 ครั้งต่อเทิร์น
+- **Red Leader** — 2 Energy ต่อเทิร์น: ยูนิตซ้ายสุด +2/+2 (แผนเดิม "ให้ Sentai ได้สีเพิ่ม" ยังทำไม่ได้: ไม่มี action เพิ่มสี)
 - **Mecha Commander** — passive: Gattai ใช้แค่ 2 ตัว
-- **Kaijin General** — 1 Energy: ให้ยูนิต 1 ตัวมี Kyodaika ในการสู้รอบถัดไป
-- **Professor Belt** (original) — 0 Energy, ครั้งเดียวต่อเกม: Discover Henshin Driver
+- **Kaijin General** — 1 Energy ต่อเทิร์น: ยูนิตซ้ายสุดได้ Kyodaika (ถาวร ไม่ใช่แค่สู้รอบถัดไป)
+- **Professor Belt** (original) — 0 Energy ครั้งเดียวต่อเกม: ได้ Street Guardian เข้ามือ (แผนเดิม "Discover Henshin Driver" ยังไม่มีการ์ดนี้)
+- **Shocker Boss** — passive: ต้นทุกเทิร์นได้ Recruit (1/1) บนบอร์ด (ถ้าบอร์ดยังไม่เต็ม)
+- **Cafe Master** — 1 Energy ต่อเทิร์น: Ally ทุกตัว +1/+1
+- **Iron Guard** — ไม่มี power, armor 6
+
+ชุด production มี hero ของตัวเอง (Captain Marvelous, Kyoryu Red, Philip, Ryotaro, Eiji Hino, Professor Belt, Himmapan Guardian, Shocker Boss, Iron Guard) ดูรายละเอียดในแท็บ Library
 
 ## 9. Gear / Spell (P1)
 Gear (เข็มขัด, อาวุธ, การ์ดแปลงร่าง) ขายในช่องพิเศษของร้าน ใช้ทันทีกับยูนิต — data model รองรับไว้ตั้งแต่แรก
 
-## 10. ตัวอย่างยูนิต Rank 1
+## 10. ตัวอย่างยูนิต Rank 1 (prototype set หลัง balance pass ล่าสุด)
 | ชื่อ | Faction | ATK/HP | Effect |
 |---|---|---|---|
-| Combatant Grunt | Grunt | 2/1 | Last Stand: เรียก Grunt 1/1 |
-| Ranger Red Cadet | Sentai (Red) | 1/3 | Team-Up(3): +2/+2 ตอนเริ่มสู้ |
+| Combatant | Grunt | 2/1 | Last Stand: เรียก Recruit 1/1 |
+| Red Cadet | Sentai (Red) | 1/3 | Team-Up(2): +2/+2 ตอนเริ่มสู้ |
 | Rookie Rider | Rider | 2/2 | Henshin(2) → Rider Form 4/4 Rider Kick |
-| Scout Drone | Mecha | 1/2 | Gattai |
-| Café Owner | Ally | 1/2 | End of Turn: ถ้าเหลือ Energy ≥1 ยูนิตสุ่ม +1/+1 |
+| Scout Drone | Mecha | 2/2 | Gattai |
+| Cafe Owner | Ally | 1/2 | End of Turn: ถ้าเหลือ Energy ≥1 ally สุ่ม +1/+1 |
+
+ค่าทั้งหมดอยู่ใน `packages/content/src/` หรือแก้ในแท็บ Admin. เอกสารนี้อาจตามไม่ทัน: ดูค่าจริงในแท็บ Library
 
 ## 11. Launch Series (ชุดแรก)
 แต่ละซีรีส์มี Signature ไม่ซ้ำกัน ครอบคลุมกลไกหลักของ engine (copy, stack, keyword grant, merge, attach, combo)

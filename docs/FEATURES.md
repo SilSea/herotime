@@ -13,7 +13,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F1.7** (P0) Auto combat (seeded, deterministic) + combat log
 - [x] **F1.8** (P0) Damage = Base Rank + Rank ยูนิตที่รอด (cap 15 เทิร์น 1–8)
 - [x] **F1.9** (P0) จับคู่ไม่ซ้ำ 3 รอบล่าสุด + Ghost
-- [x] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s, ไม่มีปุ่ม Ready (ทุกเทิร์นใช้เวลาเต็ม) → replay + นับถอยหลังเริ่มเทิร์นใหม่พร้อมกัน
+- [x] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s (+10s เทิร์น relic), Battle 20s, ไม่มีปุ่ม Ready (server ปฏิเสธ READY ด้วย) (ทุกเทิร์นใช้เวลาเต็ม) → replay + นับถอยหลังเริ่มเทิร์นใหม่พร้อมกัน
 - [x] **F1.11** (P0) Hero Power (active / passive / ครั้งเดียวต่อเกม)
 - [ ] **F1.12** (P1) Gear/Spell ในร้าน
 - [ ] **F1.13** (P2) Quick Mode (Recruit 35s, HP 20)

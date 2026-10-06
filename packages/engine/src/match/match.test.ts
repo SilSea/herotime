@@ -14,8 +14,9 @@ const humans = (n: number): Entrant[] => Array.from({ length: n }, (_, i) => ({ 
 const bots = (n: number, from = 0): Entrant[] =>
   Array.from({ length: n }, (_, i) => ({ id: `b${from + i}`, name: `Bot ${from + i}`, isBot: true }));
 
+// Most tests end recruit with READY to move on quickly; the default (no Ready) is tested on its own.
 const make = (entrants: Entrant[], seed = 1, config: Partial<MatchConfig> = {}, now = T0) =>
-  Match.create({ content: world, seed, entrants, now, config });
+  Match.create({ content: world, seed, entrants, now, config: { readyEndsRecruit: true, ...config } });
 
 /** Get a match with only humans into the recruit phase by picking the first hero for everyone. */
 function recruiting(entrants: Entrant[], seed = 1, config: Partial<MatchConfig> = {}): Match {
@@ -737,5 +738,22 @@ describe("surrender", () => {
     const m = recruiting(humans(2));
     m.dispatch("h0", { type: "SURRENDER" }, T0 + 1000);
     expect(() => m.dispatch("h1", { type: "SURRENDER" }, T0 + 1100)).toThrow(RuleError);
+  });
+});
+
+describe("no Ready button by default", () => {
+  it("READY is refused and recruit runs until its deadline", () => {
+    const m = Match.create({ content: world, seed: 1, entrants: humans(2), now: T0 });
+    for (const id of ["h0", "h1"]) m.dispatch(id, { type: "CHOOSE_HERO", index: 0 }, T0);
+    expect(m.phase).toBe("RECRUIT");
+    expect(() => m.dispatch("h0", { type: "READY" }, T0 + 1000)).toThrow(/no Ready/);
+    expect(m.player("h0").ready).toBe(false);
+    m.tick(T0 + recruitDuration(1, DEFAULT_MATCH_CONFIG) - 1);
+    expect(m.phase).toBe("RECRUIT");
+    m.tick(T0 + recruitDuration(1, DEFAULT_MATCH_CONFIG));
+    expect(m.phase).toBe("BATTLE");
+  });
+  it("the default config says so", () => {
+    expect(DEFAULT_MATCH_CONFIG.readyEndsRecruit).toBe(false);
   });
 });

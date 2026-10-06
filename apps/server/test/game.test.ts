@@ -13,7 +13,7 @@ function setup(over: Parameters<typeof testConfig>[0] = {}) {
   const publisher = new RecordingPublisher();
   const repo = new InMemoryMatchRepository();
   const content = new ContentService(starterContent(), "prototype");
-  const config = testConfig({ match: { maxTurns: 4 }, ...over });
+  const config = testConfig({ match: { maxTurns: 4, readyEndsRecruit: true }, ...over });
   const registry = new MatchRegistry(content, publisher, timers, config, repo);
   const lobby = new LobbyService(registry, publisher, timers, config, content);
   return { timers, publisher, repo, content, config, registry, lobby };
@@ -410,5 +410,17 @@ describe("LobbyService.practice (playtesting)", () => {
     const { lobby, registry } = setup({ practice: false });
     expect(() => lobby.practice(user(1))).toThrow(/practice mode is disabled/);
     expect(registry.count).toBe(0);
+  });
+});
+
+describe("the real server has no Ready", () => {
+  it("with default match settings READY is refused and recruit waits for its deadline", () => {
+    const { registry, timers } = setup({ match: { maxTurns: 4 } }); // replaces the test default, so readyEndsRecruit is off
+    const runner = registry.startMatch([user(1)]);
+    runner.dispatch("u1", { type: "CHOOSE_HERO", index: 0 });
+    timers.advance(30_000);
+    expect(runner.match.phase).toBe("RECRUIT");
+    expect(() => runner.dispatch("u1", { type: "READY" })).toThrow(/no Ready/);
+    expect(runner.match.phase).toBe("RECRUIT");
   });
 });

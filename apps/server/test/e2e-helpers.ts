@@ -20,6 +20,7 @@ export const FAST_MATCH = {
   relicBonusMs: 0,
   battleMs: 250,
   maxTurns: 4,
+  readyEndsRecruit: true, // lets tests skip ahead; the real server never enables it
 };
 
 export interface TestServer<U extends UserRepository = InMemoryUserRepository, M extends MatchRepository = InMemoryMatchRepository> {

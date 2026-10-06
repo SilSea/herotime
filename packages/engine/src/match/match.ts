@@ -292,6 +292,7 @@ export class Match {
         chooseRelic(s, intent.index, env);
         break;
       case "READY": {
+        if (!this.config.readyEndsRecruit) throw new RuleError("there is no Ready: every recruit turn runs its full time");
         p.ready = true;
         const humans = this.players.filter((x) => x.alive && !x.isBot);
         if (humans.length > 0 && humans.every((x) => x.ready)) this.finishRecruit(now);
