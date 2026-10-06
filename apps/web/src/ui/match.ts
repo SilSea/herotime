@@ -24,6 +24,7 @@ function matchFrame(ctx: Ctx, view: View, stage: HTMLElement): HTMLElement {
     "div",
     { class: "match" },
     topBar(ctx, view),
+    h("div", { class: "fuse" }, h("div", { class: "fuse-fill", id: "fuse-fill" })),
     h("div", { class: "match-body" }, leaderboard(ctx, view), stage),
     ctx.store.state.showLog && logDrawer(ctx, view),
   );
@@ -112,7 +113,7 @@ function logDrawer(ctx: Ctx, view: View): HTMLElement {
     { class: "drawer" },
     h("div", { class: "row" }, h("h3", { text: "Match log" }), h("span", { class: "spacer" }), h("button", { class: "btn", text: "Close", on: { click: () => ctx.store.set({ showLog: false }) } })),
     h("div", { class: "log", id: "log" }, ...state.log.map((l) => h("div", { text: l }))),
-    h("p", { class: "muted small", text: "R refresh - F freeze - U upgrade - Enter ready - L log - D debug" }),
+    h("p", { class: "muted small", text: "R refresh - F freeze - U upgrade - L log - D debug" }),
     debug,
   );
 }
@@ -232,9 +233,8 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
     { class: "gold", title: `Energy ${me.state.energy}/${me.limits.maxEnergy}` },
     h("div", { class: "gold-num" }, h("span", { class: "coin big-coin", text: String(me.state.energy) }), h("span", { class: "gold-max", text: `/${me.limits.maxEnergy}` })),
     h("div", { class: "pips" }, ...Array.from({ length: me.limits.maxEnergy }, (_, i) => h("span", { class: `pip ${i < me.state.energy ? "full" : ""}` }))),
-    view.phase === "RECRUIT" && me.alive && h("button", { class: `end-turn ${me.ready ? "waiting" : ""}`, disabled: me.ready, title: "Enter", text: me.ready ? "Waiting..." : "Ready", on: { click: () => void ctx.act({ type: "READY" }) } }),
-    // Time is up: no more Ready. Everyone's next turn starts together when this reaches zero.
-    view.phase === "BATTLE" && h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: "Next turn in" }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
+    // No Ready button: every turn runs its full clock so everyone starts the next one together.
+    h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: view.phase === "RECRUIT" ? "Battle in" : "Next turn in" }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
   );
 
   return h("div", { class: "bottom" }, portrait, hand, gold);

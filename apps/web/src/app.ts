@@ -148,6 +148,8 @@ export function startApp(root: HTMLElement): void {
       mount(root, frame(inner));
     }
     syncReplay();
+    hidePreview();
+    announce();
     const log = document.getElementById("log");
     if (log) log.scrollTop = log.scrollHeight;
   };
@@ -178,6 +180,42 @@ export function startApp(root: HTMLElement): void {
     }
   };
 
+  // ---- phase banner: a short "Turn 3" / "Battle!" splash when a phase begins
+  let bannerKey = "";
+  const announce = (): void => {
+    const s = store.state;
+    if (!s.view || s.screen !== "match") return;
+    const key = `${s.matchId}:${s.view.turn}:${s.view.phase}`;
+    if (key === bannerKey) return;
+    bannerKey = key;
+    const text = s.view.phase === "RECRUIT" ? `Turn ${s.view.turn}` : s.view.phase === "BATTLE" ? "Battle!" : s.view.phase === "HERO_SELECT" ? "Choose your hero" : "";
+    if (!text) return;
+    const el = h("div", { class: "banner", text });
+    document.body.append(el);
+    window.setTimeout(() => el.remove(), 1700);
+  };
+
+  // ---- big card preview: point at any card to read it at a comfortable size
+  const preview = h("div", { class: "card-preview", id: "card-preview" });
+  document.body.append(preview);
+  function hidePreview(): void {
+    preview.classList.remove("show");
+    preview.replaceChildren();
+  }
+  document.addEventListener("mouseover", (e) => {
+    const card = (e.target as Element | null)?.closest?.(".card") as HTMLElement | null;
+    if (!card || !card.dataset.key || card.closest(".card-preview") || document.body.classList.contains(DRAGGING)) return hidePreview();
+    const big = card.cloneNode(true) as HTMLElement;
+    big.classList.remove("small", "clickable", "unaffordable", "attacking", "hit", "focus", "dying", "entering", "huge");
+    big.classList.add("preview-card");
+    big.style.transform = "";
+    const info = h("div", { class: "preview-info" }, ...(card.dataset.tip ?? "").split("\n").slice(1).filter(Boolean).map((line) => h("div", { text: line })));
+    preview.replaceChildren(big, info);
+    preview.classList.toggle("left", card.getBoundingClientRect().left + card.offsetWidth / 2 > window.innerWidth / 2);
+    preview.classList.add("show");
+  });
+  document.addEventListener("dragstart", hidePreview);
+
   let queued = false;
   const schedule = (): void => {
     if (queued) return;
@@ -203,6 +241,8 @@ export function startApp(root: HTMLElement): void {
   });
 
   // ---------------------------------------------------------------- countdowns
+  let fuseKey = "";
+  let fuseTotal = 1;
   window.setInterval(() => {
     const s = store.state;
     const timer = document.getElementById("timer");
@@ -211,6 +251,14 @@ export function startApp(root: HTMLElement): void {
     for (const id of ["timer-big", "replay-timer"]) {
       const el = document.getElementById(id);
       if (el) el.textContent = id === "replay-timer" ? `Next turn in ${left}` : left;
+    }
+    const fuse = document.getElementById("fuse-fill");
+    if (fuse && s.view) {
+      const remaining = clock.remaining(s.view.deadline) ?? 0;
+      const key = `${s.matchId}:${s.view.turn}:${s.view.phase}`;
+      if (fuseKey !== key) ((fuseKey = key), (fuseTotal = Math.max(remaining, 1)));
+      fuse.style.width = `${Math.max(0, Math.min(100, (remaining / fuseTotal) * 100))}%`;
+      fuse.classList.toggle("low", remaining < 8000 && s.view.phase === "RECRUIT");
     }
     const fill = document.getElementById("fill-countdown");
     if (fill && s.status.state === "queued" && s.status.fillAt) fill.textContent = `Bots join in ${formatClock(clock.remaining(s.status.fillAt))}`;
@@ -225,7 +273,6 @@ export function startApp(root: HTMLElement): void {
     const intent: Intent | undefined = { r: { type: "REFRESH" }, f: { type: "FREEZE" }, u: { type: "UPGRADE" } }[e.key.toLowerCase() as "r" | "f" | "u"] as Intent | undefined;
     if (e.key.toLowerCase() === "d") store.set({ showDebug: !s.showDebug });
     else if (e.key.toLowerCase() === "l") store.set({ showLog: !s.showLog });
-    else if (e.key === "Enter" && s.view.phase === "RECRUIT") void ctx().act({ type: "READY" });
     else if (intent) void ctx().act(intent);
   });
 

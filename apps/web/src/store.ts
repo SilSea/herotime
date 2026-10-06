@@ -79,7 +79,34 @@ export function applyView(state: AppState, msg: ViewMessage, clock: ServerClock,
     }
   }
   if (prev && (prev.phase !== view.phase || prev.turn !== view.turn)) next = { ...next, hideOffers: false, selected: undefined };
+
+  const lost = unitsLostToPlay(state, view, newMatch);
+  if (lost.length > 0) {
+    const names = lost.map((k) => state.content?.cardName(k) ?? k).join(", ");
+    const text = `${names} was destroyed by the card you just played`;
+    next = addToast({ ...next, log: push(next.log, text) }, text, "error");
+  }
   return next;
+}
+
+/**
+ * Units that left the board because of a card just played from hand (a Henshin Call that destroys an ally).
+ * Selling and triples do not count: selling does not shrink the hand, and a triple adds a Final Form.
+ */
+export function unitsLostToPlay(state: AppState, view: ViewMessage["view"], newMatch: boolean): string[] {
+  const prev = state.view;
+  if (newMatch || !prev || prev.phase !== "RECRUIT" || view.phase !== "RECRUIT" || prev.turn !== view.turn) return [];
+  const before = prev.me?.state;
+  const after = view.me?.state;
+  if (!before || !after) return [];
+  if (after.hand.length >= before.hand.length) return [];
+  if (after.board.length > before.board.length) return [];
+  const golden = (b: readonly { golden?: boolean }[]): number => b.filter((u) => u.golden).length;
+  if (golden(after.board) > golden(before.board)) return [];
+  const left = new Map<string, number>();
+  for (const u of before.board) left.set(u.key, (left.get(u.key) ?? 0) + 1);
+  for (const u of after.board) left.set(u.key, (left.get(u.key) ?? 0) - 1);
+  return [...left].flatMap(([k, n]) => (n > 0 ? Array<string>(n).fill(k) : []));
 }
 
 export function applyEvent(state: AppState, msg: EventMessage, content?: ContentIndex): AppState {

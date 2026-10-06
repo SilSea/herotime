@@ -43,7 +43,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
 
   return h(
     "div",
-    { class: classes.filter(Boolean).join(" "), title: tooltip, style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key }, on: o.onClick ? { click: o.onClick } : {} },
+    { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip }, on: o.onClick ? { click: o.onClick } : {} },
     o.cost !== undefined && h("div", { class: "cost", text: String(o.cost), title: "Energy cost" }),
     h("div", { class: "art", style: art ? `background-image:url('${art}')` : "" }, art ? null : h("span", { text: ix.initials(o.key) })),
     h("div", { class: "name", text: ix.cardName(o.key) }),
