@@ -15,6 +15,10 @@ export interface MatchConfig {
   maxTurns: number;
   /** Heroes offered at hero select. */
   heroChoices: number;
+  /** Random factions used per match (0 or more than exist = all). Ignored if the content declares none. */
+  factionsPerMatch: number;
+  /** Force exactly these factions (for testing a matchup). Overrides factionsPerMatch. */
+  fixedFactions?: string[];
 }
 
 export const DEFAULT_MATCH_CONFIG: MatchConfig = {
@@ -29,6 +33,7 @@ export const DEFAULT_MATCH_CONFIG: MatchConfig = {
   noRepeatRounds: 3,
   maxTurns: 40,
   heroChoices: 2,
+  factionsPerMatch: 5,
 };
 
 /** Recruit-phase length for a turn: 40s, +5s each turn, capped at 75s. */

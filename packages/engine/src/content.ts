@@ -1,8 +1,9 @@
-import type { Action, CardDef, Effect, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
+import type { Action, CardDef, Effect, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
 import { isRule } from "./rules.js";
 import type { CombatUnitInput, Keyword } from "./types.js";
 
 export interface ContentData {
+  factions?: readonly FactionDef[];
   cards?: readonly CardDef[];
   series?: readonly SeriesDef[];
   gauges?: readonly GaugeDef[];
@@ -39,6 +40,8 @@ function* actionsOf(effects: readonly Effect[] | undefined): Generator<Action> {
 /** Immutable, validated snapshot of everything an admin can edit (one ContentVersion). */
 export class Content {
   readonly cards: Map<string, CardDef>;
+  /** Empty = the content does not declare factions, so card faction strings are free-form. */
+  readonly factions: Map<string, FactionDef>;
   readonly series: Map<string, SeriesDef>;
   readonly gauges: Map<string, GaugeDef>;
   readonly relics: Map<string, RelicDef>;
@@ -46,6 +49,7 @@ export class Content {
 
   constructor(data: ContentData) {
     this.cards = index("card", data.cards);
+    this.factions = index("faction", data.factions);
     this.series = index("series", data.series);
     this.gauges = index("gauge", data.gauges);
     this.relics = index("relic", data.relics);
@@ -70,6 +74,18 @@ export class Content {
     const needSeries = (key: string | undefined, from: string): void => {
       if (key !== undefined && !this.series.has(key)) problems.push(`${from} references unknown series "${key}"`);
     };
+    // Faction names are only checked once the content declares its factions.
+    const needFaction = (key: string | undefined, from: string): void => {
+      if (key !== undefined && this.factions.size > 0 && !this.factions.has(key)) {
+        problems.push(`${from} references unknown faction "${key}"`);
+      }
+    };
+    const checkFilters = (effects: readonly Effect[], from: string): void => {
+      for (const e of effects) {
+        needFaction(e.target?.faction, from);
+        if (e.condition?.type === "FACTION_COUNT_GTE") needFaction(e.condition.faction, from);
+      }
+    };
     const checkActions = (actions: Iterable<Action>, from: string): void => {
       for (const a of actions) {
         if (a.type === "SUMMON" || a.type === "ADD_TO_HAND") needCard(a.cardKey, from);
@@ -85,6 +101,8 @@ export class Content {
     for (const c of this.cards.values()) {
       const from = `card "${c.key}"`;
       needSeries(c.series, from);
+      for (const f of c.factions) needFaction(f, from);
+      checkFilters(c.effects, from);
       if (c.henshin) needCard(c.henshin.into, `${from} henshin`);
       checkActions(actionsOf(c.effects), from);
       for (const e of c.effects) {
@@ -99,6 +117,7 @@ export class Content {
       for (const b of s.bonds) {
         const from = `series "${s.key}" bond`;
         checkActions(actionsOf(b.effects), from);
+        checkFilters(b.effects, from);
         for (const e of b.effects) {
           if (e.scope !== "PLAYER" || e.trigger !== "START_OF_COMBAT") {
             problems.push(`${from} effects must be player-scope START_OF_COMBAT`);
@@ -119,10 +138,13 @@ export class Content {
     }
     for (const r of this.relics.values()) {
       needSeries(r.series, `relic "${r.key}"`);
+      for (const f of r.factions) needFaction(f, `relic "${r.key}"`);
+      checkFilters(r.effects, `relic "${r.key}"`);
       checkActions(actionsOf(r.effects), `relic "${r.key}"`);
     }
     for (const h of this.heroes.values()) {
       checkActions(actionsOf(h.power?.effects), `hero "${h.key}"`);
+      checkFilters(h.power?.effects ?? [], `hero "${h.key}"`);
     }
     return problems;
   }

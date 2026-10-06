@@ -88,16 +88,26 @@ export class Match {
     if (opts.entrants.length < 2 || opts.entrants.length > 8) throw new Error("a match needs 2-8 players");
     if (ids.size !== opts.entrants.length) throw new Error("duplicate player id");
 
-    const poolCards = [...opts.content.cards.values()]
-      .filter((c) => c.kind === "UNIT" && !c.token)
-      .map((c) => ({ key: c.key, rank: c.rank }));
     const rng = new Rng(opts.seed);
+    const factions = this.pickFactions(opts.content, rng);
+    // Neutral cards are always in; a faction card is in if any of its factions is.
+    const poolDefs = [...opts.content.cards.values()].filter(
+      (c) =>
+        c.kind === "UNIT" &&
+        !c.token &&
+        (factions === undefined || c.factions.length === 0 || c.factions.some((f) => factions.has(f))),
+    );
+    const poolCards = poolDefs.map((c) => ({ key: c.key, rank: c.rank }));
     this.env = makeEnv({
       content: opts.content,
       pool: new Pool(poolCards),
       rng,
       cfg: opts.gameConfig ?? DEFAULT_CONFIG,
     });
+    if (factions) {
+      this.env.activeFactions = factions;
+      this.env.activeSeries = new Set(poolDefs.flatMap((c) => (c.series === undefined ? [] : [c.series])));
+    }
     this.combatRng = new Rng((opts.seed ^ 0x9e3779b9) >>> 0);
 
     const heroKeys = [...opts.content.heroes.keys()];
@@ -118,6 +128,19 @@ export class Match {
     this.emitPhase();
     for (const p of this.players) if (p.isBot) this.chooseHero(p, 0);
     this.maybeStartRecruit(opts.now);
+  }
+
+  /** The factions this match plays with, or undefined when the content declares none. */
+  private pickFactions(content: Content, rng: Rng): Set<string> | undefined {
+    if (content.factions.size === 0) return undefined;
+    const all = [...content.factions.keys()];
+    const fixed = this.config.fixedFactions;
+    if (fixed) {
+      for (const f of fixed) if (!content.factions.has(f)) throw new Error(`unknown faction in fixedFactions: ${f}`);
+      return new Set(fixed);
+    }
+    const n = this.config.factionsPerMatch;
+    return new Set(n <= 0 || n >= all.length ? all : rng.shuffle(all).slice(0, n));
   }
 
   static create(opts: CreateMatchOptions): Match {
@@ -151,6 +174,7 @@ export class Match {
       phase: this.phase,
       turn: this.turn,
       deadline: this.deadline,
+      factions: [...(this.env.activeFactions ?? [])].sort(),
       me: {
         id: p.id,
         state: p.state,

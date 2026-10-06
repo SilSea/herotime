@@ -82,3 +82,20 @@ describe("content schemas", () => {
     expect(HeroDef.safeParse({ key: "h", name: "H", power: { mode: "ACTIVE", effects: [] } }).success).toBe(false);
   });
 });
+
+describe("faction and text fields", () => {
+  it("FactionDef has a default colour and requires a key and name", async () => {
+    const { FactionDef } = await import("../index.js");
+    expect(FactionDef.parse({ key: "rider", name: "Rider" })).toMatchObject({ color: "#888888", text: "" });
+    expect(FactionDef.safeParse({ key: "", name: "x" }).success).toBe(false);
+    expect(FactionDef.safeParse({ key: "x" }).success).toBe(false);
+  });
+
+  it("cards, relics and heroes carry optional rules text and art", () => {
+    expect(CardDef.parse({ key: "k", name: "K", rank: 1, atk: 1, hp: 1 })).toMatchObject({ text: "" });
+    expect(CardDef.parse({ key: "k", name: "K", rank: 1, atk: 1, hp: 1, text: "hi", art: "a.png" })).toMatchObject({ text: "hi", art: "a.png" });
+    expect(RelicDef.parse({ key: "r", name: "R", tier: "LESSER", cost: 0 })).toMatchObject({ text: "" });
+    expect(HeroDef.parse({ key: "h", name: "H" })).toMatchObject({ text: "" });
+    expect(SeriesDef.parse({ key: "s", name: "S", franchise: "kamen-rider" })).toMatchObject({ franchise: "kamen-rider", text: "" });
+  });
+});

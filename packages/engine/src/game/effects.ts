@@ -84,7 +84,10 @@ function removeFromBoard(player: PlayerState, unit: Unit, env: GameEnv): void {
 }
 
 function offerGiants(player: PlayerState, env: GameEnv): void {
-  const giants = [...env.content.cards.values()].filter((c) => c.kind === "GIANT").sort((a, b) => a.key.localeCompare(b.key));
+  // Only giants of series that can actually appear in this match.
+  const giants = [...env.content.cards.values()]
+    .filter((c) => c.kind === "GIANT" && (c.series === undefined || !env.activeSeries || env.activeSeries.has(c.series)))
+    .sort((a, b) => a.key.localeCompare(b.key));
   if (giants.length === 0) return;
 
   const perSeries = new Map<string, number>();

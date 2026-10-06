@@ -152,7 +152,11 @@ export function offerRelics(
     throw new RuleError(`already holding a ${tier.toLowerCase()} relic`);
   }
 
-  let pool = [...env.content.relics.values()].filter((r) => r.tier === tier);
+  // A relic tied to factions or a series only shows up when this match uses them.
+  const usable = (r: { factions: readonly string[]; series?: string | undefined }): boolean =>
+    (r.factions.length === 0 || !env.activeFactions || r.factions.some((f) => env.activeFactions?.has(f))) &&
+    (r.series === undefined || !env.activeSeries || env.activeSeries.has(r.series));
+  let pool = [...env.content.relics.values()].filter((r) => r.tier === tier && usable(r));
   const chosen: typeof pool = [];
   const take = (r: (typeof pool)[number] | undefined): void => {
     if (!r) return;

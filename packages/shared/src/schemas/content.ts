@@ -21,12 +21,29 @@ export const CardDef = z.object({
   henshin: z.object({ afterTurns: z.number().int().min(1), into: z.string() }).optional(),
   /** Tokens (summoned/transformed-into) are never put in the shop pool. */
   token: z.boolean().default(false),
+  /** Rules text shown on the card (the engine never reads it). */
+  text: z.string().default(""),
+  /** Image path or URL, resolved by the client. */
+  art: z.string().optional(),
 });
 export type CardDef = z.infer<typeof CardDef>;
+
+/** A tribe. Matches use a random subset of these (see MatchConfig.factionsPerMatch). */
+export const FactionDef = z.object({
+  key: z.string().min(1),
+  name: z.string().min(1),
+  /** CSS colour used for the faction badge. */
+  color: z.string().default("#888888"),
+  text: z.string().default(""),
+});
+export type FactionDef = z.infer<typeof FactionDef>;
 
 export const SeriesDef = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
+  /** Franchise this series belongs to, e.g. "super-sentai", "kamen-rider", "original". */
+  franchise: z.string().optional(),
+  text: z.string().default(""),
   /** Series Bond: at `count` units of this series on the board, the effects apply at combat start. */
   bonds: z
     .array(z.object({ count: z.number().int().min(2), effects: z.array(Effect).min(1) }))
@@ -68,6 +85,8 @@ export const RelicDef = z.object({
   series: z.string().optional(),
   weight: z.number().int().min(0).default(100),
   effects: z.array(Effect).default([]),
+  text: z.string().default(""),
+  art: z.string().optional(),
 });
 export type RelicDef = z.infer<typeof RelicDef>;
 
@@ -75,6 +94,8 @@ export const HeroDef = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
   armor: z.number().int().min(0).default(0),
+  text: z.string().default(""),
+  art: z.string().optional(),
   power: z
     .object({
       /** ACTIVE: once per turn. ONCE: once per game. PASSIVE: only ON_ACQUIRE effects. */

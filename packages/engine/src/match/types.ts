@@ -94,6 +94,8 @@ export interface MatchView {
   turn: number;
   /** Absolute time (ms) the current phase ends, null once the match is over. */
   deadline: number | null;
+  /** Factions in play this match (empty when the content declares none). */
+  factions: string[];
   me: {
     id: string;
     state: PlayerState;
