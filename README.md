@@ -27,6 +27,17 @@ pnpm exec prisma migrate deploy
 pnpm --filter @herotime/server start
 ```
 
+### ทั้งเกมใน Docker (server + เว็บ + Postgres)
+```bash
+docker compose up -d --build     # http://localhost:3000
+docker compose logs -f server
+docker compose down              # ข้อมูลอยู่ใน volume pgdata; ใช้ down -v เพื่อล้าง
+```
+Image เดียว (`Dockerfile`) รันเซิร์ฟเวอร์ที่เสิร์ฟเว็บด้วย, `docker/entrypoint.sh` รัน `prisma migrate deploy` ก่อนเริ่ม,
+postgres มี healthcheck และ server รอจน healthy. ตัวแปรตั้งผ่าน `.env` (ดู `.env.example`): `JWT_SECRET`, `CORS_ORIGIN`,
+`CONTENT_SET` (`prototype`/`production`), `PRACTICE`, `HEROTIME_FAST`. ค่าเริ่มต้นของ `JWT_SECRET` ใน compose ใช้ลองบนเครื่องตัวเองเท่านั้น
+Redis ยังไม่ถูกใช้: `docker compose --profile scale up -d`
+
 ตัวแปรสภาพแวดล้อม: `PORT`, `HOST` (ค่าเริ่มต้น 0.0.0.0 เพื่อให้เพื่อนใน LAN ต่อได้), `JWT_SECRET`, `CORS_ORIGIN`,
 `DATABASE_URL`, `HEROTIME_FAST=1`, `LOBBY_FILL_MS`. โหมด production บังคับให้ตั้ง `JWT_SECRET` (≥32 ตัว) และ `CORS_ORIGIN`
 

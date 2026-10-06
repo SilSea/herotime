@@ -1,0 +1,11 @@
+**/node_modules
+.git
+.env
+.env.*
+!.env.example
+**/dist
+coverage
+*.log
+apps/web/public/js
+apps/server/src/generated
+docs

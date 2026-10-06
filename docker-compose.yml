@@ -1,3 +1,6 @@
+# Dev database only:      docker compose up -d postgres
+# Whole game in Docker:   docker compose up -d --build   ->  http://localhost:3000
+# Redis (not used yet):   docker compose --profile scale up -d
 services:
   postgres:
     image: postgres:17
@@ -9,9 +12,33 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U herotime -d herotime"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  server:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgresql://herotime:herotime@postgres:5432/herotime
+      # NODE_ENV=production refuses a short secret and a missing CORS_ORIGIN.
+      # The default below is for trying it out on your own machine only: set a real JWT_SECRET anywhere else.
+      JWT_SECRET: ${JWT_SECRET:-local-only-secret-replace-me-0123456789abcdef}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      CONTENT_SET: ${CONTENT_SET:-prototype}
+      PRACTICE: ${PRACTICE:-1}
+      HEROTIME_FAST: ${HEROTIME_FAST:-0}
+    restart: unless-stopped
 
   redis:
     image: redis:7
+    profiles: ["scale"]
     ports:
       - "6379:6379"
 
