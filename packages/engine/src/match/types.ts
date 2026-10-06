@@ -48,6 +48,7 @@ export interface MatchPlayer {
   /** Opponent ids, oldest first (for pairing). */
   opponents: string[];
   lastCombat?: CombatRecord;
+  lastBoard?: BoardSummary;
 }
 
 /** One finished fight, from the viewpoint of whoever's `lastCombat` it is. */
@@ -87,6 +88,18 @@ export interface PublicPlayer {
   rank: number;
   relics: string[];
   ready: boolean;
+  /** The board this player last fought with (public: everyone sees it in replays). Absent before the first fight. */
+  lastBoard?: BoardSummary;
+}
+
+/** What a board was made of, without its cards: unit count and how many units carry each faction. */
+export interface BoardSummary {
+  turn: number;
+  units: number;
+  /** A unit with two factions counts for both. */
+  factions: Record<string, number>;
+  /** Units with no faction. */
+  neutral: number;
 }
 
 /** What one player is allowed to see. Other players' shops, hands and boards are never included. */

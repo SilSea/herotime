@@ -36,6 +36,7 @@ import { runBot } from "./bot.js";
 import { DEFAULT_MATCH_CONFIG, recruitDuration, type MatchConfig } from "./config.js";
 import { pairPlayers } from "./pairing.js";
 import type {
+  BoardSummary,
   CombatRecord,
   Entrant,
   GhostBoard,
@@ -54,6 +55,16 @@ export interface CreateMatchOptions {
   now: number;
   config?: Partial<MatchConfig>;
   gameConfig?: GameConfig;
+}
+
+function summarise(units: readonly CombatUnitInput[], turn: number): BoardSummary {
+  const factions: Record<string, number> = {};
+  let neutral = 0;
+  for (const u of units) {
+    if (!u.factions || u.factions.length === 0) neutral++;
+    for (const f of u.factions ?? []) factions[f] = (factions[f] ?? 0) + 1;
+  }
+  return { turn, units: units.length, factions, neutral };
 }
 
 interface Prepared {
@@ -201,6 +212,7 @@ export class Match {
           relics: o.state.relics,
           ready: o.ready,
         };
+        if (o.lastBoard) pub.lastBoard = o.lastBoard;
         if (o.placement !== undefined) pub.placement = o.placement;
         if (o.state.hero !== undefined) pub.hero = o.state.hero;
         return pub;
@@ -400,6 +412,7 @@ export class Match {
     for (const p of alive) {
       const { units, extras } = prepareCombat(p.state, this.env);
       prepared.set(p.id, { units, extras, rank: p.state.rank });
+      p.lastBoard = summarise(units, this.turn);
     }
 
     const history = new Map(alive.map((p) => [p.id, p.opponents] as const));

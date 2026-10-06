@@ -757,3 +757,18 @@ describe("no Ready button by default", () => {
     expect(DEFAULT_MATCH_CONFIG.readyEndsRecruit).toBe(false);
   });
 });
+
+describe("last seen boards", () => {
+  it("nobody has one before the first fight; afterwards everyone's board make-up is public, but not the cards", () => {
+    const m = recruiting(humans(2));
+    expect(m.view("h0").players.every((p) => p.lastBoard === undefined)).toBe(true);
+    const s = m.player("h1").state;
+    const shopUnit = [...world.cards.values()].find((c) => c.kind === "UNIT" && !c.token && c.factions.length > 0) as { key: string; factions: string[] };
+    s.board.push({ key: shopUnit.key, golden: false }, { key: shopUnit.key, golden: false });
+    toBattle(m);
+    const seen = m.view("h0").players.find((p) => p.id === "h1")?.lastBoard;
+    expect(seen).toMatchObject({ turn: 1, units: 2 });
+    for (const f of shopUnit.factions) expect(seen?.factions[f]).toBe(2);
+    expect(Object.keys(seen ?? {}).sort()).toEqual(["factions", "neutral", "turn", "units"]); // counts only, never which cards
+  });
+});

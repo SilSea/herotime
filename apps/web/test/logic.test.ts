@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatClock, ServerClock } from "../src/clock.js";
 import { ContentIndex } from "../src/content-index.js";
-import { describeCombat, KEYWORDS, keywordName, ordinal, stars } from "../src/format.js";
+import { boardLabel, describeCombat, KEYWORDS, keywordName, ordinal, stars } from "../src/format.js";
 import type { CombatRecord, ContentSnapshot } from "../src/protocol.js";
 
 describe("ServerClock", () => {
@@ -127,5 +127,25 @@ describe("format helpers", () => {
 
   it("beating a Ghost deals no damage and says so plainly", () => {
     expect(describeCombat(rec("A", { opponentName: "Ghost" }))).toBe("Turn 4 vs Ghost: Won");
+  });
+});
+
+describe("boardLabel", () => {
+  const name = (f: string): string => f.charAt(0).toUpperCase() + f.slice(1);
+  it("names the leading faction with its count", () => {
+    expect(boardLabel({ units: 5, factions: { sentai: 4, mecha: 1 }, neutral: 0 }, name)).toEqual({ headline: "Sentai 4", parts: ["Sentai 4", "Mecha 1"] });
+    expect(boardLabel({ units: 2, factions: { sentai: 2 }, neutral: 0 }, name).headline).toBe("Sentai 2");
+  });
+  it("says Mixed when nothing leads clearly", () => {
+    expect(boardLabel({ units: 4, factions: { rider: 2, sentai: 2 }, neutral: 0 }, name)).toEqual({ headline: "Mixed", parts: ["Rider 2", "Sentai 2"] });
+    expect(boardLabel({ units: 7, factions: { rider: 3, grunt: 2 }, neutral: 2 }, name).headline).toBe("Mixed"); // 3 of 7 is not half
+    expect(boardLabel({ units: 3, factions: { rider: 1 }, neutral: 2 }, name)).toEqual({ headline: "Mixed", parts: ["Rider 1", "Neutral 2"] });
+  });
+  it("a board of one faction is named even when it is small", () => {
+    expect(boardLabel({ units: 1, factions: { grunt: 1 }, neutral: 0 }, name).headline).toBe("Grunt 1");
+    expect(boardLabel({ units: 2, factions: { grunt: 1 }, neutral: 1 }, name).headline).toBe("Mixed");
+  });
+  it("an empty board says so", () => {
+    expect(boardLabel({ units: 0, factions: {}, neutral: 0 }, name)).toEqual({ headline: "Empty board", parts: [] });
   });
 });

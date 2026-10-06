@@ -130,30 +130,55 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
         )
       : h("button", { class: "btn", text: "Join the queue", on: { click: () => void ctx.joinQueue() } });
 
+  // Your numbers, from the history the server keeps (ranked games only for the record line).
+  const mine = stats.mine ?? [];
+  const ranked = mine.filter((m) => m.mode === "queue" && m.placement !== null);
+  const best = ranked.length > 0 ? Math.min(...ranked.map((m) => m.placement as number)) : undefined;
+  const wins = ranked.filter((m) => m.placement === 1).length;
+  const me = stats.board?.players.find((p) => p.username === state.user?.username);
+
+  const statTile = (label: string, value: string): HTMLElement => h("div", { class: "stat-tile" }, h("div", { class: "stat-value", text: value }), h("div", { class: "stat-label", text: label }));
+
   mount(
     root,
     h(
       "div",
       { class: "lobby" },
       h(
-        "div",
-        { class: "panel" },
-        h("h2", { text: "Practice (solo vs bots)" }),
-        h("p", { class: "muted", text: "Start right now. Tick factions to force a matchup, or leave them all empty for the normal random 5." }),
-        h("div", { class: "faction-picks" }, ...factionBoxes),
-        h("div", { class: "row" }, bots, speed),
-        h("button", { class: "btn primary big", text: "Start practice", on: { click: () => void ctx.startPractice(toPracticeOptions(form)) } }),
+        "section",
+        { class: "lobby-hero" },
+        h("div", { class: "hero-copy" }, h("div", { class: "eyebrow", text: "Auto-battler · Rider × Sentai" }), h("h1", { class: "logo", text: "HeroTime" }), h("p", { class: "tagline", text: "Recruit your squad, transform, and call the giant robo. Last hero standing wins." })),
+        h(
+          "div",
+          { class: "hero-stats" },
+          h("div", { class: "pilot", text: state.user?.username ?? "" }),
+          h("div", { class: "stat-row" }, statTile("Ranked games", String(ranked.length)), statTile("Wins", String(wins)), statTile("Best place", best ? ordinal(best) : "-"), statTile("Rank", me ? `#${me.rank}` : "-")),
+        ),
       ),
-      h("div", { class: "panel" }, h("h2", { text: "Matchmaking" }), h("p", { class: "muted", text: "Join with other players. Empty seats are filled with bots after a short wait." }), queueBox),
       h(
         "div",
-        { class: "panel" },
-        h("h2", { text: "About this build" }),
-        h("p", { class: "muted", text: `Content set: ${ix.snapshot.set} (v${ix.snapshot.version}) - ${ix.cards.size} cards, ${ix.heroes.size} heroes, ${ix.relics.size} relics, ${ix.factions.size} factions.` }),
-        h("p", { class: "muted", text: "Everything is a prototype: numbers are first guesses. Press D in a match for the debug panel; copy the report if something looks wrong." }),
+        { class: "lobby-main" },
+        h(
+          "div",
+          { class: "mode-card practice-card" },
+          h("div", { class: "mode-tag", text: "Solo" }),
+          h("h2", { text: "Practice vs bots" }),
+          h("p", { class: "muted", text: "Starts at once. Pick factions to force a matchup, or leave them empty for the usual random 5. Never counts for the leaderboard." }),
+          h("div", { class: "faction-picks" }, ...factionBoxes),
+          h("div", { class: "row" }, bots, speed),
+          h("button", { class: "btn primary big", text: "Start practice", on: { click: () => void ctx.startPractice(toPracticeOptions(form)) } }),
+        ),
+        h(
+          "div",
+          { class: "mode-card ranked-card" },
+          h("div", { class: "mode-tag", text: "Ranked" }),
+          h("h2", { text: "Matchmaking" }),
+          h("p", { class: "muted", text: "Eight players. Empty seats are filled with bots after a short wait. Your place counts for the leaderboard." }),
+          queueBox,
+          h("div", { class: "build-info muted small", text: `Content: ${ix.snapshot.set} v${ix.snapshot.version} · ${ix.cards.size} cards · ${ix.heroes.size} heroes · ${ix.relics.size} relics · ${ix.factions.size} factions` }),
+        ),
       ),
-      historyPanel(ctx),
-      leaderboardPanel(),
+      h("div", { class: "lobby-side" }, historyPanel(ctx), leaderboardPanel()),
     ),
   );
   refreshStats(ctx);

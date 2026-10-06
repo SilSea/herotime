@@ -31,6 +31,9 @@ export interface AppState {
   screen: "auth" | "lobby" | "library" | "admin" | "match";
   showDebug: boolean;
   showLog: boolean;
+  /** The card book (every card in the match by rank) and which rank it shows. */
+  showBook: boolean;
+  bookRank: number;
   hideOffers: boolean;
   selected: Selection;
 }
@@ -44,6 +47,8 @@ export const initialState = (): AppState => ({
   screen: "auth",
   showDebug: false,
   showLog: false,
+  showBook: false,
+  bookRank: 0,
   hideOffers: false,
   selected: undefined,
 });

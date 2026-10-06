@@ -1,5 +1,5 @@
 import { formatClock } from "../clock.js";
-import { ordinal, PHASE_LABEL, stars } from "../format.js";
+import { boardLabel, ordinal, PHASE_LABEL, stars } from "../format.js";
 import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
@@ -28,6 +28,7 @@ function matchFrame(ctx: Ctx, view: View, stage: HTMLElement): HTMLElement {
     h("div", { class: "fuse" }, h("div", { class: "fuse-fill", id: "fuse-fill" })),
     h("div", { class: "match-body" }, leaderboard(ctx, view), stage),
     ctx.store.state.showLog && logDrawer(ctx, view),
+    ctx.store.state.showBook && bookModal(ctx, view),
   );
 }
 
@@ -48,6 +49,7 @@ function topBar(ctx: Ctx, view: View): HTMLElement {
     h(
       "div",
       { class: "top-actions" },
+      h("button", { class: `btn ${state.showBook ? "on" : ""}`, text: "Book", title: "Every card in this match, by rank (B)", on: { click: () => ctx.store.set({ showBook: !state.showBook, bookRank: state.bookRank || me.state.rank }) } }),
       h("button", { class: `btn ${state.showLog ? "on" : ""}`, text: "Log", title: "L", on: { click: () => ctx.store.set({ showLog: !state.showLog }) } }),
       view.phase !== "ENDED" && me.alive && h("button", { class: "btn danger", text: "Surrender", title: "Give up and take your current place", on: { click: () => void surrender(ctx, view) } }),
       out && h("button", { class: "btn", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
@@ -72,26 +74,103 @@ function leaderboard(ctx: Ctx, view: View): HTMLElement {
 
 function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLElement {
   const hero = p.hero ? ctx.ix.heroName(p.hero) : p.name;
-  const tip = [
-    `${p.name}${p.isBot ? " (bot)" : ""}${mine ? " (you)" : ""}`,
-    p.hero ? `Hero: ${hero}` : "",
-    `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} armor` : ""}, tavern ${stars(p.rank)}`,
-    p.relics.length > 0 ? `Relics: ${p.relics.map(ctx.ix.relicName).join(", ")}` : "",
-    !p.alive && p.placement !== undefined ? `Out: ${ordinal(p.placement)}` : "",
-    opponent ? "You fought them last" : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  return h(
+  const row = h(
     "div",
-    { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}`, title: tip },
+    { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}` },
     h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
     h("div", { class: "pname" }, h("span", { class: "pname-text", text: p.name }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) })),
-    h("div", { class: "pmeta", text: stars(p.rank) }),
-    p.ready && p.alive && !p.isBot && h("span", { class: "ready-mark", text: "ready" }),
+    h("div", { class: "pmeta", text: `${stars(p.rank)}${p.lastBoard ? ` · ${boardLabel(p.lastBoard, ctx.ix.factionName).headline}` : ""}` }),
+  );
+  row.addEventListener("mouseenter", () => showPlayerCard(ctx, row, p, mine, opponent));
+  row.addEventListener("mouseleave", hidePlayerCard);
+  return row;
+}
+
+// ------------------------------------------------------------ hover card for a player
+
+let playerCard: HTMLElement | undefined;
+
+/** Hide the floating player card (the app calls this whenever it redraws). */
+export function hidePlayerCard(): void {
+  playerCard?.remove();
+  playerCard = undefined;
+}
+
+/** Hero power text without the "Hero Power (2 Energy, once per turn):" header, which the panel shows separately. */
+const powerBody = (text: string): string => text.replace(/^(Hero Power \([^)]*\)|Passive): /, "");
+
+/** Say why the power cannot be used, rather than just greying it out. */
+function powerButtonLabel(power: { mode: string; cost: number; usable: boolean }, recruiting: boolean, energy: number): string {
+  if (power.usable) return "Use power";
+  if (!recruiting) return "Recruit phase only";
+  if (energy < power.cost) return `Need ${power.cost} Energy`;
+  return power.mode === "ONCE" ? "Already used" : "Used this turn";
+}
+
+function powerHeader(mode: string | undefined, cost: number | undefined): string {
+  if (mode === "ACTIVE") return `Hero Power · ${cost ?? 0} Energy · once per turn`;
+  if (mode === "ONCE") return `Hero Power · ${cost ?? 0} Energy · once per game`;
+  if (mode === "PASSIVE") return "Passive";
+  return "No hero power";
+}
+
+/** Relics as small readable entries: picture, name and what it does. */
+function relicList(ctx: Ctx, keys: readonly string[]): HTMLElement {
+  return h(
+    "div",
+    { class: "relic-list" },
+    ...keys.map((k) => {
+      const r = ctx.ix.relics.get(k);
+      return h("div", { class: "relic-entry" }, artBox("relic-thumb", ctx.ix.relicArt(k), ctx.ix.relicName(k)), h("div", null, h("div", { class: "relic-name", text: `${ctx.ix.relicName(k)}${r ? ` · ${r.tier === "GREATER" ? "Greater" : "Lesser"}` : ""}` }), h("div", { class: "relic-text", text: r?.text ?? "" })));
+    }),
   );
 }
 
+function showPlayerCard(ctx: Ctx, row: HTMLElement, p: Player, mine: boolean, opponent: boolean): void {
+  hidePlayerCard();
+  const heroDef = p.hero ? ctx.ix.heroes.get(p.hero) : undefined;
+  const board = p.lastBoard ? boardLabel(p.lastBoard, ctx.ix.factionName) : undefined;
+  const card = h(
+    "div",
+    { class: "player-card" },
+    h("div", { class: "pc-head" }, artBox("pc-portrait", ctx.ix.heroArt(p.hero), heroDef?.name ?? p.name), h("div", null, h("div", { class: "pc-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${mine ? " (you)" : ""}` }), h("div", { class: "pc-hero", text: heroDef?.name ?? "Choosing a hero..." }), h("div", { class: "pc-stats", text: `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} armor` : ""} · Tavern ${stars(p.rank)}` }))),
+    !p.alive && p.placement !== undefined && h("div", { class: "pc-out", text: `Out in ${ordinal(p.placement)} place` }),
+    opponent && h("div", { class: "pc-note", text: "Your last opponent" }),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: board ? `Board in their last fight (turn ${p.lastBoard?.turn}) · ${p.lastBoard?.units} unit${p.lastBoard?.units === 1 ? "" : "s"}` : "Board" }),
+      board ? h("div", null, h("div", { class: "pc-headline", text: board.headline }), board.parts.length > 0 && h("div", { class: "pc-parts" }, ...board.parts.map((t) => h("span", { class: "pc-part", text: t })))) : h("div", { class: "muted", text: "Not seen yet: boards show up after the first fight." })),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "pc-text", text: heroDef ? powerBody(heroDef.text) || "No hero power." : "-" })),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: `Relics (${p.relics.length})` }), p.relics.length > 0 ? relicList(ctx, p.relics) : h("div", { class: "muted", text: "None yet: relics are offered on turns 5 and 9." })),
+  );
+  document.body.append(card);
+  playerCard = card;
+  const r = row.getBoundingClientRect();
+  const top = Math.max(8, Math.min(r.top, window.innerHeight - card.offsetHeight - 8));
+  card.style.left = `${r.right + 10}px`;
+  card.style.top = `${top}px`;
+}
+
+// ------------------------------------------------------------ book
+
+/** Every shop card this match can offer, by rank: only this match's factions, plus neutrals. */
+function bookModal(ctx: Ctx, view: View): HTMLElement {
+  const state = ctx.store.state;
+  const rank = state.bookRank || view.me.state.rank || 1;
+  const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
+  const pool = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
+  const ofRank = pool.filter((c) => c.rank === rank).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
+  const close = (): void => ctx.store.set({ showBook: false });
+  return h(
+    "div",
+    { class: "modal book", on: { click: (e) => e.target === e.currentTarget && close() } },
+    h(
+      "div",
+      { class: "modal-box book-box" },
+      h("div", { class: "row" }, h("h2", { text: "Card book" }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `Factions this match: ${view.factions.map(ctx.ix.factionName).join(", ") || "all"} · your tavern is rank ${view.me.state.rank}` }), h("button", { class: "btn", text: "Close", on: { click: close } })),
+      h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? "Upgrade your tavern to be offered these" : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) })))),
+      h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key })), ofRank.length === 0 && h("p", { class: "muted", text: "No cards of this rank in this match." })),
+    ),
+  );
+}
 
 // ------------------------------------------------------------ log drawer
 
@@ -220,9 +299,20 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
     { class: "hero-box" },
     h("div", { class: `portrait ${ctx.ix.heroArt(hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(hero)), title: `${name}${heroDef?.text ? `\n${heroDef.text}` : ""}` }, !ctx.ix.heroArt(hero) && h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
     h("div", { class: "hero-name", text: name }),
-    power && power.mode !== "PASSIVE" && h("button", { class: "hero-power", disabled: !power.usable, title: heroDef?.text ?? "Hero power", on: { click: () => void ctx.act({ type: "HERO_POWER" }) } }, h("span", { text: "Power" }), h("span", { class: "coin", text: String(power.cost) })),
-    power && power.mode === "PASSIVE" && h("div", { class: "passive", text: "Passive", title: heroDef?.text ?? "" }),
-    ctx.store.state.view && h("div", { class: "relic-row" }, ...(self?.relics ?? []).map((r) => h("span", { class: "relic-chip", title: ctx.ix.relics.get(r)?.text ?? "" }, ctx.ix.relicArt(r) && h("span", { class: "relic-icon", style: bg(ctx.ix.relicArt(r)) }), ctx.ix.relicName(r)))),
+  );
+
+  // What the hero power and relics do, in words, next to the portrait.
+  const info = h(
+    "div",
+    { class: "hero-info" },
+    h(
+      "div",
+      { class: "power-panel" },
+      h("div", { class: "pc-label", text: powerHeader(power?.mode, power?.cost) }),
+      h("div", { class: "power-text", text: heroDef ? powerBody(heroDef.text) || "No hero power." : "" }),
+      power && power.mode !== "PASSIVE" && h("button", { class: `hero-power ${power.usable ? "ready" : ""}`, disabled: !power.usable, on: { click: () => void ctx.act({ type: "HERO_POWER" }) } }, h("span", { text: powerButtonLabel(power, recruiting, me.state.energy) }), h("span", { class: "coin", text: String(power.cost) })),
+    ),
+    (self?.relics.length ?? 0) > 0 && h("div", { class: "relic-panel" }, h("div", { class: "pc-label", text: "Relics" }), relicList(ctx, self?.relics ?? [])),
   );
 
   const gold = h(
@@ -234,7 +324,7 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
     h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: view.phase === "RECRUIT" ? "Battle in" : "Next turn in" }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
   );
 
-  return h("div", { class: "bottom" }, portrait, hand, gold);
+  return h("div", { class: "bottom" }, h("div", { class: "hero-zone" }, portrait, info), hand, gold);
 }
 
 function dragData(e: DragEvent, zone: string, index: number): void {

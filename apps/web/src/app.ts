@@ -9,7 +9,7 @@ import type { Ctx } from "./ui/ctx.js";
 import { h, mount } from "./ui/dom.js";
 import { renderLibrary } from "./ui/library.js";
 import { invalidateStats, renderLobby } from "./ui/lobby.js";
-import { DRAGGING, renderMatch } from "./ui/match.js";
+import { DRAGGING, hidePlayerCard, renderMatch } from "./ui/match.js";
 import { ReplayView } from "./ui/replay-view.js";
 
 const TOKEN_KEY = "herotime.token";
@@ -185,6 +185,7 @@ export function startApp(root: HTMLElement): void {
     }
     syncReplay();
     hidePreview();
+    hidePlayerCard();
     announce();
     const log = document.getElementById("log");
     if (log) log.scrollTop = log.scrollHeight;
@@ -310,6 +311,8 @@ export function startApp(root: HTMLElement): void {
     const intent: Intent | undefined = { r: { type: "REFRESH" }, f: { type: "FREEZE" }, u: { type: "UPGRADE" } }[e.key.toLowerCase() as "r" | "f" | "u"] as Intent | undefined;
     if (e.key.toLowerCase() === "d") store.set({ showDebug: !s.showDebug });
     else if (e.key.toLowerCase() === "l") store.set({ showLog: !s.showLog });
+    else if (e.key.toLowerCase() === "b") store.set({ showBook: !s.showBook, bookRank: s.bookRank || s.view.me.state.rank });
+    else if (e.key === "Escape") store.set({ showBook: false, showLog: false });
     else if (intent) void ctx().act(intent);
   });
 
