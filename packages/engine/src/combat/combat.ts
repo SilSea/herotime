@@ -434,7 +434,33 @@ export function simulateCombat(
       let j = i;
       while (j < s.list.length && (s.list[j] as Fighter).keywords.has("GATTAI")) j++;
       const run = s.list.slice(i, j);
-      if (run.length >= s.rules.gattaiSize) {
+      const formKey = run.length >= s.rules.gattaiSize ? options.content?.cards.get(first.cardKey)?.gattaiInto : undefined;
+      if (formKey && options.content) {
+        // The leftmost unit is the core: the group becomes its form card, carrying the parts' stats and keywords.
+        const form = options.content.card(formKey);
+        const atk = form.atk + run.reduce((n, r) => n + r.atk, 0);
+        const hp = form.hp + run.reduce((n, r) => n + r.hp, 0);
+        const keywords = new Set([...form.keywords, ...run.flatMap((r) => [...r.keywords])].filter((k) => k !== "GATTAI"));
+        const merged: Fighter = {
+          ...first,
+          uid: `${s.id}m${spawned++}`,
+          cardKey: form.key,
+          rank: Math.max(form.rank, ...run.map((r) => r.rank)),
+          atk,
+          hp,
+          maxHp: form.hp + run.reduce((n, r) => n + r.maxHp, 0),
+          keywords,
+          barrier: keywords.has("BARRIER") || run.some((r) => r.barrier),
+          effects: form.effects,
+          factions: form.factions,
+          colors: form.colors,
+          series: form.series ?? first.series,
+          golden: run.some((r) => r.golden),
+          sourceId: undefined,
+        };
+        events.push({ type: "GATTAI", units: run.map((r) => r.uid), into: merged.uid, cardKey: merged.cardKey, atk: merged.atk, hp: merged.hp, keywords: [...merged.keywords] });
+        out.push(merged);
+      } else if (run.length >= s.rules.gattaiSize) {
         const merged: Fighter = {
           ...first,
           uid: `${s.id}m${spawned++}`,

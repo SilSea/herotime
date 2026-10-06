@@ -148,12 +148,18 @@ const cards = [
   unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
 
   // ---- Mecha (Gattai)
-  unit("mc1", "Zord Cub", { rank: 1, atk: 2, hp: 2, factions: ["mecha"], keywords: ["GATTAI"] }),
-  unit("mc2", "Galleon Unit", { rank: 2, atk: 3, hp: 4, factions: ["mecha"], series: "gokaiger", keywords: ["GATTAI", "GUARD"] }),
-  unit("mc3", "Dino Zord", { rank: 3, atk: 4, hp: 4, factions: ["mecha"], series: "kyoryuger", keywords: ["GATTAI"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
-  unit("mc4", "Origami Zord", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], series: "shinkenger", keywords: ["GATTAI"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc1", "Zord Cub", { rank: 1, atk: 2, hp: 2, factions: ["mecha"], keywords: ["GATTAI"], gattaiInto: "f_cub" }),
+  unit("mc2", "Galleon Unit", { rank: 2, atk: 3, hp: 4, factions: ["mecha"], series: "gokaiger", keywords: ["GATTAI", "GUARD"], gattaiInto: "f_galleon" }),
+  unit("mc3", "Dino Zord", { rank: 3, atk: 4, hp: 4, factions: ["mecha"], series: "kyoryuger", keywords: ["GATTAI"], gattaiInto: "f_dino", effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc4", "Origami Zord", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], series: "shinkenger", keywords: ["GATTAI"], gattaiInto: "f_origami", effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
   unit("mc5", "Command Mecha", { rank: 5, atk: 8, hp: 9, factions: ["mecha"], keywords: ["GUARD"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
-  unit("mc6", "Titan Core", { rank: 6, atk: 12, hp: 12, factions: ["mecha"], keywords: ["GATTAI", "BARRIER"] }),
+  unit("mc6", "Titan Core", { rank: 6, atk: 12, hp: 12, factions: ["mecha"], keywords: ["GATTAI", "BARRIER"], gattaiInto: "f_titan" }),
+  // ---- Gattai forms: what a group becomes when its core leads it (tokens: never sold in the shop)
+  token("f_cub", "Cub Megazord", { rank: 1, atk: 2, hp: 3, factions: ["mecha"], keywords: ["RAPID"] }),
+  token("f_galleon", "Galleon Fortress", { rank: 2, atk: 2, hp: 6, factions: ["mecha"], series: "gokaiger", keywords: ["GUARD", "BARRIER"] }),
+  token("f_dino", "Dino King", { rank: 3, atk: 5, hp: 3, factions: ["mecha"], series: "kyoryuger", keywords: ["RAPID"], effects: [onAttack(buff(1, 0, true), { target: self })] }),
+  token("f_origami", "Origami Shogun", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], series: "shinkenger", keywords: ["FINAL_BLOW"] }),
+  token("f_titan", "Titan Prime", { rank: 6, atk: 8, hp: 8, factions: ["mecha"], keywords: ["GUARD", "BARRIER"], effects: [startOfCombat(buff(2, 2), { target: allAllies() })] }),
 
   // ---- Kaijin (Kyodaika)
   unit("kj1", "Spore Beast", { rank: 1, atk: 1, hp: 2, factions: ["kaijin"], keywords: ["KYODAIKA"] }),

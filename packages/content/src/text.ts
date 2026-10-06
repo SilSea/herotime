@@ -129,6 +129,7 @@ export function effectText(e: Effect, names: Names): string {
 export function cardText(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): becomes ${names(c.henshin.into)}.`);
+  if (c.gattaiInto) lines.push(`Gattai core: leading a Gattai group, it becomes ${names(c.gattaiInto)}.`);
   // Gear is used from the hand, so its ON_PLAY reads "Use:" rather than the units' "Henshin Call:".
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectText(e, names).replace(/^Henshin Call: /, "Use: ") : effectText(e, names));
   return lines.join(" ");

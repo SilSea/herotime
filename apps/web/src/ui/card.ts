@@ -26,7 +26,7 @@ export interface CardOpts {
 }
 
 export interface BuffLike {
-  kind: "card" | "gear" | "relic" | "hero" | "combat";
+  kind: "card" | "gear" | "relic" | "hero" | "combat" | "gattai";
   key: string | null;
   atk: number;
   hp: number;
@@ -39,6 +39,7 @@ export function buffSource(ix: ContentIndex, b: BuffLike): string {
   if (b.kind === "relic") return `${ix.relicName(b.key)} (relic)`;
   if (b.kind === "hero") return `${ix.heroName(b.key)} (hero)`;
   if (b.kind === "gear") return `${ix.cardName(b.key)} (gear)`;
+  if (b.kind === "gattai") return "Combined parts";
   return ix.cardName(b.key);
 }
 
@@ -97,6 +98,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
     ...keywords.map((k) => ({ icon: KEYWORD_ICON[k] ?? "•", tip: keywordName(k) })),
     ...triggers.map((t) => ({ icon: TRIGGER_ICON[t]?.icon ?? "•", tip: TRIGGER_ICON[t]?.name ?? t })),
     ...(def?.henshin ? [{ icon: "✧", tip: `Henshin (${def.henshin.afterTurns})` }] : []),
+    ...(def?.gattaiInto ? [{ icon: "◈", tip: `Gattai core → ${ix.cardName(def.gattaiInto)}` }] : []),
   ];
   const faction = factions[0];
 

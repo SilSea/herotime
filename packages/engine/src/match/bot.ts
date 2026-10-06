@@ -5,6 +5,8 @@ import {
   autoChooseRelic,
   buyGear,
   buyUnit,
+  combineGattai,
+  gattaiGroupAt,
   chooseRelic,
   pickDiscover,
   playUnit,
@@ -123,6 +125,9 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv): void {
     if (p.energy >= c.buyCost + c.refreshCost) attempt(() => refresh(p, env.pool, env.rng, env.cfg, env.gear));
     else break;
   }
+
+  // Combine any Gattai group led by a core: it frees board slots and keeps the merged strength.
+  for (let i = 0; i < p.board.length; i++) if (gattaiGroupAt(p, i, env)) attempt(() => combineGattai(p, i, env));
 
   attempt(() => useHeroPower(p, env));
 

@@ -11,6 +11,7 @@ export const IntentSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("CHOOSE_HERO"), index: slot }).strict(),
   z.object({ type: z.literal("BUY"), index: slot }).strict(),
   z.object({ type: z.literal("BUY_GEAR") }).strict(),
+  z.object({ type: z.literal("COMBINE"), index: slot }).strict(),
   z.object({ type: z.literal("SELL"), from: z.enum(["board", "hand"]), index: slot }).strict(),
   z.object({ type: z.literal("PLAY"), handIndex: slot, position: slot }).strict(),
   z.object({ type: z.literal("REORDER"), from: slot, to: slot }).strict(),

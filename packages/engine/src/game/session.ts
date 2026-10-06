@@ -2,6 +2,7 @@ import type { Effect } from "@herotime/shared";
 import { recordBuff, type Unit } from "../content.js";
 import type { CombatOptions } from "../combat/combat.js";
 import { combatRulesOf, withRules } from "../rules.js";
+import { DEFAULT_COMBAT_RULES } from "../config.js";
 import {
   buy,
   play,
@@ -12,7 +13,7 @@ import {
   type PlayerState,
 } from "../shop/economy.js";
 import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
-import type { CombatResult, CombatSideExtras, CombatUnitInput, Side } from "../types.js";
+import type { CombatResult, CombatSideExtras, CombatUnitInput, Keyword, Side } from "../types.js";
 import { fireGaugeTrigger, runTrigger, swapKey, type Origin } from "./effects.js";
 import type { GameEnv } from "./env.js";
 
@@ -40,6 +41,44 @@ export function playUnit(player: PlayerState, handIndex: number, position: numbe
   play(player, handIndex, position, env.cfg);
   runTrigger(def.effects, "ON_PLAY", "UNIT", card, player, env);
   return resolveTriples(player, env.pool, env.rng, env.cfg);
+}
+
+/**
+ * The Gattai group whose core (leftmost) is at `index`, if it can be combined for good: the core names a form,
+ * and it plus the units right of it that have GATTAI number at least the Gattai size. Undefined otherwise.
+ */
+export function gattaiGroupAt(player: PlayerState, index: number, env: GameEnv): { form: string; parts: Unit[] } | undefined {
+  const core = player.board[index];
+  if (!core) return undefined;
+  const form = env.content.card(core.key).gattaiInto;
+  if (!form) return undefined;
+  const hasGattai = (u: Unit): boolean => env.content.card(u.key).keywords.includes("GATTAI") || (u.keywords ?? []).includes("GATTAI");
+  const parts: Unit[] = [];
+  for (let i = index; i < player.board.length && hasGattai(player.board[i] as Unit); i++) parts.push(player.board[i] as Unit);
+  const size = combatRulesOf(player).gattaiSize ?? DEFAULT_COMBAT_RULES.gattaiSize;
+  return parts.length >= size ? { form, parts } : undefined;
+}
+
+/** Combine a Gattai group into its form for good: one unit with the form's stats plus the parts', freeing slots. */
+export function combineGattai(player: PlayerState, index: number, env: GameEnv): void {
+  const group = gattaiGroupAt(player, index, env);
+  if (!group) throw new RuleError("these units cannot combine: put a Gattai core on the left of enough Gattai units");
+  const formDef = env.content.card(group.form);
+  let atk = 0;
+  let hp = 0;
+  const keywords = new Set<Keyword>();
+  for (const p of group.parts) {
+    const st = env.content.stats(p);
+    atk += st.atk;
+    hp += st.hp;
+    for (const k of [...env.content.card(p.key).keywords, ...(p.keywords ?? [])]) keywords.add(k);
+  }
+  keywords.delete("GATTAI");
+  for (const k of formDef.keywords) keywords.delete(k);
+  const combined: Unit = { key: group.form, golden: false, bonusAtk: atk, bonusHp: hp, turns: 0, components: group.parts };
+  if (keywords.size > 0) combined.keywords = [...keywords];
+  recordBuff(combined, { kind: "gattai", key: (group.parts[0] as Unit).key }, atk, hp);
+  player.board.splice(index, group.parts.length, combined);
 }
 
 /** Buy the tavern's Gear: it goes to the hand, to be used from there. Its price is the card's own cost. */

@@ -8,6 +8,7 @@ export type Intent =
   | { type: "CHOOSE_HERO"; index: number }
   | { type: "BUY"; index: number }
   | { type: "BUY_GEAR" }
+  | { type: "COMBINE"; index: number }
   | { type: "SELL"; from: "board" | "hand"; index: number }
   | { type: "PLAY"; handIndex: number; position: number }
   | { type: "REORDER"; from: number; to: number }
@@ -127,6 +128,8 @@ export interface MatchView {
     heroPower: { mode: "ACTIVE" | "ONCE" | "PASSIVE"; cost: number; usable: boolean } | null;
     /** Current ATK/HP of each hand/board unit (hand cards that are not units get 0/0). */
     handStats: { atk: number; hp: number }[];
+    /** Board indexes of Gattai cores that COMBINE would merge into their form now. */
+    combinable: number[];
     boardStats: { atk: number; hp: number }[];
   };
   players: PublicPlayer[];

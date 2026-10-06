@@ -613,3 +613,11 @@ input.bad { border-color: var(--bad); background: #2a0a14; }
 .tavern.just-frozen .shop-cards .card::after, .tavern.just-frozen .gear-slot .card::after { animation: freeze-in .55s ease-out; }
 .tavern.just-frozen .frozen-stamp { animation: pop .3s ease-out; }
 @keyframes freeze-in { from { opacity: 0; transform: scale(1.18); } 60% { opacity: 1; } }
+
+/* ---- Gattai cores and Combine */
+.core-tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 4; white-space: nowrap; font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #dbe8f7; background: #1b2a44; border: 1px solid #9fb6c9; padding: 0 6px; }
+.core-tag.ready { color: #021320; background: linear-gradient(180deg, #e8f3ff, #9fc1e6); box-shadow: 0 0 10px #9fc1e6; }
+.combine-btn { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); z-index: 7; white-space: nowrap; cursor: pointer; padding: 3px 10px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #021320; background: linear-gradient(180deg, #e8f3ff, #7fa8d6); border: 1px solid #fff; box-shadow: 0 0 14px #9fc1e6; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); animation: combine-glow 1.4s ease-in-out infinite; }
+.combine-btn:hover { filter: brightness(1.15); }
+@keyframes combine-glow { 50% { box-shadow: 0 0 24px #cfe3ff; } }
+.card.minion.core-ready { box-shadow: 0 0 0 1px #000, 0 0 0 4px #9fc1e6, 0 0 24px #cfe3ff, 0 6px 12px #000c; }

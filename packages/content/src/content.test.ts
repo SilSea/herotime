@@ -108,7 +108,8 @@ describe.each(entries)("playing %s with bots", (_name, set) => {
     for (const key of m.env.content.cards.keys()) if (m.env.pool.has(key)) add(key, m.env.pool.count(key));
     for (const p of m.players) {
       for (const k of p.state.shop) add(k, 1);
-      for (const u of [...p.state.hand, ...p.state.board]) if (m.env.pool.has(u.key)) add(u.key, u.golden ? 3 : 1);
+      // a combined Gattai form holds its parts' copies
+      for (const u of [...p.state.hand, ...p.state.board]) for (const c of m.env.content.pooledCopies(u)) if (m.env.pool.has(c.key)) add(c.key, c.copies);
       for (const d of p.state.discovers) if (d.destination === "HAND") for (const k of d.options) add(k, 1);
     }
     return t;

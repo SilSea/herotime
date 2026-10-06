@@ -2,7 +2,7 @@ import type { Action, Effect, Selector, Target } from "@herotime/shared";
 import { checkCondition, type UnitView } from "../conditions.js";
 import { recordBuff, type BuffRecord, type Unit } from "../content.js";
 import { modifyRule, withRules } from "../rules.js";
-import { copiesOf, type PlayerState } from "../shop/economy.js";
+import { copiesOf, type PlayerState, returnToPool } from "../shop/economy.js";
 import type { GameEnv } from "./env.js";
 
 export function unitView(env: GameEnv, unit: Unit): UnitView {
@@ -80,7 +80,7 @@ function removeFromBoard(player: PlayerState, unit: Unit, env: GameEnv): void {
   const i = player.board.indexOf(unit);
   if (i < 0) return;
   player.board.splice(i, 1);
-  if (env.pool.has(unit.key)) env.pool.give(unit.key, copiesOf(unit));
+  returnToPool(unit, env.pool);
 }
 
 function offerGiants(player: PlayerState, env: GameEnv): void {

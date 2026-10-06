@@ -25,6 +25,11 @@ export const CardDef = z.object({
   text: z.string().default(""),
   /** Image path or URL, resolved by the client. */
   art: z.string().optional(),
+  /**
+   * Gattai core: when this unit is the leftmost of a Gattai group, the group becomes this card (in combat, or
+   * for good with COMBINE). The result has this card's stats plus the parts' stats, its effects, and all keywords.
+   */
+  gattaiInto: z.string().optional(),
   /** Tavern price of Gear sold in the shop (not a token). Units always use the standard buy cost. */
   cost: z.number().int().min(0).optional(),
 });

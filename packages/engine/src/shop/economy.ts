@@ -78,6 +78,12 @@ export function copiesOf(unit: Unit): number {
   return unit.golden ? 3 : 1;
 }
 
+/** Put a unit's pooled copies back, including the parts a combined Gattai form was made of. */
+export function returnToPool(unit: Unit, pool: Pool): void {
+  if (pool.has(unit.key)) pool.give(unit.key, copiesOf(unit));
+  for (const part of unit.components ?? []) returnToPool(part, pool);
+}
+
 export function energyForTurn(turn: number, cfg: GameConfig = DEFAULT_CONFIG): number {
   return Math.min(cfg.startEnergy + (turn - 1) * cfg.energyPerTurn, cfg.maxEnergy);
 }
@@ -204,8 +210,8 @@ export function sell(
   const unit = zone[index];
   if (unit === undefined) throw new RuleError(`no ${from} slot ${index}`);
   zone.splice(index, 1);
-  // Tokens and other unpooled cards simply vanish; only pooled cards go back.
-  if (pool.has(unit.key)) pool.give(unit.key, copiesOf(unit));
+  // Tokens and other unpooled cards simply vanish; only pooled cards go back (a combined form returns its parts).
+  returnToPool(unit, pool);
   const c = withRules(player, cfg);
   player.energy = Math.min(player.energy + c.sellValue, c.maxEnergy);
 }

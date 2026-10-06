@@ -18,6 +18,7 @@ import {
   henshinCall,
   hero,
   lastStand,
+  onAttack,
   leftmost,
   player,
   randomAlly,
@@ -107,12 +108,18 @@ const cards = [
   unit("sn8", "Ultimate Ranger", { rank: 6, atk: 9, hp: 11, factions: ["sentai"], series: S, colors: ["EXTRA"], keywords: ["BARRIER"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(5), target: allAllies({ faction: "sentai" }) })] }),
 
   // ---- mecha (Gattai)
-  unit("mc1", "Scout Drone", { rank: 1, atk: 2, hp: 2, factions: ["mecha"], keywords: ["GATTAI"] }),
-  unit("mc2", "Tank Unit", { rank: 2, atk: 3, hp: 4, factions: ["mecha"], keywords: ["GATTAI", "GUARD"] }),
-  unit("mc3", "Jet Unit", { rank: 3, atk: 4, hp: 4, factions: ["mecha"], keywords: ["GATTAI"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
-  unit("mc4", "Drill Unit", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], keywords: ["GATTAI"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc1", "Scout Drone", { rank: 1, atk: 2, hp: 2, factions: ["mecha"], keywords: ["GATTAI"], gattaiInto: "f_sky" }),
+  unit("mc2", "Tank Unit", { rank: 2, atk: 3, hp: 4, factions: ["mecha"], keywords: ["GATTAI", "GUARD"], gattaiInto: "f_bastion" }),
+  unit("mc3", "Jet Unit", { rank: 3, atk: 4, hp: 4, factions: ["mecha"], keywords: ["GATTAI"], gattaiInto: "f_falcon", effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc4", "Drill Unit", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], keywords: ["GATTAI"], gattaiInto: "f_drill", effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
   unit("mc5", "Command Mecha", { rank: 5, atk: 8, hp: 9, factions: ["mecha"], keywords: ["GUARD"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
-  unit("mc6", "Titan Core", { rank: 6, atk: 12, hp: 12, factions: ["mecha"], keywords: ["GATTAI", "BARRIER"] }),
+  unit("mc6", "Titan Core", { rank: 6, atk: 12, hp: 12, factions: ["mecha"], keywords: ["GATTAI", "BARRIER"], gattaiInto: "f_titan" }),
+  // ---- Gattai forms: what a group becomes when its core leads it (tokens: never sold in the shop)
+  token("f_sky", "Sky Fortress", { rank: 1, atk: 2, hp: 3, factions: ["mecha"], keywords: ["RAPID"] }),
+  token("f_bastion", "Iron Bastion", { rank: 2, atk: 2, hp: 6, factions: ["mecha"], keywords: ["GUARD", "BARRIER"] }),
+  token("f_falcon", "Storm Falcon", { rank: 3, atk: 5, hp: 3, factions: ["mecha"], keywords: ["RAPID"], effects: [onAttack(buff(1, 0, true), { target: self })] }),
+  token("f_drill", "Drill Emperor", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], keywords: ["FINAL_BLOW"] }),
+  token("f_titan", "Titan Prime", { rank: 6, atk: 8, hp: 8, factions: ["mecha"], keywords: ["GUARD", "BARRIER"], effects: [startOfCombat(buff(2, 2), { target: allAllies() })] }),
 
   // ---- kaijin (Kyodaika)
   unit("kj1", "Spore Beast", { rank: 1, atk: 1, hp: 2, factions: ["kaijin"], keywords: ["KYODAIKA"] }),

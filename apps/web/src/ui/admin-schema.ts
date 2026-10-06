@@ -177,6 +177,7 @@ const CARD_ROWS: Row[] = [
   { key: "keywords", field: { kind: "tags", options: KEYWORDS } },
   { key: "token", field: { kind: "bool" }, hint: "Tokens are never sold in the shop" },
   { key: "cost", label: "gear price", field: int(0), optional: true, hint: "GEAR that is not a token is sold in the tavern for this many Energy (from its rank up)" },
+  { key: "gattaiInto", label: "gattai form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Gattai core: when this is the leftmost of a Gattai group, the group becomes this card (needs the GATTAI keyword)" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },

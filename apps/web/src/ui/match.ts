@@ -400,7 +400,9 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const st = view.me.boardStats[i] ?? { atk: 0, hp: 0 };
   const recruiting = view.phase === "RECRUIT" && view.me.alive;
   const last = view.me.state.board.length - 1;
-  const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true, buffs: u.buffs ?? [] });
+  const canCombine = recruiting && (view.me.combinable ?? []).includes(i);
+  const form = ctx.ix.card(u.key)?.gattaiInto;
+  const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true, buffs: u.buffs ?? [], classes: canCombine ? ["core-ready"] : [] });
   return h(
     "div",
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "board", i), dragend: () => document.body.classList.remove(DRAGGING), dragover: allowDrop, drop: dropOn(ctx, view, i) } },
@@ -409,6 +411,9 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
       h("button", { class: "mini", text: "<", disabled: i === 0, title: "Move left", on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i - 1 }) } }),
       h("button", { class: "mini", text: `Sell +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "board", index: i }) } }),
       h("button", { class: "mini", text: ">", disabled: i === last, title: "Move right", on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i + 1 }) } })),
+    // A Gattai core says what its group becomes; when the group is complete it offers to combine for good.
+    form && h("div", { class: `core-tag ${canCombine ? "ready" : ""}`, title: `Gattai core: lead a Gattai group (it must be the leftmost) to become ${ctx.ix.cardName(form)}` }, `Core → ${ctx.ix.cardName(form)}`),
+    canCombine && h("button", { class: "combine-btn", title: `Merge this group into ${ctx.ix.cardName(form ?? "")} for good (frees board slots)`, on: { click: () => void ctx.act({ type: "COMBINE", index: i }) } }, "⚙ Combine"),
     (u.turns ?? 0) > 0 && ctx.ix.card(u.key)?.henshin && h("div", { class: "henshin", text: `henshin ${u.turns}/${ctx.ix.card(u.key)?.henshin?.afterTurns}` }),
   );
 }

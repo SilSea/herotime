@@ -74,6 +74,12 @@ describe("rules text", () => {
     expect(cardText(c, names)).toBe("Henshin (2): becomes Super Form. Last Stand: summon Token.");
   });
 
+  it("a Gattai core keeps its form and says what it becomes", () => {
+    const c = d.unit("c", "Core", { rank: 1, atk: 1, hp: 1, keywords: ["GATTAI"], gattaiInto: "form" });
+    expect(c.gattaiInto).toBe("form");
+    expect(cardText(c, names)).toBe("Gattai core: leading a Gattai group, it becomes Super Form.");
+  });
+
   it("a plain vanilla card has no text", () => {
     expect(cardText(d.unit("a", "A", { rank: 1, atk: 1, hp: 1 }), names)).toBe("");
   });

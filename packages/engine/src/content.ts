@@ -24,11 +24,13 @@ export interface Unit {
   turns?: number;
   /** Who gave the permanent bonuses above, one entry per source (for showing on the card). */
   buffs?: BuffRecord[];
+  /** A combined Gattai form keeps the units it was made of, so they go back to the pool when it leaves. */
+  components?: Unit[];
 }
 
 /** Where a permanent bonus came from. `key` is a card, gear, relic or hero key; null for combat. */
 export interface BuffRecord {
-  kind: "card" | "gear" | "relic" | "hero" | "combat";
+  kind: "card" | "gear" | "relic" | "hero" | "combat" | "gattai";
   key: string | null;
   atk: number;
   hp: number;
@@ -128,6 +130,12 @@ export class Content {
       for (const f of c.factions) needFaction(f, from);
       checkFilters(c.effects, from);
       if (c.henshin) needCard(c.henshin.into, `${from} henshin`);
+      if (c.gattaiInto) {
+        needCard(c.gattaiInto, `${from} gattaiInto`);
+        const form = this.cards.get(c.gattaiInto);
+        if (form && form.kind !== "UNIT") problems.push(`${from} gattaiInto: "${c.gattaiInto}" must be a unit`);
+        if (!c.keywords.includes("GATTAI")) problems.push(`${from} has gattaiInto but not the GATTAI keyword`);
+      }
       checkActions(actionsOf(c.effects), from);
       for (const e of c.effects) {
         if (c.kind === "GEAR" && !(e.scope === "PLAYER" && e.trigger === "ON_PLAY")) {
@@ -178,6 +186,12 @@ export class Content {
     const def = this.card(unit.key);
     const mult = unit.golden ? 2 : 1;
     return { atk: def.atk * mult + (unit.bonusAtk ?? 0), hp: def.hp * mult + (unit.bonusHp ?? 0) };
+  }
+
+  /** Every copy a unit holds in the pool: itself if pooled, plus the parts of a combined Gattai form. */
+  pooledCopies(unit: Unit): { key: string; copies: number }[] {
+    const own = [{ key: unit.key, copies: unit.golden ? 3 : 1 }];
+    return [...own, ...(unit.components ?? []).flatMap((p) => this.pooledCopies(p))];
   }
 
   /** Snapshot an owned unit for combat. `sourceId` lets permanent buffs be written back. */

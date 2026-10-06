@@ -8,6 +8,8 @@ import {
   autoChooseRelic,
   beginTurn,
   buyGear,
+  combineGattai,
+  gattaiGroupAt,
   buyUnit,
   chooseRelic,
   combatOptions,
@@ -205,6 +207,8 @@ export class Match {
         heroPower: this.heroPowerOf(p),
         handStats: statsOf(p.state.hand),
         boardStats: statsOf(p.state.board),
+        // Board slots holding a Gattai core that can be combined for good right now.
+        combinable: this.phase === "RECRUIT" ? p.state.board.flatMap((_u, i) => (gattaiGroupAt(p.state, i, this.env) ? [i] : [])) : [],
       },
       players: this.players.map((o) => {
         const pub: MatchView["players"][number] = {
@@ -281,6 +285,9 @@ export class Match {
         break;
       case "BUY_GEAR":
         buyGear(s, env);
+        break;
+      case "COMBINE":
+        combineGattai(s, intent.index, env);
         break;
       case "SELL":
         sellUnit(s, intent.from, intent.index, env);

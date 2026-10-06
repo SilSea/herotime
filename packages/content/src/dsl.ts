@@ -98,6 +98,8 @@ export interface UnitOptions {
   effects?: ReturnType<typeof on>[];
   /** Henshin(N): becomes `into` after `after` end-of-turns on the board. */
   henshin?: { after: number; into: string };
+  /** Gattai core: leading a Gattai group, the group becomes this card. */
+  gattaiInto?: string;
   /** Overrides the generated rules text. */
   text?: string;
   art?: string;
@@ -118,6 +120,7 @@ export function unit(key: string, name: string, o: UnitOptions) {
     effects: o.effects ?? [],
     ...(o.series ? { series: o.series } : {}),
     ...(o.henshin ? { henshin: { afterTurns: o.henshin.after, into: o.henshin.into } } : {}),
+    ...(o.gattaiInto ? { gattaiInto: o.gattaiInto } : {}),
     ...(o.text !== undefined ? { text: o.text } : {}),
     ...(o.art ? { art: o.art } : {}),
   });

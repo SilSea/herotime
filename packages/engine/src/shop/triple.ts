@@ -19,7 +19,7 @@ function findTripleKey(player: PlayerState): string | undefined {
   const counts = new Map<string, number>();
   for (const zone of [player.board, player.hand]) {
     for (const u of zone) {
-      if (u.golden) continue;
+      if (u.golden || u.components) continue; // a combined Gattai form is never part of a triple
       const n = (counts.get(u.key) ?? 0) + 1;
       if (n >= 3) return u.key;
       counts.set(u.key, n);
