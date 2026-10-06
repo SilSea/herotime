@@ -811,6 +811,19 @@ describe("gear in the tavern", () => {
     expect(m.view("h0").me.boardStats[0]?.hp).toBe(hpBefore + 3);
   });
 
+  it("the unit remembers that the gear buffed it, merged per source", () => {
+    const m = start();
+    const s = m.player("h0").state;
+    s.board.push({ key: s.shop[0] as string, golden: false });
+    s.energy = 10;
+    m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 10);
+    m.dispatch("h0", { type: "USE_GEAR", handIndex: 0 }, T0 + 11);
+    expect(s.board[0]?.buffs).toEqual([{ kind: "gear", key: "g_plate", atk: 0, hp: 3 }]);
+    s.hand.push({ key: "g_plate", golden: false });
+    m.dispatch("h0", { type: "USE_GEAR", handIndex: 0 }, T0 + 12);
+    expect(s.board[0]?.buffs).toEqual([{ kind: "gear", key: "g_plate", atk: 0, hp: 6 }]);
+  });
+
   it("refuses when Energy is short or the hand is full, changing nothing", () => {
     const m = start();
     const s = m.player("h0").state;
@@ -859,5 +872,32 @@ describe("gear in the tavern", () => {
       used += m.players.filter((p) => p.isBot && p.state.shopGear === null).length;
     }
     expect(used).toBeGreaterThan(0);
+  });
+});
+
+describe("buff records", () => {
+  it("recordBuff adds up per source and lists granted keywords once", async () => {
+    const { recordBuff } = await import("../content.js");
+    const u: { key: string; golden: boolean; buffs?: unknown[] } = { key: "x", golden: false };
+    recordBuff(u as never, { kind: "card", key: "cafe" }, 1, 1);
+    recordBuff(u as never, { kind: "card", key: "cafe" }, 1, 1);
+    recordBuff(u as never, { kind: "relic", key: "r1" }, 0, 0, "GUARD");
+    recordBuff(u as never, { kind: "relic", key: "r1" }, 0, 0, "GUARD");
+    recordBuff(u as never, { kind: "combat", key: null }, 2, 0);
+    expect(u.buffs).toEqual([
+      { kind: "card", key: "cafe", atk: 2, hp: 2 },
+      { kind: "relic", key: "r1", atk: 0, hp: 0, keywords: ["GUARD"] },
+      { kind: "combat", key: null, atk: 2, hp: 0 },
+    ]);
+  });
+
+  it("permanent buffs earned in a fight are credited to combat", async () => {
+    const { applyCombatOutcome } = await import("../game/session.js");
+    const m = recruiting(humans(2));
+    const s = m.player("h0").state;
+    s.board.push({ key: s.shop[0] as string, golden: false });
+    const result = { permanent: { A: { "board:0": { atk: 2, hp: 1 } }, B: {} }, rollCall: { A: false, B: false }, winner: "A" };
+    applyCombatOutcome(s, result as never, "A", (m as unknown as { env: never }).env);
+    expect(s.board[0]?.buffs).toEqual([{ kind: "combat", key: null, atk: 2, hp: 1 }]);
   });
 });

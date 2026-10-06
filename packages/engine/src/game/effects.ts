@@ -1,6 +1,6 @@
 import type { Action, Effect, Selector, Target } from "@herotime/shared";
 import { checkCondition, type UnitView } from "../conditions.js";
-import type { Unit } from "../content.js";
+import { recordBuff, type BuffRecord, type Unit } from "../content.js";
 import { modifyRule, withRules } from "../rules.js";
 import { copiesOf, type PlayerState } from "../shop/economy.js";
 import type { GameEnv } from "./env.js";
@@ -105,20 +105,27 @@ function offerGiants(player: PlayerState, env: GameEnv): void {
   player.discovers.push({ options, destination: "GIANT" });
 }
 
-function runAction(action: Action, mult: number, source: Unit | null, targets: Unit[], player: PlayerState, env: GameEnv): void {
+/** What caused an effect, so a buff can be credited to it on the card. */
+export type Origin = Pick<BuffRecord, "kind" | "key">;
+
+function runAction(action: Action, mult: number, source: Unit | null, targets: Unit[], player: PlayerState, env: GameEnv, origin: Origin): void {
   const c = withRules(player, env.cfg);
   switch (action.type) {
     case "BUFF": {
       for (const t of targets) {
         t.bonusAtk = (t.bonusAtk ?? 0) + action.atk * mult;
         t.bonusHp = (t.bonusHp ?? 0) + action.hp * mult;
+        recordBuff(t, origin, action.atk * mult, action.hp * mult);
       }
       return;
     }
     case "GIVE_KEYWORD": {
       for (const t of targets) {
         const have = t.keywords ?? [];
-        if (!have.includes(action.keyword)) t.keywords = [...have, action.keyword];
+        if (!have.includes(action.keyword)) {
+          t.keywords = [...have, action.keyword];
+          recordBuff(t, origin, 0, 0, action.keyword);
+        }
       }
       return;
     }
@@ -169,13 +176,14 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
 }
 
 /** Run one effect in the recruit phase. `source` is the owning unit (null for player-scope effects). */
-export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv): void {
+export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin): void {
   const board = player.board.map((u) => unitView(env, u));
   if (!checkCondition(effect.condition, board, player.energy)) return;
   const mult = source?.golden ? (effect.goldenMultiplier ?? 2) : 1;
   const target: Target = effect.target ?? { selector: "SELF" };
   const targets = effect.actions.some(needsTargets) ? select(target.selector, target, source, player, env) : [];
-  for (const action of effect.actions) runAction(action, mult, source, targets, player, env);
+  const from: Origin = origin ?? (source ? { kind: "card", key: source.key } : { kind: "card", key: null });
+  for (const action of effect.actions) runAction(action, mult, source, targets, player, env, from);
 }
 
 /** Run every effect in `effects` that matches `trigger` and `scope`. */
@@ -186,9 +194,10 @@ export function runTrigger(
   source: Unit | null,
   player: PlayerState,
   env: GameEnv,
+  origin?: Origin,
 ): void {
   for (const e of effects) {
-    if (e.trigger === trigger && e.scope === scope) runEffect(e, source, player, env);
+    if (e.trigger === trigger && e.scope === scope) runEffect(e, source, player, env, origin);
   }
 }
 
@@ -205,12 +214,12 @@ export function addGauge(player: PlayerState, env: GameEnv, key: string, amount:
   for (const th of [...def.thresholds].sort((a, b) => a.at - b.at)) {
     if (th.once) {
       if (before < th.at && value >= th.at) {
-        for (const a of th.reward) runAction(a, 1, null, [], player, env);
+        for (const a of th.reward) runAction(a, 1, null, [], player, env, { kind: "card", key: null });
       }
     } else {
       // Repeating threshold: spends `at` points each time it pays out.
       while (value >= th.at) {
-        for (const a of th.reward) runAction(a, 1, null, [], player, env);
+        for (const a of th.reward) runAction(a, 1, null, [], player, env, { kind: "card", key: null });
         value -= th.at;
         player.gauges[key] = value;
       }

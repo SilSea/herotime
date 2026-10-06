@@ -245,7 +245,7 @@ export function startApp(root: HTMLElement): void {
     const card = (e.target as Element | null)?.closest?.(".card") as HTMLElement | null;
     if (!card || !card.dataset.key || card.closest(".card-preview") || document.body.classList.contains(DRAGGING)) return hidePreview();
     const big = card.cloneNode(true) as HTMLElement;
-    big.classList.remove("small", "clickable", "unaffordable", "attacking", "hit", "focus", "dying", "entering", "huge");
+    big.classList.remove("small", "minion", "clickable", "unaffordable", "attacking", "hit", "focus", "dying", "entering", "huge");
     big.classList.add("preview-card");
     big.style.transform = "";
     const info = h("div", { class: "preview-info" }, ...(card.dataset.tip ?? "").split("\n").slice(1).filter(Boolean).map((line) => h("div", { text: line })));

@@ -1,5 +1,5 @@
 import type { Effect } from "@herotime/shared";
-import type { Unit } from "../content.js";
+import { recordBuff, type Unit } from "../content.js";
 import type { CombatOptions } from "../combat/combat.js";
 import { combatRulesOf, withRules } from "../rules.js";
 import {
@@ -13,7 +13,7 @@ import {
 } from "../shop/economy.js";
 import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Side } from "../types.js";
-import { fireGaugeTrigger, runTrigger, swapKey } from "./effects.js";
+import { fireGaugeTrigger, runTrigger, swapKey, type Origin } from "./effects.js";
 import type { GameEnv } from "./env.js";
 
 // ------------------------------------------------------------ recruit intents
@@ -21,7 +21,7 @@ import type { GameEnv } from "./env.js";
 /** Start a recruit phase: refill energy, roll the shop, then run ON_TURN_START (relics, hero). */
 export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void {
   startTurn(player, turn, env.pool, env.rng, env.cfg, env.gear);
-  for (const effects of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env);
+  for (const { effects, origin } of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env, origin);
 }
 
 /** Buy from the shop; a purchase that completes a triple merges immediately. */
@@ -60,7 +60,7 @@ export function useGear(player: PlayerState, handIndex: number, env: GameEnv): v
   const def = env.content.card(card.key);
   if (def.kind !== "GEAR") throw new RuleError(`${def.name} is not gear`);
   player.hand.splice(handIndex, 1);
-  runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env);
+  runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env, { kind: "gear", key: card.key });
 }
 
 export function sellUnit(player: PlayerState, from: "board" | "hand", index: number, env: GameEnv): void {
@@ -103,7 +103,7 @@ export function assignHero(player: PlayerState, heroKey: string, env: GameEnv): 
   const hero = env.content.heroes.get(heroKey);
   if (!hero) throw new RuleError(`unknown hero: ${heroKey}`);
   player.hero = heroKey;
-  runTrigger(hero.power?.effects ?? [], "ON_ACQUIRE", "PLAYER", null, player, env);
+  runTrigger(hero.power?.effects ?? [], "ON_ACQUIRE", "PLAYER", null, player, env, { kind: "hero", key: heroKey });
 }
 
 /** Activate the hero power: ACTIVE = once per turn, ONCE = once per game, PASSIVE = not activatable. */
@@ -118,16 +118,16 @@ export function useHeroPower(player: PlayerState, env: GameEnv): void {
   spend(player, power.cost);
   if (power.mode === "ACTIVE") player.heroPowerUsed = true;
   else player.heroPowerSpent = true;
-  runTrigger(power.effects, "ON_USE", "PLAYER", null, player, env);
+  runTrigger(power.effects, "ON_USE", "PLAYER", null, player, env, { kind: "hero", key: hero.key });
 }
 
 // ----------------------------------------------------------------- relics
 
 /** Effect lists that act at the player level: owned relics and the hero power. */
-function playerEffectSources(player: PlayerState, env: GameEnv): Effect[][] {
-  const lists: Effect[][] = player.relics.map((k) => [...(env.content.relics.get(k)?.effects ?? [])]);
+function playerEffectSources(player: PlayerState, env: GameEnv): { effects: Effect[]; origin: Origin }[] {
+  const lists = player.relics.map((k) => ({ effects: [...(env.content.relics.get(k)?.effects ?? [])], origin: { kind: "relic", key: k } as Origin }));
   const power = player.hero ? env.content.heroes.get(player.hero)?.power : undefined;
-  if (power) lists.push([...power.effects]);
+  if (power) lists.push({ effects: [...power.effects], origin: { kind: "hero", key: player.hero as string } });
   return lists;
 }
 
@@ -215,7 +215,7 @@ export function chooseRelic(player: PlayerState, index: number, env: GameEnv): s
   spend(player, def.cost);
   player.relics.push(key);
   delete player.relicOffer;
-  runTrigger(def.effects, "ON_ACQUIRE", "PLAYER", null, player, env);
+  runTrigger(def.effects, "ON_ACQUIRE", "PLAYER", null, player, env, { kind: "relic", key });
   return key;
 }
 
@@ -238,7 +238,7 @@ export function prepareCombat(player: PlayerState, env: GameEnv): { units: Comba
   const units = player.board.map((u, i) => env.content.toCombat(u, `board:${i}`));
 
   const playerEffects: Effect[] = [];
-  for (const effects of playerEffectSources(player, env)) {
+  for (const { effects } of playerEffectSources(player, env)) {
     playerEffects.push(...effects.filter((e) => e.scope === "PLAYER" && e.trigger === "START_OF_COMBAT"));
   }
 
@@ -273,6 +273,7 @@ export function applyCombatOutcome(player: PlayerState, result: CombatResult, si
     if (!unit) continue;
     unit.bonusAtk = (unit.bonusAtk ?? 0) + gain.atk;
     unit.bonusHp = (unit.bonusHp ?? 0) + gain.hp;
+    recordBuff(unit, { kind: "combat", key: null }, gain.atk, gain.hp);
   }
   if (result.rollCall[side]) {
     fireGaugeTrigger(player, env, "ON_ROLL_CALL");

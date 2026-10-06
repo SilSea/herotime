@@ -151,6 +151,11 @@ function showPlayerCard(ctx: Ctx, row: HTMLElement, p: Player, mine: boolean, op
 
 // ------------------------------------------------------------ book
 
+/** Whether the tavern was frozen last time it was drawn, to play the freezing animation only once. */
+let wasFrozen = false;
+/** The shop as last drawn, so the deal-in animation plays only for a new shop. */
+let lastShopSig = "";
+
 /** Book tab for tavern gear (ranks are 1-6, so 7 cannot clash). */
 const GEAR_TAB = 7;
 
@@ -268,11 +273,18 @@ function table(ctx: Ctx, view: View): HTMLElement {
     h("button", { class: "round-btn", disabled: !recruiting || energy < me.limits.refreshCost, title: "Refresh the tavern (R)", on: { click: () => void ctx.act({ type: "REFRESH" }) } }, h("span", { class: "round-icon", text: "↻" }), h("span", { class: "coin", text: String(me.limits.refreshCost) })),
     h("button", { class: `round-btn ${s.frozen ? "on" : ""}`, disabled: !recruiting, title: "Freeze the tavern (F)", on: { click: () => void ctx.act({ type: "FREEZE" }) } }, h("span", { class: "round-icon", text: "❄" })),
   );
+  // Deal the cards in only when the shop actually changed, not on every redraw.
+  const shopSig = `${view.turn}|${s.shop.join(",")}`;
+  const dealing = shopSig !== lastShopSig;
+  lastShopSig = shopSig;
+  const justFroze = s.frozen && !wasFrozen;
+  wasFrozen = s.frozen;
   const tavern = h(
     "div",
-    { class: "tavern" },
+    { class: `tavern ${s.frozen ? "frozen" : ""} ${justFroze ? "just-frozen" : ""}` },
+    s.frozen && h("div", { class: "frozen-stamp", text: "❄ Frozen: kept for next turn" }),
     upgrade,
-    h("div", { class: "cards shop-cards" }, ...s.shop.map((key, i) => cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) })), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
+    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) })), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
     gearSlot(ctx, view),
     side,
   );
@@ -388,7 +400,7 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const st = view.me.boardStats[i] ?? { atk: 0, hp: 0 };
   const recruiting = view.phase === "RECRUIT" && view.me.alive;
   const last = view.me.state.board.length - 1;
-  const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true });
+  const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true, buffs: u.buffs ?? [] });
   return h(
     "div",
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "board", i), dragend: () => document.body.classList.remove(DRAGGING), dragover: allowDrop, drop: dropOn(ctx, view, i) } },
@@ -414,7 +426,7 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
   return h(
     "div",
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: () => document.body.classList.remove(DRAGGING) } },
-    cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true }),
+    cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [] }),
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini primary", text: gear ? "Use" : "Play", disabled: !gear && full, on: { click: () => void ctx.act(gear ? { type: "USE_GEAR", handIndex: i } : { type: "PLAY", handIndex: i, position: view.me.state.board.length }) } }),
       !gear && h("button", { class: "mini", text: `Sell +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),

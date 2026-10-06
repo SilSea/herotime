@@ -22,6 +22,30 @@ export interface Unit {
   keywords?: Keyword[];
   /** End-of-turns spent on the board; drives Henshin(N). */
   turns?: number;
+  /** Who gave the permanent bonuses above, one entry per source (for showing on the card). */
+  buffs?: BuffRecord[];
+}
+
+/** Where a permanent bonus came from. `key` is a card, gear, relic or hero key; null for combat. */
+export interface BuffRecord {
+  kind: "card" | "gear" | "relic" | "hero" | "combat";
+  key: string | null;
+  atk: number;
+  hp: number;
+  keywords?: Keyword[];
+}
+
+/** Add a bonus to a unit's record, merging with an earlier one from the same source. */
+export function recordBuff(unit: Unit, from: Pick<BuffRecord, "kind" | "key">, atk: number, hp: number, keyword?: Keyword): void {
+  const list = (unit.buffs ??= []);
+  let entry = list.find((b) => b.kind === from.kind && b.key === from.key);
+  if (!entry) {
+    entry = { kind: from.kind, key: from.key, atk: 0, hp: 0 };
+    list.push(entry);
+  }
+  entry.atk += atk;
+  entry.hp += hp;
+  if (keyword && !(entry.keywords ?? []).includes(keyword)) entry.keywords = [...(entry.keywords ?? []), keyword];
 }
 
 function index<T extends { key: string }>(kind: string, items: readonly T[] = []): Map<string, T> {

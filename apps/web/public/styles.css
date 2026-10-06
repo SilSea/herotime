@@ -183,7 +183,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .card .hp { right: -10px; background: linear-gradient(180deg, #ff8aa0, var(--hp) 55%, #8a0b24); }
 .card .stats.gear-label { display: block; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 9px; font-weight: 800; letter-spacing: .14em; color: #fff; background: #4b2fc0; border: 1px solid #c8b8ff; padding: 0 10px; box-shadow: 0 0 8px #8b6cff99; }
 .card .cost { position: absolute; top: -12px; left: -12px; width: 32px; height: 32px; background: linear-gradient(180deg, #7ff4ff, #18a9d4); color: #021320; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); filter: drop-shadow(0 0 6px #2fe4ff); z-index: 4; }
-.card.has-barrier::after, .card.minion.kw-barrier::after { content: ""; position: absolute; inset: -7px; border: 2px solid #9cf6ff; border-radius: inherit; box-shadow: 0 0 16px #2fe4ff, inset 0 0 16px #2fe4ff88; background: radial-gradient(circle, transparent 60%, #2fe4ff22); pointer-events: none; }
+.card.has-barrier::after { content: ""; position: absolute; inset: -7px; border: 2px solid #9cf6ff; border-radius: inherit; box-shadow: 0 0 16px #2fe4ff, inset 0 0 16px #2fe4ff88; background: radial-gradient(circle, transparent 60%, #2fe4ff22); pointer-events: none; }
 
 /* ---- units in play: round holo tokens */
 .card.minion {
@@ -470,12 +470,12 @@ body.dragging .idle-hint { display: none; }
 .preview-info div + div { margin-top: 4px; }
 .banner { position: fixed; left: 0; right: 0; top: 38%; z-index: 55; pointer-events: none; text-align: center; font-size: 64px; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: #fff; text-shadow: 0 0 20px var(--cyan), 0 0 50px #2fe4ff88; background: linear-gradient(90deg, transparent, #050a18cc 25%, #050a18cc 75%, transparent); border-top: 1px solid #2fe4ff55; border-bottom: 1px solid #2fe4ff55; padding: 14px 0; animation: banner 1.7s ease-out forwards; }
 @keyframes banner { 0% { transform: scaleX(.3); opacity: 0; } 15% { transform: scaleX(1.05); opacity: 1; } 25% { transform: scaleX(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
-.shop-cards .card { animation: deal .35s ease-out backwards; }
-.shop-cards .card:nth-child(2) { animation-delay: .06s; }
-.shop-cards .card:nth-child(3) { animation-delay: .12s; }
-.shop-cards .card:nth-child(4) { animation-delay: .18s; }
-.shop-cards .card:nth-child(5) { animation-delay: .24s; }
-.shop-cards .card:nth-child(6) { animation-delay: .3s; }
+.shop-cards.dealing .card { animation: deal .35s ease-out backwards; }
+.shop-cards.dealing .card:nth-child(2) { animation-delay: .06s; }
+.shop-cards.dealing .card:nth-child(3) { animation-delay: .12s; }
+.shop-cards.dealing .card:nth-child(4) { animation-delay: .18s; }
+.shop-cards.dealing .card:nth-child(5) { animation-delay: .24s; }
+.shop-cards.dealing .card:nth-child(6) { animation-delay: .3s; }
 @keyframes deal { from { transform: translateY(-40px) scale(.8); opacity: 0; } }
 
 /* ---- content editor (admin) */
@@ -548,3 +548,68 @@ input.bad { border-color: var(--bad); background: #2a0a14; }
 .gear-empty { width: 112px; height: 150px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; border: 1px dashed #8b6cff66; color: #a99ad6; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .card.gear { border-style: solid; --edge: var(--violet); }
 .card.gear .art { background: radial-gradient(circle at 35% 30%, #c8b8ff, #4b2fc0 60%, #0d0b2a); }
+
+/* ---- buffs: green numbers when raised, red when lowered, and who did it */
+.card .stats span.up { color: #8dffbf; text-shadow: 0 0 6px #3dffa8, 0 1px 0 #000; }
+.card .stats span.down { color: #ffb3b3; }
+.buff-badge { position: absolute; top: -8px; right: -8px; z-index: 4; font-size: 10px; font-weight: 900; padding: 1px 5px; color: #021a10; background: linear-gradient(180deg, #a6ffd0, #2fd98a); border: 1px solid #d6ffe9; box-shadow: 0 0 8px #3dffa8aa; clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px); }
+.card.preview-card .buff-badge { display: none; }
+.buff-list { display: none; }
+.card.preview-card .buff-list { display: block; width: 100%; margin-top: 4px; padding: 5px 8px; background: #06261aee; border: 1px solid #3dffa877; border-left: 3px solid #3dffa8; font-size: 12px; }
+.buff-title { font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #8dffbf; margin-bottom: 2px; }
+.buff-line { display: flex; gap: 8px; justify-content: space-between; line-height: 1.3; }
+.buff-src { color: #d7ffe9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.buff-val { color: #8dffbf; font-weight: 800; white-space: nowrap; }
+
+/* ---- keyword auras: one layer each, so several keywords show together */
+.auras { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1; }
+.aura { position: absolute; inset: -4px; border-radius: inherit; }
+/* Guard: a heavy steel frame and a shield mark */
+.aura-guard { border: 4px solid #9fb2cc; box-shadow: inset 0 0 0 1px #1a222e, 0 0 0 1px #1a222e, 0 0 14px #9fb8e688; }
+.aura-guard::after { content: "🛡"; position: absolute; top: -12px; right: -10px; font-size: 18px; filter: drop-shadow(0 0 4px #9fb8e6); }
+.card.minion .aura-guard { inset: -8px; border-width: 5px; }
+/* Barrier: a shimmering energy bubble */
+.aura-barrier { inset: -7px; border: 2px solid #9cf6ff; box-shadow: 0 0 16px #2fe4ff, inset 0 0 16px #2fe4ff88; background: radial-gradient(circle, transparent 58%, #2fe4ff26); animation: barrier-pulse 2.2s ease-in-out infinite; }
+@keyframes barrier-pulse { 50% { box-shadow: 0 0 26px #2fe4ff, inset 0 0 22px #2fe4ffaa; } }
+/* Rapid: speed streaks on both sides */
+.aura-rapid { box-shadow: -8px 0 14px -6px #7ff4ff, 8px 0 14px -6px #7ff4ff; animation: rapid-flick .7s ease-in-out infinite alternate; }
+.aura-rapid::before { content: "»"; position: absolute; left: -14px; top: 40%; color: #7ff4ff; font-size: 20px; font-weight: 900; text-shadow: 0 0 6px #2fe4ff; }
+@keyframes rapid-flick { to { box-shadow: -12px 0 18px -6px #c6fbff, 12px 0 18px -6px #c6fbff; } }
+/* Lethal: a toxic green glow */
+.aura-lethal { box-shadow: 0 0 16px 2px #39ff6a99, inset 0 0 18px #39ff6a55; }
+.aura-lethal::after { content: "☠"; position: absolute; bottom: 18px; left: -10px; font-size: 16px; color: #8dff9f; text-shadow: 0 0 6px #39ff6a; }
+/* Revive: a pale spirit halo */
+.aura-revive { box-shadow: 0 0 0 2px #ffffff44, 0 0 22px 4px #ffffff55; animation: revive-halo 2.6s ease-in-out infinite; }
+@keyframes revive-halo { 50% { box-shadow: 0 0 0 2px #ffffff88, 0 0 30px 8px #ffffff77; } }
+/* Rider Kick: charged lightning along the bottom */
+.aura-rider-kick { background: linear-gradient(transparent 72%, #ffd16640); box-shadow: 0 8px 16px -6px #ffd166; }
+.aura-rider-kick::after { content: "⚡"; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); font-size: 16px; filter: drop-shadow(0 0 4px #ffd166); }
+/* Final Blow: a red-orange flare */
+.aura-final-blow { box-shadow: 0 0 18px 3px #ff7a2a99, inset 0 -12px 18px -8px #ff7a2a88; }
+/* Kyodaika: a violet growth aura that swells */
+.aura-kyodaika { box-shadow: 0 0 16px 4px #b04dff88; animation: kyodaika-swell 3s ease-in-out infinite; }
+@keyframes kyodaika-swell { 50% { box-shadow: 0 0 26px 8px #b04dffbb; } }
+/* Gattai: a mechanical coupling ring */
+.aura-gattai { inset: -9px; border: 2px dashed #c3d3e6; opacity: .85; }
+.card.minion .aura-gattai { animation: spin 9s linear infinite; }
+
+/* ---- a frozen tavern frosts over */
+.tavern { position: relative; }
+.tavern.frozen { border-color: #9ee8ff; background: linear-gradient(180deg, #12395acc, #0a2238cc); box-shadow: inset 0 0 50px #9ee8ff44, 0 0 22px #9ee8ff44; }
+.frozen-stamp { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); z-index: 6; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #e6fbff; background: #0b3350e6; border: 1px solid #9ee8ff; padding: 1px 12px; box-shadow: 0 0 12px #9ee8ff88; }
+.tavern.frozen .shop-cards .card, .tavern.frozen .gear-slot .card { filter: saturate(.75) brightness(1.08); }
+.tavern.frozen .shop-cards .card::after, .tavern.frozen .gear-slot .card::after {
+  content: ""; position: absolute; inset: -3px; border-radius: inherit; pointer-events: none; z-index: 5;
+  border: 2px solid #c9f3ff; box-shadow: inset 0 0 24px #bdf2ffcc, 0 0 14px #9ee8ff;
+  background:
+    radial-gradient(circle at 12% 14%, #ffffffcc 0 2px, transparent 3px),
+    radial-gradient(circle at 84% 22%, #ffffffaa 0 1.5px, transparent 3px),
+    radial-gradient(circle at 70% 84%, #ffffffaa 0 2px, transparent 3px),
+    radial-gradient(circle at 22% 78%, #ffffff88 0 1.5px, transparent 3px),
+    linear-gradient(135deg, #e6fbff99 0, transparent 22%),
+    linear-gradient(315deg, #e6fbff77 0, transparent 20%),
+    #bfefff1f;
+}
+.tavern.just-frozen .shop-cards .card::after, .tavern.just-frozen .gear-slot .card::after { animation: freeze-in .55s ease-out; }
+.tavern.just-frozen .frozen-stamp { animation: pop .3s ease-out; }
+@keyframes freeze-in { from { opacity: 0; transform: scale(1.18); } 60% { opacity: 1; } }

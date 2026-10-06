@@ -20,7 +20,34 @@ export interface CardOpts {
   classes?: readonly string[];
   /** Replay: carries a live Barrier. */
   barrier?: boolean;
+  /** Who buffed this unit (owned units only). */
+  buffs?: readonly BuffLike[];
   onClick?: () => void;
+}
+
+export interface BuffLike {
+  kind: "card" | "gear" | "relic" | "hero" | "combat";
+  key: string | null;
+  atk: number;
+  hp: number;
+  keywords?: readonly string[];
+}
+
+/** "Armor Plate (gear)", "Kaijin General (hero)", "Combat": where a buff came from, in words. */
+export function buffSource(ix: ContentIndex, b: BuffLike): string {
+  if (b.kind === "combat" || b.key === null) return b.kind === "combat" ? "Earned in combat" : "Effect";
+  if (b.kind === "relic") return `${ix.relicName(b.key)} (relic)`;
+  if (b.kind === "hero") return `${ix.heroName(b.key)} (hero)`;
+  if (b.kind === "gear") return `${ix.cardName(b.key)} (gear)`;
+  return ix.cardName(b.key);
+}
+
+/** "+2/+3, Guard": what a buff gave. */
+export function buffValue(b: BuffLike): string {
+  const parts: string[] = [];
+  if (b.atk !== 0 || b.hp !== 0) parts.push(`${b.atk >= 0 ? "+" : ""}${b.atk}/${b.hp >= 0 ? "+" : ""}${b.hp}`);
+  for (const k of b.keywords ?? []) parts.push(keywordName(k));
+  return parts.join(", ");
 }
 
 /** Small marks for what a unit does, shown on the board where there is no room for text. */
@@ -55,6 +82,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
   const kind = def?.kind ?? "UNIT";
 
   const art = ix.artUrl(o.key);
+  const buffs = (o.buffs ?? []).filter((b) => b.atk !== 0 || b.hp !== 0 || (b.keywords?.length ?? 0) > 0);
   const tooltip = [
     `${ix.cardName(o.key)}${def ? ` (rank ${def.rank})` : ""}${o.golden ? " - Final Form" : ""}`,
     factions.join(", "),
@@ -86,7 +114,11 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
     !o.hideText && def?.text && h("div", { class: "text", text: def.text }),
     icons.length > 0 && h("div", { class: "icons" }, ...icons.slice(0, 5).map((i) => h("span", { class: "icon", title: i.tip, text: i.icon }))),
     faction && kind === "UNIT" && h("div", { class: "faction-plate", text: faction }),
-    kind !== "GEAR" && h("div", { class: "stats" }, h("span", { class: "atk", text: String(atk) }), h("span", { class: "hp", text: String(hp) })),
+    buffs.length > 0 && h("div", { class: "buff-list" }, h("div", { class: "buff-title", text: "Buffs" }), ...buffs.slice(0, 6).map((b) => h("div", { class: "buff-line" }, h("span", { class: "buff-src", text: buffSource(ix, b) }), h("span", { class: "buff-val", text: buffValue(b) })))),
+    buffs.length > 0 && h("div", { class: "buff-badge", title: `Buffed by ${buffs.length} source${buffs.length > 1 ? "s" : ""}`, text: `▲${buffs.length}` }),
+    // One layer per keyword, so a unit with several shows them all at once.
+    keywords.length > 0 && h("div", { class: "auras" }, ...keywords.map((k) => h("span", { class: `aura aura-${k.toLowerCase().replace(/_/g, "-")}` }))),
+    kind !== "GEAR" && h("div", { class: "stats" }, h("span", { class: `atk ${def && atk > def.atk * (o.golden ? 2 : 1) ? "up" : def && atk < def.atk * (o.golden ? 2 : 1) ? "down" : ""}`, text: String(atk) }), h("span", { class: `hp ${def && hp > def.hp * (o.golden ? 2 : 1) ? "up" : def && hp < def.hp * (o.golden ? 2 : 1) ? "down" : ""}`, text: String(hp) })),
     kind === "GEAR" && h("div", { class: "stats gear-label", text: "GEAR" }),
   );
 }

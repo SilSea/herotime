@@ -149,3 +149,20 @@ describe("boardLabel", () => {
     expect(boardLabel({ units: 0, factions: {}, neutral: 0 }, name)).toEqual({ headline: "Empty board", parts: [] });
   });
 });
+
+describe("buff wording", async () => {
+  const { buffSource, buffValue } = await import("../src/ui/card.js");
+  const ix = new ContentIndex({ set: "t", version: 1, factions: [], series: [], gauges: [], cards: [{ key: "g", name: "Armor Plate" }, { key: "c", name: "Cafe Owner" }] as never, relics: [{ key: "r", name: "Lucky Charm" }] as never, heroes: [{ key: "h", name: "Kaijin General" }] as never });
+  it("names each kind of source", () => {
+    expect(buffSource(ix, { kind: "gear", key: "g", atk: 0, hp: 3 })).toBe("Armor Plate (gear)");
+    expect(buffSource(ix, { kind: "card", key: "c", atk: 1, hp: 1 })).toBe("Cafe Owner");
+    expect(buffSource(ix, { kind: "relic", key: "r", atk: 1, hp: 1 })).toBe("Lucky Charm (relic)");
+    expect(buffSource(ix, { kind: "hero", key: "h", atk: 0, hp: 0 })).toBe("Kaijin General (hero)");
+    expect(buffSource(ix, { kind: "combat", key: null, atk: 2, hp: 0 })).toBe("Earned in combat");
+  });
+  it("says what was given", () => {
+    expect(buffValue({ kind: "gear", key: "g", atk: 0, hp: 3 })).toBe("+0/+3");
+    expect(buffValue({ kind: "hero", key: "h", atk: 0, hp: 0, keywords: ["KYODAIKA"] })).toBe("Kyodaika");
+    expect(buffValue({ kind: "card", key: "c", atk: 2, hp: -1, keywords: ["GUARD"] })).toBe("+2/-1, Guard");
+  });
+});
