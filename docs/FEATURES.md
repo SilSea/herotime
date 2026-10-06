@@ -34,7 +34,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F3.6** (P0) Roll Call 5 สี → Mecha Gauge → การ์ด "Kyodai Gattai!" → Giant Slot
 - [x] **F3.7** (P0) Giant Robo ลงสนามเมื่อเหลือ ≤2 ตัว หรือศัตรูเกิด Kyodaika
 - [ ] **F3.8** (P1) Super Gattai (Gauge 6 + Extra Ranger)
-- [x] **F3.12** (P1) Gattai เป็นการ์ดใหม่: ตัวซ้ายสุดของกลุ่ม (core) ที่มี `gattaiInto` กำหนดร่าง; ตอนสู้รวมอัตโนมัติ หรือกด Combine รวมถาวร (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด, effect ของร่าง; ขายแล้วชิ้นส่วนคืน pool)
+- [x] **F3.12** (P1) Gattai เป็นการ์ดใหม่: core (ซ้ายสุด, มี `gattaiInto`) + ชิ้นส่วน Gattai ติดกันครบ → กด Combine ตอนซื้อของ รวมถาวร (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด, effect ของร่าง) แล้วบัฟต่อได้; ไม่รวมระหว่างสู้; รวมได้ชั้นเดียว; ขายแล้วชิ้นส่วนคืน pool
 - [x] **F3.9** (P1) Rider Gauge → Ultimate Form
 - [ ] **F3.10** (P2) Universe Anime + faction ใหม่
 - [x] **F3.11** (P0) Launch series (production set; signature ที่ต้องมี action ใหม่ เช่น Den-O possession / W pairing / OOO medals ใช้ของที่ใกล้เคียงใน DSL ปัจจุบันไปก่อน): Gokaiger, Kyoryuger, Shinkenger, W, Den-O, OOO, Himmapan Sentai (original) — ดู [RULES.md §11](RULES.md#11-launch-series-ชุดแรก)

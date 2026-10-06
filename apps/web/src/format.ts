@@ -10,7 +10,7 @@ export const KEYWORDS: Record<string, { name: string; text: string }> = {
   RIDER_KICK: { name: "Rider Kick", text: "Its first attack of the fight deals double damage." },
   FINAL_BLOW: { name: "Final Blow", text: "First attack deals double damage, and double again against giants." },
   KYODAIKA: { name: "Kyodaika", text: "The first time it dies it returns as a giant with doubled stats and no keywords." },
-  GATTAI: { name: "Gattai", text: "3 adjacent Gattai units merge into one at the start of combat." },
+  GATTAI: { name: "Gattai", text: "Can be combined: with a Gattai core leftmost of 3 adjacent Gattai units, press Combine in the recruit phase and the group becomes the core's form for good." },
 };
 
 export const keywordName = (k: string): string => KEYWORDS[k]?.name ?? k;

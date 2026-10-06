@@ -45,7 +45,7 @@ import type { ContentSetData } from "./types.js";
 const factions = [
   faction("rider", "Rider", "#e53935", "Henshin: transform after turns on the board. Rider Kick hits twice as hard on the first strike."),
   faction("sentai", "Sentai", "#1e88e5", "Five colours. Team-Up bonuses and the Roll Call that charges the Mecha Gauge."),
-  faction("mecha", "Mecha", "#78909c", "Gattai: three adjacent Mecha merge into one big unit when combat starts."),
+  faction("mecha", "Mecha", "#78909c", "Gattai: line up a core and its parts, press Combine, and they become one robot for good."),
   faction("kaijin", "Kaijin", "#8e24aa", "Kyodaika: the first time it dies it comes back twice as big."),
   faction("grunt", "Grunt", "#6d4c41", "Swarms of cheap bodies that leave more bodies behind."),
   faction("ally", "Ally", "#43a047", "Economy and support: Energy, buffs and cards in hand."),

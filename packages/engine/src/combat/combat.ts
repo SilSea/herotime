@@ -420,72 +420,8 @@ export function simulateCombat(
     aborted = true;
   };
 
-  // ---- pre-fight: Gattai, Roll Call, Start of Combat ----
-  const mergeGattai = (s: SideState): void => {
-    const out: Fighter[] = [];
-    let i = 0;
-    while (i < s.list.length) {
-      const first = s.list[i] as Fighter;
-      if (!first.keywords.has("GATTAI")) {
-        out.push(first);
-        i++;
-        continue;
-      }
-      let j = i;
-      while (j < s.list.length && (s.list[j] as Fighter).keywords.has("GATTAI")) j++;
-      const run = s.list.slice(i, j);
-      const formKey = run.length >= s.rules.gattaiSize ? options.content?.cards.get(first.cardKey)?.gattaiInto : undefined;
-      if (formKey && options.content) {
-        // The leftmost unit is the core: the group becomes its form card, carrying the parts' stats and keywords.
-        const form = options.content.card(formKey);
-        const atk = form.atk + run.reduce((n, r) => n + r.atk, 0);
-        const hp = form.hp + run.reduce((n, r) => n + r.hp, 0);
-        const keywords = new Set([...form.keywords, ...run.flatMap((r) => [...r.keywords])].filter((k) => k !== "GATTAI"));
-        const merged: Fighter = {
-          ...first,
-          uid: `${s.id}m${spawned++}`,
-          cardKey: form.key,
-          rank: Math.max(form.rank, ...run.map((r) => r.rank)),
-          atk,
-          hp,
-          maxHp: form.hp + run.reduce((n, r) => n + r.maxHp, 0),
-          keywords,
-          barrier: keywords.has("BARRIER") || run.some((r) => r.barrier),
-          effects: form.effects,
-          factions: form.factions,
-          colors: form.colors,
-          series: form.series ?? first.series,
-          golden: run.some((r) => r.golden),
-          sourceId: undefined,
-        };
-        events.push({ type: "GATTAI", units: run.map((r) => r.uid), into: merged.uid, cardKey: merged.cardKey, atk: merged.atk, hp: merged.hp, keywords: [...merged.keywords] });
-        out.push(merged);
-      } else if (run.length >= s.rules.gattaiSize) {
-        const merged: Fighter = {
-          ...first,
-          uid: `${s.id}m${spawned++}`,
-          rank: Math.max(...run.map((r) => r.rank)),
-          atk: run.reduce((n, r) => n + r.atk, 0),
-          hp: run.reduce((n, r) => n + r.hp, 0),
-          maxHp: run.reduce((n, r) => n + r.maxHp, 0),
-          keywords: new Set(run.flatMap((r) => [...r.keywords]).filter((k) => k !== "GATTAI")),
-          barrier: run.some((r) => r.barrier),
-          effects: run.flatMap((r) => [...r.effects]),
-          factions: [...new Set(run.flatMap((r) => [...r.factions]))],
-          colors: run.flatMap((r) => [...r.colors]),
-          golden: run.some((r) => r.golden),
-          sourceId: undefined,
-        };
-        events.push({ type: "GATTAI", units: run.map((r) => r.uid), into: merged.uid, cardKey: merged.cardKey, atk: merged.atk, hp: merged.hp, keywords: [...merged.keywords] });
-        out.push(merged);
-      } else {
-        out.push(...run);
-      }
-      i = j;
-    }
-    s.list = out;
-  };
-
+  // ---- pre-fight: Roll Call, Start of Combat ----
+  // (Gattai happens in the recruit phase with COMBINE; units never merge mid-fight.)
   const rollCall = (s: SideState): void => {
     const need = Math.max(1, s.rules.rollCallColors);
     if (sentaiColorCount(friendly(s)) >= need) {
@@ -512,7 +448,6 @@ export function simulateCombat(
     boardA.length > boardB.length ? "A" : boardB.length > boardA.length ? "B" : rng.int(2) === 0 ? "A" : "B";
   const firstOrder: Side[] = [turn, other(turn)];
 
-  for (const id of firstOrder) mergeGattai(sides[id]);
   for (const id of firstOrder) rollCall(sides[id]);
   for (const id of firstOrder) {
     const s = sides[id];

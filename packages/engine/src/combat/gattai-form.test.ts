@@ -8,6 +8,7 @@ import { Pool } from "../shop/pool.js";
 import { Rng } from "../rng/rng.js";
 import { newPlayer } from "../shop/economy.js";
 import { simulateCombat } from "./combat.js";
+import { recordBuff, type Unit } from "../content.js";
 
 // A small world: a core that becomes "Mega Form", two plain parts, a core without a form, and the form itself.
 const world = content({
@@ -23,31 +24,11 @@ const world = content({
 });
 const f = (key: string, atk: number, hp: number, kw: string[] = ["GATTAI"]) => fighter(key, atk, hp, { keywords: kw as never });
 
-describe("Gattai into a form card, in combat", () => {
-  const fight = (board: ReturnType<typeof f>[]) => simulateCombat(board, [f("foe", 1, 1, [])], 1, { content: world, maxAttacksPerCombat: 1 });
-
-  it("the leftmost core decides: the group becomes its form with the form's stats plus the parts'", () => {
-    const r = fight([f("core", 2, 2), f("part", 1, 2), f("part", 1, 2)]);
-    const g = r.events.find((e) => e.type === "GATTAI");
-    expect(g).toMatchObject({ cardKey: "mega", atk: 4 + 4, hp: 4 + 6 });
-    expect(g && g.type === "GATTAI" && [...g.keywords].sort()).toEqual(["RAPID"]);
-  });
-
-  it("moving another unit to the left changes the result", () => {
-    const r = fight([f("part", 1, 2), f("core", 2, 2), f("part", 1, 2)]);
-    const g = r.events.find((e) => e.type === "GATTAI");
-    expect(g).toMatchObject({ cardKey: "part", atk: 4, hp: 6 }); // a plain part leads: the old merge, under its face
-  });
-
-  it("keeps the parts' keywords (Guard here) on the form", () => {
-    const r = fight([f("core", 2, 2), f("shield", 1, 3, ["GATTAI", "GUARD"]), f("part", 1, 2)]);
-    const g = r.events.find((e) => e.type === "GATTAI");
-    expect(g && g.type === "GATTAI" && [...g.keywords].sort()).toEqual(["GUARD", "RAPID"]);
-  });
-
-  it("too few parts: nothing merges, form or not", () => {
-    const r = fight([f("core", 2, 2), f("part", 1, 2), f("wall", 1, 5, [])]);
+describe("no merging in combat, even with a core", () => {
+  it("a core and its parts fight as separate units", () => {
+    const r = simulateCombat([f("core", 2, 2), f("part", 1, 2), f("part", 1, 2)], [f("foe", 1, 1, [])], 1, { content: world, maxAttacksPerCombat: 1 });
     expect(r.events.some((e) => e.type === "GATTAI")).toBe(false);
+    expect(r.survivorsA.map((s) => s.cardKey)).toEqual(["core", "part", "part"]);
   });
 });
 
@@ -101,6 +82,37 @@ describe("Combine for good, in the recruit phase", () => {
     combineGattai(p, 1, env);
     p.hand = [{ key: "mega", golden: false, components: [] }, { key: "mega", golden: false, components: [] }];
     expect(resolveTriples(p, env.pool, env.rng, env.cfg)).toEqual([]);
+  });
+});
+
+describe("a combined robot can still grow, and is combined only once", () => {
+  const setup = () => {
+    const pool = new Pool([{ key: "core", rank: 1 }, { key: "part", rank: 1 }, { key: "shield", rank: 1 }, { key: "plain_core", rank: 1 }]);
+    const env = makeEnv({ content: world, pool, rng: new Rng(1) });
+    const p = newPlayer();
+    p.board = [{ key: "core", golden: false }, { key: "part", golden: false }, { key: "part", golden: false }];
+    combineGattai(p, 0, env);
+    return { env, p };
+  };
+
+  it("buffs after combining stick to the robot, next to the parts' total", () => {
+    const { env, p } = setup();
+    const robot = p.board[0] as Unit;
+    robot.bonusAtk = (robot.bonusAtk ?? 0) + 2;
+    robot.bonusHp = (robot.bonusHp ?? 0) + 2;
+    recordBuff(robot, { kind: "gear", key: "plate" }, 2, 2);
+    expect(world.stats(robot)).toEqual({ atk: 4 + 4 + 2, hp: 4 + 6 + 2 });
+    expect(robot.buffs?.map((b) => b.kind)).toEqual(["gattai", "gear"]);
+    expect(prepareCombat(p, env).units[0]).toMatchObject({ cardKey: "mega", atk: 10, hp: 12 });
+  });
+
+  it("a combined robot is never a part of a new group, even if it is given Gattai later", () => {
+    const { env, p } = setup();
+    const robot = p.board[0] as Unit;
+    robot.keywords = [...(robot.keywords ?? []), "GATTAI"];
+    p.board.unshift({ key: "core", golden: false }, { key: "part", golden: false });
+    // core, part, robot(with Gattai): only 2 real parts in a row, so no group
+    expect(gattaiGroupAt(p, 0, env)).toBeUndefined();
   });
 });
 

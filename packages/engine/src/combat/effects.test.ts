@@ -297,42 +297,14 @@ describe("KYODAIKA", () => {
 });
 
 describe("GATTAI", () => {
+  // Gattai happens in the recruit phase (COMBINE). In a fight, Gattai units are just units.
   const g = (name: string, atk = 1, hp = 2) => f(name, atk, hp, { keywords: ["GATTAI"] });
-  const merged = (board: CombatUnitInput[], rules = {}) =>
-    simulateCombat(board, [f("foe", 1, 1)], 1, { ...PRE, a: { rules } });
 
-  it("merges 3 adjacent into one with summed stats", () => {
-    const r = merged([g("g1"), g("g2"), g("g3"), f("solo", 1, 1)]);
-    expect(r.survivorsA.map((s) => s.cardKey)).toEqual(["g1", "solo"]);
-    expect(r.survivorsA[0]).toMatchObject({ atk: 3, hp: 6 });
-    expect(types(r.events, "GATTAI")).toHaveLength(1);
-  });
-
-  it("does not merge a run that is too short or broken up", () => {
-    expect(merged([g("g1"), g("g2")]).survivorsA).toHaveLength(2);
-    expect(merged([g("g1"), g("g2"), f("wall", 1, 1), g("g3")]).survivorsA).toHaveLength(4);
-  });
-
-  it("honours the gattaiSize rule", () => {
-    const r = merged([g("g1"), g("g2")], { gattaiSize: 2 });
-    expect(r.survivorsA).toHaveLength(1);
-    expect(r.survivorsA[0]).toMatchObject({ atk: 2, hp: 4 });
-  });
-
-  it("merges the whole run, and separate runs independently", () => {
-    const r = merged([g("a1"), g("a2"), g("a3"), g("a4"), f("wall", 1, 1), g("b1"), g("b2"), g("b3")]);
-    expect(r.survivorsA).toHaveLength(3);
-    expect(r.survivorsA[0]).toMatchObject({ atk: 4, hp: 8 });
-    expect(r.survivorsA[2]).toMatchObject({ atk: 3, hp: 6 });
-  });
-
-  it("the merged unit inherits Guard from any member", () => {
-    const board = [f("wall", 1, 99), f("g1", 1, 5, { keywords: ["GATTAI", "GUARD"] }), g("g2"), g("g3")];
-    for (let seed = 1; seed <= 15; seed++) {
-      const r = simulateCombat(board, [f("foe", 1, 999)], seed, { maxAttacksPerCombat: 6 });
-      const foeHits = r.events.filter((e) => e.type === "ATTACK" && e.attacker.startsWith("B"));
-      expect(foeHits.length).toBeGreaterThan(0);
-      for (const h of foeHits) expect(h.type === "ATTACK" && h.target).toBe("Am0"); // the merged unit, never "wall"
+  it("never merges during combat, however many are lined up or whatever the rules say", () => {
+    for (const rules of [{}, { gattaiSize: 2 }]) {
+      const r = simulateCombat([g("g1"), g("g2"), g("g3"), f("solo", 1, 1)], [f("foe", 1, 1)], 1, { ...PRE, a: { rules } });
+      expect(types(r.events, "GATTAI")).toHaveLength(0);
+      expect(r.survivorsA.map((s) => s.cardKey)).toEqual(["g1", "g2", "g3", "solo"]);
     }
   });
 });
@@ -383,7 +355,7 @@ describe("events describe the state they leave behind (so a client can replay wi
     expect(r.events.findIndex((e) => e.type === "BARRIER_POP")).toBeLessThan(r.events.findIndex((e) => e.type === "ATTACK"));
   });
 
-  it("SUMMON, TRANSFORM, KYODAIKA, REVIVE and GATTAI carry stats", () => {
+  it("SUMMON, TRANSFORM, KYODAIKA and REVIVE carry stats", () => {
     const tok = card("tok", { atk: 2, hp: 3, keywords: ["GUARD"] });
     const big = card("big", { atk: 6, hp: 7, keywords: ["RAPID"] });
     const w = content({ cards: [tok, big] });
@@ -401,8 +373,6 @@ describe("events describe the state they leave behind (so a client can replay wi
     const rv = simulateCombat([f("p", 1, 1, { keywords: ["REVIVE"] })], [f("foe", 9, 100)], 3, { maxAttacksPerCombat: 1 });
     expect(find(rv.events, "REVIVE")).toMatchObject({ hp: 1 });
 
-    const gt = simulateCombat([f("g1", 1, 2, { keywords: ["GATTAI"] }), f("g2", 2, 3, { keywords: ["GATTAI"] }), f("g3", 3, 4, { keywords: ["GATTAI", "GUARD"] })], [f("foe", 1, 1)], 1, PRE);
-    expect(find(gt.events, "GATTAI")).toMatchObject({ units: ["A0", "A1", "A2"], cardKey: "g1", atk: 6, hp: 9, keywords: ["GUARD"] });
   });
 
   it("EFFECT_DAMAGE reports the hp left, and 0 dealt through a barrier", () => {
