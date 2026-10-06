@@ -26,6 +26,10 @@ export interface ServerConfig {
   match: Partial<MatchConfig>;
   /** Which content set matches are built from (see @herotime/content). */
   contentSet: string;
+  /** Publish `contentSet` as a new version even though the database already has content (CONTENT_RESEED=1). */
+  contentReseed: boolean;
+  /** Usernames (lowercase) that get the admin role: ADMIN_USERS=alice,bob. Roles are never taken from sign-up requests. */
+  adminUsers: string[];
   /** Lets a player start a match immediately with chosen factions/speed (playtesting). Off in production. */
   practice: boolean;
   /** Folder of static web files to serve at /, or undefined for API only. */
@@ -80,6 +84,8 @@ export function loadConfig(env: Env = process.env, warn: (msg: string) => void =
     authLimits: { registerPerMin: int(env.REGISTER_PER_MIN, 10), loginPerMin: int(env.LOGIN_PER_MIN, 10) },
     match,
     contentSet: env.CONTENT_SET ?? (production ? "production" : "prototype"),
+    contentReseed: env.CONTENT_RESEED === "1",
+    adminUsers: (env.ADMIN_USERS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean),
     practice: env.PRACTICE !== undefined ? env.PRACTICE === "1" : !production,
     webDir: env.WEB_DIR || undefined,
     databaseUrl: env.DATABASE_URL || undefined,

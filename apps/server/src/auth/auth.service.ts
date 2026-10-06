@@ -24,7 +24,7 @@ export interface PublicUser {
   role: Role;
 }
 
-const toPublic = (u: UserRecord): PublicUser => ({ id: u.id, username: u.username, role: u.role });
+
 
 @Injectable()
 export class AuthService {
@@ -44,7 +44,7 @@ export class AuthService {
     try {
       // Role is never taken from the request: everyone registers as a plain player.
       const user = await this.users.create({ username: input.username, email: input.email, passwordHash, role: "PLAYER" });
-      return { token: await this.sign(user), user: toPublic(user) };
+      return { token: await this.sign(user), user: this.toPublic(user) };
     } catch (e) {
       if (e instanceof DuplicateUserError) throw new ConflictException(e.message);
       throw e;
@@ -55,7 +55,13 @@ export class AuthService {
     const user = await this.users.findByUsername(input.username);
     const ok = await bcrypt.compare(input.password, user?.passwordHash ?? this.decoyHash);
     if (!user || !ok) throw new UnauthorizedException("invalid username or password");
-    return { token: await this.sign(user), user: toPublic(user) };
+    return { token: await this.sign(user), user: this.toPublic(user) };
+  }
+
+  /** The role comes from the database or from ADMIN_USERS: never from anything a client sends. */
+  private toPublic(u: UserRecord): PublicUser {
+    const admin = u.role === "ADMIN" || this.config.adminUsers.includes(u.username.toLowerCase());
+    return { id: u.id, username: u.username, role: admin ? "ADMIN" : "PLAYER" };
   }
 
   /** The user a valid token belongs to, or undefined (expired, forged, or the user is gone). */
@@ -63,14 +69,14 @@ export class AuthService {
     try {
       const payload = await this.jwt.verifyAsync<TokenPayload>(token);
       const user = await this.users.findById(payload.sub);
-      return user ? toPublic(user) : undefined;
+      return user ? this.toPublic(user) : undefined;
     } catch {
       return undefined;
     }
   }
 
   private sign(user: UserRecord): Promise<string> {
-    const payload: TokenPayload = { sub: user.id, name: user.username, role: user.role };
+    const payload: TokenPayload = { sub: user.id, name: user.username, role: this.toPublic(user).role };
     return this.jwt.signAsync(payload);
   }
 }

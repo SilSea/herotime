@@ -3,16 +3,19 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthController, JwtAuthGuard } from "./auth/auth.controller.js";
 import { AuthService } from "./auth/auth.service.js";
 import type { ServerConfig } from "./config.js";
+import { AdminController, AdminGuard } from "./content/admin.controller.js";
 import { ContentController } from "./content/content.controller.js";
 import { ContentService } from "./content/content.service.js";
 import { GameGateway, SocketPublisher } from "./game/game.gateway.js";
 import { LobbyService } from "./game/lobby.service.js";
 import { MatchRegistry } from "./game/match.registry.js";
 import { realTimers, type Timers } from "./game/ports.js";
-import { InMemoryMatchRepository, InMemoryUserRepository } from "./persistence/in-memory.js";
+import { InMemoryContentRepository, InMemoryMatchRepository, InMemoryUserRepository } from "./persistence/in-memory.js";
 import {
+  CONTENT_REPOSITORY,
   MATCH_REPOSITORY,
   USER_REPOSITORY,
+  type ContentRepository,
   type MatchRepository,
   type UserRepository,
 } from "./persistence/repositories.js";
@@ -23,6 +26,7 @@ export interface AppDeps {
   content: ContentService;
   users?: UserRepository;
   matches?: MatchRepository;
+  contentRepo?: ContentRepository;
   timers?: Timers;
   /** Closes anything the caller opened for us (a database connection) on shutdown. */
   onShutdown?: () => Promise<void>;
@@ -47,14 +51,16 @@ export class AppModule implements OnApplicationShutdown {
           verifyOptions: { algorithms: ["HS256"] },
         }),
       ],
-      controllers: [AuthController, ContentController],
+      controllers: [AuthController, ContentController, AdminController],
       providers: [
         { provide: CONFIG, useValue: deps.config },
         { provide: SHUTDOWN_HOOK, useValue: deps.onShutdown },
         { provide: TIMERS, useValue: deps.timers ?? realTimers },
         { provide: USER_REPOSITORY, useValue: deps.users ?? new InMemoryUserRepository() },
         { provide: MATCH_REPOSITORY, useValue: deps.matches ?? new InMemoryMatchRepository() },
+        { provide: CONTENT_REPOSITORY, useValue: deps.contentRepo ?? new InMemoryContentRepository() },
         { provide: ContentService, useValue: deps.content },
+        AdminGuard,
         SocketPublisher,
         { provide: PUBLISHER, useExisting: SocketPublisher },
         AuthService,

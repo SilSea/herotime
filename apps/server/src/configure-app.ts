@@ -6,6 +6,7 @@ import { AppIoAdapter } from "./io-adapter.js";
 /** Everything that turns a bare Nest app into the real server. Shared by main.ts and the tests. */
 export function configureApp(app: NestExpressApplication, config: ServerConfig): void {
   app.disable("x-powered-by");
+  app.useBodyParser("json", { limit: "4mb" });
   app.enableCors({ origin: config.corsOrigin });
   app.useWebSocketAdapter(new AppIoAdapter(app, config));
   if (config.webDir) {

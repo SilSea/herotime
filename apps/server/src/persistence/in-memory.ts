@@ -1,6 +1,12 @@
 import { randomUUID } from "node:crypto";
 import {
   DuplicateUserError,
+  type AuditEntry,
+  type ContentData,
+  type ContentRepository,
+  type ContentVersionMeta,
+  type ContentVersionRecord,
+  type DraftRecord,
   type MatchRepository,
   type MatchResult,
   type UserRecord,
@@ -43,5 +49,50 @@ export class InMemoryMatchRepository implements MatchRepository {
       .filter((r) => r.players.some((p) => p.userId === userId))
       .slice(-limit)
       .reverse();
+  }
+}
+
+export class InMemoryContentRepository implements ContentRepository {
+  private readonly versions: ContentVersionRecord[] = [];
+  private draft: DraftRecord | undefined;
+  private readonly log: AuditEntry[] = [];
+
+  async latest(): Promise<ContentVersionRecord | undefined> {
+    return this.versions.at(-1);
+  }
+
+  async get(number: number): Promise<ContentVersionRecord | undefined> {
+    return this.versions.find((v) => v.number === number);
+  }
+
+  async list(limit: number): Promise<ContentVersionMeta[]> {
+    return [...this.versions].reverse().slice(0, limit).map(({ data: _data, ...meta }) => meta);
+  }
+
+  async publish(data: ContentData, notes: string | null, userId: string | null): Promise<ContentVersionRecord> {
+    const record: ContentVersionRecord = { number: (this.versions.at(-1)?.number ?? 0) + 1, data: structuredClone(data), notes, publishedAt: new Date(), publishedBy: userId };
+    this.versions.push(record);
+    return record;
+  }
+
+  async loadDraft(): Promise<DraftRecord | undefined> {
+    return this.draft && { ...this.draft, data: structuredClone(this.draft.data) };
+  }
+
+  async saveDraft(data: ContentData, basedOn: number, userId: string): Promise<DraftRecord> {
+    this.draft = { data: structuredClone(data), basedOn, updatedAt: new Date(), updatedBy: userId };
+    return this.draft;
+  }
+
+  async clearDraft(): Promise<void> {
+    this.draft = undefined;
+  }
+
+  async audit(adminId: string, entity: string, before: unknown, after: unknown): Promise<void> {
+    this.log.push({ id: randomUUID(), adminId, entity, before, after, at: new Date() });
+  }
+
+  async recentAudit(limit: number): Promise<AuditEntry[]> {
+    return [...this.log].reverse().slice(0, limit);
   }
 }

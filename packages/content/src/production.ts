@@ -34,7 +34,7 @@ import {
   unit,
   allAllies,
 } from "./dsl.js";
-import { withGeneratedText, type ContentSetData } from "./types.js";
+import type { ContentSetData } from "./types.js";
 
 /**
  * PRODUCTION set: the launch line-up. Seven factions, seven series (Gokaiger, Kyoryuger, Shinkenger,
@@ -236,4 +236,5 @@ const heroes = [
   hero("iron_guard", "Iron Guard", { armor: 6 }),
 ];
 
-export const production: ContentSetData = withGeneratedText({ factions, series: allSeries, cards, gauges, relics, heroes });
+/** As authored: no generated rules text yet (that is filled in when a set is loaded). */
+export const productionRaw: ContentSetData = { factions, series: allSeries, cards, gauges, relics, heroes };

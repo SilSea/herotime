@@ -6,7 +6,8 @@ import { AppModule } from "../src/app.module.js";
 import type { ServerConfig } from "../src/config.js";
 import { ContentService } from "../src/content/content.service.js";
 import { configureApp } from "../src/configure-app.js";
-import { InMemoryMatchRepository, InMemoryUserRepository } from "../src/persistence/in-memory.js";
+import { InMemoryContentRepository, InMemoryMatchRepository, InMemoryUserRepository } from "../src/persistence/in-memory.js";
+import { getRawContentSet } from "@herotime/content";
 import type { MatchRepository, UserRepository } from "../src/persistence/repositories.js";
 import { starterContent, testConfig } from "./fakes.js";
 
@@ -27,6 +28,8 @@ export interface TestServer<U extends UserRepository = InMemoryUserRepository, M
   config: ServerConfig;
   users: U;
   matches: M;
+  content: ContentService;
+  contentRepo: InMemoryContentRepository;
   close(): Promise<void>;
 }
 
@@ -48,14 +51,17 @@ export async function startServer(
   });
   const users = repos?.users ?? new InMemoryUserRepository();
   const matches = repos?.matches ?? new InMemoryMatchRepository();
+  const content = new ContentService(starterContent(), "prototype", getRawContentSet("prototype"));
+  const contentRepo = new InMemoryContentRepository();
+  await content.restore(contentRepo);
   const moduleRef = await Test.createTestingModule({
-    imports: [AppModule.forRoot({ config, content: new ContentService(starterContent(), "prototype"), users, matches })],
+    imports: [AppModule.forRoot({ config, content, users, matches, contentRepo })],
   }).compile();
   const app = moduleRef.createNestApplication<NestExpressApplication>();
   configureApp(app, config);
   await app.listen(0, "127.0.0.1");
   const port = (app.getHttpServer().address() as { port: number }).port;
-  return { app, url: `http://127.0.0.1:${port}`, config, users, matches, close: () => app.close() };
+  return { app, url: `http://127.0.0.1:${port}`, config, users, matches, content, contentRepo, close: () => app.close() };
 }
 
 /** GET a URL and parse the JSON body. */

@@ -2,6 +2,12 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma, PrismaClient } from "../generated/prisma/client.js";
 import {
   DuplicateUserError,
+  type AuditEntry,
+  type ContentData,
+  type ContentRepository,
+  type ContentVersionMeta,
+  type ContentVersionRecord,
+  type DraftRecord,
   type MatchRepository,
   type MatchResult,
   type UserRecord,
@@ -99,5 +105,72 @@ export class PrismaMatchRepository implements MatchRepository {
         .map((p) => ({ userId: p.userId, name: p.name, isBot: p.isBot, heroKey: p.heroKey, placement: p.placement }))
         .sort((a, b) => a.placement - b.placement),
     }));
+  }
+}
+
+const DRAFT_ID = "main";
+const toJson = (v: unknown) => (v === null || v === undefined ? Prisma.JsonNull : (v as Prisma.InputJsonValue));
+
+export class PrismaContentRepository implements ContentRepository {
+  constructor(private readonly db: PrismaClient) {}
+
+  private static record(v: { number: number; snapshot: unknown; notes: string | null; publishedAt: Date; publishedBy: string | null }): ContentVersionRecord {
+    return { number: v.number, data: v.snapshot as ContentData, notes: v.notes, publishedAt: v.publishedAt, publishedBy: v.publishedBy };
+  }
+
+  async latest(): Promise<ContentVersionRecord | undefined> {
+    const v = await this.db.contentVersion.findFirst({ orderBy: { number: "desc" } });
+    return v ? PrismaContentRepository.record(v) : undefined;
+  }
+
+  async get(number: number): Promise<ContentVersionRecord | undefined> {
+    const v = await this.db.contentVersion.findUnique({ where: { number } });
+    return v ? PrismaContentRepository.record(v) : undefined;
+  }
+
+  async list(limit: number): Promise<ContentVersionMeta[]> {
+    const rows = await this.db.contentVersion.findMany({ orderBy: { number: "desc" }, take: limit, select: { number: true, notes: true, publishedAt: true, publishedBy: true } });
+    return rows;
+  }
+
+  async publish(data: ContentData, notes: string | null, userId: string | null): Promise<ContentVersionRecord> {
+    // The unique number is the arbiter: two simultaneous publishes cannot both take the same one.
+    for (let attempt = 0; ; attempt++) {
+      const last = await this.db.contentVersion.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
+      try {
+        const v = await this.db.contentVersion.create({ data: { number: (last?.number ?? 0) + 1, snapshot: data as Prisma.InputJsonValue, notes, publishedBy: userId } });
+        return PrismaContentRepository.record(v);
+      } catch (e) {
+        if (attempt < 3 && e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") continue;
+        throw e;
+      }
+    }
+  }
+
+  async loadDraft(): Promise<DraftRecord | undefined> {
+    const d = await this.db.contentDraft.findUnique({ where: { id: DRAFT_ID } });
+    return d ? { data: d.data as ContentData, basedOn: d.basedOn, updatedAt: d.updatedAt, updatedBy: d.updatedBy } : undefined;
+  }
+
+  async saveDraft(data: ContentData, basedOn: number, userId: string): Promise<DraftRecord> {
+    const d = await this.db.contentDraft.upsert({
+      where: { id: DRAFT_ID },
+      create: { id: DRAFT_ID, data: data as Prisma.InputJsonValue, basedOn, updatedBy: userId },
+      update: { data: data as Prisma.InputJsonValue, basedOn, updatedBy: userId },
+    });
+    return { data: d.data as ContentData, basedOn: d.basedOn, updatedAt: d.updatedAt, updatedBy: d.updatedBy };
+  }
+
+  async clearDraft(): Promise<void> {
+    await this.db.contentDraft.deleteMany({ where: { id: DRAFT_ID } });
+  }
+
+  async audit(adminId: string, entity: string, before: unknown, after: unknown): Promise<void> {
+    await this.db.auditLog.create({ data: { adminId, entity, before: toJson(before), after: toJson(after) } });
+  }
+
+  async recentAudit(limit: number): Promise<AuditEntry[]> {
+    const rows = await this.db.auditLog.findMany({ orderBy: { at: "desc" }, take: limit });
+    return rows.map((r) => ({ id: r.id, adminId: r.adminId, entity: r.entity, before: r.before, after: r.after, at: r.at }));
   }
 }

@@ -12,7 +12,7 @@ export interface EndedInfo {
   placements: { playerId: string; placement: number }[];
 }
 
-type Payload = { matchId: string; /** Server clock, so clients can show countdowns correctly even if their own clock is off. */ serverNow: number; view: Omit<MatchView, "lastCombat"> & { lastCombat?: MatchView["lastCombat"] } };
+type Payload = { matchId: string; /** Server clock, so clients can show countdowns correctly even if their own clock is off. */ serverNow: number; /** Content version the match was built from, so a client can show the right cards. */ contentVersion: number; view: Omit<MatchView, "lastCombat"> & { lastCombat?: MatchView["lastCombat"] } };
 
 /**
  * Drives one Match in real time: schedules its next deadline, applies player intents and pushes each
@@ -86,7 +86,7 @@ export class MatchRunner {
     const view: Payload["view"] = { ...this.match.view(userId) };
     // The replay is large and only changes once a turn, so ordinary updates leave it out.
     if (!withCombat) delete view.lastCombat;
-    this.publisher.toUser(userId, "match:view", { matchId: this.id, serverNow: this.timers.now(), view } satisfies Payload);
+    this.publisher.toUser(userId, "match:view", { matchId: this.id, serverNow: this.timers.now(), contentVersion: this.meta.contentVersion, view } satisfies Payload);
   }
 
   private schedule(): void {

@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { DuplicateUserError, type MatchResult } from "../src/persistence/repositories.js";
-import { createPrismaClient, PrismaMatchRepository, PrismaUserRepository } from "../src/persistence/prisma.js";
+import { createPrismaClient, PrismaContentRepository, PrismaMatchRepository, PrismaUserRepository } from "../src/persistence/prisma.js";
 import { api, connect, startServer } from "./e2e-helpers.js";
 
 /**
@@ -38,6 +38,9 @@ describe.skipIf(!URL_)("Prisma repositories on real Postgres", () => {
   beforeEach(async () => {
     await db.matchPlayer.deleteMany();
     await db.match.deleteMany();
+    await db.auditLog.deleteMany(); // rows that point at users go first
+    await db.contentDraft.deleteMany();
+    await db.contentVersion.deleteMany();
     await db.user.deleteMany();
   });
 
@@ -171,5 +174,80 @@ describe.skipIf(!URL_)("Prisma repositories on real Postgres", () => {
       c.close();
       await second.close();
     }, 60_000);
+  });
+
+  describe("content versions", () => {
+    const content = new PrismaContentRepository(db);
+    // audit rows point at users, so they must go before the outer beforeEach clears the users
+    const clean = async () => {
+      await db.contentDraft.deleteMany();
+      await db.auditLog.deleteMany();
+      await db.contentVersion.deleteMany();
+    };
+    beforeEach(clean);
+    afterEach(clean);
+
+    it("numbers versions 1, 2, 3 and returns them newest first with the data intact", async () => {
+      expect(await content.latest()).toBeUndefined();
+      const admin = await newUser("editor");
+      const v1 = await content.publish({ cards: [{ key: "a" }], note: "é ✓" }, null, null);
+      const v2 = await content.publish({ cards: [] }, "second", admin.id);
+      expect([v1.number, v2.number]).toEqual([1, 2]);
+      expect((await content.latest())?.number).toBe(2);
+      expect((await content.get(1))?.data).toEqual({ cards: [{ key: "a" }], note: "é ✓" });
+      expect(await content.get(9)).toBeUndefined();
+      const list = await content.list(10);
+      expect(list.map((v) => v.number)).toEqual([2, 1]);
+      expect(list[0]).toMatchObject({ notes: "second", publishedBy: admin.id });
+      expect(list[0]).not.toHaveProperty("data");
+    });
+
+    it("two publishes at once never share a number", async () => {
+      const results = await Promise.all(Array.from({ length: 4 }, (_, i) => content.publish({ i }, null, null)));
+      expect(new Set(results.map((r) => r.number)).size).toBe(4);
+      expect((await content.latest())?.number).toBe(4);
+    });
+
+    it("keeps one draft that is replaced on save and gone after clear", async () => {
+      const admin = await newUser("drafter");
+      expect(await content.loadDraft()).toBeUndefined();
+      await content.saveDraft({ cards: [1] }, 1, admin.id);
+      const second = await content.saveDraft({ cards: [1, 2] }, 3, admin.id);
+      expect(second).toMatchObject({ basedOn: 3, updatedBy: admin.id });
+      expect((await content.loadDraft())?.data).toEqual({ cards: [1, 2] });
+      expect(await db.contentDraft.count()).toBe(1);
+      await content.clearDraft();
+      await content.clearDraft(); // clearing nothing is fine
+      expect(await content.loadDraft()).toBeUndefined();
+    });
+
+    it("records an audit trail, newest first, including entries with nothing before or after", async () => {
+      const admin = await newUser("auditor");
+      await content.audit(admin.id, "content.draft", null, { cards: 3 });
+      await content.audit(admin.id, "content.publish", { version: 1 }, { version: 2 });
+      const entries = await content.recentAudit(10);
+      expect(entries.map((e) => e.entity)).toEqual(["content.publish", "content.draft"]);
+      expect(entries[1]).toMatchObject({ adminId: admin.id, before: null, after: { cards: 3 } });
+    });
+
+    it("a server restarts into the newest published version, and an edited card survives it", async () => {
+      const { ContentService } = await import("../src/content/content.service.js");
+      const { getRawContentSet } = await import("@herotime/content");
+      const { starterContent } = await import("./fakes.js");
+      const first = new ContentService(starterContent(), "prototype", getRawContentSet("prototype"));
+      expect(await first.restore(content)).toBe("seeded");
+      const admin = await newUser("publisher");
+      const edited = structuredClone(first.authored()) as any;
+      edited.cards.find((c: any) => c.key === "n1").atk = 4;
+      expect(await first.publishData(content, edited, "tuned", admin.id)).toBe(2);
+
+      const second = new ContentService(starterContent(), "prototype", getRawContentSet("prototype"));
+      expect(await second.restore(content)).toBe("loaded");
+      expect(second.latest.version).toBe(2);
+      expect(second.latest.content.card("n1").atk).toBe(4);
+      expect(await second.restore(content, true)).toBe("seeded"); // reseed publishes the configured set again
+      expect(second.latest.version).toBe(3);
+      expect(second.latest.content.card("n1").atk).toBe(2);
+    });
   });
 });

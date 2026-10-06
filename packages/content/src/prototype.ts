@@ -32,7 +32,7 @@ import {
   token,
   unit,
 } from "./dsl.js";
-import { withGeneratedText, type ContentSetData } from "./types.js";
+import type { ContentSetData } from "./types.js";
 
 /**
  * PROTOTYPE set: a kitchen sink for trying ideas. All 7 factions with a full rank 1-6 ladder,
@@ -192,4 +192,5 @@ const heroes = [
   hero("iron_guard", "Iron Guard", { armor: 6 }),
 ];
 
-export const prototype: ContentSetData = withGeneratedText({ factions, series: [proSentai, proRider], cards, gauges, relics, heroes });
+/** As authored: no generated rules text yet (that is filled in when a set is loaded). */
+export const prototypeRaw: ContentSetData = { factions, series: [proSentai, proRider], cards, gauges, relics, heroes };

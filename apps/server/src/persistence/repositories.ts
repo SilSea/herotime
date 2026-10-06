@@ -39,3 +39,53 @@ export interface MatchRepository {
 
 export const USER_REPOSITORY = Symbol("USER_REPOSITORY");
 export const MATCH_REPOSITORY = Symbol("MATCH_REPOSITORY");
+
+// ------------------------------------------------------------------ content
+
+/** Content as JSON (the shape of @herotime/content's ContentSetData). The repository never looks inside. */
+export type ContentData = Record<string, unknown>;
+
+export interface ContentVersionMeta {
+  number: number;
+  notes: string | null;
+  publishedAt: Date;
+  publishedBy: string | null;
+}
+
+export interface ContentVersionRecord extends ContentVersionMeta {
+  data: ContentData;
+}
+
+export interface DraftRecord {
+  data: ContentData;
+  /** Version the draft was started from, to warn when someone else published in between. */
+  basedOn: number;
+  updatedAt: Date;
+  updatedBy: string | null;
+}
+
+export interface AuditEntry {
+  id: string;
+  adminId: string;
+  entity: string;
+  before: unknown;
+  after: unknown;
+  at: Date;
+}
+
+export interface ContentRepository {
+  latest(): Promise<ContentVersionRecord | undefined>;
+  get(number: number): Promise<ContentVersionRecord | undefined>;
+  /** Newest first. */
+  list(limit: number): Promise<ContentVersionMeta[]>;
+  /** Stores the data as the next version number. */
+  publish(data: ContentData, notes: string | null, userId: string | null): Promise<ContentVersionRecord>;
+  loadDraft(): Promise<DraftRecord | undefined>;
+  saveDraft(data: ContentData, basedOn: number, userId: string): Promise<DraftRecord>;
+  clearDraft(): Promise<void>;
+  audit(adminId: string, entity: string, before: unknown, after: unknown): Promise<void>;
+  /** Newest first. */
+  recentAudit(limit: number): Promise<AuditEntry[]>;
+}
+
+export const CONTENT_REPOSITORY = Symbol("CONTENT_REPOSITORY");
