@@ -4,7 +4,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 เฟสอ้างอิง roadmap ใน [PLAN.md](PLAN.md) · กฎละเอียดดู [RULES.md](RULES.md)
 
 ## F1. Core Gameplay
-- [ ] **F1.1** (P0) ล็อบบี้ 8 คน, เลือก Hero 1 จาก 2
+- [x] **F1.1** (P0) ล็อบบี้ 8 คน, เลือก Hero 1 จาก 2
 - [x] **F1.2** (P0) Economy: Energy 3→10, ซื้อ 3 / ขาย 1 / Refresh 1 / Freeze 0
 - [x] **F1.3** (P0) Base Rank 1–6 + ราคาอัปลดลง 1 ทุกเทิร์นที่ยังไม่อัป
 - [x] **F1.4** (P0) Shared pool จำกัดจำนวนตาม Rank
@@ -12,8 +12,8 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F1.6** (P0) Triple → Final Form + Discover Rank+1
 - [x] **F1.7** (P0) Auto combat (seeded, deterministic) + combat log
 - [x] **F1.8** (P0) Damage = Base Rank + Rank ยูนิตที่รอด (cap 15 เทิร์น 1–8)
-- [ ] **F1.9** (P0) จับคู่ไม่ซ้ำ 3 รอบล่าสุด + Ghost
-- [ ] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s, replay ≤25s, Ready ก่อนเวลา
+- [x] **F1.9** (P0) จับคู่ไม่ซ้ำ 3 รอบล่าสุด + Ghost
+- [x] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s, replay ≤25s, Ready ก่อนเวลา
 - [x] **F1.11** (P0) Hero Power (active / passive / ครั้งเดียวต่อเกม)
 - [ ] **F1.12** (P1) Gear/Spell ในร้าน
 - [ ] **F1.13** (P2) Quick Mode (Recruit 35s, HP 20)
@@ -38,16 +38,16 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [ ] **F3.11** (P0) Launch series: Gokaiger, Kyoryuger, Shinkenger, W, Den-O, OOO, Himmapan Sentai (original) — ดู [RULES.md §11](RULES.md#11-launch-series-ชุดแรก)
 
 ## F4. Online / Server
-- [ ] **F4.1** (P0) สมัคร/ล็อกอิน JWT, role `player` / `admin`
-- [ ] **F4.2** (P0) Matchmaking queue + เติม bot
-- [ ] **F4.3** (P0) Server-authoritative intent API (Socket.IO)
-- [ ] **F4.4** (P0) ซ่อนข้อมูลของคนอื่น (PlayerView)
-- [ ] **F4.5** (P0) Reconnect กลางเกม
-- [ ] **F4.6** (P0) Bot AI พื้นฐาน
+- [x] **F4.1** (P0) สมัคร/ล็อกอิน JWT, role `player` / `admin`
+- [x] **F4.2** (P0) Matchmaking queue + เติม bot
+- [x] **F4.3** (P0) Server-authoritative intent API (Socket.IO)
+- [x] **F4.4** (P0) ซ่อนข้อมูลของคนอื่น (PlayerView)
+- [x] **F4.5** (P0) Reconnect กลางเกม
+- [x] **F4.6** (P0) Bot AI พื้นฐาน
 - [ ] **F4.7** (P1) ประวัติแมตช์ + อันดับ
 - [ ] **F4.8** (P2) MMR/Ranked, friend lobby
 - [ ] **F4.9** (P2) Redis scale หลาย instance
-- [ ] **F4.10** (P0) รัน local: Docker Compose (Postgres + Redis) + `pnpm dev`, เล่นใน LAN ได้
+- [x] **F4.10** (P0) รัน local: Docker Compose (Postgres + Redis) + `pnpm dev`, เล่นใน LAN ได้
 - [ ] **F4.11** (P2) Deploy cloud (Railway → Fly.io/VPS)
 
 ## F5. Web Client

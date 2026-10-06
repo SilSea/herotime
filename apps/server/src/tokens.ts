@@ -2,3 +2,4 @@
 export const CONFIG = Symbol("CONFIG");
 export const TIMERS = Symbol("TIMERS");
 export const PUBLISHER = Symbol("PUBLISHER");
+export const SHUTDOWN_HOOK = Symbol("SHUTDOWN_HOOK");

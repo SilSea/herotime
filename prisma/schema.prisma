@@ -24,8 +24,11 @@ enum CardSlot {
 
 model User {
   id           String           @id @default(cuid())
-  name         String           @unique
-  email        String           @unique
+  username     String
+  /// lowercase copy of username: uniqueness is enforced on this, so "Rider" and "rider" collide
+  usernameKey  String           @unique
+  email        String
+  emailKey     String           @unique
   passwordHash String
   role         Role             @default(PLAYER)
   createdAt    DateTime         @default(now())
@@ -147,30 +150,32 @@ model ContentVersion {
   snapshot    Json
   notes       String?
   publishedAt DateTime @default(now())
-  publishedBy String
-  publisher   User     @relation(fields: [publishedBy], references: [id])
-  matches     Match[]
+  /// set once the admin editor publishes; null for seeded content
+  publishedBy String?
+  publisher   User?    @relation(fields: [publishedBy], references: [id])
 }
 
 // ---- Matches ----
 
 model Match {
-  id               String         @id @default(cuid())
-  contentVersionId String
-  seed             Int
-  startedAt        DateTime       @default(now())
-  endedAt          DateTime?
-  contentVersion   ContentVersion @relation(fields: [contentVersionId], references: [id])
-  players          MatchPlayer[]
+  id             String        @id
+  /// number of the content version the match was played with (matches ContentVersion.number)
+  contentVersion Int
+  seed           Int
+  startedAt      DateTime
+  endedAt        DateTime
+  players        MatchPlayer[]
 }
 
 model MatchPlayer {
   id        String  @id @default(cuid())
   matchId   String
+  /// null for bots
   userId    String?
+  name      String
   isBot     Boolean @default(false)
-  heroKey   String
-  placement Int?
+  heroKey   String?
+  placement Int
   match     Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
   user      User?   @relation(fields: [userId], references: [id])
 

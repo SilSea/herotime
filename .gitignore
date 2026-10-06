@@ -9,3 +9,4 @@ coverage/
 *.log
 uploads/
 .DS_Store
+apps/server/src/generated/

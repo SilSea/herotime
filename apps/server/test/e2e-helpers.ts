@@ -7,6 +7,7 @@ import type { ServerConfig } from "../src/config.js";
 import { ContentService } from "../src/content/content.service.js";
 import { AppIoAdapter } from "../src/io-adapter.js";
 import { InMemoryMatchRepository, InMemoryUserRepository } from "../src/persistence/in-memory.js";
+import type { MatchRepository, UserRepository } from "../src/persistence/repositories.js";
 import { starterContent, testConfig } from "./fakes.js";
 
 /** Real timers, but a match that finishes in about four seconds. */
@@ -20,16 +21,24 @@ export const FAST_MATCH = {
   maxTurns: 4,
 };
 
-export interface TestServer {
+export interface TestServer<U extends UserRepository = InMemoryUserRepository, M extends MatchRepository = InMemoryMatchRepository> {
   app: NestExpressApplication;
   url: string;
   config: ServerConfig;
-  users: InMemoryUserRepository;
-  matches: InMemoryMatchRepository;
+  users: U;
+  matches: M;
   close(): Promise<void>;
 }
 
-export async function startServer(over: Partial<ServerConfig> = {}): Promise<TestServer> {
+export function startServer(over?: Partial<ServerConfig>): Promise<TestServer>;
+export function startServer<U extends UserRepository, M extends MatchRepository>(
+  over: Partial<ServerConfig>,
+  repos: { users: U; matches: M },
+): Promise<TestServer<U, M>>;
+export async function startServer(
+  over: Partial<ServerConfig> = {},
+  repos?: { users: UserRepository; matches: MatchRepository },
+): Promise<TestServer<any, any>> {
   const config = testConfig({
     match: FAST_MATCH,
     lobby: { matchSize: 8, fillAfterMs: 150 },
@@ -37,8 +46,8 @@ export async function startServer(over: Partial<ServerConfig> = {}): Promise<Tes
     authLimits: { registerPerMin: 10_000, loginPerMin: 10 },
     ...over,
   });
-  const users = new InMemoryUserRepository();
-  const matches = new InMemoryMatchRepository();
+  const users = repos?.users ?? new InMemoryUserRepository();
+  const matches = repos?.matches ?? new InMemoryMatchRepository();
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule.forRoot({ config, content: new ContentService(starterContent()), users, matches })],
   }).compile();
@@ -50,7 +59,7 @@ export async function startServer(over: Partial<ServerConfig> = {}): Promise<Tes
   return { app, url: `http://127.0.0.1:${port}`, config, users, matches, close: () => app.close() };
 }
 
-export async function api(server: TestServer, path: string, body?: unknown, token?: string) {
+export async function api(server: { url: string }, path: string, body?: unknown, token?: string) {
   const res = await fetch(`${server.url}${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: { "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) },
@@ -68,7 +77,7 @@ export async function api(server: TestServer, path: string, body?: unknown, toke
 
 let counter = 0;
 /** Register a fresh user and return their credentials. */
-export async function newUser(server: TestServer, name?: string) {
+export async function newUser(server: { url: string }, name?: string) {
   const username = name ?? `rider_${Date.now().toString(36)}_${counter++}`;
   const res = await api(server, "/auth/register", { username, email: `${username}@test.dev`, password: "password123" });
   if (res.status !== 201) throw new Error(`register failed: ${res.status} ${JSON.stringify(res.body)}`);
@@ -147,7 +156,7 @@ export class Client {
 }
 
 /** Connect and wait until the server has authenticated us (it always sends queue:status first). */
-export async function connect(server: TestServer, token: string): Promise<Client> {
+export async function connect(server: { url: string }, token: string): Promise<Client> {
   const c = new Client(server.url, token);
   await c.waitFor("queue:status");
   return c;

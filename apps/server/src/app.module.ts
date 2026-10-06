@@ -15,7 +15,7 @@ import {
   type MatchRepository,
   type UserRepository,
 } from "./persistence/repositories.js";
-import { CONFIG, PUBLISHER, TIMERS } from "./tokens.js";
+import { CONFIG, PUBLISHER, SHUTDOWN_HOOK, TIMERS } from "./tokens.js";
 
 export interface AppDeps {
   config: ServerConfig;
@@ -23,6 +23,8 @@ export interface AppDeps {
   users?: UserRepository;
   matches?: MatchRepository;
   timers?: Timers;
+  /** Closes anything the caller opened for us (a database connection) on shutdown. */
+  onShutdown?: () => Promise<void>;
 }
 
 @Module({})
@@ -30,6 +32,7 @@ export class AppModule implements OnApplicationShutdown {
   constructor(
     @Inject(MatchRegistry) private readonly registry: MatchRegistry,
     @Inject(LobbyService) private readonly lobby: LobbyService,
+    @Inject(SHUTDOWN_HOOK) private readonly hook: (() => Promise<void>) | undefined,
   ) {}
 
   /** Everything environment-specific comes in through `deps`, which keeps tests free of globals. */
@@ -46,6 +49,7 @@ export class AppModule implements OnApplicationShutdown {
       controllers: [AuthController],
       providers: [
         { provide: CONFIG, useValue: deps.config },
+        { provide: SHUTDOWN_HOOK, useValue: deps.onShutdown },
         { provide: TIMERS, useValue: deps.timers ?? realTimers },
         { provide: USER_REPOSITORY, useValue: deps.users ?? new InMemoryUserRepository() },
         { provide: MATCH_REPOSITORY, useValue: deps.matches ?? new InMemoryMatchRepository() },
@@ -61,8 +65,9 @@ export class AppModule implements OnApplicationShutdown {
     };
   }
 
-  onApplicationShutdown(): void {
+  async onApplicationShutdown(): Promise<void> {
     this.lobby.shutdown();
     this.registry.shutdown();
+    await this.hook?.();
   }
 }
