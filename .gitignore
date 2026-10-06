@@ -10,3 +10,4 @@ coverage/
 uploads/
 .DS_Store
 apps/server/src/generated/
+apps/web/public/js/

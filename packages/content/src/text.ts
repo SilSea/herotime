@@ -90,10 +90,9 @@ export function effectText(e: Effect, names: Names): string {
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;
 }
 
-/** Rules text of a card: keywords first, then Henshin, then every effect. */
+/** Rules text of a card: Henshin, then every effect. Keywords are not repeated here: the card shows them as chips. */
 export function cardText(c: CardDef, names: Names): string {
   const lines: string[] = [];
-  if (c.keywords.length > 0) lines.push(c.keywords.map((k) => KEYWORD[k]).join(", "));
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): becomes ${names(c.henshin.into)}.`);
   for (const e of c.effects) lines.push(effectText(e, names));
   return lines.join(" ");

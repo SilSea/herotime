@@ -58,7 +58,7 @@ describe("Giant Robo", () => {
 
   it("enters at once when the board is at or under the threshold", () => {
     const r = simulateCombat([sentai(2, 2), sentai(4, 4)], [f("foe", 1, 1)], 1, { ...PRE, a: { giant } });
-    expect(ofType(r.events, "GIANT_ENTER")).toEqual([{ type: "GIANT_ENTER", unit: "Ag", side: "A" }]);
+    expect(ofType(r.events, "GIANT_ENTER")).toMatchObject([{ type: "GIANT_ENTER", unit: "Ag", side: "A", cardKey: "zyuoh_king", atk: 13, hp: 13 }]);
     expect(r.survivorsA.map((s) => s.uid)).toEqual(["A0", "A1", "Ag"]);
   });
 

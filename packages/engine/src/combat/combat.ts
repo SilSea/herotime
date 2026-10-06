@@ -257,15 +257,16 @@ export function simulateCombat(
         for (let n = 0; n < count && friendly(s).length < boardLimit; n++) {
           const uid = `${s.id}s${spawned++}`;
           const f = fighterFromCard(action.cardKey, uid, s.id);
-          insertAt(s, Math.min(at(), s.list.length), f);
-          events.push({ type: "SUMMON", unit: uid, cardKey: action.cardKey, side: s.id });
+          const index = Math.min(at(), s.list.length);
+          insertAt(s, index, f);
+          events.push({ type: "SUMMON", unit: uid, cardKey: action.cardKey, side: s.id, index, atk: f.atk, hp: f.hp, keywords: [...f.keywords] });
         }
         return;
       }
       case "DAMAGE": {
         for (const t of targets) {
           const dealt = dealDamage(t, action.amount * mult, false);
-          events.push({ type: "EFFECT_DAMAGE", unit: t.uid, amount: dealt });
+          events.push({ type: "EFFECT_DAMAGE", unit: t.uid, amount: dealt, hp: t.hp });
         }
         return;
       }
@@ -292,12 +293,15 @@ export function simulateCombat(
           t.factions = into.factions;
           t.colors = into.colors;
           t.series = into.series;
-          events.push({ type: "TRANSFORM", unit: t.uid, into: action.into });
+          events.push({ type: "TRANSFORM", unit: t.uid, into: action.into, atk: t.atk, hp: t.hp, keywords: [...t.keywords] });
         }
         return;
       }
       case "DESTROY": {
-        for (const t of targets) t.hp = 0;
+        for (const t of targets) {
+          t.hp = 0;
+          events.push({ type: "DESTROY", unit: t.uid });
+        }
         return;
       }
       case "GAIN_ENERGY":
@@ -348,7 +352,7 @@ export function simulateCombat(
       f.huge = true;
       s.list.push(f);
       s.giantEntered = true;
-      events.push({ type: "GIANT_ENTER", unit: f.uid, side: id });
+      events.push({ type: "GIANT_ENTER", unit: f.uid, side: id, cardKey: f.cardKey, atk: f.atk, hp: f.hp, keywords: [...f.keywords] });
       entered = true;
     }
     return entered;
@@ -365,10 +369,10 @@ export function simulateCombat(
 
   const handleDeath = (f: Fighter): void => {
     const s = sides[f.side];
-    events.push({ type: "DEATH", unit: f.uid });
     const idx = s.list.indexOf(f);
     const kyodaika = f.keywords.has("KYODAIKA") && !f.kyodaikaUsed;
     const revive = !kyodaika && f.keywords.has("REVIVE") && !f.revived;
+    events.push({ type: "DEATH", unit: f.uid, returns: kyodaika || revive });
 
     // A returning unit stays in the list as a ghost so Last Stand summons land on its right.
     if (!kyodaika && !revive) removeAt(s, idx);
@@ -387,12 +391,12 @@ export function simulateCombat(
       f.keywords = new Set();
       f.barrier = false;
       f.huge = true;
-      events.push({ type: "KYODAIKA", unit: f.uid });
+      events.push({ type: "KYODAIKA", unit: f.uid, atk: f.atk, hp: f.hp });
       sides[other(s.id)].giantTriggered = true;
     } else if (revive) {
       f.revived = true;
       f.hp = 1;
-      events.push({ type: "REVIVE", unit: f.uid });
+      events.push({ type: "REVIVE", unit: f.uid, hp: f.hp });
     }
   };
 
@@ -446,7 +450,7 @@ export function simulateCombat(
           golden: run.some((r) => r.golden),
           sourceId: undefined,
         };
-        events.push({ type: "GATTAI", units: run.map((r) => r.uid), into: merged.uid });
+        events.push({ type: "GATTAI", units: run.map((r) => r.uid), into: merged.uid, cardKey: merged.cardKey, atk: merged.atk, hp: merged.hp, keywords: [...merged.keywords] });
         out.push(merged);
       } else {
         out.push(...run);
@@ -538,15 +542,17 @@ export function simulateCombat(
       const back = target.atk;
 
       attacks++;
+      const hitTarget = dealDamage(target, out, attacker.keywords.has("LETHAL")) > 0;
+      const hitAttacker = dealDamage(attacker, back, target.keywords.has("LETHAL")) > 0;
       events.push({
         type: "ATTACK",
         attacker: attacker.uid,
         target: target.uid,
         damageToTarget: out,
         damageToAttacker: back,
+        targetHp: target.hp,
+        attackerHp: attacker.hp,
       });
-      const hitTarget = dealDamage(target, out, attacker.keywords.has("LETHAL")) > 0;
-      const hitAttacker = dealDamage(attacker, back, target.keywords.has("LETHAL")) > 0;
       settle(order);
 
       const wounded = [hitTarget ? target : undefined, hitAttacker ? attacker : undefined].filter(

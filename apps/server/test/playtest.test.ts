@@ -1,4 +1,6 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -194,5 +196,53 @@ describe("the content a match really uses", () => {
     const recruit = await c.waitFor("match:view", (p) => p.view.phase === "RECRUIT");
     const cardKeys = new Set(content.cards.map((x: { key: string }) => x.key));
     for (const k of recruit.view.me.state.shop) expect(cardKeys.has(k)).toBe(true);
+  });
+});
+
+describe("the real web client served by the real server", () => {
+  let real: TestServer;
+  beforeAll(async () => {
+    const { execFileSync } = await import("node:child_process");
+    const web = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "web");
+    execFileSync(process.execPath, [join(web, "scripts", "build.mjs")], { stdio: "pipe" });
+    real = await startServer({ webDir: join(web, "public") });
+  }, 60_000);
+  afterAll(async () => {
+    await real.close();
+  });
+
+  it("serves the page, its script, its styles and the socket.io client", async () => {
+    const page = await fetch(`${real.url}/`);
+    expect(page.status).toBe(200);
+    expect(await page.text()).toContain("HeroTime");
+
+    const main = await fetch(`${real.url}/js/main.js`);
+    expect(main.status).toBe(200);
+    expect(main.headers.get("content-type")).toMatch(/javascript/);
+
+    expect((await fetch(`${real.url}/styles.css`)).status).toBe(200);
+    const io = await fetch(`${real.url}/socket.io/socket.io.js`);
+    expect(io.status).toBe(200);
+    expect(await io.text()).toContain("io");
+  });
+
+  it("every script the browser will import is reachable over HTTP", async () => {
+    const main = await (await fetch(`${real.url}/js/main.js`)).text();
+    const seen = new Set<string>();
+    const queue = ["/js/main.js"];
+    let body = main;
+    while (queue.length) {
+      const path = queue.pop() as string;
+      if (seen.has(path)) continue;
+      seen.add(path);
+      const res = await fetch(`${real.url}${path}`);
+      expect(res.status, path).toBe(200);
+      body = await res.text();
+      for (const m of body.matchAll(/from\s+["'](\.{1,2}\/[^"']+)["']/g)) {
+        const next = new URL(m[1] as string, `${real.url}${path}`).pathname;
+        queue.push(next);
+      }
+    }
+    expect(seen.size).toBeGreaterThan(10);
   });
 });

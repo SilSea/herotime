@@ -66,9 +66,9 @@ describe("rules text", () => {
     expect(t(effect)).toContain(expected);
   });
 
-  it("a card lists keywords, then Henshin, then effects", () => {
+  it("a card lists Henshin, then effects, but not keywords (shown as chips)", () => {
     const c = d.unit("a", "A", { rank: 1, atk: 1, hp: 1, keywords: ["GUARD", "RAPID"], henshin: { after: 2, into: "form" }, effects: [d.lastStand(d.summon("tok"))] });
-    expect(cardText(c, names)).toBe("Guard, Rapid Henshin (2): becomes Super Form. Last Stand: summon Token.");
+    expect(cardText(c, names)).toBe("Henshin (2): becomes Super Form. Last Stand: summon Token.");
   });
 
   it("a plain vanilla card has no text", () => {
@@ -97,7 +97,7 @@ describe("withGeneratedText", () => {
         d.unit("b", "B", { rank: 1, atk: 1, hp: 1, keywords: ["GUARD"], text: "My own words." }),
       ],
     });
-    expect(set.cards[0]?.text).toBe("Guard");
+    expect(set.cards[0]?.text).toBe("");
     expect(set.cards[1]?.text).toBe("My own words.");
   });
 

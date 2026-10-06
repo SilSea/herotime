@@ -38,6 +38,15 @@ describe("MatchRunner", () => {
     expect(publisher.of("bot-1")).toEqual([]); // bots are not sockets
   });
 
+  it("stamps every view with the server clock for countdowns", () => {
+    const { registry, publisher, timers } = setup();
+    const runner = registry.startMatch([user(1)]);
+    expect(publisher.of("u1", "match:view")[0]?.payload.serverNow).toBe(timers.now());
+    timers.advance(7_000);
+    runner.dispatch("u1", { type: "CHOOSE_HERO", index: 0 });
+    expect(publisher.of("u1", "match:view").at(-1)?.payload.serverNow).toBe(timers.now());
+  });
+
   it("fills the seats with bots up to the match size", () => {
     const { registry } = setup();
     const runner = registry.startMatch([user(1), user(2), user(3)]);

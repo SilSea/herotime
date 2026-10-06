@@ -625,3 +625,55 @@ describe("timeline and bots", () => {
     }
   });
 });
+
+describe("what the view says things cost", () => {
+  it("shows the default prices and limits", () => {
+    const m = recruiting(humans(2));
+    expect(m.view("h0").me.limits).toEqual({ buyCost: 3, refreshCost: 1, sellValue: 1, maxEnergy: 10, boardSize: 7, handSize: 10 });
+  });
+
+  it("follows rule changes: a free refresh shows as 0, other rules show their new values", () => {
+    const m = recruiting(humans(2));
+    const s = m.player("h0").state;
+    s.freeRefreshes = 1;
+    s.rules.buyCost = 2;
+    s.rules.boardSize = 6;
+    expect(m.view("h0").me.limits).toMatchObject({ refreshCost: 0, buyCost: 2, boardSize: 6 });
+    s.freeRefreshes = 0;
+    expect(m.view("h0").me.limits.refreshCost).toBe(1);
+    expect(m.view("h1").me.limits.buyCost).toBe(3); // someone else's rules do not leak
+  });
+
+  it("describes the hero power and whether it can be used right now", () => {
+    const m = recruiting(humans(2), 1);
+    const power = (id: string) => m.view(id).me.heroPower;
+    const withHero = (id: string, hero: string) => {
+      m.player(id).state.hero = hero;
+    };
+    withHero("h0", "red_leader"); // ACTIVE, 2 energy
+    withHero("h1", "time_traveler"); // PASSIVE
+    expect(power("h0")).toEqual({ mode: "ACTIVE", cost: 2, usable: true });
+    expect(power("h1")).toEqual({ mode: "PASSIVE", cost: 0, usable: false });
+
+    m.player("h0").state.energy = 1;
+    expect(power("h0")?.usable).toBe(false); // cannot afford
+    m.player("h0").state.energy = 5;
+    m.player("h0").state.heroPowerUsed = true;
+    expect(power("h0")?.usable).toBe(false); // used this turn
+
+    withHero("h1", "prof_belt"); // ONCE, free
+    expect(power("h1")).toEqual({ mode: "ONCE", cost: 0, usable: true });
+    m.player("h1").state.heroPowerSpent = true;
+    expect(power("h1")?.usable).toBe(false);
+  });
+
+  it("a hero without a power, and any hero outside the recruit phase, cannot use one", () => {
+    const m = recruiting(humans(2));
+    m.player("h0").state.hero = "blank";
+    expect(m.view("h0").me.heroPower).toBeNull();
+    m.player("h1").state.hero = "red_leader";
+    m.player("h1").state.energy = 9;
+    toBattle(m);
+    expect(m.view("h1").me.heroPower?.usable).toBe(false);
+  });
+});

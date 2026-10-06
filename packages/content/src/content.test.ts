@@ -85,7 +85,7 @@ describe.each(entries)("content set: %s", (_name, set) => {
   });
 
   it("every card, relic and hero has rules text with no template leftovers", () => {
-    const texts = [...set.cards.filter((c) => c.kind !== "UNIT" || c.effects.length + c.keywords.length > 0 || c.henshin), ...set.relics].map((x) => `${x.key}: ${x.text}`);
+    const texts = [...set.cards.filter((c) => c.effects.length > 0 || c.henshin), ...set.relics].map((x) => `${x.key}: ${x.text}`);
     for (const t of texts) {
       expect(t, t).not.toMatch(/undefined|\[object|NaN/);
       expect(t.split(": ")[1], t).not.toBe("");

@@ -106,6 +106,10 @@ export interface MatchView {
     heroOptions: string[];
     ready: boolean;
     upgradeCost: number | null;
+    /** What things cost for this player right now, after their relics and hero changed the rules. */
+    limits: { buyCost: number; refreshCost: number; sellValue: number; maxEnergy: number; boardSize: number; handSize: number };
+    /** The hero power, or null if the hero has none. */
+    heroPower: { mode: "ACTIVE" | "ONCE" | "PASSIVE"; cost: number; usable: boolean } | null;
     /** Current ATK/HP of each hand/board unit (hand cards that are not units get 0/0). */
     handStats: { atk: number; hp: number }[];
     boardStats: { atk: number; hp: number }[];

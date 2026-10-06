@@ -184,6 +184,8 @@ export class Match {
         heroOptions: p.heroOptions,
         ready: p.ready,
         upgradeCost: upgradeCost(p.state, withRules(p.state, this.env.cfg)) ?? null,
+        limits: this.limitsOf(p),
+        heroPower: this.heroPowerOf(p),
         handStats: statsOf(p.state.hand),
         boardStats: statsOf(p.state.board),
       },
@@ -207,6 +209,29 @@ export class Match {
     if (p.placement !== undefined) view.me.placement = p.placement;
     if (p.lastCombat) view.lastCombat = p.lastCombat;
     return view;
+  }
+
+  private limitsOf(p: MatchPlayer): MatchView["me"]["limits"] {
+    const c = withRules(p.state, this.env.cfg);
+    return {
+      buyCost: c.buyCost,
+      refreshCost: p.state.freeRefreshes > 0 ? 0 : c.refreshCost,
+      sellValue: c.sellValue,
+      maxEnergy: c.maxEnergy,
+      boardSize: c.boardSize,
+      handSize: c.handSize,
+    };
+  }
+
+  private heroPowerOf(p: MatchPlayer): MatchView["me"]["heroPower"] {
+    const power = p.state.hero ? this.env.content.heroes.get(p.state.hero)?.power : undefined;
+    if (!power) return null;
+    const spent = power.mode === "ACTIVE" ? p.state.heroPowerUsed : power.mode === "ONCE" ? p.state.heroPowerSpent : true;
+    return {
+      mode: power.mode,
+      cost: power.cost,
+      usable: this.phase === "RECRUIT" && p.alive && !spent && p.state.energy >= power.cost,
+    };
   }
 
   // -------------------------------------------------------------------- input

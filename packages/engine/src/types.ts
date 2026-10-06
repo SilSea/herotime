@@ -28,20 +28,28 @@ export interface CombatSideExtras {
   rules?: Partial<CombatRules>;
 }
 
+/**
+ * Events carry the state they leave behind (hp, atk, keywords), so a client can replay a fight by
+ * just applying them in order, without knowing any rule. Order inside one attack: BARRIER_POPs,
+ * then ATTACK (with both hp values after the hit), then DEATH / REVIVE / KYODAIKA / Last Stand effects.
+ */
 export type CombatEvent =
-  | { type: "ATTACK"; attacker: string; target: string; damageToTarget: number; damageToAttacker: number }
+  | { type: "ATTACK"; attacker: string; target: string; damageToTarget: number; damageToAttacker: number; targetHp: number; attackerHp: number }
   | { type: "BARRIER_POP"; unit: string }
-  | { type: "REVIVE"; unit: string }
-  | { type: "DEATH"; unit: string }
+  | { type: "REVIVE"; unit: string; hp: number }
+  /** `returns`: it stays in its slot because Revive or Kyodaika brings it straight back. */
+  | { type: "DEATH"; unit: string; returns: boolean }
   | { type: "BUFF"; unit: string; atk: number; hp: number }
-  | { type: "EFFECT_DAMAGE"; unit: string; amount: number }
+  | { type: "EFFECT_DAMAGE"; unit: string; amount: number; hp: number }
+  /** An effect set its hp to 0; a DEATH follows once the board settles. */
+  | { type: "DESTROY"; unit: string }
   | { type: "KEYWORD"; unit: string; keyword: Keyword }
-  | { type: "SUMMON"; unit: string; cardKey: string; side: Side }
-  | { type: "TRANSFORM"; unit: string; into: string }
-  | { type: "KYODAIKA"; unit: string }
-  | { type: "GATTAI"; units: string[]; into: string }
+  | { type: "SUMMON"; unit: string; cardKey: string; side: Side; index: number; atk: number; hp: number; keywords: Keyword[] }
+  | { type: "TRANSFORM"; unit: string; into: string; atk: number; hp: number; keywords: Keyword[] }
+  | { type: "KYODAIKA"; unit: string; atk: number; hp: number }
+  | { type: "GATTAI"; units: string[]; into: string; cardKey: string; atk: number; hp: number; keywords: Keyword[] }
   | { type: "ROLL_CALL"; side: Side }
-  | { type: "GIANT_ENTER"; unit: string; side: Side };
+  | { type: "GIANT_ENTER"; unit: string; side: Side; cardKey: string; atk: number; hp: number; keywords: Keyword[] };
 
 export interface CombatSurvivor {
   uid: string;

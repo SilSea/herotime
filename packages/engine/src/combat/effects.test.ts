@@ -368,3 +368,48 @@ describe("runaway content", () => {
     expect(r.attacks).toBe(0);
   });
 });
+
+describe("events describe the state they leave behind (so a client can replay without rules)", () => {
+  const find = <T extends CombatEvent["type"]>(events: CombatEvent[], type: T) =>
+    events.find((e): e is Extract<CombatEvent, { type: T }> => e.type === type);
+
+  it("ATTACK reports both hp values after the hit, including a barrier-absorbed one", () => {
+    const r = simulateCombat([f("a", 3, 10)], [f("b", 2, 9, { keywords: ["BARRIER"] })], 1, { maxAttacksPerCombat: 1 });
+    const hit = find(r.events, "ATTACK");
+    const [aIsAttacker] = [hit?.attacker === "A0"];
+    // the shielded unit lost no hp from the first hit; the other took the counter-damage
+    expect(aIsAttacker ? hit?.targetHp : hit?.attackerHp).toBe(9);
+    expect(aIsAttacker ? hit?.attackerHp : hit?.targetHp).toBe(8); // the unshielded unit took the other side's 2 damage
+    expect(r.events.findIndex((e) => e.type === "BARRIER_POP")).toBeLessThan(r.events.findIndex((e) => e.type === "ATTACK"));
+  });
+
+  it("SUMMON, TRANSFORM, KYODAIKA, REVIVE and GATTAI carry stats", () => {
+    const tok = card("tok", { atk: 2, hp: 3, keywords: ["GUARD"] });
+    const big = card("big", { atk: 6, hp: 7, keywords: ["RAPID"] });
+    const w = content({ cards: [tok, big] });
+
+    const summonTok = effect({ trigger: "LAST_STAND", actions: [{ type: "SUMMON", cardKey: "tok" }] });
+    const s = simulateCombat([f("g", 1, 1, { effects: [summonTok] })], [f("foe", 9, 99)], 1, { content: content({ cards: [tok] }), maxAttacksPerCombat: 1 });
+    expect(find(s.events, "SUMMON")).toMatchObject({ cardKey: "tok", atk: 2, hp: 3, keywords: ["GUARD"] });
+
+    const tr = simulateCombat([f("a", 1, 1, { effects: [effect({ trigger: "START_OF_COMBAT", actions: [{ type: "TRANSFORM", into: "big" }] })] })], [f("foe", 1, 1)], 1, { ...PRE, content: w });
+    expect(find(tr.events, "TRANSFORM")).toMatchObject({ into: "big", atk: 6, hp: 7, keywords: ["RAPID"] });
+
+    const k = simulateCombat([f("k", 2, 3, { keywords: ["KYODAIKA"] })], [f("foe", 10, 100)], 1, { maxAttacksPerCombat: 1 });
+    expect(find(k.events, "KYODAIKA")).toMatchObject({ atk: 4, hp: 6 });
+
+    const rv = simulateCombat([f("p", 1, 1, { keywords: ["REVIVE"] })], [f("foe", 9, 100)], 3, { maxAttacksPerCombat: 1 });
+    expect(find(rv.events, "REVIVE")).toMatchObject({ hp: 1 });
+
+    const gt = simulateCombat([f("g1", 1, 2, { keywords: ["GATTAI"] }), f("g2", 2, 3, { keywords: ["GATTAI"] }), f("g3", 3, 4, { keywords: ["GATTAI", "GUARD"] })], [f("foe", 1, 1)], 1, PRE);
+    expect(find(gt.events, "GATTAI")).toMatchObject({ units: ["A0", "A1", "A2"], cardKey: "g1", atk: 6, hp: 9, keywords: ["GUARD"] });
+  });
+
+  it("EFFECT_DAMAGE reports the hp left, and 0 dealt through a barrier", () => {
+    const fxd = effect({ trigger: "START_OF_COMBAT", target: { selector: "LEFTMOST_ENEMY" }, actions: [{ type: "DAMAGE", amount: 3 }] });
+    const plain = simulateCombat([f("a", 1, 9, { effects: [fxd] })], [f("b", 1, 10)], 1, PRE);
+    expect(find(plain.events, "EFFECT_DAMAGE")).toMatchObject({ unit: "B0", amount: 3, hp: 7 });
+    const shield = simulateCombat([f("a", 1, 9, { effects: [fxd] })], [f("b", 1, 10, { keywords: ["BARRIER"] })], 1, PRE);
+    expect(find(shield.events, "EFFECT_DAMAGE")).toMatchObject({ unit: "B0", amount: 0, hp: 10 });
+  });
+});

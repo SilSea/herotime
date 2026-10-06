@@ -16,3 +16,5 @@ export * from "./match/types.js";
 export * from "./match/pairing.js";
 export * from "./match/bot.js";
 export * from "./match/match.js";
+export { fuzzWorld, randomSide } from "./testing-fuzz.js";
+export { card as testCard, content as testContent, effect as testEffect, fighter as testFighter } from "./testing.js";

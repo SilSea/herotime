@@ -1,0 +1,26 @@
+import type { ServerClock } from "../clock.js";
+import type { ContentIndex } from "../content-index.js";
+import type { Api, Net } from "../net.js";
+import type { AuthResult, Intent, PracticeOptions } from "../protocol.js";
+import type { Store } from "../store.js";
+
+/** Everything a screen may use. Screens never reach for globals. */
+export interface Ctx {
+  store: Store;
+  net: Net;
+  api: Api;
+  clock: ServerClock;
+  /** The content, once downloaded. Screens are only drawn after that. */
+  ix: ContentIndex;
+  /** Send a game intent; failures show up as a toast. Resolves true when the server accepted it. */
+  act(intent: Intent): Promise<boolean>;
+  toast(text: string, kind?: "info" | "error"): void;
+  login(result: AuthResult): Promise<void>;
+  logout(): void;
+  startPractice(options: PracticeOptions): Promise<void>;
+  joinQueue(): Promise<void>;
+  leaveQueue(): Promise<void>;
+  /** After a match: go back to the lobby. */
+  leaveMatch(): Promise<void>;
+  go(screen: "lobby" | "library"): void;
+}
