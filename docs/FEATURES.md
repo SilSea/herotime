@@ -34,7 +34,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F3.6** (P0) Roll Call 5 สี → Mecha Gauge → การ์ด "Kyodai Gattai!" → Giant Slot
 - [x] **F3.7** (P0) Giant Robo ลงสนามเมื่อเหลือ ≤2 ตัว หรือศัตรูเกิด Kyodaika
 - [ ] **F3.8** (P1) Super Gattai (Gauge 6 + Extra Ranger)
-- [ ] **F3.9** (P1) Rider Gauge → Ultimate Form
+- [x] **F3.9** (P1) Rider Gauge → Ultimate Form
 - [ ] **F3.10** (P2) Universe Anime + faction ใหม่
 - [x] **F3.11** (P0) Launch series (production set; signature ที่ต้องมี action ใหม่ เช่น Den-O possession / W pairing / OOO medals ใช้ของที่ใกล้เคียงใน DSL ปัจจุบันไปก่อน): Gokaiger, Kyoryuger, Shinkenger, W, Den-O, OOO, Himmapan Sentai (original) — ดู [RULES.md §11](RULES.md#11-launch-series-ชุดแรก)
 
@@ -82,7 +82,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F7.3** (P0) Effect DSL owner scope `PLAYER` + trigger ระดับผู้เล่น
 - [x] **F7.4** (P0) `RuleContext` + action `MODIFY_RULE`
 - [x] **F7.5** (P0) UI: แถบ Relic ข้างรูป Hero, modal เลือก, tooltip, เห็น Relic คนอื่นใน leaderboard
-- [ ] **F7.6** (P0) Admin CRUD Relic + `weight` การสุ่ม
+- [x] **F7.6** (P0) Admin CRUD Relic + `weight` การสุ่ม
 - [x] **F7.7** (P0) Bot เลือก Relic
 - [x] **F7.8** (P0) Content: production 10 Lesser + 8 Greater, prototype 9 + 7
 - [ ] **F7.9** (P1) ใส่ Relic ใน admin sandbox
