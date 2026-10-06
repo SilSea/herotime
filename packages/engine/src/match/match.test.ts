@@ -901,3 +901,27 @@ describe("buff records", () => {
     expect(s.board[0]?.buffs).toEqual([{ kind: "combat", key: null, atk: 2, hp: 1 }]);
   });
 });
+
+describe("spectating", () => {
+  it("players still in see only board make-ups; a player who is out sees every last-fight board", () => {
+    const m = recruiting(humans(3));
+    const s1 = m.player("h1").state;
+    s1.board.push({ key: s1.shop[0] as string, golden: false });
+    toBattle(m);
+    m.tick((m.deadline as number) + 1);
+    const alive = m.view("h0").players.find((p) => p.id === "h1");
+    expect(alive?.lastBoard?.units).toBe(1);
+    expect(alive?.lastFightBoard).toBeUndefined();
+
+    m.dispatch("h0", { type: "SURRENDER" }, (m.deadline as number) - 1);
+    const out = m.view("h0").players.find((p) => p.id === "h1");
+    expect(out?.lastFightBoard).toEqual([expect.objectContaining({ cardKey: s1.board[0]?.key, golden: false })]);
+    expect(m.view("h2").players.find((p) => p.id === "h1")?.lastFightBoard).toBeUndefined(); // h2 is still playing
+  });
+
+  it("at max rank there is no upgrade price", () => {
+    const m = recruiting(humans(2));
+    m.player("h0").state.rank = 6;
+    expect(m.view("h0").me.upgradeCost).toBeNull();
+  });
+});

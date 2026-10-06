@@ -166,3 +166,19 @@ describe("buff wording", async () => {
     expect(buffValue({ kind: "card", key: "c", atk: 2, hp: -1, keywords: ["GUARD"] })).toBe("+2/-1, Guard");
   });
 });
+
+describe("gaugeText", async () => {
+  const { gaugeText } = await import("../src/format.js");
+  const name = (k: string): string => ({ kyodai_gattai: "Kyodai Gattai!", ultimate_form: "Ultimate Form" })[k] ?? k;
+  it("explains the Mecha Gauge from its data", () => {
+    const t = gaugeText({ name: "Mecha Gauge", max: 6, sources: [{ trigger: "ON_ROLL_CALL", amount: 1 }, { trigger: "ON_ROLL_CALL_WIN", amount: 1 }], thresholds: [{ at: 3, once: true, reward: [{ type: "ADD_TO_HAND", cardKey: "kyodai_gattai" }] }] }, name);
+    expect(t.fills).toEqual(["+1 when Roll Call fires (Sentai of 5 different colours at the start of a fight)", "+1 more if you also win that fight"]);
+    expect(t.rewards).toEqual(["At 3: get Kyodai Gattai! (once per game)"]);
+    expect(t.short).toBe("at 3 → Kyodai Gattai!");
+  });
+  it("explains a repeating reward", () => {
+    const t = gaugeText({ name: "Rider Gauge", max: 6, sources: [{ trigger: "HENSHIN", amount: 1 }], thresholds: [{ at: 2, once: false, reward: [{ type: "ADD_TO_HAND", cardKey: "ultimate_form" }] }] }, name);
+    expect(t.rewards).toEqual(["Every 2: get Ultimate Form"]);
+    expect(t.short).toBe("every 2 → Ultimate Form");
+  });
+});

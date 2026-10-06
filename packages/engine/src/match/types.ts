@@ -51,6 +51,7 @@ export interface MatchPlayer {
   opponents: string[];
   lastCombat?: CombatRecord;
   lastBoard?: BoardSummary;
+  lastFightBoard?: SeenUnit[];
 }
 
 /** One finished fight, from the viewpoint of whoever's `lastCombat` it is. */
@@ -92,6 +93,17 @@ export interface PublicPlayer {
   ready: boolean;
   /** The board this player last fought with (public: everyone sees it in replays). Absent before the first fight. */
   lastBoard?: BoardSummary;
+  /** That board unit by unit, sent only to players who are out (spectating) or once the match has ended. */
+  lastFightBoard?: SeenUnit[];
+}
+
+/** One unit of a board as it went into a fight. */
+export interface SeenUnit {
+  cardKey: string;
+  atk: number;
+  hp: number;
+  golden: boolean;
+  keywords: string[];
 }
 
 /** What a board was made of, without its cards: unit count and how many units carry each faction. */

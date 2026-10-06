@@ -1,5 +1,5 @@
 import { formatClock } from "../clock.js";
-import { boardLabel, ordinal, PHASE_LABEL, stars } from "../format.js";
+import { boardLabel, gaugeText, KEYWORDS, keywordName, ordinal, PHASE_LABEL, stars } from "../format.js";
 import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
@@ -17,7 +17,66 @@ export function renderMatch(root: HTMLElement, ctx: Ctx): void {
   const view = ctx.store.state.view as View;
   if (view.phase === "HERO_SELECT") return mount(root, matchFrame(ctx, view, heroSelect(ctx, view)));
   if (view.phase === "ENDED") return mount(root, matchFrame(ctx, view, endScreen(ctx, view)));
-  mount(root, matchFrame(ctx, view, table(ctx, view)));
+  // Out of the match while it goes on: watch the others instead of an empty table.
+  const out = !view.me.alive;
+  mount(root, matchFrame(ctx, view, out ? spectateStage(ctx, view) : table(ctx, view)));
+}
+
+/** Shown once when you are knocked out: your place, then watch or leave. */
+function defeatNotice(ctx: Ctx, view: View): HTMLElement | null {
+  const state = ctx.store.state;
+  if (view.me.alive || view.phase === "ENDED" || state.defeatAck === state.matchId) return null;
+  const place = view.me.placement;
+  const firstAlive = view.players.find((p) => p.alive)?.id;
+  return h(
+    "div",
+    { class: "modal defeat" },
+    h(
+      "div",
+      { class: "modal-box defeat-box" },
+      h("div", { class: "defeat-title", text: "Defeated" }),
+      h("p", { class: "defeat-place", text: place ? `You finished ${ordinal(place)}` : "You are out of the match" }),
+      h("p", { class: "muted", text: "The match goes on without you. You can watch the other players' boards from their last fight, or leave." }),
+      h("div", { class: "row center-row" },
+        h("button", { class: "btn primary big", text: "Watch other players", on: { click: () => ctx.store.set({ defeatAck: state.matchId, spectating: state.spectating ?? firstAlive }) } }),
+        h("button", { class: "btn big", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
+      ),
+    ),
+  );
+}
+
+/** A knocked-out player's view: pick anyone and see the board they last fought with. */
+function spectateStage(ctx: Ctx, view: View): HTMLElement {
+  const state = ctx.store.state;
+  const others = view.players.filter((p) => p.id !== view.me.id).sort((a, b) => Number(b.alive) - Number(a.alive) || b.hp - a.hp);
+  const target = others.find((p) => p.id === state.spectating) ?? others.find((p) => p.alive) ?? others[0];
+  const heroDef = target?.hero ? ctx.ix.heroes.get(target.hero) : undefined;
+  const units = target?.lastFightBoard ?? [];
+  const label = target?.lastBoard ? boardLabel(target.lastBoard, ctx.ix.factionName) : undefined;
+  return h(
+    "div",
+    { class: "stage table spectate" },
+    defeatNotice(ctx, view),
+    h("div", { class: "spectate-head" },
+      h("span", { class: "spectate-tag", text: "Spectating" }),
+      h("div", { class: "spectate-tabs" }, ...others.map((p) => h("button", { class: `tab ${p.id === target?.id ? "active" : ""} ${p.alive ? "" : "out"}`, text: `${p.name}${p.alive ? ` · ${Math.max(0, p.hp)} HP` : ` · ${p.placement ? ordinal(p.placement) : "out"}`}`, on: { click: () => ctx.store.set({ spectating: p.id }) } }))),
+      h("span", { class: "spacer" }),
+      h("button", { class: "btn", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
+    ),
+    target
+      ? h("div", { class: "spectate-body" },
+          h("div", { class: "spectate-hero" },
+            artBox("pc-portrait", ctx.ix.heroArt(target.hero), heroDef?.name ?? target.name),
+            h("div", null, h("div", { class: "pc-name", text: target.name }), h("div", { class: "pc-hero", text: heroDef?.name ?? "" }), h("div", { class: "pc-stats", text: `${Math.max(0, target.hp)} HP${target.armor ? ` + ${target.armor} armor` : ""} · Tavern rank ${target.rank}` }))),
+          h("div", { class: "pc-label", text: target.lastBoard ? `Board in their last fight (turn ${target.lastBoard.turn})${label ? ` · ${label.headline}` : ""}` : "No fight seen yet" }),
+          h("div", { class: "cards board-cards spectate-board" }, ...units.map((u) => cardEl(ctx.ix, { key: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden, extraKeywords: u.keywords, small: true, minion: true })), units.length === 0 && h("p", { class: "muted", text: target.lastBoard ? "They fought with an empty board." : "Boards appear after a fight." })),
+          h("div", { class: "spectate-info" },
+            h("div", { class: "power-panel" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "power-text", text: heroDef ? powerBody(heroDef.text) || "No hero power." : "" })),
+            target.relics.length > 0 && h("div", { class: "relic-panel" }, h("div", { class: "pc-label", text: "Relics" }), relicList(ctx, target.relics)),
+          ),
+        )
+      : h("p", { class: "muted", text: "Nobody else is left." }),
+  );
 }
 
 function matchFrame(ctx: Ctx, view: View, stage: HTMLElement): HTMLElement {
@@ -77,11 +136,13 @@ function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLE
   const row = h(
     "div",
     { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}` },
-    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
+    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "tier-badge", title: `Tavern rank ${p.rank}`, text: String(p.rank) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
     h("div", { class: "pname" }, h("span", { class: "pname-text", text: p.name }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) })),
     h("div", { class: "pmeta", text: `${stars(p.rank)}${p.lastBoard ? ` · ${boardLabel(p.lastBoard, ctx.ix.factionName).headline}` : ""}` }),
   );
   row.addEventListener("mouseenter", () => showPlayerCard(ctx, row, p, mine, opponent));
+  // Once you are out, clicking a player shows their board.
+  if (!ctx.store.state.view?.me.alive && !mine) row.addEventListener("click", () => ctx.store.set({ spectating: p.id, defeatAck: ctx.store.state.matchId }));
   row.addEventListener("mouseleave", hidePlayerCard);
   return row;
 }
@@ -166,7 +227,12 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
   const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
   const pool = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
   const gear = [...ctx.ix.cards.values()].filter((c) => c.kind === "GEAR" && !c.token && inMatch(c)).sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
-  const ofRank = rank === GEAR_TAB ? gear : pool.filter((c) => c.rank === rank).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
+  const fac = state.bookFaction;
+  const kw = state.bookKeyword;
+  const pass = (c: { factions: string[]; keywords: string[]; effects: { actions: { type: string; keyword?: string }[] }[] }): boolean =>
+    (fac === "" || (fac === "_neutral" ? c.factions.length === 0 : c.factions.includes(fac))) &&
+    (kw === "" || c.keywords.includes(kw) || c.effects.some((e) => e.actions.some((a) => a.type === "GIVE_KEYWORD" && a.keyword === kw)));
+  const ofRank = (rank === GEAR_TAB ? gear : pool.filter((c) => c.rank === rank)).filter(pass).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
   const close = (): void => ctx.store.set({ showBook: false });
   return h(
     "div",
@@ -177,7 +243,19 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
       h("div", { class: "row" }, h("h2", { text: "Card book" }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `Factions this match: ${view.factions.map(ctx.ix.factionName).join(", ") || "all"} · your tavern is rank ${view.me.state.rank}` }), h("button", { class: "btn", text: "Close", on: { click: close } })),
       h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? "Upgrade your tavern to be offered these" : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
         gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: "Gear the tavern can offer (from the rank shown on each card)", on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) }))),
-      h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: "No cards of this rank in this match." })),
+      h(
+        "div",
+        { class: "book-filters" },
+        h("span", { class: "muted small", text: "Faction" }),
+        ...[["", "All"], ...view.factions.map((f) => [f, ctx.ix.factionName(f)]), ["_neutral", "Neutral"]].map(([k, label]) => h("button", { class: `chip filter-chip ${fac === k ? "active" : ""}`, style: k && k !== "_neutral" ? `--c:${ctx.ix.factionColor(k as string)}` : "--c:#8296bb", text: label as string, on: { click: () => ctx.store.set({ bookFaction: k as string }) } })),
+        h("span", { class: "muted small", text: "Keyword" }),
+        (() => {
+          const sel = h("select", null, h("option", { value: "", text: "Any", selected: kw === "" }), ...Object.keys(KEYWORDS).map((k) => h("option", { value: k, text: keywordName(k), selected: kw === k })));
+          sel.addEventListener("change", () => ctx.store.set({ bookKeyword: sel.value }));
+          return sel;
+        })(),
+      ),
+      h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? "No cards match these filters at this rank." : "No cards of this rank in this match." })),
     ),
   );
 }
@@ -262,9 +340,10 @@ function table(ctx: Ctx, view: View): HTMLElement {
 
   const upgrade = h(
     "button",
-    { class: "tier-btn", disabled: !recruiting || me.upgradeCost === null || energy < (me.upgradeCost ?? 0), title: "Upgrade the tavern (U)", on: { click: () => void ctx.act({ type: "UPGRADE" }) } },
+    { class: `tier-btn ${me.upgradeCost === null ? "maxed" : ""}`, disabled: !recruiting || me.upgradeCost === null || energy < (me.upgradeCost ?? 0), title: me.upgradeCost === null ? "Your tavern is at the highest rank" : "Upgrade the tavern (U)", on: { click: () => void ctx.act({ type: "UPGRADE" }) } },
     h("span", { class: "tier-stars", text: stars(s.rank) }),
-    h("span", { class: "tier-label", text: me.upgradeCost === null ? "Max" : "Upgrade" }),
+    // At the top rank there is nothing to buy: no price, just the rank.
+    me.upgradeCost === null ? h("span", { class: "tier-label", text: "Max rank" }) : h("span", { class: "tier-label", text: `Upgrade to ${s.rank + 1}` }),
     me.upgradeCost !== null && h("span", { class: "coin", text: String(me.upgradeCost) }),
   );
   const side = h(
@@ -281,10 +360,10 @@ function table(ctx: Ctx, view: View): HTMLElement {
   wasFrozen = s.frozen;
   const tavern = h(
     "div",
-    { class: `tavern ${s.frozen ? "frozen" : ""} ${justFroze ? "just-frozen" : ""}` },
+    { class: `tavern ${s.frozen ? "frozen" : ""} ${justFroze ? "just-frozen" : ""}`, on: { dragover: allowDrop, drop: tavernDrop(ctx, view) } },
     s.frozen && h("div", { class: "frozen-stamp", text: "❄ Frozen: kept for next turn" }),
     upgrade,
-    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) })), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
+    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => draggableCard(cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) }), recruiting, "shop", i)), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
     gearSlot(ctx, view),
     side,
   );
@@ -299,7 +378,21 @@ function table(ctx: Ctx, view: View): HTMLElement {
 
   const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: "Buy a card from the tavern, then drag it onto your warband." }));
 
-  return h("div", { class: "stage table" }, tavern, board, bottomBar(ctx, view, hand), offersModal(ctx, view));
+  board.addEventListener("dragover", allowDrop);
+  board.addEventListener("drop", (e) => void warbandDrop(ctx, view, board)(e));
+  const bottom = bottomBar(ctx, view, hand);
+  bottom.addEventListener("dragover", allowDrop);
+  bottom.addEventListener("drop", buyDrop(ctx, view));
+  return h("div", { class: "stage table" }, tavern, board, bottom, offersModal(ctx, view));
+}
+
+/** Make a tavern card draggable (to the board to buy and play, to the hero or hand to buy). */
+function draggableCard(el: HTMLElement, on: boolean, zone: "shop" | "gear", index: number): HTMLElement {
+  if (!on) return el;
+  el.draggable = true;
+  el.addEventListener("dragstart", (e) => dragData(e, zone, index));
+  el.addEventListener("dragend", endDrag);
+  return el;
 }
 
 /** The tavern's Gear slot: one card at its own price, bought into the hand and used from there. */
@@ -315,7 +408,7 @@ function gearSlot(ctx: Ctx, view: View): HTMLElement | null {
     "div",
     { class: "gear-slot" },
     h("div", { class: "gear-slot-label", text: "Gear" }),
-    key ? cardEl(ctx.ix, { key, cost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }) : h("div", { class: "gear-empty", text: "Sold out until the next refresh" }),
+    key ? draggableCard(cardEl(ctx.ix, { key, cost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: "Sold out until the next refresh" }),
   );
 }
 
@@ -366,6 +459,71 @@ function dragData(e: DragEvent, zone: string, index: number): void {
   e.dataTransfer?.setData("text/plain", JSON.stringify({ zone, index }));
   e.dataTransfer && (e.dataTransfer.effectAllowed = "move");
   document.body.classList.add(DRAGGING);
+  // Lets CSS light up the places this card can go (sell, buy, board).
+  document.body.dataset.drag = zone;
+}
+
+function endDrag(): void {
+  document.body.classList.remove(DRAGGING);
+  delete document.body.dataset.drag;
+}
+
+/** Where on the board a drop at `x` lands: the number of units whose middle is left of it. */
+function boardIndexAt(board: HTMLElement, x: number): number {
+  const slots = [...board.querySelectorAll<HTMLElement>(".board-cards > .slot")];
+  return slots.filter((s) => {
+    const r = s.getBoundingClientRect();
+    return r.left + r.width / 2 < x;
+  }).length;
+}
+
+/** The whole warband takes drops: play from hand, reorder, or buy straight from the tavern and play. */
+function warbandDrop(ctx: Ctx, view: View, board: HTMLElement) {
+  return async (e: DragEvent): Promise<void> => {
+    e.preventDefault();
+    const d = readDrag(e);
+    endDrag();
+    if (!d || view.phase !== "RECRUIT" || !view.me.alive) return;
+    const at = boardIndexAt(board, e.clientX);
+    const s = view.me.state;
+    if (d.zone === "hand") {
+      void ctx.act(isGear(ctx, view, d.index) ? { type: "USE_GEAR", handIndex: d.index } : { type: "PLAY", handIndex: d.index, position: Math.min(at, s.board.length) });
+    } else if (d.zone === "board") {
+      const to = Math.min(at > d.index ? at - 1 : at, s.board.length - 1);
+      if (to !== d.index) void ctx.act({ type: "REORDER", from: d.index, to });
+    } else if (d.zone === "shop" || d.zone === "gear") {
+      const key = d.zone === "shop" ? s.shop[d.index] : s.shopGear;
+      if (!key) return;
+      const bought = await ctx.act(d.zone === "shop" ? { type: "BUY", index: d.index } : { type: "BUY_GEAR" });
+      // Then play (or use) it: it is the last copy of that card in the hand, unless a triple swallowed it.
+      const hand = ctx.store.state.view?.me.state.hand ?? [];
+      const i = hand.map((u) => u.key).lastIndexOf(key);
+      if (!bought || i < 0) return;
+      void ctx.act(d.zone === "gear" ? { type: "USE_GEAR", handIndex: i } : { type: "PLAY", handIndex: i, position: Math.min(at, ctx.store.state.view?.me.state.board.length ?? at) });
+    }
+  };
+}
+
+/** Dropping a unit anywhere on the tavern sells it. */
+function tavernDrop(ctx: Ctx, view: View) {
+  return (e: DragEvent): void => {
+    e.preventDefault();
+    const d = readDrag(e);
+    endDrag();
+    if (d && (d.zone === "hand" || d.zone === "board") && view.phase === "RECRUIT") void ctx.act({ type: "SELL", from: d.zone, index: d.index });
+  };
+}
+
+/** Dropping a tavern card on your hero or hand buys it. */
+function buyDrop(ctx: Ctx, view: View) {
+  return (e: DragEvent): void => {
+    e.preventDefault();
+    const d = readDrag(e);
+    endDrag();
+    if (!d || view.phase !== "RECRUIT") return;
+    if (d.zone === "shop") void ctx.act({ type: "BUY", index: d.index });
+    else if (d.zone === "gear") void ctx.act({ type: "BUY_GEAR" });
+  };
 }
 
 function readDrag(e: DragEvent): { zone: string; index: number } | undefined {
@@ -375,21 +533,6 @@ function readDrag(e: DragEvent): { zone: string; index: number } | undefined {
   } catch {
     return undefined;
   }
-}
-
-function dropOn(ctx: Ctx, view: View, target: number) {
-  return (e: DragEvent): void => {
-    e.preventDefault();
-    const d = readDrag(e);
-    document.body.classList.remove(DRAGGING);
-    if (!d || view.phase !== "RECRUIT") return;
-    if (d.zone === "hand") {
-      void ctx.act(isGear(ctx, view, d.index) ? { type: "USE_GEAR", handIndex: d.index } : { type: "PLAY", handIndex: d.index, position: Math.min(target, view.me.state.board.length) });
-    } else if (d.zone === "board") {
-      const to = Math.min(target, view.me.state.board.length - 1);
-      if (to !== d.index) void ctx.act({ type: "REORDER", from: d.index, to });
-    }
-  };
 }
 
 const isGear = (ctx: Ctx, view: View, handIndex: number): boolean => ctx.ix.card(view.me.state.hand[handIndex]?.key ?? "")?.kind === "GEAR";
@@ -405,7 +548,7 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true, buffs: u.buffs ?? [], classes: canCombine ? ["core-ready"] : [] });
   return h(
     "div",
-    { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "board", i), dragend: () => document.body.classList.remove(DRAGGING), dragover: allowDrop, drop: dropOn(ctx, view, i) } },
+    { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "board", i), dragend: endDrag } },
     el,
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini", text: "<", disabled: i === 0, title: "Move left", on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i - 1 }) } }),
@@ -419,7 +562,9 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
 }
 
 function endDrop(ctx: Ctx, view: View): HTMLElement {
-  return h("div", { class: "end-drop", title: "Drop here to put a card at the end", on: { dragover: allowDrop, drop: dropOn(ctx, view, view.me.state.board.length) } }, h("span", { text: "+" }));
+  void ctx;
+  void view;
+  return h("div", { class: "end-drop", title: "Drop anywhere on the board" }, h("span", { text: "+" }));
 }
 
 function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
@@ -430,7 +575,7 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const full = view.me.state.board.length >= view.me.limits.boardSize;
   return h(
     "div",
-    { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: () => document.body.classList.remove(DRAGGING) } },
+    { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: endDrag } },
     cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [] }),
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini primary", text: gear ? "Use" : "Play", disabled: !gear && full, on: { click: () => void ctx.act(gear ? { type: "USE_GEAR", handIndex: i } : { type: "PLAY", handIndex: i, position: view.me.state.board.length }) } }),
@@ -467,8 +612,9 @@ function gaugeBars(ctx: Ctx, view: View): HTMLElement {
     { class: "gauges" },
     ...ctx.ix.snapshot.gauges.map((g) => {
       const value = view.me.state.gauges[g.key] ?? 0;
-      const marks = g.thresholds.map((t) => `${t.at}`).join("/");
-      return h("div", { class: "gauge", title: `${g.name}: ${value}/${g.max}. Rewards at ${marks}.` }, h("span", { class: "gname", text: g.name }), h("div", { class: "gbar" }, h("div", { class: "gfill", style: `width:${(value / g.max) * 100}%` }), ...g.thresholds.map((t) => h("div", { class: "gmark", style: `left:${(t.at / g.max) * 100}%` }))), h("span", { class: "gnum", text: `${value}/${g.max}` }));
+      const t = gaugeText(g, ctx.ix.cardName);
+      const tip = [`${g.name}: ${value}/${g.max}`, "Fills:", ...t.fills.map((f) => `  ${f}`), "Rewards:", ...t.rewards.map((r) => `  ${r}`)].join("\n");
+      return h("div", { class: "gauge", title: tip }, h("span", { class: "gname", text: g.name }), h("div", { class: "gbar" }, h("div", { class: "gfill", style: `width:${(value / g.max) * 100}%` }), ...g.thresholds.map((t) => h("div", { class: "gmark", style: `left:${(t.at / g.max) * 100}%` }))), h("span", { class: "gnum", text: `${value}/${g.max}` }), h("span", { class: "ghint", text: t.short }));
     }),
   );
 }

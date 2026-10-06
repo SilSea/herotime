@@ -276,6 +276,7 @@ export function startApp(root: HTMLElement): void {
 
   document.addEventListener("dragend", () => {
     document.body.classList.remove(DRAGGING);
+    delete document.body.dataset.drag;
     schedule();
   });
 

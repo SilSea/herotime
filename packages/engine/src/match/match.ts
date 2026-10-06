@@ -40,6 +40,7 @@ import { DEFAULT_MATCH_CONFIG, recruitDuration, type MatchConfig } from "./confi
 import { pairPlayers } from "./pairing.js";
 import type {
   BoardSummary,
+  SeenUnit,
   CombatRecord,
   Entrant,
   GhostBoard,
@@ -223,6 +224,8 @@ export class Match {
           ready: o.ready,
         };
         if (o.lastBoard) pub.lastBoard = o.lastBoard;
+        // Whole boards only for spectators: someone still playing must not scout the others' cards.
+        if (o.lastFightBoard && (!p.alive || this.phase === "ENDED")) pub.lastFightBoard = o.lastFightBoard;
         if (o.placement !== undefined) pub.placement = o.placement;
         if (o.state.hero !== undefined) pub.hero = o.state.hero;
         return pub;
@@ -429,6 +432,7 @@ export class Match {
       const { units, extras } = prepareCombat(p.state, this.env);
       prepared.set(p.id, { units, extras, rank: p.state.rank });
       p.lastBoard = summarise(units, this.turn);
+      p.lastFightBoard = units.map((u) => ({ cardKey: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden ?? false, keywords: [...(u.keywords ?? [])] }));
     }
 
     const history = new Map(alive.map((p) => [p.id, p.opponents] as const));

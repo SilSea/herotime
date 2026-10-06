@@ -34,6 +34,12 @@ export interface AppState {
   /** The card book (every card in the match by rank) and which rank it shows. */
   showBook: boolean;
   bookRank: number;
+  /** Book filters: a faction key, "_neutral", or "" for all; a keyword or "". */
+  bookFaction: string;
+  bookKeyword: string;
+  /** After being knocked out: whose board is on show, and whether the defeat notice was closed (by match id). */
+  spectating?: string;
+  defeatAck?: string;
   hideOffers: boolean;
   selected: Selection;
 }
@@ -49,6 +55,8 @@ export const initialState = (): AppState => ({
   showLog: false,
   showBook: false,
   bookRank: 0,
+  bookFaction: "",
+  bookKeyword: "",
   hideOffers: false,
   selected: undefined,
 });
