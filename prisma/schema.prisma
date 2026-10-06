@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../apps/server/src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PLAYER
+  ADMIN
+}
+
+enum RelicTier {
+  LESSER
+  GREATER
+}
+
+enum CardSlot {
+  BOARD
+  GIANT
+}
+
+model User {
+  id           String           @id @default(cuid())
+  name         String           @unique
+  email        String           @unique
+  passwordHash String
+  role         Role             @default(PLAYER)
+  createdAt    DateTime         @default(now())
+  matches      MatchPlayer[]
+  versions     ContentVersion[]
+  audits       AuditLog[]
+}
+
+// ---- Content (editable in admin, snapshotted into ContentVersion) ----
+
+model Faction {
+  id    String  @id @default(cuid())
+  key   String  @unique
+  name  String
+  color String  @default("#888888")
+  icon  String?
+}
+
+model Keyword {
+  id          String @id @default(cuid())
+  key         String @unique
+  name        String
+  description String
+  engineKey   String
+}
+
+model Universe {
+  id         String      @id @default(cuid())
+  key        String      @unique
+  name       String
+  franchises Franchise[]
+}
+
+model Franchise {
+  id         String   @id @default(cuid())
+  universeId String
+  key        String   @unique
+  name       String
+  universe   Universe @relation(fields: [universeId], references: [id])
+  series     Series[]
+  gauges     Gauge[]
+}
+
+model Series {
+  id          String    @id @default(cuid())
+  franchiseId String
+  key         String    @unique
+  name        String
+  bondEffects Json      @default("[]")
+  signature   Json      @default("{}")
+  enabled     Boolean   @default(true)
+  franchise   Franchise @relation(fields: [franchiseId], references: [id])
+  cards       Card[]
+  relics      Relic[]
+}
+
+model Card {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  name            String
+  rank            Int
+  atk             Int
+  hp              Int
+  seriesId        String?
+  factions        String[]
+  sentaiColors    String[]
+  keywords        String[]
+  effects         Json     @default("[]")
+  transformInto   String?
+  goldenOverrides Json?
+  entryRules      Json?
+  art             String?
+  slot            CardSlot @default(BOARD)
+  inShop          Boolean  @default(true)
+  isToken         Boolean  @default(false)
+  enabled         Boolean  @default(true)
+  series          Series?  @relation(fields: [seriesId], references: [id])
+}
+
+model Gauge {
+  id          String     @id @default(cuid())
+  key         String     @unique
+  name        String
+  max         Int
+  sources     Json       @default("[]")
+  thresholds  Json       @default("[]")
+  franchiseId String?
+  franchise   Franchise? @relation(fields: [franchiseId], references: [id])
+}
+
+model Hero {
+  id      String  @id @default(cuid())
+  key     String  @unique
+  name    String
+  armor   Int     @default(0)
+  power   Json    @default("{}")
+  art     String?
+  enabled Boolean @default(true)
+}
+
+model Relic {
+  id       String    @id @default(cuid())
+  key      String    @unique
+  name     String
+  tier     RelicTier
+  cost     Int
+  factions String[]
+  seriesId String?
+  effects  Json      @default("[]")
+  art      String?
+  weight   Int       @default(100)
+  enabled  Boolean   @default(true)
+  series   Series?   @relation(fields: [seriesId], references: [id])
+}
+
+model ContentVersion {
+  id          String   @id @default(cuid())
+  number      Int      @unique
+  snapshot    Json
+  notes       String?
+  publishedAt DateTime @default(now())
+  publishedBy String
+  publisher   User     @relation(fields: [publishedBy], references: [id])
+  matches     Match[]
+}
+
+// ---- Matches ----
+
+model Match {
+  id               String         @id @default(cuid())
+  contentVersionId String
+  seed             Int
+  startedAt        DateTime       @default(now())
+  endedAt          DateTime?
+  contentVersion   ContentVersion @relation(fields: [contentVersionId], references: [id])
+  players          MatchPlayer[]
+}
+
+model MatchPlayer {
+  id        String  @id @default(cuid())
+  matchId   String
+  userId    String?
+  isBot     Boolean @default(false)
+  heroKey   String
+  placement Int?
+  match     Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user      User?   @relation(fields: [userId], references: [id])
+
+  @@index([matchId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id      String   @id @default(cuid())
+  adminId String
+  entity  String
+  before  Json?
+  after   Json?
+  at      DateTime @default(now())
+  admin   User     @relation(fields: [adminId], references: [id])
+
+  @@index([entity])
+}

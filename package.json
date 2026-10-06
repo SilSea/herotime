@@ -15,6 +15,10 @@
     "db:down": "docker compose down"
   },
   "devDependencies": {
+    "prisma": "7.10.0",
     "typescript": "^5.9.0"
+  },
+  "dependencies": {
+    "@prisma/client": "7.10.0"
   }
 }
