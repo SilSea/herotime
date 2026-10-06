@@ -8,30 +8,30 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F1.2** (P0) Economy: Energy 3→10, ซื้อ 3 / ขาย 1 / Refresh 1 / Freeze 0
 - [x] **F1.3** (P0) Base Rank 1–6 + ราคาอัปลดลง 1 ทุกเทิร์นที่ยังไม่อัป
 - [x] **F1.4** (P0) Shared pool จำกัดจำนวนตาม Rank
-- [ ] **F1.5** (P0) Board 7 / Hand 10, จัดลำดับยูนิต
+- [x] **F1.5** (P0) Board 7 / Hand 10, จัดลำดับยูนิต
 - [x] **F1.6** (P0) Triple → Final Form + Discover Rank+1
-- [ ] **F1.7** (P0) Auto combat (seeded, deterministic) + combat log
+- [x] **F1.7** (P0) Auto combat (seeded, deterministic) + combat log
 - [x] **F1.8** (P0) Damage = Base Rank + Rank ยูนิตที่รอด (cap 15 เทิร์น 1–8)
 - [ ] **F1.9** (P0) จับคู่ไม่ซ้ำ 3 รอบล่าสุด + Ghost
 - [ ] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s, replay ≤25s, Ready ก่อนเวลา
-- [ ] **F1.11** (P0) Hero Power (active / passive / ครั้งเดียวต่อเกม)
+- [x] **F1.11** (P0) Hero Power (active / passive / ครั้งเดียวต่อเกม)
 - [ ] **F1.12** (P1) Gear/Spell ในร้าน
 - [ ] **F1.13** (P2) Quick Mode (Recruit 35s, HP 20)
 
 ## F2. Faction & Keyword
 - [ ] **F2.1** (P0) 7 Faction: Rider, Sentai, Mecha, Kaijin, Grunt, Ally, Dark Rider — สุ่ม 5 ต่อล็อบบี้
-- [ ] **F2.2** (P0) Keyword มาตรฐาน: Guard, Barrier, Last Stand, Henshin Call, Rapid, Lethal, Revive, Start of Combat, End of Turn, Avenge(N)
-- [ ] **F2.3** (P0) Keyword ธีม: Henshin(N), Team-Up(k), Gattai, Kyodaika, Rider Kick
-- [ ] **F2.4** (P0) Sentai color (Red/Blue/Yellow/Green/Pink) + Extra = wildcard
+- [x] **F2.2** (P0) Keyword มาตรฐาน: Guard, Barrier, Last Stand, Henshin Call, Rapid, Lethal, Revive, Start of Combat, End of Turn, Avenge(N)
+- [x] **F2.3** (P0) Keyword ธีม: Henshin(N), Team-Up(k), Gattai, Kyodaika, Rider Kick
+- [x] **F2.4** (P0) Sentai color (Red/Blue/Yellow/Green/Pink) + Extra = wildcard
 
 ## F3. Series & Giant Robo
 - [ ] **F3.1** (P0) ลำดับชั้น Universe → Franchise → Series
 - [ ] **F3.2** (P0) Series Template (Core / Extra / Mecha / Villain / Bond / Signature)
-- [ ] **F3.3** (P0) Series Bond (≥2 / ≥4 ยูนิตซีรีส์เดียวกัน)
+- [x] **F3.3** (P0) Series Bond (≥2 / ≥4 ยูนิตซีรีส์เดียวกัน)
 - [ ] **F3.4** (P1) Featured Series 3 ซีรีส์ต่อ franchise ต่อล็อบบี้
-- [ ] **F3.5** (P0) Gauge system กลาง (sources / thresholds เก็บใน DB)
-- [ ] **F3.6** (P0) Roll Call 5 สี → Mecha Gauge → การ์ด "Kyodai Gattai!" → Giant Slot
-- [ ] **F3.7** (P0) Giant Robo ลงสนามเมื่อเหลือ ≤2 ตัว หรือศัตรูเกิด Kyodaika
+- [x] **F3.5** (P0) Gauge system กลาง (sources / thresholds เก็บใน DB)
+- [x] **F3.6** (P0) Roll Call 5 สี → Mecha Gauge → การ์ด "Kyodai Gattai!" → Giant Slot
+- [x] **F3.7** (P0) Giant Robo ลงสนามเมื่อเหลือ ≤2 ตัว หรือศัตรูเกิด Kyodaika
 - [ ] **F3.8** (P1) Super Gattai (Gauge 6 + Extra Ranger)
 - [ ] **F3.9** (P1) Rider Gauge → Ultimate Form
 - [ ] **F3.10** (P2) Universe Anime + faction ใหม่
@@ -72,10 +72,10 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [ ] **F6.8** (P2) Stat dashboard (pick rate, win rate ต่อการ์ด)
 
 ## F7. Relic (ระบบสมบัติ) — ดู [RULES.md §13](RULES.md#13-relic-ระบบสมบัติ)
-- [ ] **F7.1** (P0) เลือก Lesser Relic เทิร์น 5, Greater Relic เทิร์น 9 (1 จาก 4, มีราคา Energy, เลือกไม่ทันได้ตัวราคา 0)
-- [ ] **F7.2** (P0) กฎสุ่มตัวเลือก (faction หลัก + series + สุ่ม 2) และ Relic unique ต่อล็อบบี้
-- [ ] **F7.3** (P0) Effect DSL owner scope `PLAYER` + trigger ระดับผู้เล่น
-- [ ] **F7.4** (P0) `RuleContext` + action `MODIFY_RULE`
+- [x] **F7.1** (P0) เลือก Lesser Relic เทิร์น 5, Greater Relic เทิร์น 9 (1 จาก 4, มีราคา Energy, เลือกไม่ทันได้ตัวราคา 0)
+- [x] **F7.2** (P0) กฎสุ่มตัวเลือก (faction หลัก + series + สุ่ม 2) — Relic ซ้ำกันระหว่างผู้เล่นได้
+- [x] **F7.3** (P0) Effect DSL owner scope `PLAYER` + trigger ระดับผู้เล่น
+- [x] **F7.4** (P0) `RuleContext` + action `MODIFY_RULE`
 - [ ] **F7.5** (P0) UI: แถบ Relic ข้างรูป Hero, modal เลือก, tooltip, เห็น Relic คนอื่นใน leaderboard
 - [ ] **F7.6** (P0) Admin CRUD Relic + `weight` การสุ่ม
 - [ ] **F7.7** (P0) Bot เลือก Relic

@@ -1,4 +1,5 @@
 import type { Action, CardDef, Effect, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
+import { isRule } from "./rules.js";
 import type { CombatUnitInput, Keyword } from "./types.js";
 
 export interface ContentData {
@@ -75,20 +76,46 @@ export class Content {
         else if (a.type === "TRANSFORM") needCard(a.into, from);
         else if (a.type === "GAUGE_ADD" && !this.gauges.has(a.gauge)) {
           problems.push(`${from} references unknown gauge "${a.gauge}"`);
+        } else if (a.type === "MODIFY_RULE" && !isRule(a.rule)) {
+          problems.push(`${from} modifies unknown rule "${a.rule}"`);
         }
       }
     };
 
     for (const c of this.cards.values()) {
-      needSeries(c.series, `card "${c.key}"`);
-      if (c.henshin) needCard(c.henshin.into, `card "${c.key}" henshin`);
-      checkActions(actionsOf(c.effects), `card "${c.key}"`);
+      const from = `card "${c.key}"`;
+      needSeries(c.series, from);
+      if (c.henshin) needCard(c.henshin.into, `${from} henshin`);
+      checkActions(actionsOf(c.effects), from);
+      for (const e of c.effects) {
+        if (c.kind === "GEAR" && !(e.scope === "PLAYER" && e.trigger === "ON_PLAY")) {
+          problems.push(`${from} is gear: its effects must be player-scope ON_PLAY`);
+        } else if (c.kind !== "GEAR" && e.scope !== "UNIT") {
+          problems.push(`${from} has a player-scope effect, which only gear may have`);
+        }
+      }
     }
     for (const s of this.series.values()) {
-      for (const b of s.bonds) checkActions(actionsOf(b.effects), `series "${s.key}" bond`);
+      for (const b of s.bonds) {
+        const from = `series "${s.key}" bond`;
+        checkActions(actionsOf(b.effects), from);
+        for (const e of b.effects) {
+          if (e.scope !== "PLAYER" || e.trigger !== "START_OF_COMBAT") {
+            problems.push(`${from} effects must be player-scope START_OF_COMBAT`);
+          }
+        }
+      }
     }
+    // Rewards run with no source unit, so actions that need a target would silently do nothing.
+    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "SUMMON"]);
     for (const g of this.gauges.values()) {
-      for (const t of g.thresholds) checkActions(t.reward, `gauge "${g.key}"`);
+      for (const t of g.thresholds) {
+        const from = `gauge "${g.key}"`;
+        checkActions(t.reward, from);
+        for (const a of t.reward) {
+          if (!targetless.has(a.type)) problems.push(`${from} reward uses ${a.type}, which needs a target`);
+        }
+      }
     }
     for (const r of this.relics.values()) {
       needSeries(r.series, `relic "${r.key}"`);

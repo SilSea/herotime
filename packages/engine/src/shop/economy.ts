@@ -1,6 +1,7 @@
 import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
 import type { Unit } from "../content.js";
 import type { Rng } from "../rng/rng.js";
+import { withRules } from "../rules.js";
 import type { Pool } from "./pool.js";
 
 export type { Unit };
@@ -13,6 +14,17 @@ export class RuleError extends Error {
   }
 }
 
+/** A Discover waiting for the player to pick. HAND picks come from the pool; GIANT picks go in the Giant Slot. */
+export interface DiscoverOffer {
+  options: string[];
+  destination: "HAND" | "GIANT";
+}
+
+export interface RelicOffer {
+  tier: "LESSER" | "GREATER";
+  options: string[];
+}
+
 export interface PlayerState {
   energy: number;
   rank: number;
@@ -22,8 +34,21 @@ export interface PlayerState {
   frozen: boolean;
   hand: Unit[];
   board: Unit[];
-  /** Pending Discover offers (card keys), oldest first. Resolved with chooseDiscover. */
-  discovers: string[][];
+  /** Pending Discover offers, oldest first. Resolved with chooseDiscover. */
+  discovers: DiscoverOffer[];
+  /** Per-player rule overrides set by MODIFY_RULE (relics, heroes). */
+  rules: Record<string, number>;
+  /** Refreshes left this turn that cost nothing (rule: freeRefreshesPerTurn). */
+  freeRefreshes: number;
+  /** Gauge values by gauge key. */
+  gauges: Record<string, number>;
+  /** The Giant Robo in the Giant Slot (outside the 7 board slots). */
+  giant?: Unit;
+  hero?: string;
+  heroPowerUsed: boolean;
+  heroPowerSpent: boolean;
+  relics: string[];
+  relicOffer?: RelicOffer;
 }
 
 export function newPlayer(): PlayerState {
@@ -36,6 +61,12 @@ export function newPlayer(): PlayerState {
     hand: [],
     board: [],
     discovers: [],
+    rules: {},
+    freeRefreshes: 0,
+    gauges: {},
+    heroPowerUsed: false,
+    heroPowerSpent: false,
+    relics: [],
   };
 }
 
@@ -60,7 +91,7 @@ export function upgradeCost(player: PlayerState, cfg: GameConfig = DEFAULT_CONFI
   return Math.max(0, base - player.upgradeDiscount);
 }
 
-function spend(player: PlayerState, cost: number): void {
+export function spend(player: PlayerState, cost: number): void {
   if (player.energy < cost) {
     throw new RuleError(`not enough energy: need ${cost}, have ${player.energy}`);
   }
@@ -86,7 +117,10 @@ export function startTurn(
   rng: Rng,
   cfg: GameConfig = DEFAULT_CONFIG,
 ): void {
-  player.energy = energyForTurn(turn, cfg);
+  const c = withRules(player, cfg);
+  player.energy = energyForTurn(turn, c);
+  player.freeRefreshes = player.rules.freeRefreshesPerTurn ?? 0;
+  player.heroPowerUsed = false;
   if (turn > 1) player.upgradeDiscount += 1;
   if (player.frozen) {
     player.frozen = false;
@@ -96,9 +130,20 @@ export function startTurn(
 }
 
 export function refresh(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig = DEFAULT_CONFIG): void {
-  spend(player, cfg.refreshCost);
+  const c = withRules(player, cfg);
+  if (player.freeRefreshes > 0) player.freeRefreshes--;
+  else spend(player, c.refreshCost);
   player.frozen = false;
   rollShop(player, pool, rng, cfg);
+}
+
+/** Drag a board unit to a new slot (order matters: attacks go left to right). */
+export function reorder(player: PlayerState, from: number, to: number): void {
+  const n = player.board.length;
+  if (!Number.isInteger(from) || from < 0 || from >= n) throw new RuleError(`no board slot ${from}`);
+  if (!Number.isInteger(to) || to < 0 || to >= n) throw new RuleError(`invalid board position ${to}`);
+  const [unit] = player.board.splice(from, 1);
+  player.board.splice(to, 0, unit as Unit);
 }
 
 export function toggleFreeze(player: PlayerState): void {
@@ -106,10 +151,11 @@ export function toggleFreeze(player: PlayerState): void {
 }
 
 export function buy(player: PlayerState, shopIndex: number, cfg: GameConfig = DEFAULT_CONFIG): string {
+  const c = withRules(player, cfg);
   const key = player.shop[shopIndex];
   if (key === undefined) throw new RuleError(`no shop slot ${shopIndex}`);
-  if (player.hand.length >= cfg.handSize) throw new RuleError("hand is full");
-  spend(player, cfg.buyCost);
+  if (player.hand.length >= c.handSize) throw new RuleError("hand is full");
+  spend(player, c.buyCost);
   player.shop.splice(shopIndex, 1);
   player.hand.push({ key, golden: false });
   return key;
@@ -122,9 +168,10 @@ export function play(
   position: number,
   cfg: GameConfig = DEFAULT_CONFIG,
 ): void {
+  const c = withRules(player, cfg);
   const unit = player.hand[handIndex];
   if (unit === undefined) throw new RuleError(`no hand slot ${handIndex}`);
-  if (player.board.length >= cfg.boardSize) throw new RuleError("board is full");
+  if (player.board.length >= c.boardSize) throw new RuleError("board is full");
   if (!Number.isInteger(position) || position < 0 || position > player.board.length) {
     throw new RuleError(`invalid board position ${position}`);
   }
@@ -144,12 +191,14 @@ export function sell(
   const unit = zone[index];
   if (unit === undefined) throw new RuleError(`no ${from} slot ${index}`);
   zone.splice(index, 1);
-  pool.give(unit.key, copiesOf(unit));
-  player.energy = Math.min(player.energy + cfg.sellValue, cfg.maxEnergy);
+  // Tokens and other unpooled cards simply vanish; only pooled cards go back.
+  if (pool.has(unit.key)) pool.give(unit.key, copiesOf(unit));
+  const c = withRules(player, cfg);
+  player.energy = Math.min(player.energy + c.sellValue, c.maxEnergy);
 }
 
 export function upgrade(player: PlayerState, cfg: GameConfig = DEFAULT_CONFIG): void {
-  const cost = upgradeCost(player, cfg);
+  const cost = upgradeCost(player, withRules(player, cfg));
   if (cost === undefined) throw new RuleError("already at max rank");
   spend(player, cost);
   player.rank += 1;

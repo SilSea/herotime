@@ -104,6 +104,9 @@ function survivor(f: Fighter): CombatSurvivor {
   return s;
 }
 
+/** Max death/giant-entry steps in one settle() before the fight is abandoned as a draw. */
+const SETTLE_LIMIT = 2_000;
+
 const needsTargets = (a: Action): boolean =>
   a.type === "BUFF" ||
   a.type === "DAMAGE" ||
@@ -393,9 +396,15 @@ export function simulateCombat(
     }
   };
 
-  /** Resolve deaths, Last Stands and Giant entries until the board is stable. */
+  /**
+   * Resolve deaths, Last Stands and Giant entries until the board is stable. Content that chains
+   * forever (a unit whose Last Stand summons something that dies at once, ...) must not take the
+   * match down, so after too many steps the fight is abandoned and ends as a draw.
+   */
+  let aborted = false;
   const settle = (order: Side[]): void => {
-    for (let guard = 0; guard < 10_000; guard++) {
+    if (aborted) return;
+    for (let guard = 0; guard < SETTLE_LIMIT; guard++) {
       const dead = findDead(order);
       if (dead) {
         handleDeath(dead);
@@ -404,7 +413,7 @@ export function simulateCombat(
       if (enterGiants(order)) continue;
       return;
     }
-    throw new Error("combat did not settle (effects keep killing/summoning)");
+    aborted = true;
   };
 
   // ---- pre-fight: Gattai, Roll Call, Start of Combat ----
@@ -491,8 +500,9 @@ export function simulateCombat(
     const perm = (s: SideState): Record<string, { atk: number; hp: number }> => Object.fromEntries(s.permanent);
     return {
       winner,
-      survivorsA: sides.A.list.map(survivor),
-      survivorsB: sides.B.list.map(survivor),
+      // An abandoned fight can leave dead units in the lists; they are not survivors.
+      survivorsA: sides.A.list.filter(alive).map(survivor),
+      survivorsB: sides.B.list.filter(alive).map(survivor),
       events,
       attacks,
       rollCall: { A: sides.A.rollCall, B: sides.B.rollCall },
@@ -501,7 +511,7 @@ export function simulateCombat(
   };
 
   for (let iterations = 0; sides.A.list.length > 0 && sides.B.list.length > 0; iterations++) {
-    if (attacks >= maxAttacks || iterations > maxAttacks * 4) return finish("DRAW");
+    if (aborted || attacks >= maxAttacks || iterations > maxAttacks * 4) return finish("DRAW");
 
     const s = sides[turn];
     const foe = sides[other(turn)];
@@ -550,7 +560,8 @@ export function simulateCombat(
     turn = other(turn);
   }
 
-  return finish(sides.A.list.length > 0 ? "A" : sides.B.list.length > 0 ? "B" : "DRAW");
+  if (aborted) return finish("DRAW");
+  return finish(friendly(sides.A).length > 0 ? "A" : friendly(sides.B).length > 0 ? "B" : "DRAW");
 }
 
 /** Damage the winner deals to the loser's hero: base rank + survivor ranks, capped early game. */

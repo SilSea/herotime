@@ -86,7 +86,7 @@ describe("resolveTriples", () => {
     expect(res?.offer).toHaveLength(3);
     expect(new Set(res?.offer).size).toBe(3);
     for (const k of res?.offer ?? []) expect(pool.rankOf(k)).toBe(2);
-    expect(p.discovers).toEqual([res?.offer]);
+    expect(p.discovers).toEqual([{ options: res?.offer, destination: "HAND" }]);
   });
 
   it("caps the Discover rank at the max rank", () => {
@@ -132,7 +132,7 @@ describe("chooseDiscover", () => {
 
   it("adds the pick to hand and returns the other options to the pool", () => {
     withOffer();
-    const offer = [...(p.discovers[0] as string[])];
+    const offer = [...(p.discovers[0]?.options as string[])];
     const before = offer.map((k) => pool.count(k));
     const picked = chooseDiscover(p, 1, pool);
     expect(picked).toBe(offer[1]);
@@ -143,10 +143,30 @@ describe("chooseDiscover", () => {
     expect(pool.count(offer[1] as string)).toBe(before[1]); // the pick stays out
   });
 
+  it("honours this player's handSize rule", () => {
+    withOffer();
+    p.hand = [u("b"), u("b")];
+    p.rules.handSize = 2;
+    expect(() => chooseDiscover(p, 0, pool)).toThrow(/hand is full/);
+    p.rules.handSize = 3;
+    expect(() => chooseDiscover(p, 0, pool)).not.toThrow();
+  });
+
+  it("a Giant offer fills the Giant Slot even with a full hand and returns nothing to the pool", () => {
+    p.hand = Array.from({ length: DEFAULT_CONFIG.handSize }, (_, i) => u(`filler${i}`));
+    p.discovers = [{ options: ["a", "b"], destination: "GIANT" }];
+    const before = pool.count("a") + pool.count("b");
+    chooseDiscover(p, 1, pool);
+    expect(p.giant).toEqual(u("b"));
+    expect(p.hand).toHaveLength(DEFAULT_CONFIG.handSize);
+    expect(pool.count("a") + pool.count("b")).toBe(before);
+    expect(p.discovers).toEqual([]);
+  });
+
   it("answers the oldest offer first", () => {
     p.hand = Array.from({ length: 6 }, () => u("a"));
     resolveTriples(p, pool, rng);
-    const first = (p.discovers[0] as string[])[0];
+    const first = p.discovers[0]?.options[0];
     expect(chooseDiscover(p, 0, pool)).toBe(first);
     expect(p.discovers).toHaveLength(1);
   });

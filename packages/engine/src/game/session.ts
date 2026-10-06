@@ -1,0 +1,266 @@
+import type { Effect } from "@herotime/shared";
+import type { Unit } from "../content.js";
+import type { CombatOptions } from "../combat/combat.js";
+import { combatRulesOf } from "../rules.js";
+import {
+  buy,
+  play,
+  RuleError,
+  sell,
+  spend,
+  startTurn,
+  type PlayerState,
+} from "../shop/economy.js";
+import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
+import type { CombatResult, CombatSideExtras, CombatUnitInput, Side } from "../types.js";
+import { fireGaugeTrigger, runTrigger, swapKey } from "./effects.js";
+import type { GameEnv } from "./env.js";
+
+// ------------------------------------------------------------ recruit intents
+
+/** Start a recruit phase: refill energy, roll the shop, then run ON_TURN_START (relics, hero). */
+export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void {
+  startTurn(player, turn, env.pool, env.rng, env.cfg);
+  for (const effects of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env);
+}
+
+/** Buy from the shop; a purchase that completes a triple merges immediately. */
+export function buyUnit(player: PlayerState, shopIndex: number, env: GameEnv): TripleResult[] {
+  buy(player, shopIndex, env.cfg);
+  return resolveTriples(player, env.pool, env.rng, env.cfg);
+}
+
+/** Put a unit on the board, run its Henshin Call (ON_PLAY), then resolve any triple. */
+export function playUnit(player: PlayerState, handIndex: number, position: number, env: GameEnv): TripleResult[] {
+  const card = player.hand[handIndex];
+  if (card === undefined) throw new RuleError(`no hand slot ${handIndex}`);
+  const def = env.content.card(card.key);
+  if (def.kind !== "UNIT") throw new RuleError(`${def.name} is not a unit${def.kind === "GEAR" ? " (use it instead)" : ""}`);
+
+  play(player, handIndex, position, env.cfg);
+  runTrigger(def.effects, "ON_PLAY", "UNIT", card, player, env);
+  return resolveTriples(player, env.pool, env.rng, env.cfg);
+}
+
+/** Use a Gear card from hand: its player-scope ON_PLAY effects run, then it is spent. */
+export function useGear(player: PlayerState, handIndex: number, env: GameEnv): void {
+  const card = player.hand[handIndex];
+  if (card === undefined) throw new RuleError(`no hand slot ${handIndex}`);
+  const def = env.content.card(card.key);
+  if (def.kind !== "GEAR") throw new RuleError(`${def.name} is not gear`);
+  player.hand.splice(handIndex, 1);
+  runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env);
+}
+
+export function sellUnit(player: PlayerState, from: "board" | "hand", index: number, env: GameEnv): void {
+  const unit = (from === "board" ? player.board : player.hand)[index];
+  if (unit !== undefined && env.content.card(unit.key).kind === "GEAR") throw new RuleError("gear cannot be sold");
+  sell(player, from, index, env.pool, env.cfg);
+}
+
+/** Take a Discover pick, then resolve a triple the pick may have completed. */
+export function pickDiscover(player: PlayerState, index: number, env: GameEnv): TripleResult[] {
+  chooseDiscover(player, index, env.pool, env.cfg);
+  return resolveTriples(player, env.pool, env.rng, env.cfg);
+}
+
+/**
+ * End the recruit phase: END_OF_TURN effects (left to right), then each board unit's turn counter
+ * ticks and Henshin(N) units transform, firing HENSHIN effects and feeding Henshin gauges.
+ */
+export function endTurn(player: PlayerState, env: GameEnv): void {
+  for (const unit of [...player.board]) {
+    if (!player.board.includes(unit)) continue; // an earlier effect removed it
+    runTrigger(env.content.card(unit.key).effects, "END_OF_TURN", "UNIT", unit, player, env);
+  }
+
+  for (const unit of [...player.board]) {
+    if (!player.board.includes(unit)) continue;
+    unit.turns = (unit.turns ?? 0) + 1;
+    const henshin = env.content.card(unit.key).henshin;
+    if (!henshin || unit.turns < henshin.afterTurns) continue;
+
+    if (!swapKey(unit, henshin.into, env)) continue; // pool cannot cover the new form: try again next turn
+    runTrigger(env.content.card(unit.key).effects, "HENSHIN", "UNIT", unit, player, env);
+    fireGaugeTrigger(player, env, "HENSHIN");
+  }
+}
+
+// ------------------------------------------------------------------ hero
+
+export function assignHero(player: PlayerState, heroKey: string, env: GameEnv): void {
+  const hero = env.content.heroes.get(heroKey);
+  if (!hero) throw new RuleError(`unknown hero: ${heroKey}`);
+  player.hero = heroKey;
+  runTrigger(hero.power?.effects ?? [], "ON_ACQUIRE", "PLAYER", null, player, env);
+}
+
+/** Activate the hero power: ACTIVE = once per turn, ONCE = once per game, PASSIVE = not activatable. */
+export function useHeroPower(player: PlayerState, env: GameEnv): void {
+  const hero = player.hero ? env.content.heroes.get(player.hero) : undefined;
+  const power = hero?.power;
+  if (!hero || !power) throw new RuleError("no hero power");
+  if (power.mode === "PASSIVE") throw new RuleError("this hero power is passive");
+  if (power.mode === "ACTIVE" && player.heroPowerUsed) throw new RuleError("hero power already used this turn");
+  if (power.mode === "ONCE" && player.heroPowerSpent) throw new RuleError("hero power already used this game");
+
+  spend(player, power.cost);
+  if (power.mode === "ACTIVE") player.heroPowerUsed = true;
+  else player.heroPowerSpent = true;
+  runTrigger(power.effects, "ON_USE", "PLAYER", null, player, env);
+}
+
+// ----------------------------------------------------------------- relics
+
+/** Effect lists that act at the player level: owned relics and the hero power. */
+function playerEffectSources(player: PlayerState, env: GameEnv): Effect[][] {
+  const lists: Effect[][] = player.relics.map((k) => [...(env.content.relics.get(k)?.effects ?? [])]);
+  const power = player.hero ? env.content.heroes.get(player.hero)?.power : undefined;
+  if (power) lists.push([...power.effects]);
+  return lists;
+}
+
+function weightedPick<T extends { weight: number }>(items: readonly T[], env: GameEnv): T | undefined {
+  const total = items.reduce((n, i) => n + i.weight, 0);
+  if (total <= 0) return undefined;
+  let roll = env.rng.int(total);
+  for (const item of items) {
+    if (roll < item.weight) return item;
+    roll -= item.weight;
+  }
+  return undefined;
+}
+
+function topKey(counts: Map<string, number>): string | undefined {
+  let best: string | undefined;
+  for (const key of [...counts.keys()].sort()) {
+    if (best === undefined || (counts.get(key) ?? 0) > (counts.get(best) ?? 0)) best = key;
+  }
+  return best;
+}
+
+/**
+ * Offer 4 relics of `tier`: one for the board's main faction, one for its main series, two random,
+ * and always at least one free option. Several players may be offered, and hold, the same relic.
+ */
+export function offerRelics(
+  player: PlayerState,
+  tier: "LESSER" | "GREATER",
+  env: GameEnv,
+): string[] {
+  if (player.relics.some((k) => env.content.relics.get(k)?.tier === tier)) {
+    throw new RuleError(`already holding a ${tier.toLowerCase()} relic`);
+  }
+
+  let pool = [...env.content.relics.values()].filter((r) => r.tier === tier);
+  const chosen: typeof pool = [];
+  const take = (r: (typeof pool)[number] | undefined): void => {
+    if (!r) return;
+    chosen.push(r);
+    pool = pool.filter((x) => x !== r);
+  };
+
+  const factions = new Map<string, number>();
+  const series = new Map<string, number>();
+  for (const u of player.board) {
+    const def = env.content.card(u.key);
+    for (const f of def.factions) factions.set(f, (factions.get(f) ?? 0) + 1);
+    if (def.series !== undefined) series.set(def.series, (series.get(def.series) ?? 0) + 1);
+  }
+  const mainFaction = topKey(factions);
+  const mainSeries = topKey(series);
+
+  if (mainFaction !== undefined) take(weightedPick(pool.filter((r) => r.factions.includes(mainFaction)), env));
+  if (mainSeries !== undefined) take(weightedPick(pool.filter((r) => r.series === mainSeries), env));
+  while (chosen.length < 4) {
+    const next = weightedPick(pool, env);
+    if (!next) break;
+    take(next);
+  }
+
+  if (chosen.length > 0 && !chosen.some((r) => r.cost === 0)) {
+    const free = weightedPick(pool.filter((r) => r.cost === 0), env);
+    if (free) chosen[chosen.length - 1] = free;
+  }
+
+  const options = chosen.map((r) => r.key);
+  player.relicOffer = { tier, options };
+  return options;
+}
+
+/** Pay for and take one offered relic. */
+export function chooseRelic(player: PlayerState, index: number, env: GameEnv): string {
+  const offer = player.relicOffer;
+  if (!offer) throw new RuleError("no relic offer pending");
+  const key = offer.options[index];
+  if (key === undefined) throw new RuleError(`no relic option ${index}`);
+  const def = env.content.relics.get(key);
+  if (!def) throw new RuleError(`unknown relic: ${key}`);
+
+  spend(player, def.cost);
+  player.relics.push(key);
+  delete player.relicOffer;
+  runTrigger(def.effects, "ON_ACQUIRE", "PLAYER", null, player, env);
+  return key;
+}
+
+/** Timeout fallback: take the free option (offers include one when content allows). */
+export function autoChooseRelic(player: PlayerState, env: GameEnv): string | undefined {
+  const offer = player.relicOffer;
+  if (!offer) return undefined;
+  const free = offer.options.findIndex((k) => env.content.relics.get(k)?.cost === 0);
+  if (free < 0) {
+    delete player.relicOffer;
+    return undefined;
+  }
+  return chooseRelic(player, free, env);
+}
+
+// ----------------------------------------------------------------- combat
+
+/** Everything simulateCombat needs for this player's side, snapshotted from their board. */
+export function prepareCombat(player: PlayerState, env: GameEnv): { units: CombatUnitInput[]; extras: CombatSideExtras } {
+  const units = player.board.map((u, i) => env.content.toCombat(u, `board:${i}`));
+
+  const playerEffects: Effect[] = [];
+  for (const effects of playerEffectSources(player, env)) {
+    playerEffects.push(...effects.filter((e) => e.scope === "PLAYER" && e.trigger === "START_OF_COMBAT"));
+  }
+
+  const perSeries = new Map<string, number>();
+  for (const u of player.board) {
+    const s = env.content.card(u.key).series;
+    if (s !== undefined) perSeries.set(s, (perSeries.get(s) ?? 0) + 1);
+  }
+  for (const [key, count] of perSeries) {
+    for (const bond of env.content.series.get(key)?.bonds ?? []) {
+      if (count >= bond.count) playerEffects.push(...bond.effects);
+    }
+  }
+
+  const extras: CombatSideExtras = { playerEffects, rules: combatRulesOf(player) };
+  if (player.giant) extras.giant = env.content.toCombat(player.giant);
+  return { units, extras };
+}
+
+export function combatOptions(env: GameEnv): Pick<CombatOptions, "content" | "boardSize" | "maxAttacksPerCombat"> {
+  return { content: env.content, boardSize: env.cfg.boardSize, maxAttacksPerCombat: env.cfg.maxAttacksPerCombat };
+}
+
+/**
+ * Write a finished fight back to the player: permanent buffs onto the units that earned them, then
+ * Roll Call gauge points. The board must be unchanged since prepareCombat.
+ */
+export function applyCombatOutcome(player: PlayerState, result: CombatResult, side: Side, env: GameEnv): void {
+  for (const [sourceId, gain] of Object.entries(result.permanent[side])) {
+    const index = Number(sourceId.replace("board:", ""));
+    const unit: Unit | undefined = player.board[index];
+    if (!unit) continue;
+    unit.bonusAtk = (unit.bonusAtk ?? 0) + gain.atk;
+    unit.bonusHp = (unit.bonusHp ?? 0) + gain.hp;
+  }
+  if (result.rollCall[side]) {
+    fireGaugeTrigger(player, env, "ON_ROLL_CALL");
+    if (result.winner === side) fireGaugeTrigger(player, env, "ON_ROLL_CALL_WIN");
+  }
+}

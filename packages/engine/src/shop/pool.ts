@@ -26,6 +26,10 @@ export class Pool {
     }
   }
 
+  has(key: string): boolean {
+    return this.ranks.has(key);
+  }
+
   count(key: string): number {
     return this.remaining.get(key) ?? 0;
   }
@@ -62,6 +66,15 @@ export class Pool {
       roll -= n;
     }
     return undefined; // unreachable: total > 0 guarantees a hit above
+  }
+
+  /** Remove specific copies from the pool (e.g. a card created by an effect). False if not enough are left. */
+  take(key: string, copies = 1): boolean {
+    this.rankOf(key); // validates the key
+    const n = this.count(key);
+    if (n < copies) return false;
+    this.remaining.set(key, n - copies);
+    return true;
   }
 
   /** Return copies to the pool (sold, rolled away, or removed from the game). */

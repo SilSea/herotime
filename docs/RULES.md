@@ -153,27 +153,51 @@ Gear (เข็มขัด, อาวุธ, การ์ดแปลงร่�
 ---
 
 ## 12. Ability DSL (data-driven)
-Effect เก็บเป็น JSON ใน DB, engine ตีความ — admin สร้างการ์ดใหม่ได้โดยไม่แก้ code
+Effect เก็บเป็น JSON ใน DB, engine ตีความ — admin สร้างการ์ดใหม่ได้โดยไม่แก้ code. Schema จริงอยู่ที่ `packages/shared/src/schemas/effect.ts` (zod) ใช้ validate ทั้ง admin editor และ server
 
 ```jsonc
 {
-  "trigger": "START_OF_COMBAT",          // ON_PLAY, LAST_STAND, ON_ATTACK, AFTER_DAMAGED, END_OF_TURN, ON_BUY, ON_SELL, AVENGE, HENSHIN ...
+  "scope": "UNIT",                       // UNIT (ผูกกับยูนิต) | PLAYER (Hero Power, Relic, Series Bond, Gear)
+  "trigger": "START_OF_COMBAT",
   "condition": { "type": "TEAM_UP_COLORS_GTE", "value": 3 },
-  "target": { "selector": "SELF" },      // RANDOM_FRIENDLY, ALL_FRIENDLY_TRIBE{tribe}, ADJACENT, LEFTMOST_ENEMY ...
+  "target": { "selector": "SELF" },      // + faction / series filter สำหรับ selector ฝั่งเรา
   "actions": [
     { "type": "BUFF", "atk": 2, "hp": 2, "permanent": false },
-    { "type": "SUMMON", "cardId": "grunt_token", "count": 1 }
+    { "type": "SUMMON", "cardKey": "grunt_token", "count": 1 }
   ],
   "goldenMultiplier": 2
 }
 ```
 
-- **Action registry**: `BUFF`, `SUMMON`, `DAMAGE`, `GIVE_KEYWORD`, `TRANSFORM`, `GAIN_ENERGY`, `DISCOVER`, `ADD_TO_HAND`, `DESTROY`, `STEAL_STATS`, `MERGE`, `GAUGE_ADD`, `MODIFY_RULE`, … — กลไกใหม่จริงๆ = เพิ่ม handler 1 ตัว ที่เหลือเป็น data
-- **Owner scope**: `UNIT` (การ์ด) หรือ `PLAYER` (Hero Power, Relic) — effect ระดับผู้เล่นไม่ผูกกับยูนิต ไม่หายเมื่อยูนิตตาย
-- **Trigger ระดับผู้เล่น**: `ON_TURN_START`, `ON_REFRESH`, `ON_ROLL_CALL`, `ON_HENSHIN`, `ON_GAUGE_CHANGE` (+ trigger ปกติทั้งหมด)
-- **`MODIFY_RULE`**: แก้ค่า rule ของผู้เล่นคนนั้นระหว่างเกม (ราคา, threshold Gauge, จำนวนสี Roll Call, เงื่อนไขหุ่นลงสนาม, …). Engine อ่านค่า rule ทุกตัวผ่าน `RuleContext` ของผู้เล่น ห้าม hardcode
-- Schema นิยามด้วย zod ใน `packages/shared` ใช้ validate ทั้ง admin editor และ server
+### 12.1 Triggers
+| ระดับ | Trigger |
+|---|---|
+| ยูนิต | `ON_PLAY` (Henshin Call), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย) |
+| ผู้เล่น | `ON_ACQUIRE` (เลือก Relic/Hero), `ON_TURN_START`, `ON_USE` (Hero Power), `START_OF_COMBAT` (Relic/Series Bond), `ON_PLAY` (Gear) |
+| แหล่ง Gauge | `ON_ROLL_CALL`, `ON_ROLL_CALL_WIN`, `HENSHIN` |
+
+### 12.2 Conditions / Selectors / Actions
+- **Conditions**: `TEAM_UP_COLORS_GTE`, `FACTION_COUNT_GTE`, `SERIES_COUNT_GTE`, `ENERGY_GTE` (ใน combat ไม่มี energy → ไม่ผ่าน)
+- **Selectors**: `SELF`, `ADJACENT`, `LEFTMOST_FRIENDLY`, `RIGHTMOST_FRIENDLY`, `RANDOM_FRIENDLY` (**ไม่เลือกตัวเอง**), `ALL_FRIENDLY`, `LEFTMOST_ENEMY`, `RANDOM_ENEMY`, `ALL_ENEMY` (selector ศัตรูใช้ได้เฉพาะใน combat)
+- **Actions**: `BUFF`, `SUMMON`, `DAMAGE` (combat เท่านั้น), `GIVE_KEYWORD`, `TRANSFORM`, `DESTROY`, `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`. ยังไม่มี: `STEAL_STATS`, `MERGE`, `COPY_KEYWORD`, `DISCOVER` ทั่วไป (ซีรีส์ Gokaiger/Kyoryuger/W/Den-O/OOO ใช้ตอน content pass: เพิ่ม handler ตามต้องการ)
+- action ที่ใช้ได้เฉพาะตอน recruit: `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`
+
+### 12.3 กฎที่ engine บังคับ (ได้จากการทำ + fuzz จริง)
+- **Golden**: ตัวเลข `BUFF`/`SUMMON count`/`DAMAGE`/`GAIN_ENERGY`/`GAUGE_ADD` คูณ `goldenMultiplier` (ค่าเริ่มต้น 2) เมื่อ *ยูนิตเจ้าของ* เป็น Final Form
+- **Last Stand ทำงานทุกครั้งที่ตาย** รวมครั้งที่ตามด้วย Revive/Kyodaika (ยูนิตที่ฟื้นกลับมา summon ไปทางขวาของตัวเอง; ยูนิตที่ตายจริงๆ summon ลงช่องของมัน). ยูนิตที่ฟื้นจึงมี event DEATH 2 ครั้ง
+- **Kyodaika** ใช้ HP สูงสุด ×ตัวคูณ (ไม่ใช่ HP ที่เหลือ), ล้าง keyword, เป็น "ตัวใหญ่" (FINAL_BLOW ตีแรงขึ้น ×2) และทำให้หุ่นฝั่งตรงข้ามลงสนาม
+- **FINAL_BLOW**: ตีครั้งแรก ×2 และ ×2 อีกชั้นเมื่อเป้าหมายเป็นตัวใหญ่ (หุ่น/Kyodaika) — ซ้อนกันเป็น ×4
+- **ลำดับตี**: ใช้ pointer ที่ปรับตามการเพิ่ม/ลบยูนิตทั้งสองฝั่ง ไม่มีตัวไหนถูกข้ามเมื่อยูนิตทางซ้ายตาย
+- **การ์ดที่ effect สร้างและอยู่ใน pool** (`ADD_TO_HAND`, `SUMMON`, `TRANSFORM`, Henshin) ดึง/สลับจาก pool จริง — ถ้า pool ไม่มีให้ ไม่เกิดผล (Henshin รอเทิร์นถัดไป). token/Gear/Giant ไม่อยู่ใน pool จึงไม่กระทบ
+- **combat ที่ effect วนไม่รู้จบ** (ตาย→summon→ตาย…) จบเป็นเสมอ ไม่ crash แมตช์
+- **Content validation** (ตอน publish): reference ที่ไม่มีอยู่, `MODIFY_RULE` ชื่อกฎที่ไม่มี, Series Bond ที่ไม่ใช่ player-scope `START_OF_COMBAT`, Gear ที่ effect ไม่ใช่ player-scope `ON_PLAY`, การ์ดยูนิตที่มี player-scope effect, รางวัล Gauge ที่ต้องมีเป้าหมาย
+- **`MODIFY_RULE`**: กฎที่ปรับได้ = `startEnergy`, `energyPerTurn`, `maxEnergy`, `buyCost`, `sellValue`, `refreshCost`, `boardSize`, `handSize`, `maxRank`, `freeRefreshesPerTurn`, `rollCallColors`, `rollCallBuff`, `gattaiSize`, `giantEntryThreshold`, `giantSentaiScale`, `kyodaikaMultiplier`. Engine อ่านผ่านกฎของผู้เล่นเสมอ ห้าม hardcode
 - **Content versioning**: draft → Publish = snapshot ที่ไม่เปลี่ยน, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
+
+### 12.4 Gauge / Gear / Giant
+- Gauge: `sources` (trigger+amount) + `thresholds` (`at`, `reward` = actions ที่ไม่ต้องมีเป้าหมาย). `once: true` จ่ายครั้งเดียวตอนข้าม; `once: false` จ่ายซ้ำและหัก `at` ทุกครั้ง
+- **Gear** = การ์ด `kind: "GEAR"` ในมือ ใช้ด้วย `useGear` (รัน player-scope `ON_PLAY`) ขายไม่ได้ ไม่อยู่ใน pool
+- **Giant** = การ์ด `kind: "GIANT"` ไม่อยู่ใน pool; เลือกผ่าน `DISCOVER_GIANT` (3 ตัว, ตัวของซีรีส์ที่มียูนิตบนบอร์ดมากสุดออกแน่นอน) เข้า Giant Slot. ลงสนามเมื่อยูนิตเหลือ ≤ `giantEntryThreshold` หรือศัตรู Kyodaika; ลงได้ครั้งเดียวต่อการสู้
 
 ---
 
@@ -195,7 +219,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 2. 1 อันผูกกับ Series ที่มีบนบอร์ด (ไม่มีก็สุ่มทั่วไป)
 3. 2 อันสุ่มทั่วไป
 
-กรองเฉพาะ Faction/Series ที่ล็อบบี้เปิดใช้. Relic **unique ต่อล็อบบี้** (สองคนไม่ได้ Relic เดียวกัน). น้ำหนักการสุ่มปรับได้ด้วย `weight`
+กรองเฉพาะ Faction/Series ที่ล็อบบี้เปิดใช้. ผู้เล่นหลายคนได้รับเสนอและเลือก Relic ชิ้นเดียวกันได้ (ไม่มีการจองชิ้นต่อล็อบบี้). ผู้เล่นคนเดียวถือได้ tier ละ 1 อัน จึงไม่มีทางได้ซ้ำกับตัวเอง. น้ำหนักการสุ่มปรับได้ด้วย `weight`; หมดเวลาจะได้ตัวฟรี.
 
 ### 13.2 ประเภท
 | ประเภท | ตัวอย่างผล |

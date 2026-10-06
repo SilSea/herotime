@@ -1,6 +1,8 @@
 import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
 import type { Rng } from "../rng/rng.js";
-import { RuleError, type PlayerState, type Unit } from "./economy.js";
+import type { Unit } from "../content.js";
+import { RuleError, type PlayerState } from "./economy.js";
+import { withRules } from "../rules.js";
 import type { Pool } from "./pool.js";
 
 export interface TripleResult {
@@ -73,14 +75,17 @@ export function resolveTriples(
     anchor.zone.splice(anchor.index, 0, { key, golden: true });
 
     const offer = drawOffer(pool, rng, Math.min(player.rank + 1, cfg.maxRank));
-    if (offer.length > 0) player.discovers.push(offer);
+    if (offer.length > 0) player.discovers.push({ options: offer, destination: "HAND" });
     results.push({ key, offer });
   }
 
   return results;
 }
 
-/** Take one card from the oldest Discover offer into hand; the rest return to the pool. */
+/**
+ * Take one card from the oldest Discover offer. HAND offers put it in hand and return the rest to
+ * the pool; GIANT offers fill the Giant Slot (Giants are never pooled, so nothing is returned).
+ */
 export function chooseDiscover(
   player: PlayerState,
   index: number,
@@ -89,12 +94,18 @@ export function chooseDiscover(
 ): string {
   const offer = player.discovers[0];
   if (offer === undefined) throw new RuleError("no discover pending");
-  const key = offer[index];
+  const key = offer.options[index];
   if (key === undefined) throw new RuleError(`no discover option ${index}`);
-  if (player.hand.length >= cfg.handSize) throw new RuleError("hand is full");
 
+  if (offer.destination === "GIANT") {
+    player.discovers.shift();
+    player.giant = { key, golden: false };
+    return key;
+  }
+
+  if (player.hand.length >= withRules(player, cfg).handSize) throw new RuleError("hand is full");
   player.discovers.shift();
-  offer.forEach((k, i) => {
+  offer.options.forEach((k, i) => {
     if (i !== index) pool.give(k);
   });
   player.hand.push({ key, golden: false });

@@ -99,3 +99,23 @@ describe("Pool", () => {
     expect(run(8)).toEqual(run(8));
   });
 });
+
+describe("Pool.take", () => {
+  it("removes copies and reports success", () => {
+    const pool = new Pool([{ key: "k", rank: 1 }], { 1: 3 });
+    expect(pool.take("k")).toBe(true);
+    expect(pool.count("k")).toBe(2);
+    expect(pool.take("k", 2)).toBe(true);
+    expect(pool.count("k")).toBe(0);
+  });
+
+  it("refuses without changing anything when there are not enough copies", () => {
+    const pool = new Pool([{ key: "k", rank: 1 }], { 1: 2 });
+    expect(pool.take("k", 3)).toBe(false);
+    expect(pool.count("k")).toBe(2);
+  });
+
+  it("validates the key", () => {
+    expect(() => new Pool([], {}).take("ghost")).toThrow(/unknown/);
+  });
+});

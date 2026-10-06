@@ -336,3 +336,35 @@ describe("GATTAI", () => {
     }
   });
 });
+
+describe("runaway content", () => {
+  // Every friendly death makes the avenger destroy itself; its Last Stand summons another one: forever.
+  const ouro = card("ouro", {
+    effects: [
+      effect({ trigger: "LAST_STAND", actions: [{ type: "SUMMON", cardKey: "ouro" }] }),
+      effect({ trigger: "AVENGE", actions: [{ type: "DESTROY" }] }),
+    ],
+  });
+  const loopWorld = content({ cards: [ouro] });
+  const ouroInput = f("ouro", 1, 1, { effects: ouro.effects });
+
+  it("ends as a draw instead of throwing", () => {
+    // a second unit that dies at start kicks the chain off
+    const killer = f("killer", 0, 1, {
+      effects: [effect({ trigger: "START_OF_COMBAT", actions: [{ type: "DESTROY" }] })],
+    });
+    let result: ReturnType<typeof simulateCombat> | undefined;
+    expect(() => {
+      result = simulateCombat([killer, ouroInput], [f("foe", 1, 1)], 1, { content: loopWorld });
+    }).not.toThrow();
+    expect(result?.winner).toBe("DRAW");
+  });
+
+  it("an aborted fight stops fighting: no attacks happen after the chain starts", () => {
+    const killer = f("killer", 0, 1, {
+      effects: [effect({ trigger: "START_OF_COMBAT", actions: [{ type: "DESTROY" }] })],
+    });
+    const r = simulateCombat([killer, ouroInput], [f("foe", 1, 1)], 1, { content: loopWorld });
+    expect(r.attacks).toBe(0);
+  });
+});

@@ -8,6 +8,7 @@ import {
   newPlayer,
   play,
   refresh,
+  reorder,
   RuleError,
   sell,
   shopSizeFor,
@@ -41,7 +42,7 @@ const total = (): number => cards.reduce((n, c) => n + pool.count(c.key), 0);
 const held = (s: PlayerState): number =>
   s.shop.length +
   [...s.hand, ...s.board].reduce((n, unit) => n + copiesOf(unit), 0) +
-  s.discovers.reduce((n, offer) => n + offer.length, 0);
+  s.discovers.reduce((n, offer) => n + offer.options.length, 0);
 
 describe("energy & sizes", () => {
   it("energy is 3 on turn 1, +1 per turn, capped at 10", () => {
@@ -175,6 +176,38 @@ describe("buy / play / sell", () => {
   });
 });
 
+describe("reorder", () => {
+  const names = (s: PlayerState) => s.board.map((x) => x.key);
+  beforeEach(() => {
+    p.board = [u("a"), u("b"), u("c"), u("d")];
+  });
+
+  it("moves a unit right and left, shifting the others", () => {
+    reorder(p, 0, 2);
+    expect(names(p)).toEqual(["b", "c", "a", "d"]);
+    reorder(p, 3, 0);
+    expect(names(p)).toEqual(["d", "b", "c", "a"]);
+  });
+
+  it("moving to the same slot changes nothing and never loses a unit", () => {
+    reorder(p, 1, 1);
+    expect(names(p)).toEqual(["a", "b", "c", "d"]);
+  });
+
+  it("keeps the unit itself (golden, bonuses) intact", () => {
+    p.board[0] = { key: "a", golden: true, bonusAtk: 2 };
+    reorder(p, 0, 3);
+    expect(p.board[3]).toEqual({ key: "a", golden: true, bonusAtk: 2 });
+  });
+
+  it("rejects out-of-range or fractional slots without changing the board", () => {
+    for (const [from, to] of [[-1, 0], [4, 0], [0, 4], [0, -1], [0.5, 1], [1, 1.5]] as const) {
+      expect(() => reorder(p, from, to)).toThrow(RuleError);
+    }
+    expect(names(p)).toEqual(["a", "b", "c", "d"]);
+  });
+});
+
 describe("upgrade", () => {
   it("costs 5 from rank 1", () => {
     p.energy = 10;
@@ -219,5 +252,100 @@ describe("upgrade", () => {
     upgrade(p);
     startTurn(p, 2, pool, rng);
     expect(p.shop).toHaveLength(4);
+  });
+});
+
+describe("per-player rules (MODIFY_RULE overrides)", () => {
+  it("buyCost", () => {
+    startTurn(p, 1, pool, rng);
+    p.rules.buyCost = 1;
+    p.energy = 3;
+    buy(p, 0);
+    expect(p.energy).toBe(2);
+  });
+
+  it("sellValue and maxEnergy cap the refund", () => {
+    p.hand = [u("r1_0")];
+    p.energy = 5;
+    p.rules.sellValue = 3;
+    sell(p, "hand", 0, pool);
+    expect(p.energy).toBe(8);
+
+    p.hand = [u("r1_1")];
+    p.rules.maxEnergy = 9;
+    sell(p, "hand", 0, pool);
+    expect(p.energy).toBe(9); // 8 + 3 would be 11, capped by the player's own max
+  });
+
+  it("refreshCost", () => {
+    startTurn(p, 1, pool, rng);
+    p.rules.refreshCost = 2;
+    refresh(p, pool, rng);
+    expect(p.energy).toBe(1);
+  });
+
+  it("free refreshes are spent before paying, and refill each turn", () => {
+    p.rules.freeRefreshesPerTurn = 2;
+    startTurn(p, 1, pool, rng);
+    expect(p.freeRefreshes).toBe(2);
+    refresh(p, pool, rng);
+    refresh(p, pool, rng);
+    expect(p.energy).toBe(3);
+    refresh(p, pool, rng);
+    expect(p.energy).toBe(2);
+    startTurn(p, 2, pool, rng);
+    expect(p.freeRefreshes).toBe(2);
+  });
+
+  it("boardSize and handSize", () => {
+    p.rules.boardSize = 1;
+    p.hand = [u("a"), u("b")];
+    play(p, 0, 0);
+    expect(() => play(p, 0, 0)).toThrow(/board is full/);
+
+    p.rules.handSize = 1;
+    startTurn(p, 1, pool, rng);
+    p.energy = 9;
+    expect(() => buy(p, 0)).toThrow(/hand is full/);
+  });
+
+  it("startEnergy, energyPerTurn and maxEnergy shape the turn refill", () => {
+    p.rules.startEnergy = 5;
+    p.rules.energyPerTurn = 2;
+    p.rules.maxEnergy = 8;
+    startTurn(p, 1, pool, rng);
+    expect(p.energy).toBe(5);
+    startTurn(p, 3, pool, rng);
+    expect(p.energy).toBe(8); // 5 + 2*2 = 9, capped at 8
+  });
+
+  it("maxRank caps upgrades for this player only", () => {
+    p.rules.maxRank = 2;
+    p.energy = 10;
+    upgrade(p);
+    expect(p.rank).toBe(2);
+    expect(() => upgrade(p)).toThrow(/max rank/);
+    const other = newPlayer();
+    other.energy = 10;
+    upgrade(other);
+    expect(other.rank).toBe(2);
+    other.energy = 10;
+    expect(() => upgrade(other)).not.toThrow();
+  });
+
+  it("rules belong to one player", () => {
+    const other = newPlayer();
+    p.rules.buyCost = 0;
+    startTurn(other, 1, pool, rng);
+    expect(() => buy(other, 0)).not.toThrow();
+    expect(other.energy).toBe(0); // paid the normal 3
+  });
+
+  it("selling an unpooled card (a token) is allowed and the pool is unchanged", () => {
+    p.hand = [u("token_not_in_pool")];
+    const before = cards.reduce((n, c) => n + pool.count(c.key), 0);
+    sell(p, "hand", 0, pool);
+    expect(cards.reduce((n, c) => n + pool.count(c.key), 0)).toBe(before);
+    expect(p.energy).toBe(1);
   });
 });
