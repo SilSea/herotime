@@ -67,13 +67,13 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [ ] **F5.9** (P2) Mobile layout
 
 ## F6. Admin Editor
-- [ ] **F6.1** (P0) CRUD Card / Hero / Faction / Keyword / Series / Gauge
-- [ ] **F6.2** (P0) Effect builder (dropdown สร้างจาก zod schema) + โหมด raw JSON
-- [ ] **F6.3** (P0) Live card preview
-- [ ] **F6.4** (P0) Draft → Publish ContentVersion, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
+- [x] **F6.1** (P0) CRUD Card / Hero / Relic / Faction / Series / Gauge (Keyword ยังเป็น enum ใน engine)
+- [x] **F6.2** (P0) Effect builder (form จาก descriptor ที่มี test ตรวจว่าตรงกับ zod) + โหมด raw JSON
+- [x] **F6.3** (P0) Live card preview (ข้อความกฎที่สร้างจาก effect อัพเดตตอน Save)
+- [x] **F6.4** (P0) Draft → Publish ContentVersion, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
 - [ ] **F6.5** (P0) Upload รูป
 - [ ] **F6.6** (P1) Sandbox simulate ×1000 + win-rate
-- [ ] **F6.7** (P1) Diff / rollback version, Audit log
+- [~] **F6.7** (P1) Rollback (restore เวอร์ชันเก่าเข้า draft แล้ว publish) + Audit log ทำแล้ว; Diff ยังไม่ทำ
 - [ ] **F6.8** (P2) Stat dashboard (pick rate, win rate ต่อการ์ด)
 
 ## F7. Relic (ระบบสมบัติ) — ดู [RULES.md §13](RULES.md#13-relic-ระบบสมบัติ)

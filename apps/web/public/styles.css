@@ -50,7 +50,7 @@ h1, h2, h3 { margin: 0 0 8px; font-family: Georgia, "Palatino Linotype", serif; 
 .mini { font-size: 11px; padding: 2px 7px; border-radius: 10px; border: 1px solid #7a5a35; background: linear-gradient(#5a3d22, #3d2815); cursor: pointer; }
 .mini.primary { background: linear-gradient(#ffd966, #d9a21b); color: #2a1a00; border-color: #8a6410; font-weight: 700; }
 .mini:disabled { opacity: .35; cursor: default; }
-input, select { background: #140c05; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+input, select, textarea { background: #140c05; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
 .tabs { display: flex; gap: 4px; }
 .tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 6px 12px; cursor: pointer; color: var(--muted); }
 .tab.active { color: var(--text); border-color: var(--gold); }
@@ -329,3 +329,49 @@ body.dragging .end-drop, body.dragging .sell-zone { border-color: var(--gold); c
 .shop-cards .card:nth-child(5) { animation-delay: .24s; }
 .shop-cards .card:nth-child(6) { animation-delay: .3s; }
 @keyframes deal { from { transform: translateY(-40px) scale(.8); opacity: 0; } }
+
+/* ---- content editor (admin) */
+.admin { display: flex; flex-direction: column; gap: 10px; }
+.admin-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 12px; background: linear-gradient(var(--panel-2), var(--panel)); border: 2px solid #6b4d2c; border-radius: 10px; }
+.admin-status { color: var(--muted); font-size: 13px; }
+.admin-status.dirty { color: var(--gold); font-weight: 700; }
+.admin-issues { background: #3b1511; border: 2px solid var(--bad); border-radius: 10px; padding: 8px 14px; }
+.admin-issues ul { margin: 6px 0 0; padding-left: 20px; font-size: 13px; }
+.admin-body { display: grid; grid-template-columns: 260px minmax(0, 1fr) 300px; gap: 12px; align-items: start; }
+.admin-left, .admin-middle, .admin-right { background: linear-gradient(var(--panel-2), var(--panel)); border: 2px solid #6b4d2c; border-radius: 10px; padding: 10px; min-width: 0; }
+.admin-left { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 170px); position: sticky; top: 8px; }
+.admin-tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+.admin-tabs .tab { padding: 3px 8px; font-size: 12px; }
+.admin-list { overflow: auto; display: flex; flex-direction: column; gap: 3px; }
+.admin-item { text-align: left; background: #0003; border: 1px solid transparent; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
+.admin-item:hover { border-color: var(--gold); }
+.admin-item.active { background: #f6c74422; border-color: var(--gold); }
+.admin-right { position: sticky; top: 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.preview-small { margin-top: 12px; }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td { text-align: left; padding: 4px 8px; border-bottom: 1px solid #5b412644; vertical-align: top; }
+.json-area { width: 100%; font-family: Consolas, "Courier New", monospace; font-size: 12px; margin-bottom: 8px; }
+.form-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.frow { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 4px 10px; align-items: start; }
+.frow-block { grid-template-columns: 1fr; }
+.flabel { display: flex; gap: 6px; align-items: center; color: var(--gold); font-size: 13px; font-weight: 700; }
+.frow-body input[type=text], .frow-body input[type=number], .frow-body select, .frow-body textarea { width: 100%; max-width: 420px; }
+.frow-block .frow-body { padding-left: 10px; border-left: 2px solid #5b4126; }
+.fhint { grid-column: 2; font-size: 11px; color: var(--muted); }
+.frow-block .fhint { grid-column: 1; }
+input.bad { border-color: var(--bad); background: #3b1511; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.tag-pick { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; }
+.tag-pick.bad { color: var(--bad); }
+.flist { display: flex; flex-direction: column; gap: 6px; }
+.fitem { background: #0003; border: 1px solid #5b4126; border-radius: 8px; padding: 6px 8px; }
+.fitem-head { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
+.mini.add { align-self: flex-start; }
+.funion { display: flex; flex-direction: column; gap: 4px; }
+.funion-body { padding-left: 8px; }
+@media (max-width: 1100px) {
+  .admin-body { grid-template-columns: 1fr; }
+  .admin-left, .admin-right { position: static; max-height: none; }
+  .frow { grid-template-columns: 1fr; }
+  .fhint { grid-column: 1; }
+}

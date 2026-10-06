@@ -22,5 +22,7 @@ export interface Ctx {
   leaveQueue(): Promise<void>;
   /** After a match: go back to the lobby. */
   leaveMatch(): Promise<void>;
-  go(screen: "lobby" | "library"): void;
+  go(screen: "lobby" | "library" | "admin"): void;
+  /** Download the latest published content again (after an admin publishes, or when a match uses another version). */
+  refreshContent(version?: number): Promise<void>;
 }

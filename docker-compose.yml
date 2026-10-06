@@ -32,6 +32,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-local-only-secret-replace-me-0123456789abcdef}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       CONTENT_SET: ${CONTENT_SET:-prototype}
+      CONTENT_RESEED: ${CONTENT_RESEED:-0}
+      ADMIN_USERS: ${ADMIN_USERS:-}
       PRACTICE: ${PRACTICE:-1}
       HEROTIME_FAST: ${HEROTIME_FAST:-0}
     restart: unless-stopped

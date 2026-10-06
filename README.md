@@ -41,6 +41,14 @@ Redis ยังไม่ถูกใช้: `docker compose --profile scale up -
 ตัวแปรสภาพแวดล้อม: `PORT`, `HOST` (ค่าเริ่มต้น 0.0.0.0 เพื่อให้เพื่อนใน LAN ต่อได้), `JWT_SECRET`, `CORS_ORIGIN`,
 `DATABASE_URL`, `HEROTIME_FAST=1`, `LOBBY_FILL_MS`. โหมด production บังคับให้ตั้ง `JWT_SECRET` (≥32 ตัว) และ `CORS_ORIGIN`
 
+## แก้ content ในเกม (Admin editor)
+ตั้ง `ADMIN_USERS=ชื่อผู้ใช้` (คั่นด้วย , ได้หลายคน) แล้วสมัคร/ล็อกอินด้วยชื่อนั้น จะเห็นแท็บ **Admin**:
+เลือกการ์ด/hero/relic/faction/series/gauge → แก้ด้วยฟอร์ม (หรือโหมด JSON) → **Save draft** (ตรวจให้ ปัญหาทั้งหมดแสดงในกล่องแดง) →
+**Publish** เป็นเวอร์ชันใหม่ ผู้เล่นที่เริ่มแมตช์หลังจากนั้นได้ค่าใหม่ ส่วนแมตช์ที่กำลังเล่นใช้เวอร์ชันเดิมจนจบ.
+**Versions** ดูประวัติและ restore เวอร์ชันเก่าเข้า draft (แล้ว publish เพื่อย้อนกลับ), **History** ดูว่าใครแก้อะไรเมื่อไหร่.
+มี database: เวอร์ชันที่ publish เก็บใน Postgres และ server เริ่มต้นจากเวอร์ชันล่าสุดเสมอ (`CONTENT_SET` ใช้ตอน DB ว่างเท่านั้น,
+`CONTENT_RESEED=1` เพื่อ publish ชุดนั้นใหม่). ไม่มี database: แก้ได้แต่หายเมื่อปิด server.
+
 ## ทดสอบ
 ```bash
 pnpm -r typecheck

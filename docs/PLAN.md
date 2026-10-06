@@ -110,5 +110,6 @@ herotime/
   - Cloud (Railway → Fly.io/VPS) ค่อยตัดสินใจทีหลัง ใช้ Docker setup เดิมย้ายได้
 - **Content sets**: `packages/content` มี `prototype` (เล่นทดลอง/ปรับเร็ว) กับ `production` (ชุดเปิดตัว 7 ซีรีส์, 74 การ์ด) เลือกด้วย env `CONTENT_SET`; ข้อมูลเป็น data ล้วนผ่าน DSL builder → ภายหลังย้ายเข้า DB/admin editor ได้
 - **Docker**: image เดียว (server เสิร์ฟเว็บเอง) + Postgres healthcheck + `prisma migrate deploy` ตอนเริ่ม; Redis อยู่หลัง profile `scale` (ยังไม่ใช้)
-- **Phase ตอนนี้**: เฟส 0–3 เสร็จ (เล่นจริงได้), เฟส 5 เริ่มแล้ว (production content), เฟส 4 (admin editor) ยังไม่เริ่ม
+- **Phase ตอนนี้**: เฟส 0–3 เสร็จ (เล่นจริงได้), เฟส 4 admin editor ใช้งานได้ (ยังไม่มี upload รูป / sandbox / diff), เฟส 5 เริ่มแล้ว (production content)
+- **Admin**: บัญชีที่อยู่ใน `ADMIN_USERS` เป็น admin (role ไม่เคยมาจากคำขอสมัคร) → แท็บ Admin: แก้ draft → Save (ตรวจและแสดงปัญหาทั้งหมด) → Publish เป็นเวอร์ชันใหม่ แมตช์ที่กำลังเล่นใช้เวอร์ชันเดิมจนจบ; ถ้า DB มีเวอร์ชันอยู่แล้ว server เริ่มจากเวอร์ชันล่าสุดที่ publish (`CONTENT_RESEED=1` เพื่อ publish ชุดจาก `CONTENT_SET` ใหม่)
 - **ซีรีส์ชุดแรก**: Sentai 3 + Rider 3 + original 1 — ดู [RULES.md §11](RULES.md#11-launch-series-ชุดแรก)

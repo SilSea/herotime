@@ -12,7 +12,7 @@ export interface Toast {
 export type Selection = { zone: "board" | "hand" | "shop"; index: number } | undefined;
 
 export interface AppState {
-  user?: { id: string; username: string };
+  user?: { id: string; username: string; role?: string };
   token?: string;
   content?: ContentIndex;
   connected: boolean;
@@ -28,7 +28,7 @@ export interface AppState {
   placements?: { playerId: string; placement: number }[];
   log: string[];
   toasts: Toast[];
-  screen: "auth" | "lobby" | "library" | "match";
+  screen: "auth" | "lobby" | "library" | "admin" | "match";
   showDebug: boolean;
   showLog: boolean;
   hideOffers: boolean;

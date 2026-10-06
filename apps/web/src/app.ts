@@ -3,6 +3,7 @@ import { ContentIndex } from "./content-index.js";
 import { Api, Net } from "./net.js";
 import type { AuthResult, Intent, PracticeOptions } from "./protocol.js";
 import { addToast, applyEvent, applyStatus, applyView, removeToast, Store } from "./store.js";
+import { adminHasFocus, renderAdmin, resetAdmin } from "./ui/admin.js";
 import { renderAuth } from "./ui/auth.js";
 import type { Ctx } from "./ui/ctx.js";
 import { h, mount } from "./ui/dom.js";
@@ -47,6 +48,7 @@ export function startApp(root: HTMLElement): void {
   let replay: ReplayView | undefined;
   let replayTurn = 0;
   let content: ContentIndex | undefined;
+  let wantedVersion = 0;
 
   const toast = (text: string, kind: "info" | "error" = "info"): void => {
     store.update((s) => addToast(s, text, kind));
@@ -66,13 +68,23 @@ export function startApp(root: HTMLElement): void {
       if (!ack.ok) toast(ack.error, "error");
       return ack.ok;
     },
+    async refreshContent(version?: number) {
+      try {
+        content = new ContentIndex(await api.content(version));
+        store.set({ content });
+      } catch {
+        // keep what we have: a stale card list is better than a blank screen
+      }
+    },
     async login(result: AuthResult) {
       storage.set(result.token);
-      store.set({ token: result.token, user: { id: result.user.id, username: result.user.username }, screen: "lobby" });
+      resetAdmin();
+      store.set({ token: result.token, user: { id: result.user.id, username: result.user.username, role: result.user.role }, screen: "lobby" });
       net.connect(result.token);
     },
     logout() {
       storage.clear();
+      resetAdmin();
       net.disconnect();
       store.set({ token: undefined, user: undefined, view: undefined, matchId: undefined, status: { state: "idle" }, screen: "auth", connected: false });
     },
@@ -90,6 +102,8 @@ export function startApp(root: HTMLElement): void {
     },
     async leaveMatch() {
       await net.leaveMatch();
+      wantedVersion = 0;
+      void ctx().refreshContent();
       store.set({ screen: "lobby", view: undefined, matchId: undefined, combat: undefined, replayPending: undefined, placements: undefined, status: { state: "idle" } });
     },
     go(screen) {
@@ -100,7 +114,14 @@ export function startApp(root: HTMLElement): void {
   // ----------------------------------------------------------- server messages
   net.on("connection", (connected) => store.set({ connected }));
   net.on("status", (status) => store.update((s) => applyStatus(s, status)));
-  net.on("view", (m) => store.update((s) => applyView(s, m, clock)));
+  net.on("view", (m) => {
+    store.update((s) => applyView(s, m, clock));
+    const shown = content?.snapshot.version;
+    if (m.contentVersion !== undefined && shown !== undefined && m.contentVersion !== shown && wantedVersion !== m.contentVersion) {
+      wantedVersion = m.contentVersion; // once per version, not on every view message
+      void ctx().refreshContent(m.contentVersion);
+    }
+  });
   net.on("event", (m) => store.update((s) => applyEvent(s, m)));
   net.on("matchError", (e) => toast(e, "error"));
   net.on("authError", () => {
@@ -111,7 +132,7 @@ export function startApp(root: HTMLElement): void {
   // ---------------------------------------------------------------- rendering
   const frame = (inner: HTMLElement): HTMLElement => {
     const s = store.state;
-    const nav = (id: "lobby" | "library", label: string) => h("button", { class: `tab ${s.screen === id ? "active" : ""}`, text: label, on: { click: () => store.set({ screen: id }) } });
+    const nav = (id: "lobby" | "library" | "admin", label: string) => h("button", { class: `tab ${s.screen === id ? "active" : ""}`, text: label, on: { click: () => store.set({ screen: id }) } });
     return h(
       "div",
       { class: "shell" },
@@ -119,7 +140,7 @@ export function startApp(root: HTMLElement): void {
         "header",
         { class: "app-header" },
         h("span", { class: "logo small", text: "HeroTime" }),
-        h("nav", { class: "tabs" }, nav("lobby", "Play"), nav("library", "Library")),
+        h("nav", { class: "tabs" }, nav("lobby", "Play"), nav("library", "Library"), s.user?.role === "ADMIN" && nav("admin", "Admin")),
         h("span", { class: "spacer" }),
         !s.connected && h("span", { class: "conn bad", text: "reconnecting..." }),
         h("span", { class: "muted", text: s.user?.username ?? "" }),
@@ -136,12 +157,16 @@ export function startApp(root: HTMLElement): void {
       renderAuth(root, api, (r) => ctx().login(r));
       return;
     }
+    if (s.screen === "admin" && adminHasFocus()) return; // someone is typing: leave the form alone
     const inner = h("div", { class: "screen" });
     if (s.screen === "match" && s.view) {
       renderMatch(inner, ctx());
       mount(root, inner);
     } else if (s.screen === "library") {
       renderLibrary(inner, ctx());
+      mount(root, frame(inner));
+    } else if (s.screen === "admin" && s.user.role === "ADMIN") {
+      renderAdmin(inner, ctx());
       mount(root, frame(inner));
     } else {
       renderLobby(inner, ctx());
@@ -290,7 +315,7 @@ export function startApp(root: HTMLElement): void {
     if (token) {
       try {
         const me = await api.me(token);
-        store.set({ token, user: { id: me.id, username: me.username }, screen: "lobby" });
+        store.set({ token, user: { id: me.id, username: me.username, role: me.role }, screen: "lobby" });
         net.connect(token);
         return;
       } catch {

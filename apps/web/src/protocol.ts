@@ -7,6 +7,8 @@ export type { CardDef, CombatEvent, CombatRecord, CombatUnitInput, FactionDef, G
 export interface ViewMessage {
   matchId: string;
   serverNow: number;
+  /** Content version the match uses (absent from older servers). */
+  contentVersion?: number;
   view: Omit<MatchView, "lastCombat"> & { lastCombat?: CombatRecord };
 }
 
@@ -43,4 +45,33 @@ export interface PracticeOptions {
   factions?: string[];
   speed?: "normal" | "fast";
   bots?: number;
+}
+
+/** What /admin/draft returns: the working copy and everything the editor shows about it. */
+export interface AdminDraft {
+  data: Record<string, any[]>;
+  saved: boolean;
+  basedOn: number;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  published: number;
+  issues: string[];
+  /** The cards as players would see them, or null while the draft has problems. */
+  snapshot: ContentSnapshot | null;
+}
+
+export interface VersionMeta {
+  number: number;
+  notes: string | null;
+  publishedAt: string;
+  publishedBy: string | null;
+}
+
+export interface AuditEntry {
+  id: string;
+  adminId: string;
+  entity: string;
+  before: unknown;
+  after: unknown;
+  at: string;
 }
