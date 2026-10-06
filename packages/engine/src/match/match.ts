@@ -7,6 +7,7 @@ import {
   assignHero,
   autoChooseRelic,
   beginTurn,
+  buyGear,
   buyUnit,
   chooseRelic,
   combatOptions,
@@ -109,11 +110,16 @@ export class Match {
         (factions === undefined || c.factions.length === 0 || c.factions.some((f) => factions.has(f))),
     );
     const poolCards = poolDefs.map((c) => ({ key: c.key, rank: c.rank }));
+    // Tavern gear follows the same faction rule as units, but is never pooled.
+    const gear = [...opts.content.cards.values()]
+      .filter((c) => c.kind === "GEAR" && !c.token && (factions === undefined || c.factions.length === 0 || c.factions.some((f) => factions.has(f))))
+      .map((c) => ({ key: c.key, rank: c.rank }));
     this.env = makeEnv({
       content: opts.content,
       pool: new Pool(poolCards),
       rng,
       cfg: opts.gameConfig ?? DEFAULT_CONFIG,
+      gear,
     });
     if (factions) {
       this.env.activeFactions = factions;
@@ -273,6 +279,9 @@ export class Match {
       case "BUY":
         buyUnit(s, intent.index, env);
         break;
+      case "BUY_GEAR":
+        buyGear(s, env);
+        break;
       case "SELL":
         sellUnit(s, intent.from, intent.index, env);
         break;
@@ -283,7 +292,7 @@ export class Match {
         reorder(s, intent.from, intent.to);
         break;
       case "REFRESH":
-        refresh(s, env.pool, env.rng, env.cfg);
+        refresh(s, env.pool, env.rng, env.cfg, env.gear);
         break;
       case "FREEZE":
         toggleFreeze(s);

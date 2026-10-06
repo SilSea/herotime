@@ -151,13 +151,17 @@ function showPlayerCard(ctx: Ctx, row: HTMLElement, p: Player, mine: boolean, op
 
 // ------------------------------------------------------------ book
 
+/** Book tab for tavern gear (ranks are 1-6, so 7 cannot clash). */
+const GEAR_TAB = 7;
+
 /** Every shop card this match can offer, by rank: only this match's factions, plus neutrals. */
 function bookModal(ctx: Ctx, view: View): HTMLElement {
   const state = ctx.store.state;
   const rank = state.bookRank || view.me.state.rank || 1;
   const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
   const pool = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
-  const ofRank = pool.filter((c) => c.rank === rank).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
+  const gear = [...ctx.ix.cards.values()].filter((c) => c.kind === "GEAR" && !c.token && inMatch(c)).sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
+  const ofRank = rank === GEAR_TAB ? gear : pool.filter((c) => c.rank === rank).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
   const close = (): void => ctx.store.set({ showBook: false });
   return h(
     "div",
@@ -166,8 +170,9 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
       "div",
       { class: "modal-box book-box" },
       h("div", { class: "row" }, h("h2", { text: "Card book" }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `Factions this match: ${view.factions.map(ctx.ix.factionName).join(", ") || "all"} · your tavern is rank ${view.me.state.rank}` }), h("button", { class: "btn", text: "Close", on: { click: close } })),
-      h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? "Upgrade your tavern to be offered these" : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) })))),
-      h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key })), ofRank.length === 0 && h("p", { class: "muted", text: "No cards of this rank in this match." })),
+      h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? "Upgrade your tavern to be offered these" : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
+        gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: "Gear the tavern can offer (from the rank shown on each card)", on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) }))),
+      h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: "No cards of this rank in this match." })),
     ),
   );
 }
@@ -268,6 +273,7 @@ function table(ctx: Ctx, view: View): HTMLElement {
     { class: "tavern" },
     upgrade,
     h("div", { class: "cards shop-cards" }, ...s.shop.map((key, i) => cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) })), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
+    gearSlot(ctx, view),
     side,
   );
 
@@ -282,6 +288,23 @@ function table(ctx: Ctx, view: View): HTMLElement {
   const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: "Buy a card from the tavern, then drag it onto your warband." }));
 
   return h("div", { class: "stage table" }, tavern, board, bottomBar(ctx, view, hand), offersModal(ctx, view));
+}
+
+/** The tavern's Gear slot: one card at its own price, bought into the hand and used from there. */
+function gearSlot(ctx: Ctx, view: View): HTMLElement | null {
+  const me = view.me;
+  const key = me.state.shopGear;
+  const anyGear = [...ctx.ix.cards.values()].some((c) => c.kind === "GEAR" && !c.token);
+  if (!key && !anyGear) return null; // content without tavern gear: no empty box either
+  const recruiting = view.phase === "RECRUIT" && me.alive;
+  const cost = key ? (ctx.ix.card(key)?.cost ?? me.limits.buyCost) : 0;
+  const canBuy = recruiting && !!key && me.state.energy >= cost && me.state.hand.length < me.limits.handSize;
+  return h(
+    "div",
+    { class: "gear-slot" },
+    h("div", { class: "gear-slot-label", text: "Gear" }),
+    key ? cardEl(ctx.ix, { key, cost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }) : h("div", { class: "gear-empty", text: "Sold out until the next refresh" }),
+  );
 }
 
 /** Hero portrait with its power on the left, the hand in the middle, gold and the end-turn button on the right. */

@@ -25,6 +25,8 @@ export const CardDef = z.object({
   text: z.string().default(""),
   /** Image path or URL, resolved by the client. */
   art: z.string().optional(),
+  /** Tavern price of Gear sold in the shop (not a token). Units always use the standard buy cost. */
+  cost: z.number().int().min(0).optional(),
 });
 export type CardDef = z.infer<typeof CardDef>;
 

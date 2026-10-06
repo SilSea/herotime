@@ -3,6 +3,7 @@ import { refresh, RuleError, upgrade, upgradeCost, type PlayerState } from "../s
 import type { GameEnv } from "../game/env.js";
 import {
   autoChooseRelic,
+  buyGear,
   buyUnit,
   chooseRelic,
   pickDiscover,
@@ -119,11 +120,17 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv): void {
       if (!attempt(() => pickDiscover(p, 0, env))) break;
     }
     for (let guard = 0; guard < 4 && upgradeBoard(p, env); guard++);
-    if (p.energy >= c.buyCost + c.refreshCost) attempt(() => refresh(p, env.pool, env.rng, env.cfg));
+    if (p.energy >= c.buyCost + c.refreshCost) attempt(() => refresh(p, env.pool, env.rng, env.cfg, env.gear));
     else break;
   }
 
   attempt(() => useHeroPower(p, env));
+
+  // Spare Energy goes on the tavern's Gear, used at once. Gear helps the units on the board, so only with some there.
+  if (p.shopGear && p.board.length > 0 && attempt(() => buyGear(p, env))) {
+    const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
+    if (i >= 0) attempt(() => useGear(p, i, env));
+  }
   for (let guard = 0; guard < 6 && p.discovers.length > 0; guard++) {
     if (!attempt(() => pickDiscover(p, 0, env))) break;
   }

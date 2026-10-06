@@ -1,7 +1,7 @@
 import type { Effect } from "@herotime/shared";
 import type { Unit } from "../content.js";
 import type { CombatOptions } from "../combat/combat.js";
-import { combatRulesOf } from "../rules.js";
+import { combatRulesOf, withRules } from "../rules.js";
 import {
   buy,
   play,
@@ -20,7 +20,7 @@ import type { GameEnv } from "./env.js";
 
 /** Start a recruit phase: refill energy, roll the shop, then run ON_TURN_START (relics, hero). */
 export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void {
-  startTurn(player, turn, env.pool, env.rng, env.cfg);
+  startTurn(player, turn, env.pool, env.rng, env.cfg, env.gear);
   for (const effects of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env);
 }
 
@@ -40,6 +40,17 @@ export function playUnit(player: PlayerState, handIndex: number, position: numbe
   play(player, handIndex, position, env.cfg);
   runTrigger(def.effects, "ON_PLAY", "UNIT", card, player, env);
   return resolveTriples(player, env.pool, env.rng, env.cfg);
+}
+
+/** Buy the tavern's Gear: it goes to the hand, to be used from there. Its price is the card's own cost. */
+export function buyGear(player: PlayerState, env: GameEnv): void {
+  const key = player.shopGear;
+  if (!key) throw new RuleError("there is no gear in the tavern");
+  const c = withRules(player, env.cfg);
+  if (player.hand.length >= c.handSize) throw new RuleError("hand is full");
+  spend(player, env.content.card(key).cost ?? c.buyCost);
+  player.hand.push({ key, golden: false });
+  player.shopGear = null;
 }
 
 /** Use a Gear card from hand: its player-scope ON_PLAY effects run, then it is spent. */

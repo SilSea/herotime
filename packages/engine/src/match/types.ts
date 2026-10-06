@@ -7,6 +7,7 @@ export type Phase = "HERO_SELECT" | "RECRUIT" | "BATTLE" | "ENDED";
 export type Intent =
   | { type: "CHOOSE_HERO"; index: number }
   | { type: "BUY"; index: number }
+  | { type: "BUY_GEAR" }
   | { type: "SELL"; from: "board" | "hand"; index: number }
   | { type: "PLAY"; handIndex: number; position: number }
   | { type: "REORDER"; from: number; to: number }

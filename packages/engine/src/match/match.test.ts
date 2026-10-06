@@ -772,3 +772,92 @@ describe("last seen boards", () => {
     expect(Object.keys(seen ?? {}).sort()).toEqual(["factions", "neutral", "turn", "units"]); // counts only, never which cards
   });
 });
+
+describe("gear in the tavern", () => {
+  // A world with two shop gears: one at rank 1, one at rank 3.
+  const withGear = (() => {
+    const base = buildWorld();
+    const extra = [
+      { key: "g_plate", name: "Armor Plate", rank: 1, atk: 0, hp: 1, kind: "GEAR", token: false, cost: 2, factions: [], colors: [], keywords: [], text: "", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "LEFTMOST_FRIENDLY" }, actions: [{ type: "BUFF", atk: 0, hp: 3, permanent: false }] }] },
+      { key: "g_core", name: "Power Core", rank: 3, atk: 0, hp: 1, kind: "GEAR", token: false, cost: 4, factions: [], colors: [], keywords: [], text: "", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "ALL_FRIENDLY" }, actions: [{ type: "BUFF", atk: 1, hp: 1, permanent: false }] }] },
+    ];
+    return content({ factions: [...base.factions.values()], series: [...base.series.values()], gauges: [...base.gauges.values()], relics: [...base.relics.values()], heroes: [...base.heroes.values()], cards: [...base.cards.values(), ...extra] } as never);
+  })();
+  const start = (seed = 3) => {
+    const m = Match.create({ content: withGear, seed, entrants: humans(2), now: T0, config: { readyEndsRecruit: true } });
+    for (const id of ["h0", "h1"]) m.dispatch(id, { type: "CHOOSE_HERO", index: 0 }, T0);
+    return m;
+  };
+
+  it("offers only gear up to the player's tavern rank, and is not part of the unit pool", () => {
+    const m = start();
+    expect(m.player("h0").state.shopGear).toBe("g_plate");
+    expect(m.player("h0").state.shop).not.toContain("g_plate");
+  });
+
+  it("buying costs the gear's own price, puts it in hand, and empties the slot; using it applies its effect", () => {
+    const m = start();
+    const s = m.player("h0").state;
+    s.board.push({ key: s.shop[0] as string, golden: false });
+    const hpBefore = m.view("h0").me.boardStats[0]?.hp as number;
+    s.energy = 3;
+    m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 10);
+    expect(s.energy).toBe(1);
+    expect(s.shopGear).toBeNull();
+    expect(s.hand.map((u) => u.key)).toEqual(["g_plate"]);
+    expect(() => m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 20)).toThrow(/no gear/);
+    m.dispatch("h0", { type: "USE_GEAR", handIndex: 0 }, T0 + 30);
+    expect(s.hand).toEqual([]);
+    expect(m.view("h0").me.boardStats[0]?.hp).toBe(hpBefore + 3);
+  });
+
+  it("refuses when Energy is short or the hand is full, changing nothing", () => {
+    const m = start();
+    const s = m.player("h0").state;
+    s.energy = 1;
+    expect(() => m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 10)).toThrow(/not enough energy/);
+    expect(s.shopGear).toBe("g_plate");
+    s.energy = 9;
+    s.hand = Array.from({ length: 10 }, () => ({ key: s.shop[0] as string, golden: false }));
+    expect(() => m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 10)).toThrow(/hand is full/);
+    expect(s.energy).toBe(9);
+  });
+
+  it("Refresh rolls it again, Freeze keeps it, and higher ranks open stronger gear", () => {
+    const m = start(11);
+    const s = m.player("h0").state;
+    s.rank = 3;
+    s.energy = 10;
+    const seen = new Set<string>();
+    for (let i = 0; i < 30; i++) {
+      m.dispatch("h0", { type: "REFRESH" }, T0 + 10);
+      s.energy = 10;
+      seen.add(s.shopGear as string);
+    }
+    expect([...seen].sort()).toEqual(["g_core", "g_plate"]);
+
+    m.dispatch("h0", { type: "FREEZE" }, T0 + 20);
+    const kept = s.shopGear;
+    toBattle(m, T0 + 30);
+    m.tick(T0 + 30 + DEFAULT_MATCH_CONFIG.battleMs);
+    expect(m.phase).toBe("RECRUIT");
+    expect(s.shopGear).toBe(kept);
+  });
+
+  it("content without shop gear behaves exactly as before (no gear slot, same shops)", () => {
+    const a = Match.create({ content: world, seed: 5, entrants: humans(2), now: T0 });
+    for (const id of ["h0", "h1"]) a.dispatch(id, { type: "CHOOSE_HERO", index: 0 }, T0);
+    expect(a.player("h0").state.shopGear).toBeNull();
+  });
+
+  it("bots buy and use gear with spare Energy", () => {
+    let used = 0;
+    for (let seed = 1; seed <= 6; seed++) {
+      const m = Match.create({ content: withGear, seed, entrants: [...humans(1), ...bots(3)], now: T0 });
+      m.dispatch("h0", { type: "CHOOSE_HERO", index: 0 }, T0);
+      for (let i = 0; i < 40 && m.phase !== "ENDED"; i++) m.tick((m.deadline as number) + 1);
+      used += m.players.filter((p) => p.isBot && p.state.shopGear === null).length;
+    }
+    expect(used).toBeGreaterThan(0);
+  });
+});

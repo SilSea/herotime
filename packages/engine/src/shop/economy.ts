@@ -31,6 +31,8 @@ export interface PlayerState {
   /** Turns waited since the last rank-up; each one makes the next upgrade 1 cheaper. */
   upgradeDiscount: number;
   shop: string[];
+  /** The tavern's Gear slot: a key, or null when empty (bought, or nothing to offer). */
+  shopGear: string | null;
   frozen: boolean;
   hand: Unit[];
   board: Unit[];
@@ -57,6 +59,7 @@ export function newPlayer(): PlayerState {
     rank: 1,
     upgradeDiscount: 0,
     shop: [],
+    shopGear: null,
     frozen: false,
     hand: [],
     board: [],
@@ -98,7 +101,13 @@ export function spend(player: PlayerState, cost: number): void {
   player.energy -= cost;
 }
 
-function rollShop(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig): void {
+/** Gear the tavern can offer: key and rank. Not pooled, so offering one takes nothing from anyone. */
+export interface GearChoice {
+  key: string;
+  rank: number;
+}
+
+function rollShop(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig, gear: readonly GearChoice[]): void {
   for (const key of player.shop) pool.give(key);
   player.shop = [];
   const size = shopSizeFor(player.rank, cfg);
@@ -107,6 +116,9 @@ function rollShop(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig): v
     if (key === undefined) break;
     player.shop.push(key);
   }
+  // Rolled after the units so content without gear keeps exactly the random sequence it had before.
+  const eligible = gear.filter((g) => g.rank <= player.rank);
+  player.shopGear = eligible.length > 0 ? rng.pick(eligible).key : null;
 }
 
 /** Begin a recruit phase: refill energy, tick the upgrade discount, refresh the shop unless frozen. */
@@ -116,6 +128,7 @@ export function startTurn(
   pool: Pool,
   rng: Rng,
   cfg: GameConfig = DEFAULT_CONFIG,
+  gear: readonly GearChoice[] = [],
 ): void {
   const c = withRules(player, cfg);
   player.energy = energyForTurn(turn, c);
@@ -125,16 +138,16 @@ export function startTurn(
   if (player.frozen) {
     player.frozen = false;
   } else {
-    rollShop(player, pool, rng, cfg);
+    rollShop(player, pool, rng, cfg, gear);
   }
 }
 
-export function refresh(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig = DEFAULT_CONFIG): void {
+export function refresh(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig = DEFAULT_CONFIG, gear: readonly GearChoice[] = []): void {
   const c = withRules(player, cfg);
   if (player.freeRefreshes > 0) player.freeRefreshes--;
   else spend(player, c.refreshCost);
   player.frozen = false;
-  rollShop(player, pool, rng, cfg);
+  rollShop(player, pool, rng, cfg, gear);
 }
 
 /** Drag a board unit to a new slot (order matters: attacks go left to right). */

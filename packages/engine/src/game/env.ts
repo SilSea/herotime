@@ -13,8 +13,15 @@ export interface GameEnv {
   activeFactions?: ReadonlySet<string>;
   /** Series that have at least one card in this match's pool. Undefined = no restriction. */
   activeSeries?: ReadonlySet<string>;
+  /** Gear the tavern can offer this match (not pooled: any number of players may get the same one). */
+  gear: readonly GearOffer[];
 }
 
-export function makeEnv(parts: Omit<GameEnv, "cfg"> & { cfg?: GameConfig }): GameEnv {
-  return { cfg: DEFAULT_CONFIG, ...parts };
+export interface GearOffer {
+  key: string;
+  rank: number;
+}
+
+export function makeEnv(parts: Omit<GameEnv, "cfg" | "gear"> & { cfg?: GameConfig; gear?: readonly GearOffer[] }): GameEnv {
+  return { cfg: DEFAULT_CONFIG, gear: [], ...parts };
 }

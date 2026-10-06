@@ -181,7 +181,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .card.small .stats span { min-width: 28px; height: 24px; font-size: 14px; bottom: -8px; }
 .card .atk { left: -10px; background: linear-gradient(180deg, #ffd36b, var(--atk) 55%, #a35a00); }
 .card .hp { right: -10px; background: linear-gradient(180deg, #ff8aa0, var(--hp) 55%, #8a0b24); }
-.card .stats.gear-label { display: flex; position: absolute; bottom: 4px; left: 0; right: 0; justify-content: center; color: var(--cyan); font-weight: 800; letter-spacing: .2em; }
+.card .stats.gear-label { display: block; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 9px; font-weight: 800; letter-spacing: .14em; color: #fff; background: #4b2fc0; border: 1px solid #c8b8ff; padding: 0 10px; box-shadow: 0 0 8px #8b6cff99; }
 .card .cost { position: absolute; top: -12px; left: -12px; width: 32px; height: 32px; background: linear-gradient(180deg, #7ff4ff, #18a9d4); color: #021320; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); filter: drop-shadow(0 0 6px #2fe4ff); z-index: 4; }
 .card.has-barrier::after, .card.minion.kw-barrier::after { content: ""; position: absolute; inset: -7px; border: 2px solid #9cf6ff; border-radius: inherit; box-shadow: 0 0 16px #2fe4ff, inset 0 0 16px #2fe4ff88; background: radial-gradient(circle, transparent 60%, #2fe4ff22); pointer-events: none; }
 
@@ -540,3 +540,11 @@ input.bad { border-color: var(--bad); background: #2a0a14; }
   .frow { grid-template-columns: 1fr; }
   .fhint { grid-column: 1; }
 }
+
+/* ---- tavern gear slot */
+.gear-slot { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-left: 16px; border-left: 1px solid #8b6cff55; }
+.gear-slot-label { font-size: 10px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #c8b8ff; text-shadow: 0 0 8px #8b6cff; }
+.gear-slot .card { --w: 112px; --edge: var(--violet); }
+.gear-empty { width: 112px; height: 150px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; border: 1px dashed #8b6cff66; color: #a99ad6; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+.card.gear { border-style: solid; --edge: var(--violet); }
+.card.gear .art { background: radial-gradient(circle at 35% 30%, #c8b8ff, #4b2fc0 60%, #0d0b2a); }

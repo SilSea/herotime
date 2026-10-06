@@ -127,8 +127,12 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 
 ชุด production มี hero ของตัวเอง (Captain Marvelous, Kyoryu Red, Philip, Ryotaro, Eiji Hino, Professor Belt, Himmapan Guardian, Shocker Boss, Iron Guard) ดูรายละเอียดในแท็บ Library
 
-## 9. Gear / Spell (P1)
-Gear (เข็มขัด, อาวุธ, การ์ดแปลงร่าง) ขายในช่องพิเศษของร้าน ใช้ทันทีกับยูนิต — data model รองรับไว้ตั้งแต่แรก
+## 9. Gear
+- ร้านมี **ช่อง Gear 1 ช่อง** ข้างยูนิต: สุ่มจาก Gear ที่ rank ≤ rank ร้านของเรา (และอยู่ใน faction ของแมตช์ หรือเป็น neutral)
+- ราคาเป็นของแต่ละชิ้น (ไม่ใช่ 3 เสมอ): ซื้อแล้วเข้ามือ กด **Use** เพื่อใช้ผล (ส่วนใหญ่บัฟยูนิตซ้ายสุด/ทุกตัว แบบถาวรเพราะใช้ช่วง recruit)
+- Refresh สุ่ม Gear ใหม่, Freeze เก็บไว้, ซื้อแล้วช่องว่างจน Refresh/เทิร์นหน้า
+- Gear ไม่อยู่ใน shared pool: หลายคนได้ชิ้นเดียวกันได้. ขาย Gear ไม่ได้
+- Gear ที่ได้จาก Gauge (Kyodai Gattai!, Ultimate Form) ไม่ขายในร้าน
 
 ## 10. ตัวอย่างยูนิต Rank 1 (prototype set หลัง balance pass ล่าสุด)
 | ชื่อ | Faction | ATK/HP | Effect |

@@ -23,6 +23,7 @@ import {
   relic,
   rightmost,
   rule,
+  shopGear,
   self,
   series,
   seriesCount,
@@ -187,6 +188,18 @@ const cards = [
   unit("dr6", "Dark Lord", { rank: 6, atk: 14, hp: 12, factions: ["dark_rider"], keywords: ["RIDER_KICK", "REVIVE"] }),
 ];
 
+// ---- tavern gear: one slot in the shop, bought for its own price, used from the hand
+const tavernGear = [
+  shopGear("g_armor", "Armor Plate", 1, 1, [player("ON_PLAY", buff(0, 3), { target: leftmost() })]),
+  shopGear("g_cell", "Energy Cell", 2, 1, [player("ON_PLAY", energy(2))]),
+  shopGear("g_blade", "Plasma Blade", 2, 2, [player("ON_PLAY", buff(3, 0), { target: leftmost() })]),
+  shopGear("g_emitter", "Barrier Emitter", 3, 3, [player("ON_PLAY", give("BARRIER"), { target: leftmost() })]),
+  shopGear("g_driver", "Henshin Driver", 3, 2, [player("ON_PLAY", [buff(2, 2), give("RIDER_KICK")], { target: leftmost({ faction: "rider" }) })], { factions: ["rider"] }),
+  shopGear("g_boost", "Squad Boost", 4, 3, [player("ON_PLAY", buff(1, 1), { target: allAllies() })]),
+  shopGear("g_overclock", "Overclock Chip", 5, 4, [player("ON_PLAY", give("RAPID"), { target: leftmost() })]),
+  shopGear("g_serum", "Titan Serum", 6, 5, [player("ON_PLAY", buff(2, 2), { target: allAllies() })]),
+];
+
 const gauges = [
   gaugeDef(
     "mecha",
@@ -237,4 +250,4 @@ const heroes = [
 ];
 
 /** As authored: no generated rules text yet (that is filled in when a set is loaded). */
-export const productionRaw: ContentSetData = { factions, series: allSeries, cards, gauges, relics, heroes };
+export const productionRaw: ContentSetData = { factions, series: allSeries, cards: [...cards, ...tavernGear], gauges, relics, heroes };
