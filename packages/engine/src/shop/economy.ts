@@ -1,6 +1,9 @@
 import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
+import type { Unit } from "../content.js";
 import type { Rng } from "../rng/rng.js";
 import type { Pool } from "./pool.js";
+
+export type { Unit };
 
 /** Thrown when a player intent breaks a rule; the server turns it into an error reply. */
 export class RuleError extends Error {
@@ -8,12 +11,6 @@ export class RuleError extends Error {
     super(message);
     this.name = "RuleError";
   }
-}
-
-/** A unit the player owns. `golden` = Final Form (made by a triple). */
-export interface Unit {
-  key: string;
-  golden: boolean;
 }
 
 export interface PlayerState {

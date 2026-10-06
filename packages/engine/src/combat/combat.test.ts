@@ -117,8 +117,11 @@ describe("simulateCombat", () => {
   describe("REVIVE", () => {
     it("returns with 1 HP exactly once", () => {
       const r = simulateCombat([unit("a", 10, 50)], [unit("b", 1, 1, ["REVIVE"])], 2);
-      expect(r.events.filter((e) => e.type === "REVIVE")).toHaveLength(1);
-      expect(r.events.filter((e) => e.type === "DEATH" && e.unit === "B0")).toHaveLength(1);
+      // dies (Last Stand would fire here), comes back once, then dies for good
+      const story = r.events
+        .filter((e) => (e.type === "DEATH" || e.type === "REVIVE") && e.unit === "B0")
+        .map((e) => e.type);
+      expect(story).toEqual(["DEATH", "REVIVE", "DEATH"]);
       expect(r.winner).toBe("A");
     });
 

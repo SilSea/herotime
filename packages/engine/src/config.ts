@@ -21,6 +21,37 @@ export interface GameConfig {
   maxAttacksPerCombat: number;
 }
 
+/**
+ * Rule values that cards, relics and heroes may change with MODIFY_RULE.
+ * The engine reads every one of these through a player's rules, never as a literal.
+ */
+export interface CombatRules {
+  /** Distinct Sentai colors needed for Roll Call (Extra is a wildcard). */
+  rollCallColors: number;
+  /** Stat bonus every Sentai gets in a fight where Roll Call fires. */
+  rollCallBuff: number;
+  /** Adjacent GATTAI units needed to merge. */
+  gattaiSize: number;
+  /** The Giant enters once this many (or fewer) of your units are alive. */
+  giantEntryThreshold: number;
+  /** Fraction of your Sentai's total ATK/HP added to the Giant's base stats. */
+  giantSentaiScale: number;
+  /** Stat multiplier when a KYODAIKA unit rises. */
+  kyodaikaMultiplier: number;
+}
+
+/** Faction key that Roll Call and Giant scaling look at. */
+export const SENTAI_FACTION = "sentai";
+
+export const DEFAULT_COMBAT_RULES: CombatRules = {
+  rollCallColors: 5,
+  rollCallBuff: 1,
+  gattaiSize: 3,
+  giantEntryThreshold: 2,
+  giantSentaiScale: 0.5,
+  kyodaikaMultiplier: 2,
+};
+
 export const DEFAULT_CONFIG: GameConfig = {
   startEnergy: 3,
   energyPerTurn: 1,
