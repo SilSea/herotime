@@ -228,6 +228,7 @@ export function startApp(root: HTMLElement): void {
     // No banner for battles: the replay opens at that moment and would be covered by it.
     const text = s.view.phase === "RECRUIT" ? `Turn ${s.view.turn}` : s.view.phase === "HERO_SELECT" ? "Choose your hero" : "";
     if (!text) return;
+    for (const old of document.querySelectorAll(".banner")) old.remove(); // a new phase replaces the last banner
     const el = h("div", { class: "banner", text });
     document.body.append(el);
     window.setTimeout(() => el.remove(), 1700);

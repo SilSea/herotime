@@ -307,8 +307,30 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .slot:hover .card { transform: translateY(-5px); }
 .henshin { position: absolute; top: -9px; right: -6px; font-size: 10px; font-weight: 800; background: #050a18; color: var(--cyan); border: 1px solid var(--cyan); padding: 0 5px; z-index: 3; }
 .end-drop { width: 44px; align-self: stretch; min-height: 120px; border: 1px dashed #2fe4ff55; display: flex; align-items: center; justify-content: center; color: #2fe4ff99; font-size: 22px; }
-body.dragging .end-drop, body.dragging .sell-zone { border-color: var(--cyan); color: var(--cyan); background: #2fe4ff14; box-shadow: 0 0 14px #2fe4ff44; }
-.sell-zone { border: 1px dashed #ff4d6d77; padding: 3px 14px; color: #ff8fa3; font-size: 12px; margin-left: auto; text-transform: uppercase; letter-spacing: .08em; }
+body.dragging .end-drop { border-color: var(--cyan); color: var(--cyan); background: #2fe4ff14; box-shadow: 0 0 14px #2fe4ff44; }
+.sell-zone {
+  margin-left: auto; display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 8px; min-width: 210px; position: relative;
+  background: linear-gradient(180deg, #2a0d1fcc, #14070fcc); border: 1px solid #ff4d6d66; color: #ffb3c2;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+}
+/* hazard stripe along the bottom edge */
+.sell-zone::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: repeating-linear-gradient(135deg, var(--magenta) 0 8px, #1a0810 8px 16px); opacity: .7; }
+.sell-icon { width: 34px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; background: linear-gradient(180deg, #ff6f8f, #a1163d); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); filter: drop-shadow(0 0 6px #ff4d6d); }
+.sell-copy { display: flex; flex-direction: column; line-height: 1.1; }
+.sell-title { font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: #fff; font-size: 13px; }
+.sell-hint { font-size: 10px; color: #ff9db1; text-transform: uppercase; letter-spacing: .08em; }
+.sell-value { margin-left: auto; display: flex; flex-direction: column; align-items: center; line-height: 1; padding: 3px 8px; background: #050a18; border: 1px solid #2fe4ff66; color: var(--cyan); font-weight: 900; font-size: 16px; text-shadow: 0 0 8px #2fe4ff; }
+.sell-unit { font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: #8fe9ff; }
+body.dragging .sell-zone { border-color: var(--magenta); background: linear-gradient(180deg, #4a1030ee, #22081aee); box-shadow: 0 0 22px #ff3d9a88; animation: sell-pulse 1s ease-in-out infinite; }
+/* the hint changes while a card is being dragged */
+.drag-hint { display: none; color: #fff; }
+body.dragging .drag-hint { display: inline; }
+body.dragging .idle-hint { display: none; }
+.sell-zone.over { transform: scale(1.08); border-color: #fff; box-shadow: 0 0 34px #ff3d9acc, inset 0 0 20px #ff3d9a66; animation: none; }
+.sell-zone.over .sell-icon { animation: spin 1.2s linear infinite; }
+@keyframes sell-pulse { 50% { box-shadow: 0 0 34px #ff3d9acc; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 .giant-slot { min-width: 112px; text-align: center; padding-left: 12px; border-left: 1px solid #2fe4ff33; }
 .giant-slot .card { --w: 100px; }
 .giant-slot .card.minion { --w: 96px; }

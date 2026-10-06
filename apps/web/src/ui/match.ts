@@ -405,7 +405,15 @@ function sellZone(ctx: Ctx, view: View): HTMLElement {
     const d = readDrag(e);
     if (d && (d.zone === "hand" || d.zone === "board") && view.phase === "RECRUIT") void ctx.act({ type: "SELL", from: d.zone, index: d.index });
   };
-  return h("div", { class: "sell-zone", text: `Drop here to sell (+${view.me.limits.sellValue})`, on: { dragover: allowDrop, drop: sell } });
+  // A recycler console: quiet until a card is dragged, then it lights up; brighter still while the card is over it.
+  const zone = h(
+    "div",
+    { class: "sell-zone", title: "Drag a unit here to sell it", on: { dragover: allowDrop, drop: sell, dragenter: () => zone.classList.add("over"), dragleave: (e) => !zone.contains(e.relatedTarget as Node | null) && zone.classList.remove("over") } },
+    h("span", { class: "sell-icon", text: "♻" }),
+    h("span", { class: "sell-copy" }, h("span", { class: "sell-title", text: "Sell" }), h("span", { class: "sell-hint idle-hint", text: "drag a unit here" }), h("span", { class: "sell-hint drag-hint", text: "release to sell" })),
+    h("span", { class: "sell-value" }, h("span", { text: `+${view.me.limits.sellValue}` }), h("span", { class: "sell-unit", text: "Energy" })),
+  );
+  return zone;
 }
 
 function giantSlot(ctx: Ctx, view: View): HTMLElement {
