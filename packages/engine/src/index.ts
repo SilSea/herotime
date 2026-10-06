@@ -11,3 +11,8 @@ export * from "./rules.js";
 export * from "./game/env.js";
 export * from "./game/effects.js";
 export * from "./game/session.js";
+export * from "./match/config.js";
+export * from "./match/types.js";
+export * from "./match/pairing.js";
+export * from "./match/bot.js";
+export * from "./match/match.js";
