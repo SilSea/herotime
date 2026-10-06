@@ -4,3 +4,8 @@ packages:
 
 allowBuilds:
   esbuild: true
+  prisma: true
+  "@prisma/engines": true
+
+overrides:
+  socket.io: 4.8.4
