@@ -1,13 +1,14 @@
+import { production } from "./production.js";
 import { prototype } from "./prototype.js";
 import type { ContentSetData } from "./types.js";
 
 export * from "./dsl.js";
 export * from "./text.js";
 export * from "./types.js";
-export { prototype };
+export { production, prototype };
 
 /** Every set that can be selected with CONTENT_SET. */
-export const CONTENT_SETS: Record<string, ContentSetData> = { prototype };
+export const CONTENT_SETS: Record<string, ContentSetData> = { prototype, production };
 
 export function getContentSet(name: string): ContentSetData {
   const set = CONTENT_SETS[name];

@@ -19,7 +19,7 @@
 | ส่วน | เทคโนโลยี |
 |---|---|
 | Monorepo | pnpm workspaces (+ Turborepo ถ้าต้องการ) |
-| `apps/web` | React + Vite + TypeScript, Zustand, Framer Motion, socket.io-client, TanStack Query |
+| `apps/web` | **vanilla TypeScript ไม่มี bundler** (build = `typescript.transpileModule` → `public/js`, DOM helper `h()`, store ของตัวเอง, socket.io client จาก server) — เปลี่ยนจาก React + Vite ที่วางไว้เดิมเพื่อไม่ต้องติดตั้งเพิ่ม; logic (store/net/replay/clock) ไม่ผูก DOM และมี test; ย้ายไป React ภายหลังได้ |
 | `apps/server` | NestJS, `@nestjs/websockets` (Socket.IO) สำหรับเกม, REST สำหรับ auth/admin |
 | `packages/engine` | game logic เป็น pure TS แบบ deterministic (seeded RNG, ไม่มี IO) |
 | `packages/shared` | types, zod schemas, socket event contracts |
@@ -108,4 +108,7 @@ herotime/
   - `pnpm dev` → web `:5173`, server `:3000`
   - เล่นกับเพื่อนใน LAN ได้ผ่าน IP ของเครื่อง (bind `0.0.0.0`)
   - Cloud (Railway → Fly.io/VPS) ค่อยตัดสินใจทีหลัง ใช้ Docker setup เดิมย้ายได้
+- **Content sets**: `packages/content` มี `prototype` (เล่นทดลอง/ปรับเร็ว) กับ `production` (ชุดเปิดตัว 7 ซีรีส์, 74 การ์ด) เลือกด้วย env `CONTENT_SET`; ข้อมูลเป็น data ล้วนผ่าน DSL builder → ภายหลังย้ายเข้า DB/admin editor ได้
+- **Docker**: image เดียว (server เสิร์ฟเว็บเอง) + Postgres healthcheck + `prisma migrate deploy` ตอนเริ่ม; Redis อยู่หลัง profile `scale` (ยังไม่ใช้)
+- **Phase ตอนนี้**: เฟส 0–3 เสร็จ (เล่นจริงได้), เฟส 5 เริ่มแล้ว (production content), เฟส 4 (admin editor) ยังไม่เริ่ม
 - **ซีรีส์ชุดแรก**: Sentai 3 + Rider 3 + original 1 — ดู [RULES.md §11](RULES.md#11-launch-series-ชุดแรก)

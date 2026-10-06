@@ -148,3 +148,31 @@ describe.each(entries)("playing %s with bots", (_name, set) => {
     }
   }, 120_000);
 });
+
+describe("production set", () => {
+  const set = getContentSet("production");
+  const content = build(set);
+  const shop = [...content.cards.values()].filter((c) => c.kind === "UNIT" && !c.token);
+
+  it("ships the seven launch series", () => {
+    expect(set.series.map((s) => s.key).sort()).toEqual(["den_o", "gokaiger", "himmapan", "kyoryuger", "ooo", "shinkenger", "w"]);
+  });
+
+  it("every series has enough units for its 4-unit bond to be reachable", () => {
+    for (const s of set.series) {
+      expect(shop.filter((c) => c.series === s.key).length, s.key).toBeGreaterThanOrEqual(4);
+      expect(s.bonds.length, `${s.key} bonds`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("each Sentai series has a Giant to call, and all five colours exist across the squads", () => {
+    const giants = [...content.cards.values()].filter((c) => c.kind === "GIANT").map((c) => c.series);
+    for (const key of ["gokaiger", "kyoryuger", "shinkenger", "himmapan"]) expect(giants, key).toContain(key);
+    const colours = new Set(shop.flatMap((c) => c.colors));
+    for (const c of ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "EXTRA"]) expect(colours.has(c as never), c).toBe(true);
+  });
+
+  it("is a larger set than the prototype", () => {
+    expect(shop.length).toBeGreaterThan(getContentSet("prototype").cards.filter((c) => c.kind === "UNIT" && !c.token).length);
+  });
+});
