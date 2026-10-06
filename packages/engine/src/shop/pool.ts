@@ -36,17 +36,24 @@ export class Pool {
     return rank;
   }
 
-  /** Draw one copy at random (weighted by copies left) from cards up to maxRank. */
-  draw(rng: Rng, maxRank: number): string | undefined {
+  /**
+   * Draw one copy at random (weighted by copies left) from cards with
+   * minRank <= rank <= maxRank. Shops use the default minRank; Discover pins both.
+   */
+  draw(rng: Rng, maxRank: number, minRank = 1): string | undefined {
+    const eligible = (key: string): boolean => {
+      const r = this.rankOf(key);
+      return r >= minRank && r <= maxRank;
+    };
     let total = 0;
     for (const key of this.order) {
-      if (this.rankOf(key) <= maxRank) total += this.count(key);
+      if (eligible(key)) total += this.count(key);
     }
     if (total === 0) return undefined;
 
     let roll = rng.int(total);
     for (const key of this.order) {
-      if (this.rankOf(key) > maxRank) continue;
+      if (!eligible(key)) continue;
       const n = this.count(key);
       if (roll < n) {
         this.remaining.set(key, n - 1);

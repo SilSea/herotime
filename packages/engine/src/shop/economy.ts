@@ -10,6 +10,12 @@ export class RuleError extends Error {
   }
 }
 
+/** A unit the player owns. `golden` = Final Form (made by a triple). */
+export interface Unit {
+  key: string;
+  golden: boolean;
+}
+
 export interface PlayerState {
   energy: number;
   rank: number;
@@ -17,12 +23,28 @@ export interface PlayerState {
   upgradeDiscount: number;
   shop: string[];
   frozen: boolean;
-  hand: string[];
-  board: string[];
+  hand: Unit[];
+  board: Unit[];
+  /** Pending Discover offers (card keys), oldest first. Resolved with chooseDiscover. */
+  discovers: string[][];
 }
 
 export function newPlayer(): PlayerState {
-  return { energy: 0, rank: 1, upgradeDiscount: 0, shop: [], frozen: false, hand: [], board: [] };
+  return {
+    energy: 0,
+    rank: 1,
+    upgradeDiscount: 0,
+    shop: [],
+    frozen: false,
+    hand: [],
+    board: [],
+    discovers: [],
+  };
+}
+
+/** Pool copies a unit is worth: a Final Form consumed 3 copies. */
+export function copiesOf(unit: Unit): number {
+  return unit.golden ? 3 : 1;
 }
 
 export function energyForTurn(turn: number, cfg: GameConfig = DEFAULT_CONFIG): number {
@@ -92,7 +114,7 @@ export function buy(player: PlayerState, shopIndex: number, cfg: GameConfig = DE
   if (player.hand.length >= cfg.handSize) throw new RuleError("hand is full");
   spend(player, cfg.buyCost);
   player.shop.splice(shopIndex, 1);
-  player.hand.push(key);
+  player.hand.push({ key, golden: false });
   return key;
 }
 
@@ -103,14 +125,14 @@ export function play(
   position: number,
   cfg: GameConfig = DEFAULT_CONFIG,
 ): void {
-  const key = player.hand[handIndex];
-  if (key === undefined) throw new RuleError(`no hand slot ${handIndex}`);
+  const unit = player.hand[handIndex];
+  if (unit === undefined) throw new RuleError(`no hand slot ${handIndex}`);
   if (player.board.length >= cfg.boardSize) throw new RuleError("board is full");
   if (!Number.isInteger(position) || position < 0 || position > player.board.length) {
     throw new RuleError(`invalid board position ${position}`);
   }
   player.hand.splice(handIndex, 1);
-  player.board.splice(position, 0, key);
+  player.board.splice(position, 0, unit);
 }
 
 /** Sell a unit from the board (or hand); the card returns to the shared pool. */
@@ -122,10 +144,10 @@ export function sell(
   cfg: GameConfig = DEFAULT_CONFIG,
 ): void {
   const zone = from === "board" ? player.board : player.hand;
-  const key = zone[index];
-  if (key === undefined) throw new RuleError(`no ${from} slot ${index}`);
+  const unit = zone[index];
+  if (unit === undefined) throw new RuleError(`no ${from} slot ${index}`);
   zone.splice(index, 1);
-  pool.give(key);
+  pool.give(unit.key, copiesOf(unit));
   player.energy = Math.min(player.energy + cfg.sellValue, cfg.maxEnergy);
 }
 

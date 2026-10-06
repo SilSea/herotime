@@ -28,6 +28,16 @@ describe("Pool", () => {
     }
   });
 
+  it("draw honours minRank (exact-rank draws for Discover)", () => {
+    const pool = new Pool(cards, { 1: 5, 3: 5 });
+    const rng = new Rng(2);
+    for (let i = 0; i < 5; i++) {
+      expect(pool.draw(rng, 3, 3)).toBe("r3a");
+    }
+    expect(pool.draw(rng, 3, 3)).toBeUndefined(); // all 5 copies drawn
+    expect(pool.draw(rng, 2, 2)).toBeUndefined(); // no rank-2 cards exist
+  });
+
   it("draw decrements the count", () => {
     const pool = new Pool([{ key: "only", rank: 1 }], { 1: 2 });
     const rng = new Rng(1);

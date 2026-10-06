@@ -5,13 +5,13 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 
 ## F1. Core Gameplay
 - [ ] **F1.1** (P0) ล็อบบี้ 8 คน, เลือก Hero 1 จาก 2
-- [ ] **F1.2** (P0) Economy: Energy 3→10, ซื้อ 3 / ขาย 1 / Refresh 1 / Freeze 0
-- [ ] **F1.3** (P0) Base Rank 1–6 + ราคาอัปลดลง 1 ทุกเทิร์นที่ยังไม่อัป
-- [ ] **F1.4** (P0) Shared pool จำกัดจำนวนตาม Rank
+- [x] **F1.2** (P0) Economy: Energy 3→10, ซื้อ 3 / ขาย 1 / Refresh 1 / Freeze 0
+- [x] **F1.3** (P0) Base Rank 1–6 + ราคาอัปลดลง 1 ทุกเทิร์นที่ยังไม่อัป
+- [x] **F1.4** (P0) Shared pool จำกัดจำนวนตาม Rank
 - [ ] **F1.5** (P0) Board 7 / Hand 10, จัดลำดับยูนิต
-- [ ] **F1.6** (P0) Triple → Final Form + Discover Rank+1
+- [x] **F1.6** (P0) Triple → Final Form + Discover Rank+1
 - [ ] **F1.7** (P0) Auto combat (seeded, deterministic) + combat log
-- [ ] **F1.8** (P0) Damage = Base Rank + Rank ยูนิตที่รอด (cap 15 เทิร์น 1–8)
+- [x] **F1.8** (P0) Damage = Base Rank + Rank ยูนิตที่รอด (cap 15 เทิร์น 1–8)
 - [ ] **F1.9** (P0) จับคู่ไม่ซ้ำ 3 รอบล่าสุด + Ghost
 - [ ] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s, replay ≤25s, Ready ก่อนเวลา
 - [ ] **F1.11** (P0) Hero Power (active / passive / ครั้งเดียวต่อเกม)

@@ -3,6 +3,7 @@ import { DEFAULT_CONFIG } from "../config.js";
 import { Rng } from "../rng/rng.js";
 import {
   buy,
+  copiesOf,
   energyForTurn,
   newPlayer,
   play,
@@ -15,6 +16,7 @@ import {
   upgrade,
   upgradeCost,
   type PlayerState,
+  type Unit,
 } from "./economy.js";
 import { Pool } from "./pool.js";
 
@@ -22,6 +24,8 @@ const cards = [
   ...Array.from({ length: 6 }, (_, i) => ({ key: `r1_${i}`, rank: 1 })),
   ...Array.from({ length: 6 }, (_, i) => ({ key: `r2_${i}`, rank: 2 })),
 ];
+
+const u = (key: string, golden = false): Unit => ({ key, golden });
 
 let pool: Pool;
 let rng: Rng;
@@ -34,7 +38,10 @@ beforeEach(() => {
 });
 
 const total = (): number => cards.reduce((n, c) => n + pool.count(c.key), 0);
-const held = (s: PlayerState): number => s.shop.length + s.hand.length + s.board.length;
+const held = (s: PlayerState): number =>
+  s.shop.length +
+  [...s.hand, ...s.board].reduce((n, unit) => n + copiesOf(unit), 0) +
+  s.discovers.reduce((n, offer) => n + offer.length, 0);
 
 describe("energy & sizes", () => {
   it("energy is 3 on turn 1, +1 per turn, capped at 10", () => {
@@ -105,7 +112,7 @@ describe("buy / play / sell", () => {
     expect(buy(p, 0)).toBe(key);
     expect(p.energy).toBe(0);
     expect(p.shop).toHaveLength(2);
-    expect(p.hand).toEqual([key]);
+    expect(p.hand).toEqual([u(key)]);
   });
 
   it("buy fails when poor, with a bad slot, or with a full hand — without spending", () => {
@@ -113,24 +120,30 @@ describe("buy / play / sell", () => {
     expect(() => buy(p, 0)).toThrow(/not enough energy/);
     p.energy = 9;
     expect(() => buy(p, 99)).toThrow(/no shop slot/);
-    p.hand = Array.from({ length: DEFAULT_CONFIG.handSize }, () => "x");
+    p.hand = Array.from({ length: DEFAULT_CONFIG.handSize }, () => u("x"));
     expect(() => buy(p, 0)).toThrow(/hand is full/);
     expect(p.energy).toBe(9);
   });
 
   it("play places a card at a position", () => {
-    p.hand = ["a", "b"];
-    p.board = ["x", "y"];
+    p.hand = [u("a"), u("b")];
+    p.board = [u("x"), u("y")];
     play(p, 1, 1);
-    expect(p.board).toEqual(["x", "b", "y"]);
-    expect(p.hand).toEqual(["a"]);
+    expect(p.board).toEqual([u("x"), u("b"), u("y")]);
+    expect(p.hand).toEqual([u("a")]);
+  });
+
+  it("play keeps a golden unit golden", () => {
+    p.hand = [u("a", true)];
+    play(p, 0, 0);
+    expect(p.board).toEqual([u("a", true)]);
   });
 
   it("play rejects a full board and bad positions", () => {
-    p.hand = ["a"];
-    p.board = Array.from({ length: 7 }, () => "x");
+    p.hand = [u("a")];
+    p.board = Array.from({ length: 7 }, () => u("x"));
     expect(() => play(p, 0, 0)).toThrow(/board is full/);
-    p.board = ["x"];
+    p.board = [u("x")];
     expect(() => play(p, 0, 5)).toThrow(/invalid board position/);
     expect(() => play(p, 3, 0)).toThrow(/no hand slot/);
   });
@@ -145,9 +158,16 @@ describe("buy / play / sell", () => {
     expect(pool.count(key)).toBe(before + 1);
 
     p.energy = 10;
-    p.hand = ["r1_0"];
+    p.hand = [u("r1_0")];
     sell(p, "hand", 0, pool);
     expect(p.energy).toBe(10);
+  });
+
+  it("selling a Final Form returns all 3 copies to the pool", () => {
+    p.hand = [u("r1_0", true)];
+    const before = pool.count("r1_0");
+    sell(p, "hand", 0, pool);
+    expect(pool.count("r1_0")).toBe(before + 3);
   });
 
   it("sell rejects an empty slot", () => {
