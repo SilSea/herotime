@@ -96,30 +96,30 @@ const cards = [
   unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], series: R, keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
 
   // ---- sentai (colours drive Team-Up and Roll Call)
-  unit("sn1", "Red Cadet", { rank: 1, atk: 1, hp: 3, factions: ["sentai"], series: S, colors: ["RED"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(3) })] }),
+  unit("sn1", "Red Cadet", { rank: 1, atk: 1, hp: 3, factions: ["sentai"], series: S, colors: ["RED"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(2) })] }),
   unit("sn2", "Blue Cadet", { rank: 1, atk: 2, hp: 2, factions: ["sentai"], series: S, colors: ["BLUE"], effects: [startOfCombat(buff(1, 1), { condition: teamUp(2) })] }),
   unit("sn3", "Yellow Ranger", { rank: 2, atk: 3, hp: 3, factions: ["sentai"], series: S, colors: ["YELLOW"], effects: [startOfCombat(buff(1, 0), { condition: teamUp(3), target: allAllies({ faction: "sentai" }) })] }),
   unit("sn4", "Green Ranger", { rank: 2, atk: 2, hp: 4, factions: ["sentai"], series: S, colors: ["GREEN"], keywords: ["GUARD"] }),
   unit("sn5", "Pink Ranger", { rank: 3, atk: 3, hp: 5, factions: ["sentai"], series: S, colors: ["PINK"], effects: [startOfCombat(buff(1, 1), { condition: teamUp(4), target: allAllies({ faction: "sentai" }) })] }),
-  unit("sn6", "Extra Ranger", { rank: 4, atk: 5, hp: 5, factions: ["sentai"], series: S, colors: ["EXTRA"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(4) })] }),
+  unit("sn6", "Extra Ranger", { rank: 4, atk: 5, hp: 5, factions: ["sentai"], series: S, colors: ["EXTRA"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(3) })] }),
   unit("sn7", "Team Leader", { rank: 5, atk: 6, hp: 8, factions: ["sentai"], series: S, colors: ["RED"], effects: [startOfCombat(buff(3, 3), { condition: teamUp(5), target: allAllies({ faction: "sentai" }) })] }),
   unit("sn8", "Ultimate Ranger", { rank: 6, atk: 9, hp: 11, factions: ["sentai"], series: S, colors: ["EXTRA"], keywords: ["BARRIER"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(5), target: allAllies({ faction: "sentai" }) })] }),
 
   // ---- mecha (Gattai)
-  unit("mc1", "Scout Drone", { rank: 1, atk: 1, hp: 2, factions: ["mecha"], keywords: ["GATTAI"] }),
-  unit("mc2", "Tank Unit", { rank: 2, atk: 2, hp: 4, factions: ["mecha"], keywords: ["GATTAI", "GUARD"] }),
-  unit("mc3", "Jet Unit", { rank: 3, atk: 4, hp: 3, factions: ["mecha"], keywords: ["GATTAI"] }),
-  unit("mc4", "Drill Unit", { rank: 4, atk: 5, hp: 5, factions: ["mecha"], keywords: ["GATTAI"] }),
-  unit("mc5", "Command Mecha", { rank: 5, atk: 7, hp: 9, factions: ["mecha"], keywords: ["GUARD"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc1", "Scout Drone", { rank: 1, atk: 2, hp: 2, factions: ["mecha"], keywords: ["GATTAI"] }),
+  unit("mc2", "Tank Unit", { rank: 2, atk: 3, hp: 4, factions: ["mecha"], keywords: ["GATTAI", "GUARD"] }),
+  unit("mc3", "Jet Unit", { rank: 3, atk: 4, hp: 4, factions: ["mecha"], keywords: ["GATTAI"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc4", "Drill Unit", { rank: 4, atk: 6, hp: 6, factions: ["mecha"], keywords: ["GATTAI"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
+  unit("mc5", "Command Mecha", { rank: 5, atk: 8, hp: 9, factions: ["mecha"], keywords: ["GUARD"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "mecha" }) })] }),
   unit("mc6", "Titan Core", { rank: 6, atk: 12, hp: 12, factions: ["mecha"], keywords: ["GATTAI", "BARRIER"] }),
 
   // ---- kaijin (Kyodaika)
   unit("kj1", "Spore Beast", { rank: 1, atk: 1, hp: 2, factions: ["kaijin"], keywords: ["KYODAIKA"] }),
   unit("kj2", "Claw Fiend", { rank: 2, atk: 3, hp: 3, factions: ["kaijin"], effects: [lastStand(buff(1, 1), { target: randomAlly() })] }),
-  unit("kj3", "Stone Golem", { rank: 3, atk: 3, hp: 6, factions: ["kaijin"], keywords: ["KYODAIKA", "GUARD"] }),
-  unit("kj4", "Venom Wyrm", { rank: 4, atk: 5, hp: 5, factions: ["kaijin"], keywords: ["KYODAIKA"] }),
-  unit("kj5", "Monster Duke", { rank: 5, atk: 6, hp: 8, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [avenge(2, buff(3, 3))] }),
-  unit("kj6", "Monster General", { rank: 6, atk: 10, hp: 12, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [startOfCombat(buff(0, 3), { target: allAllies({ faction: "kaijin" }) })] }),
+  unit("kj3", "Stone Golem", { rank: 3, atk: 3, hp: 5, factions: ["kaijin"], keywords: ["KYODAIKA", "GUARD"] }),
+  unit("kj4", "Venom Wyrm", { rank: 4, atk: 4, hp: 5, factions: ["kaijin"], keywords: ["KYODAIKA"] }),
+  unit("kj5", "Monster Duke", { rank: 5, atk: 5, hp: 7, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [avenge(2, buff(2, 2))] }),
+  unit("kj6", "Monster General", { rank: 6, atk: 7, hp: 9, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [startOfCombat(buff(0, 2), { target: allAllies({ faction: "kaijin" }) })] }),
 
   // ---- grunt (swarm)
   unit("gr1", "Combatant", { rank: 1, atk: 2, hp: 1, factions: ["grunt"], effects: [lastStand(summon("grunt_token"))] }),
@@ -134,8 +134,8 @@ const cards = [
   unit("al2", "Mechanic", { rank: 2, atk: 1, hp: 3, factions: ["ally"], effects: [henshinCall(energy(2))] }),
   unit("al3", "Informant", { rank: 3, atk: 3, hp: 4, factions: ["ally"], effects: [henshinCall(toHand("al1"))] }),
   unit("al4", "Mentor", { rank: 4, atk: 4, hp: 6, factions: ["ally"], effects: [endOfTurn(buff(2, 2), { target: leftmost() })] }),
-  unit("al5", "Veteran Coach", { rank: 5, atk: 5, hp: 8, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: allAllies() })] }),
-  unit("al6", "Base Commander", { rank: 6, atk: 6, hp: 10, factions: ["ally"], effects: [endOfTurn(buff(2, 2), { target: allAllies() })] }),
+  unit("al5", "Veteran Coach", { rank: 5, atk: 5, hp: 8, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: randomAlly() })] }),
+  unit("al6", "Base Commander", { rank: 6, atk: 6, hp: 10, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: allAllies() })] }),
 
   // ---- dark rider (sacrifice: destroys a random ally, then grows; alone it just grows)
   unit("dr1", "Shadow Rider", { rank: 1, atk: 2, hp: 2, factions: ["dark_rider"], series: R, effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(2, 2), { target: self })] }),
