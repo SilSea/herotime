@@ -23,8 +23,11 @@ export interface UserRepository {
   create(user: Omit<UserRecord, "id" | "createdAt">): Promise<UserRecord>;
 }
 
+export type MatchMode = "queue" | "practice";
+
 export interface MatchResult {
   matchId: string;
+  mode: MatchMode;
   seed: number;
   contentVersion: number;
   startedAt: Date;
@@ -32,9 +35,26 @@ export interface MatchResult {
   players: { userId: string | null; name: string; isBot: boolean; heroKey: string | null; placement: number }[];
 }
 
+/** One player's record over ranked (queue) matches. */
+export interface Standing {
+  userId: string;
+  username: string;
+  games: number;
+  wins: number;
+  top4: number;
+  avgPlacement: number;
+}
+
 export interface MatchRepository {
   save(result: MatchResult): Promise<void>;
   recentForUser(userId: string, limit: number): Promise<MatchResult[]>;
+  /** Queue matches only; players with fewer than `minGames` are left out. Best average placement first. */
+  leaderboard(limit: number, minGames: number): Promise<Standing[]>;
+}
+
+/** Shared by both repositories so they rank the same way. */
+export function rankStandings(rows: Standing[], limit: number): Standing[] {
+  return [...rows].sort((a, b) => a.avgPlacement - b.avgPlacement || b.games - a.games || a.username.localeCompare(b.username)).slice(0, limit);
 }
 
 export const USER_REPOSITORY = Symbol("USER_REPOSITORY");

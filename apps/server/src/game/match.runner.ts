@@ -2,6 +2,7 @@ import { RuleError, type Intent, type Match, type MatchEvent, type MatchView } f
 import type { Publisher, Timers } from "./ports.js";
 
 export interface RunnerMeta {
+  mode: "queue" | "practice";
   seed: number;
   contentVersion: number;
   startedAt: Date;

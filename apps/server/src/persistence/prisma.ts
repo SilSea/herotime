@@ -10,6 +10,8 @@ import {
   type DraftRecord,
   type MatchRepository,
   type MatchResult,
+  rankStandings,
+  type Standing,
   type UserRecord,
   type UserRepository,
 } from "./repositories.js";
@@ -71,6 +73,7 @@ export class PrismaMatchRepository implements MatchRepository {
     await this.db.match.create({
       data: {
         id: result.matchId,
+        mode: result.mode,
         contentVersion: result.contentVersion,
         seed: result.seed,
         startedAt: result.startedAt,
@@ -97,6 +100,7 @@ export class PrismaMatchRepository implements MatchRepository {
     });
     return rows.map((m) => ({
       matchId: m.id,
+      mode: m.mode === "practice" ? ("practice" as const) : ("queue" as const),
       seed: m.seed,
       contentVersion: m.contentVersion,
       startedAt: m.startedAt,
@@ -105,6 +109,32 @@ export class PrismaMatchRepository implements MatchRepository {
         .map((p) => ({ userId: p.userId, name: p.name, isBot: p.isBot, heroKey: p.heroKey, placement: p.placement }))
         .sort((a, b) => a.placement - b.placement),
     }));
+  }
+
+  async leaderboard(limit: number, minGames: number): Promise<Standing[]> {
+    const ranked = { userId: { not: null }, match: { mode: "queue" } } as const;
+    const all = await this.db.matchPlayer.groupBy({ by: ["userId"], where: ranked, _count: { _all: true }, _avg: { placement: true } });
+    const eligible = all.filter((r) => r._count._all >= minGames && r.userId !== null);
+    if (eligible.length === 0) return [];
+    const ids = eligible.map((r) => r.userId as string);
+    const [wins, top4, users] = await Promise.all([
+      this.db.matchPlayer.groupBy({ by: ["userId"], where: { ...ranked, userId: { in: ids }, placement: 1 }, _count: { _all: true } }),
+      this.db.matchPlayer.groupBy({ by: ["userId"], where: { ...ranked, userId: { in: ids }, placement: { lte: 4 } }, _count: { _all: true } }),
+      this.db.user.findMany({ where: { id: { in: ids } }, select: { id: true, username: true } }),
+    ]);
+    const count = (rows: { userId: string | null; _count: { _all: number } }[], id: string): number => rows.find((r) => r.userId === id)?._count._all ?? 0;
+    const names = new Map(users.map((u) => [u.id, u.username]));
+    return rankStandings(
+      eligible.map((r) => ({
+        userId: r.userId as string,
+        username: names.get(r.userId as string) ?? "?",
+        games: r._count._all,
+        wins: count(wins, r.userId as string),
+        top4: count(top4, r.userId as string),
+        avgPlacement: Math.round((r._avg.placement ?? 0) * 100) / 100,
+      })),
+      limit,
+    );
   }
 }
 

@@ -90,8 +90,9 @@ describe.skipIf(!URL_)("Prisma repositories on real Postgres", () => {
   });
 
   describe("matches", () => {
-    const result = (id: string, userId: string, placement: number, endedAt: Date): MatchResult => ({
+    const result = (id: string, userId: string, placement: number, endedAt: Date, mode: MatchResult["mode"] = "queue"): MatchResult => ({
       matchId: id,
+      mode,
       seed: 12345,
       contentVersion: 1,
       startedAt: new Date(endedAt.getTime() - 60_000),
@@ -174,6 +175,44 @@ describe.skipIf(!URL_)("Prisma repositories on real Postgres", () => {
       c.close();
       await second.close();
     }, 60_000);
+  });
+
+  describe("leaderboard", () => {
+    const one = (id: string, players: { userId: string | null; name: string; placement: number }[], mode: "queue" | "practice" = "queue"): MatchResult => ({
+      matchId: id,
+      mode,
+      seed: 1,
+      contentVersion: 1,
+      startedAt: new Date("2026-10-01T10:00:00Z"),
+      endedAt: new Date("2026-10-01T10:20:00Z"),
+      players: players.map((p) => ({ ...p, isBot: p.userId === null, heroKey: null })),
+    });
+
+    it("ranks by average placement over queue matches only, with wins, top 4 and real usernames", async () => {
+      const a = await newUser("alpha");
+      const b = await newUser("bravo");
+      const c = await newUser("charlie");
+      // alpha: 1, 2, 5  -> avg 2.67, 1 win, 2 top-4 ; bravo: 3, 1, 1 -> avg 1.67 ; charlie: only 2 ranked games
+      await matches.save(one("q1", [{ userId: a.id, name: "alpha", placement: 1 }, { userId: b.id, name: "bravo", placement: 3 }, { userId: c.id, name: "charlie", placement: 2 }, { userId: null, name: "Bot", placement: 4 }]));
+      await matches.save(one("q2", [{ userId: a.id, name: "alpha", placement: 2 }, { userId: b.id, name: "bravo", placement: 1 }, { userId: c.id, name: "charlie", placement: 3 }]));
+      await matches.save(one("q3", [{ userId: a.id, name: "alpha", placement: 5 }, { userId: b.id, name: "bravo", placement: 1 }]));
+      // practice never counts, however well it went
+      for (const id of ["p1", "p2", "p3"]) await matches.save(one(id, [{ userId: c.id, name: "charlie", placement: 1 }], "practice"));
+
+      const board = await matches.leaderboard(10, 3);
+      expect(board.map((r) => r.username)).toEqual(["bravo", "alpha"]);
+      expect(board[0]).toMatchObject({ games: 3, wins: 2, top4: 3, avgPlacement: 1.67 });
+      expect(board[1]).toMatchObject({ games: 3, wins: 1, top4: 2, avgPlacement: 2.67 });
+      expect(await matches.leaderboard(1, 3)).toHaveLength(1);
+      expect((await matches.leaderboard(10, 2)).map((r) => r.username)).toContain("charlie");
+
+      const recent = await matches.recentForUser(c.id, 10);
+      expect(recent.filter((m) => m.mode === "practice")).toHaveLength(3);
+    });
+
+    it("is empty when nobody has played enough", async () => {
+      expect(await matches.leaderboard(10, 3)).toEqual([]);
+    });
   });
 
   describe("content versions", () => {

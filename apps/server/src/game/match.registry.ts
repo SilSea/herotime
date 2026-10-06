@@ -18,6 +18,8 @@ export interface StartOptions {
   size?: number;
   /** Overrides for this match only. */
   match?: Partial<MatchConfig>;
+  /** Practice matches are kept in history but never ranked. */
+  mode?: "queue" | "practice";
 }
 
 /** How long a finished match stays available for reconnects and final standings. */
@@ -60,7 +62,7 @@ export class MatchRegistry {
       id,
       match,
       new Set(humans.map((h) => h.id)),
-      { seed, contentVersion: version, startedAt },
+      { mode: options.mode ?? "queue", seed, contentVersion: version, startedAt },
       this.publisher,
       this.timers,
       (info) => this.finished(info),
@@ -105,6 +107,7 @@ export class MatchRegistry {
     void this.matches
       .save({
         matchId: runner.id,
+        mode: runner.meta.mode,
         seed: runner.meta.seed,
         contentVersion: runner.meta.contentVersion,
         startedAt: runner.meta.startedAt,

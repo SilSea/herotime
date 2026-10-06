@@ -8,7 +8,7 @@ import { renderAuth } from "./ui/auth.js";
 import type { Ctx } from "./ui/ctx.js";
 import { h, mount } from "./ui/dom.js";
 import { renderLibrary } from "./ui/library.js";
-import { renderLobby } from "./ui/lobby.js";
+import { invalidateStats, renderLobby } from "./ui/lobby.js";
 import { DRAGGING, renderMatch } from "./ui/match.js";
 import { ReplayView } from "./ui/replay-view.js";
 
@@ -88,6 +88,7 @@ export function startApp(root: HTMLElement): void {
     async login(result: AuthResult) {
       storage.set(result.token);
       resetAdmin();
+      invalidateStats();
       store.set({ token: result.token, user: { id: result.user.id, username: result.user.username, role: result.user.role }, screen: "lobby" });
       net.connect(result.token);
     },
@@ -111,6 +112,7 @@ export function startApp(root: HTMLElement): void {
     },
     async leaveMatch() {
       await net.leaveMatch();
+      invalidateStats();
       wantedVersion = 0;
       void ctx().refreshContent();
       store.set({ screen: "lobby", view: undefined, matchId: undefined, combat: undefined, replayPending: undefined, placements: undefined, status: { state: "idle" } });

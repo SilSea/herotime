@@ -45,7 +45,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F4.4** (P0) ซ่อนข้อมูลของคนอื่น (PlayerView)
 - [x] **F4.5** (P0) Reconnect กลางเกม
 - [x] **F4.6** (P0) Bot AI พื้นฐาน
-- [ ] **F4.7** (P1) ประวัติแมตช์ + อันดับ
+- [x] **F4.7** (P1) ประวัติแมตช์ (20 นัดล่าสุดของตัวเอง รวม practice) + leaderboard (เฉพาะ matchmaking, ≥3 นัด, เรียงตามอันดับเฉลี่ย) ใน lobby
 - [ ] **F4.8** (P2) MMR/Ranked, friend lobby
 - [ ] **F4.9** (P2) Redis scale หลาย instance
 - [x] **F4.10** (P0) รัน local: `pnpm dev` หรือ `docker compose up -d --build` (server + เว็บ + Postgres, migrate อัตโนมัติ), เล่นใน LAN ได้

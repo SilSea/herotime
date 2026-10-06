@@ -50,6 +50,7 @@ export class LobbyService {
     this.registry.startMatch([user], {
       size: options.bots === undefined ? this.config.lobby.matchSize : options.bots + 1,
       match,
+      mode: "practice",
     });
     const status = this.statusFor(user.id);
     this.publisher.toUser(user.id, "queue:status", status);

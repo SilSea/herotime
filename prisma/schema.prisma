@@ -161,6 +161,8 @@ model Match {
   id             String        @id
   /// number of the content version the match was played with (matches ContentVersion.number)
   contentVersion Int
+  /// "queue" (matchmaking, counts for the leaderboard) or "practice" (solo vs bots, never ranked)
+  mode           String        @default("queue")
   seed           Int
   startedAt      DateTime
   endedAt        DateTime

@@ -6,6 +6,7 @@ import type { ServerConfig } from "./config.js";
 import { AdminController, AdminGuard } from "./content/admin.controller.js";
 import { UploadStore } from "./content/uploads.js";
 import { ContentController } from "./content/content.controller.js";
+import { StatsController } from "./game/stats.controller.js";
 import { ContentService } from "./content/content.service.js";
 import { GameGateway, SocketPublisher } from "./game/game.gateway.js";
 import { LobbyService } from "./game/lobby.service.js";
@@ -43,6 +44,7 @@ export class AppModule implements OnApplicationShutdown {
 
   /** Everything environment-specific comes in through `deps`, which keeps tests free of globals. */
   static forRoot(deps: AppDeps): DynamicModule {
+    const users = deps.users ?? new InMemoryUserRepository();
     return {
       module: AppModule,
       imports: [
@@ -52,13 +54,13 @@ export class AppModule implements OnApplicationShutdown {
           verifyOptions: { algorithms: ["HS256"] },
         }),
       ],
-      controllers: [AuthController, ContentController, AdminController],
+      controllers: [AuthController, ContentController, AdminController, StatsController],
       providers: [
         { provide: CONFIG, useValue: deps.config },
         { provide: SHUTDOWN_HOOK, useValue: deps.onShutdown },
         { provide: TIMERS, useValue: deps.timers ?? realTimers },
-        { provide: USER_REPOSITORY, useValue: deps.users ?? new InMemoryUserRepository() },
-        { provide: MATCH_REPOSITORY, useValue: deps.matches ?? new InMemoryMatchRepository() },
+        { provide: USER_REPOSITORY, useValue: users },
+        { provide: MATCH_REPOSITORY, useValue: deps.matches ?? new InMemoryMatchRepository(users) },
         { provide: CONTENT_REPOSITORY, useValue: deps.contentRepo ?? new InMemoryContentRepository() },
         { provide: ContentService, useValue: deps.content },
         AdminGuard,

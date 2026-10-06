@@ -95,3 +95,22 @@ export interface SimulationReport {
   factions: SimRow[];
   neverUsed: string[];
 }
+
+export interface MyMatch {
+  matchId: string;
+  mode: "queue" | "practice";
+  endedAt: string;
+  contentVersion: number;
+  placement: number | null;
+  heroKey: string | null;
+  players: { name: string; isBot: boolean; heroKey: string | null; placement: number; me: boolean }[];
+}
+
+export interface LeaderboardRow {
+  rank: number;
+  username: string;
+  games: number;
+  wins: number;
+  top4: number;
+  avgPlacement: number;
+}

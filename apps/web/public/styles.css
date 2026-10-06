@@ -383,3 +383,5 @@ input.bad { border-color: var(--bad); background: #3b1511; }
 
 .upload-row { display: flex; flex-direction: column; gap: 4px; }
 .upload-row input[type=file] { font-size: 12px; max-width: 420px; }
+
+.place-win { color: var(--gold); font-weight: 800; }

@@ -1,5 +1,6 @@
 import { formatClock } from "../clock.js";
-import type { PracticeOptions } from "../protocol.js";
+import { ordinal } from "../format.js";
+import type { LeaderboardRow, MyMatch, PracticeOptions } from "../protocol.js";
 import { h, mount } from "./dom.js";
 import type { Ctx } from "./ctx.js";
 
@@ -11,6 +12,66 @@ interface PracticeForm {
 }
 
 const KEY = "herotime.practice";
+
+/** History and leaderboard, fetched in the background and refreshed when the lobby is shown again after a while. */
+const stats: { at: number; loading: boolean; user?: string; mine?: MyMatch[]; board?: { minGames: number; players: LeaderboardRow[] }; error?: string } = { at: 0, loading: false };
+const STATS_TTL_MS = 15_000;
+
+/** Forget the cached numbers (a match just finished, or someone else logged in). */
+export function invalidateStats(): void {
+  stats.at = 0;
+}
+
+function refreshStats(ctx: Ctx): void {
+  const user = ctx.store.state.user?.id;
+  const token = ctx.store.state.token;
+  if (!user || !token || stats.loading) return;
+  if (stats.user === user && Date.now() - stats.at < STATS_TTL_MS) return;
+  stats.loading = true;
+  Promise.all([ctx.api.myMatches(token), ctx.api.leaderboard()])
+    .then(([mine, board]) => {
+      Object.assign(stats, { user, mine: mine.matches, board, error: undefined });
+    })
+    .catch((e: unknown) => {
+      stats.error = e instanceof Error ? e.message : "could not load";
+      stats.user = user;
+    })
+    .finally(() => {
+      stats.at = Date.now();
+      stats.loading = false;
+      if (ctx.store.state.screen === "lobby") ctx.store.set({}); // draw again with the numbers
+    });
+}
+
+function historyPanel(ctx: Ctx): HTMLElement {
+  const rows = stats.mine;
+  return h(
+    "div",
+    { class: "panel" },
+    h("h2", { text: "Your recent matches" }),
+    stats.error && h("p", { class: "form-error", text: stats.error }),
+    !rows ? h("p", { class: "muted", text: "Loading..." }) : rows.length === 0 ? h("p", { class: "muted", text: "No finished matches yet." }) :
+      h("table", { class: "admin-table" }, h("tr", null, ...["Place", "Hero", "Mode", "When"].map((t) => h("th", { text: t }))),
+        ...rows.map((m) => h("tr", { title: m.players.map((p) => `${ordinal(p.placement)} ${p.name}${p.isBot ? " (bot)" : ""}`).join("\n") },
+          h("td", { class: m.placement === 1 ? "place-win" : "", text: m.placement ? ordinal(m.placement) : "-" }),
+          h("td", { text: m.heroKey ? ctx.ix.heroName(m.heroKey) : "-" }),
+          h("td", { text: m.mode === "practice" ? "practice" : "ranked" }),
+          h("td", { class: "muted", text: new Date(m.endedAt).toLocaleString() })))),
+  );
+}
+
+function leaderboardPanel(): HTMLElement {
+  const b = stats.board;
+  return h(
+    "div",
+    { class: "panel" },
+    h("h2", { text: "Leaderboard" }),
+    h("p", { class: "muted", text: `Matchmaking games only (practice never counts). At least ${b?.minGames ?? 3} games to appear. Lower average place is better.` }),
+    !b ? h("p", { class: "muted", text: "Loading..." }) : b.players.length === 0 ? h("p", { class: "muted", text: "Nobody has enough ranked games yet." }) :
+      h("table", { class: "admin-table" }, h("tr", null, ...["#", "Player", "Games", "Wins", "Top 4", "Avg place"].map((t) => h("th", { text: t }))),
+        ...b.players.map((p) => h("tr", null, h("td", { text: String(p.rank) }), h("td", { text: p.username }), h("td", { text: String(p.games) }), h("td", { text: String(p.wins) }), h("td", { text: String(p.top4) }), h("td", { text: p.avgPlacement.toFixed(2) })))),
+  );
+}
 
 function loadForm(): PracticeForm {
   try {
@@ -91,6 +152,9 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
         h("p", { class: "muted", text: `Content set: ${ix.snapshot.set} (v${ix.snapshot.version}) - ${ix.cards.size} cards, ${ix.heroes.size} heroes, ${ix.relics.size} relics, ${ix.factions.size} factions.` }),
         h("p", { class: "muted", text: "Everything is a prototype: numbers are first guesses. Press D in a match for the debug panel; copy the report if something looks wrong." }),
       ),
+      historyPanel(ctx),
+      leaderboardPanel(),
     ),
   );
+  refreshStats(ctx);
 }

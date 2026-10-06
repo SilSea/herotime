@@ -1,4 +1,4 @@
-import type { Ack, AdminDraft, SimulationReport, AuditEntry, AuthResult, ContentSnapshot, EventMessage, Intent, PracticeOptions, QueueStatus, VersionMeta, ViewMessage } from "./protocol.js";
+import type { Ack, AdminDraft, LeaderboardRow, MyMatch, SimulationReport, AuditEntry, AuthResult, ContentSnapshot, EventMessage, Intent, PracticeOptions, QueueStatus, VersionMeta, ViewMessage } from "./protocol.js";
 
 /** The slice of a socket.io client we use, so tests can plug in a fake. */
 export interface SocketLike {
@@ -118,6 +118,9 @@ export class Api {
   register = (username: string, email: string, password: string): Promise<AuthResult> => this.post("/auth/register", { username, email, password });
   login = (username: string, password: string): Promise<AuthResult> => this.post("/auth/login", { username, password });
   content = (version?: number): Promise<ContentSnapshot> => this.json(version === undefined ? "/content" : `/content/${version}`);
+
+  myMatches = (token: string): Promise<{ matches: MyMatch[] }> => this.json("/me/matches", { headers: { authorization: `Bearer ${token}` } });
+  leaderboard = (): Promise<{ minGames: number; players: LeaderboardRow[] }> => this.json("/leaderboard");
 
   // ---- admin (the server refuses anyone who is not an admin)
   private admin<T>(token: string, method: string, path: string, body?: unknown): Promise<T> {
