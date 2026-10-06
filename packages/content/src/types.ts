@@ -1,4 +1,4 @@
-import type { CardDef, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
+import type { CardDef, ContentRules, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
 import { cardText, heroText, relicText } from "./text.js";
 
 /** Everything one content set contains. The server feeds this to the engine's Content. */
@@ -9,6 +9,8 @@ export interface ContentSetData {
   gauges: GaugeDef[];
   relics: RelicDef[];
   heroes: HeroDef[];
+  /** Game-wide rule numbers (prices, sizes, Roll Call, Gattai, Giant...). Missing ones use the engine defaults. */
+  rules?: ContentRules;
 }
 
 /** Fill in rules text for anything whose author did not write any. */

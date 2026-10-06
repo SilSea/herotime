@@ -1,5 +1,5 @@
 import { heroDamage, simulateCombat } from "../combat/combat.js";
-import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
+import { configFromRules, DEFAULT_CONFIG, type GameConfig } from "../config.js";
 import type { Content } from "../content.js";
 import { makeEnv, type GameEnv } from "../game/env.js";
 import {
@@ -121,7 +121,7 @@ export class Match {
       content: opts.content,
       pool: new Pool(poolCards),
       rng,
-      cfg: opts.gameConfig ?? DEFAULT_CONFIG,
+      cfg: opts.gameConfig ?? configFromRules(opts.content.rules),
       gear,
     });
     if (factions) {

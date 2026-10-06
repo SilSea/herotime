@@ -56,7 +56,7 @@ export function gattaiGroupAt(player: PlayerState, index: number, env: GameEnv):
   const hasGattai = (u: Unit): boolean => !u.components && (env.content.card(u.key).keywords.includes("GATTAI") || (u.keywords ?? []).includes("GATTAI"));
   const parts: Unit[] = [];
   for (let i = index; i < player.board.length && hasGattai(player.board[i] as Unit); i++) parts.push(player.board[i] as Unit);
-  const size = combatRulesOf(player).gattaiSize ?? DEFAULT_COMBAT_RULES.gattaiSize;
+  const size = combatRulesOf(player).gattaiSize ?? env.cfg.combatDefaults?.gattaiSize ?? DEFAULT_COMBAT_RULES.gattaiSize;
   return parts.length >= size ? { form, parts } : undefined;
 }
 
@@ -293,7 +293,7 @@ export function prepareCombat(player: PlayerState, env: GameEnv): { units: Comba
     }
   }
 
-  const extras: CombatSideExtras = { playerEffects, rules: combatRulesOf(player) };
+  const extras: CombatSideExtras = { playerEffects, rules: { ...env.cfg.combatDefaults, ...combatRulesOf(player) } };
   if (player.giant) extras.giant = env.content.toCombat(player.giant);
   return { units, extras };
 }

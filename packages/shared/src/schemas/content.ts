@@ -113,3 +113,31 @@ export const HeroDef = z.object({
     .optional(),
 });
 export type HeroDef = z.infer<typeof HeroDef>;
+
+const count = z.number().int().min(0);
+/**
+ * Game-wide rule numbers for this content version. Anything left out keeps the engine default.
+ * Relics, heroes and cards can still change them per player with MODIFY_RULE.
+ */
+export const ContentRules = z
+  .object({
+    startEnergy: count,
+    energyPerTurn: count,
+    maxEnergy: count.min(1),
+    buyCost: count,
+    sellValue: count,
+    refreshCost: count,
+    boardSize: count.min(1).max(12),
+    handSize: count.min(1).max(20),
+    damageCap: count,
+    damageCapUntilTurn: count,
+    rollCallColors: count.min(1).max(6),
+    rollCallBuff: count,
+    gattaiSize: count.min(2).max(7),
+    giantEntryThreshold: count.max(7),
+    giantSentaiScale: z.number().min(0).max(3),
+    kyodaikaMultiplier: z.number().min(1).max(5),
+  })
+  .partial()
+  .strict();
+export type ContentRules = z.infer<typeof ContentRules>;

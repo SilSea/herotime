@@ -91,3 +91,17 @@ describe("defaults", () => {
     expect(defaultFor({ kind: "list", of: { kind: "int" }, make: () => 7, min: 2 })).toEqual([7, 7]);
   });
 });
+
+describe("the rules tab matches the engine and the schema", () => {
+  it("lists every rule a content set may change, with the engine's defaults", async () => {
+    const { RULE_DEFAULTS, RULE_ROWS } = await import("../src/ui/admin-schema.js");
+    const { ContentRules } = await import("@herotime/shared");
+    const { DEFAULT_CONFIG, DEFAULT_COMBAT_RULES } = await import("@herotime/engine");
+    expect(Object.keys(RULE_DEFAULTS).sort()).toEqual(Object.keys(ContentRules.shape).sort());
+    for (const [k, v] of Object.entries(RULE_DEFAULTS)) {
+      const engine = (DEFAULT_CONFIG as unknown as Record<string, unknown>)[k] ?? (DEFAULT_COMBAT_RULES as unknown as Record<string, unknown>)[k];
+      expect(engine, k).toBe(v);
+    }
+    expect(RULE_ROWS.every((r) => r.optional)).toBe(true);
+  });
+});

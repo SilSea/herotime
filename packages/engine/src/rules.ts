@@ -34,7 +34,7 @@ export function isRule(rule: string): boolean {
 
 export function ruleDefault(rule: string, cfg: GameConfig = DEFAULT_CONFIG): number {
   if ((GAME_RULE_KEYS as readonly string[]).includes(rule)) return cfg[rule as GameRuleKey];
-  if (rule in DEFAULT_COMBAT_RULES) return DEFAULT_COMBAT_RULES[rule as keyof CombatRules];
+  if (rule in DEFAULT_COMBAT_RULES) return cfg.combatDefaults?.[rule as keyof CombatRules] ?? DEFAULT_COMBAT_RULES[rule as keyof CombatRules];
   const extra = EXTRA_RULES[rule];
   if (extra !== undefined) return extra;
   throw new Error(`unknown rule "${rule}"`);

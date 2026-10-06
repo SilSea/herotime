@@ -1,7 +1,7 @@
 import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
 import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta } from "../protocol.js";
-import { ENTITIES, entityInfo, type EntityKind, type RefKind } from "./admin-schema.js";
+import { ENTITIES, entityInfo, RULE_DEFAULTS, RULE_ROWS, type EntityKind, type RefKind } from "./admin-schema.js";
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
@@ -16,7 +16,8 @@ interface EditorState {
   draft?: AdminDraft;
   loading: boolean;
   loadError?: string;
-  kind: EntityKind;
+  /** Which list is open; "rules" is the game-wide numbers. */
+  kind: EntityKind | "rules";
   /** Position in the list of that kind (not the key, which can be edited). */
   index?: number;
   query: string;
@@ -40,6 +41,9 @@ let host: HTMLElement | undefined;
 let live: Ctx | undefined;
 let statusEl: HTMLElement | undefined;
 let previewEl: HTMLElement | undefined;
+
+/** The entity list being edited (the Rules tab has no list; entity code never runs there). */
+const kindNow = (): EntityKind => (ed.kind === "rules" ? "cards" : ed.kind);
 
 const data = (): Record<string, any[]> => (ed.draft as AdminDraft).data;
 const list = (kind: EntityKind): any[] => (data()[kind] ??= []);
@@ -306,11 +310,31 @@ function auditPanel(): HTMLElement {
 
 // ----------------------------------------------------------------- the editor
 
-function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
-  const info = entityInfo(ed.kind);
-  const items = list(ed.kind);
+function rulesBody(refs: (k: RefKind) => string[]): HTMLElement {
+  const d = data() as unknown as Record<string, unknown>;
+  const rules = (d.rules ??= {}) as Record<string, unknown>;
+  const env: FormEnv = { refs, changed: setDirty };
+  const tabs = rulesTabs();
+  return h(
+    "div",
+    { class: "admin-body rules-body" },
+    h("div", { class: "admin-left" }, tabs, h("p", { class: "muted small", text: "Game-wide numbers for this content version. Tick a rule to override its default; untick to go back to it. Relics, heroes and cards can still change them for one player with MODIFY_RULE." })),
+    h("div", { class: "admin-middle" }, h("strong", { text: "Game rules" }), renderRows(RULE_ROWS, rules, env)),
+    h("div", { class: "admin-right" }, h("h3", { text: "In effect" }), h("table", { class: "admin-table" }, ...Object.keys(RULE_DEFAULTS).map((k) => h("tr", null, h("td", { text: k }), h("td", { class: rules[k] !== undefined ? "rule-changed" : "muted", text: String(rules[k] ?? RULE_DEFAULTS[k]) }))))),
+  );
+}
 
-  const tabs = h("div", { class: "admin-tabs" }, ...ENTITIES.map((e) => h("button", { class: `tab ${e.kind === ed.kind ? "active" : ""}`, text: `${e.label} (${list(e.kind).length})`, on: { click: () => ((ed.kind = e.kind), (ed.index = undefined), redraw()) } })));
+function rulesTabs(): HTMLElement {
+  return h("div", { class: "admin-tabs" }, ...ENTITIES.map((e) => h("button", { class: `tab ${e.kind === ed.kind ? "active" : ""}`, text: `${e.label} (${list(e.kind).length})`, on: { click: () => ((ed.kind = e.kind), (ed.index = undefined), redraw()) } })), h("button", { class: `tab ${ed.kind === "rules" ? "active" : ""}`, text: "Rules", on: { click: () => ((ed.kind = "rules"), (ed.index = undefined), redraw()) } }));
+}
+
+function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
+  if (ed.kind === "rules") return rulesBody(refs);
+  const kind: EntityKind = ed.kind;
+  const info = entityInfo(kind);
+  const items = list(kind);
+
+  const tabs = rulesTabs();
   const search = h("input", { type: "text", placeholder: "Search...", value: ed.query });
   search.addEventListener("input", () => {
     ed.query = search.value;
@@ -340,18 +364,19 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
 }
 
 function newEntity(_ctx: Ctx): void {
-  const info = entityInfo(ed.kind);
+  if (ed.kind === "rules") return;
+  const info = entityInfo(kindNow());
   const key = window.prompt(`Key for the new ${info.singular} (letters, digits, _ ; cannot change meaning later)`, "")?.trim();
   if (!key) return;
-  if (list(ed.kind).some((x) => x.key === key)) return live?.toast(`There is already a ${info.singular} "${key}"`, "error");
-  list(ed.kind).push(info.make(key));
-  ed.index = list(ed.kind).length - 1;
+  if (list(kindNow()).some((x) => x.key === key)) return live?.toast(`There is already a ${info.singular} "${key}"`, "error");
+  list(kindNow()).push(info.make(key));
+  ed.index = list(kindNow()).length - 1;
   ed.dirty = true;
   redraw();
 }
 
 function entityEditor(ctx: Ctx, entity: Record<string, any>, refs: (k: RefKind) => string[]): HTMLElement {
-  const info = entityInfo(ed.kind);
+  const info = entityInfo(kindNow());
   const env: FormEnv = { refs, changed: setDirty, upload: (file) => uploadImage(ctx, file) };
 
   const mode = h(
@@ -413,7 +438,7 @@ function applyJson(area: HTMLTextAreaElement, msg: HTMLElement, ctx: Ctx): void 
     msg.textContent = "Expected a JSON object";
     return;
   }
-  list(ed.kind)[ed.index as number] = parsed;
+  list(kindNow())[ed.index as number] = parsed;
   ed.dirty = true;
   ctx.toast("JSON applied. Save the draft to check it.");
   redraw();
@@ -422,17 +447,17 @@ function applyJson(area: HTMLTextAreaElement, msg: HTMLElement, ctx: Ctx): void 
 function duplicate(entity: Record<string, any>): void {
   const copy = structuredClone(entity);
   let key = `${entity.key}_copy`;
-  for (let n = 2; list(ed.kind).some((x) => x.key === key); n++) key = `${entity.key}_copy${n}`;
+  for (let n = 2; list(kindNow()).some((x) => x.key === key); n++) key = `${entity.key}_copy${n}`;
   copy.key = key;
   if (typeof copy.name === "string") copy.name = `${copy.name} (copy)`;
-  list(ed.kind).push(copy);
-  ed.index = list(ed.kind).length - 1;
+  list(kindNow()).push(copy);
+  ed.index = list(kindNow()).length - 1;
   ed.dirty = true;
   redraw();
 }
 
 function remove(): void {
-  const items = list(ed.kind);
+  const items = list(kindNow());
   const it = items[ed.index as number];
   if (!it || !window.confirm(`Delete "${it.name ?? it.key}"? Anything that refers to it will show up as a problem.`)) return;
   items.splice(ed.index as number, 1);
@@ -463,7 +488,7 @@ function localIndex(ctx: Ctx): ContentIndex {
 
 function updatePreview(): void {
   if (!previewEl || !live) return;
-  const entity = ed.index !== undefined ? list(ed.kind)[ed.index] : undefined;
+  const entity = ed.index !== undefined ? list(kindNow())[ed.index] : undefined;
   if (!entity) return mount(previewEl);
   const ix = localIndex(live);
   const note = h("p", { class: "muted small", text: "Rules text made from the effects updates when you save the draft." });

@@ -284,3 +284,50 @@ export const ENTITIES: EntityInfo[] = [
 ];
 
 export const entityInfo = (kind: EntityKind): EntityInfo => ENTITIES.find((e) => e.kind === kind) as EntityInfo;
+
+/** Engine defaults for every rule a content set can change (engine config.ts); a test keeps them in step. */
+export const RULE_DEFAULTS: Record<string, number> = {
+  startEnergy: 3,
+  energyPerTurn: 1,
+  maxEnergy: 10,
+  buyCost: 3,
+  sellValue: 1,
+  refreshCost: 1,
+  boardSize: 7,
+  handSize: 10,
+  damageCap: 15,
+  damageCapUntilTurn: 8,
+  rollCallColors: 5,
+  rollCallBuff: 1,
+  gattaiSize: 3,
+  giantEntryThreshold: 2,
+  giantSentaiScale: 1,
+  kyodaikaMultiplier: 2,
+};
+
+const RULE_HELP: Record<string, string> = {
+  startEnergy: "Energy on turn 1",
+  energyPerTurn: "Extra Energy each turn",
+  maxEnergy: "Energy never goes above this",
+  buyCost: "Price of a unit in the tavern",
+  sellValue: "Energy back when selling",
+  refreshCost: "Price of a Refresh",
+  boardSize: "Units on the board",
+  handSize: "Cards in hand",
+  damageCap: "Most damage a loss can do, early on",
+  damageCapUntilTurn: "The cap applies up to this turn",
+  rollCallColors: "Different Sentai colours Roll Call needs",
+  rollCallBuff: "Stats every Sentai gets when Roll Call fires",
+  gattaiSize: "Adjacent Gattai units a Combine needs",
+  giantEntryThreshold: "The Giant Robo joins when this many of your units (or fewer) are left",
+  giantSentaiScale: "Share of your Sentai's total ATK/HP the Giant Robo gets (1 = all of it)",
+  kyodaikaMultiplier: "Stat multiplier when a Kyodaika unit rises",
+};
+
+/** One row per rule: switch it on to override the default for this content version. */
+export const RULE_ROWS: Row[] = Object.keys(RULE_DEFAULTS).map((key) => ({
+  key,
+  field: key === "giantSentaiScale" || key === "kyodaikaMultiplier" ? { kind: "num" as const } : { kind: "int" as const, min: 0 },
+  optional: true,
+  hint: `${RULE_HELP[key] ?? ""} (default ${RULE_DEFAULTS[key]})`,
+}));

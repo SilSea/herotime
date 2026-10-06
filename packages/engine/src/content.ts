@@ -9,6 +9,8 @@ export interface ContentData {
   gauges?: readonly GaugeDef[];
   relics?: readonly RelicDef[];
   heroes?: readonly HeroDef[];
+  /** Game-wide rule numbers for this content (see ContentRules). */
+  rules?: Readonly<Record<string, number | undefined>>;
 }
 
 /** A unit the player owns. `golden` = Final Form (made by a triple). */
@@ -65,6 +67,8 @@ function* actionsOf(effects: readonly Effect[] | undefined): Generator<Action> {
 
 /** Immutable, validated snapshot of everything an admin can edit (one ContentVersion). */
 export class Content {
+  /** Game-wide rule numbers from the content set (missing ones use the engine defaults). */
+  readonly rules: Readonly<Record<string, number | undefined>>;
   readonly cards: Map<string, CardDef>;
   /** Empty = the content does not declare factions, so card faction strings are free-form. */
   readonly factions: Map<string, FactionDef>;
@@ -80,6 +84,7 @@ export class Content {
     this.gauges = index("gauge", data.gauges);
     this.relics = index("relic", data.relics);
     this.heroes = index("hero", data.heroes);
+    this.rules = { ...(data.rules ?? {}) };
 
     const problems = this.validate();
     if (problems.length > 0) throw new Error(`invalid content:\n- ${problems.join("\n- ")}`);

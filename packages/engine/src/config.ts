@@ -19,6 +19,8 @@ export interface GameConfig {
   damageCapUntilTurn: number;
   /** Safety valve so combat always terminates. */
   maxAttacksPerCombat: number;
+  /** Combat rule defaults for this content (anything missing uses DEFAULT_COMBAT_RULES). */
+  combatDefaults?: Partial<CombatRules>;
 }
 
 /**
@@ -34,7 +36,7 @@ export interface CombatRules {
   gattaiSize: number;
   /** The Giant enters once this many (or fewer) of your units are alive. */
   giantEntryThreshold: number;
-  /** Fraction of your Sentai's total ATK/HP added to the Giant's base stats. */
+  /** Share of your Sentai's total ATK/HP added to the Giant's base stats (1 = all of it). */
   giantSentaiScale: number;
   /** Stat multiplier when a KYODAIKA unit rises. */
   kyodaikaMultiplier: number;
@@ -48,9 +50,22 @@ export const DEFAULT_COMBAT_RULES: CombatRules = {
   rollCallBuff: 1,
   gattaiSize: 3,
   giantEntryThreshold: 2,
-  giantSentaiScale: 0.5,
+  giantSentaiScale: 1,
   kyodaikaMultiplier: 2,
 };
+
+/** The game config a content set's rules produce: engine defaults with the set's numbers on top. */
+export function configFromRules(rules: Readonly<Record<string, number | undefined>> = {}): GameConfig {
+  const cfg: GameConfig = { ...DEFAULT_CONFIG };
+  const combat: Partial<CombatRules> = {};
+  for (const [k, v] of Object.entries(rules)) {
+    if (v === undefined) continue;
+    if (k in DEFAULT_COMBAT_RULES) (combat as Record<string, number>)[k] = v;
+    else if (k in DEFAULT_CONFIG && typeof (DEFAULT_CONFIG as unknown as Record<string, unknown>)[k] === "number") (cfg as unknown as Record<string, number>)[k] = v;
+  }
+  if (Object.keys(combat).length > 0) cfg.combatDefaults = combat;
+  return cfg;
+}
 
 export const DEFAULT_CONFIG: GameConfig = {
   startEnergy: 3,

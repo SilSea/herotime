@@ -260,3 +260,22 @@ describe("card art upload", () => {
     expect((await fetch(server.url + "/art/0000000000000000.png")).status).toBe(404);
   });
 });
+
+describe("game rules in content", () => {
+  it("a draft can set rule numbers; bad ones are reported; published ones reach /content", async () => {
+    const d = (await call("GET", "/admin/draft", admin.token)).body;
+    const bad = structuredClone(d.data);
+    bad.rules = { buyCost: -1, boardSize: 99, nonsense: 1 };
+    const refused = await call("PUT", "/admin/draft", admin.token, { data: bad });
+    expect(refused.body.issues.join("\n")).toMatch(/rules/);
+
+    const good = structuredClone(d.data);
+    good.rules = { buyCost: 2, giantSentaiScale: 0.75 };
+    const saved = await call("PUT", "/admin/draft", admin.token, { data: good });
+    expect(saved.body.issues).toEqual([]);
+    expect((await call("POST", "/admin/publish", admin.token, { force: true })).status).toBe(201);
+    const live = (await call("GET", "/content")).body;
+    expect(live.rules).toEqual({ buyCost: 2, giantSentaiScale: 0.75 });
+    expect(server.content.latest.content.rules).toEqual({ buyCost: 2, giantSentaiScale: 0.75 });
+  });
+});

@@ -372,13 +372,20 @@ function table(ctx: Ctx, view: View): HTMLElement {
   const board = h(
     "div",
     { class: "warband" },
-    h("div", { class: "band-head" }, h("span", { class: "band-count", text: `${s.board.length}/${me.limits.boardSize}` }), gaugeBars(ctx, view), sellZone(ctx, view)),
-    h("div", { class: "board-row" }, h("div", { class: "cards board-cards" }, ...boardSlots, endDrop(ctx, view)), giantSlot(ctx, view)),
+    h("div", { class: "band-head" }, gaugeBars(ctx, view), h("span", { class: "spacer" }), h("span", { class: "band-count", title: "Units on your board", text: `${s.board.length}/${me.limits.boardSize}` }), sellZone(ctx, view)),
+    // The Giant Slot sits at the far right; the whole row is the drop target (no dashed box), with a marker where a card will land.
+    h("div", { class: "board-row" }, h("div", { class: "cards board-cards" }, ...boardSlots, h("div", { class: "drop-marker" })), giantSlot(ctx, view)),
   );
 
   const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: "Buy a card from the tavern, then drag it onto your warband." }));
 
-  board.addEventListener("dragover", allowDrop);
+  board.addEventListener("dragover", (e) => {
+    allowDrop(e);
+    placeMarker(board, e.clientX);
+  });
+  board.addEventListener("dragleave", (e) => {
+    if (!board.contains(e.relatedTarget as Node | null)) board.querySelector(".drop-marker")?.classList.remove("show");
+  });
   board.addEventListener("drop", (e) => void warbandDrop(ctx, view, board)(e));
   const bottom = bottomBar(ctx, view, hand);
   bottom.addEventListener("dragover", allowDrop);
@@ -475,6 +482,22 @@ function boardIndexAt(board: HTMLElement, x: number): number {
     const r = s.getBoundingClientRect();
     return r.left + r.width / 2 < x;
   }).length;
+}
+
+/** Move the glowing marker to where a drop at `x` would land on the board. */
+function placeMarker(board: HTMLElement, x: number): void {
+  const row = board.querySelector<HTMLElement>(".board-cards");
+  const marker = board.querySelector<HTMLElement>(".drop-marker");
+  if (!row || !marker) return;
+  const slots = [...row.querySelectorAll<HTMLElement>(":scope > .slot")];
+  const at = boardIndexAt(board, x);
+  const rowBox = row.getBoundingClientRect();
+  let left: number;
+  if (slots.length === 0) left = rowBox.width / 2;
+  else if (at >= slots.length) left = (slots[slots.length - 1] as HTMLElement).getBoundingClientRect().right - rowBox.left + 8;
+  else left = (slots[at] as HTMLElement).getBoundingClientRect().left - rowBox.left - 8;
+  marker.style.left = `${left}px`;
+  marker.classList.add("show");
 }
 
 /** The whole warband takes drops: play from hand, reorder, or buy straight from the tavern and play. */
@@ -613,10 +636,46 @@ function gaugeBars(ctx: Ctx, view: View): HTMLElement {
     ...ctx.ix.snapshot.gauges.map((g) => {
       const value = view.me.state.gauges[g.key] ?? 0;
       const t = gaugeText(g, ctx.ix.cardName);
-      const tip = [`${g.name}: ${value}/${g.max}`, "Fills:", ...t.fills.map((f) => `  ${f}`), "Rewards:", ...t.rewards.map((r) => `  ${r}`)].join("\n");
-      return h("div", { class: "gauge", title: tip }, h("span", { class: "gname", text: g.name }), h("div", { class: "gbar" }, h("div", { class: "gfill", style: `width:${(value / g.max) * 100}%` }), ...g.thresholds.map((t) => h("div", { class: "gmark", style: `left:${(t.at / g.max) * 100}%` }))), h("span", { class: "gnum", text: `${value}/${g.max}` }), h("span", { class: "ghint", text: t.short }));
+      const el = h("div", { class: "gauge" }, h("span", { class: "gname", text: g.name }), h("div", { class: "gbar" }, h("div", { class: "gfill", style: `width:${(value / g.max) * 100}%` }), ...g.thresholds.map((th) => h("div", { class: "gmark", style: `left:${(th.at / g.max) * 100}%` }))), h("span", { class: "gnum", text: `${value}/${g.max}` }), h("span", { class: "ghint", text: t.short }));
+      el.addEventListener("mouseenter", () => showGaugeCard(ctx, view, el, g));
+      el.addEventListener("mouseleave", hidePlayerCard);
+      return el;
     }),
   );
+}
+
+/** A gauge explained: how it fills, what it pays, the reward card, and cards in this match that fill it. */
+function showGaugeCard(ctx: Ctx, view: View, anchor: HTMLElement, g: (typeof ctx.ix.snapshot.gauges)[number]): void {
+  hidePlayerCard();
+  const t = gaugeText(g, ctx.ix.cardName);
+  const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
+  const shopUnits = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
+  const triggers = new Set(g.sources.map((s) => s.trigger));
+  // Units that feed it: Sentai colours for Roll Call, Henshin units for transformations.
+  const feeders = shopUnits.filter((c) => ((triggers.has("ON_ROLL_CALL") || triggers.has("ON_ROLL_CALL_WIN")) && c.colors.length > 0) || (triggers.has("HENSHIN") && c.henshin !== undefined));
+  const seenColors = new Set<string>();
+  const examples = feeders.filter((c) => {
+    const key = c.colors[0] ?? c.key;
+    if (seenColors.has(key)) return false;
+    seenColors.add(key);
+    return true;
+  }).slice(0, 5);
+  const rewardKeys = g.thresholds.flatMap((th) => th.reward.flatMap((r) => (r.type === "ADD_TO_HAND" ? [r.cardKey] : [])));
+  const value = view.me.state.gauges[g.key] ?? 0;
+  const card = h(
+    "div",
+    { class: "player-card gauge-card" },
+    h("div", { class: "pc-name", text: `${g.name} · ${value}/${g.max}` }),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "How it fills" }), ...t.fills.map((f) => h("div", { class: "pc-text", text: f }))),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "What it gives" }), ...t.rewards.map((r) => h("div", { class: "pc-text", text: r })), rewardKeys.length > 0 && h("div", { class: "gauge-examples" }, ...rewardKeys.map((k) => cardEl(ctx.ix, { key: k, small: true })))),
+    examples.length > 0 && h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "Cards in this match that fill it" }), h("div", { class: "gauge-examples" }, ...examples.map((c) => cardEl(ctx.ix, { key: c.key, small: true })))),
+    examples.length === 0 && h("div", { class: "pc-section muted", text: "No card in this match's factions fills it." }),
+  );
+  document.body.append(card);
+  playerCard = card;
+  const r = anchor.getBoundingClientRect();
+  card.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - card.offsetWidth - 8))}px`;
+  card.style.top = `${Math.min(r.bottom + 8, window.innerHeight - card.offsetHeight - 8)}px`;
 }
 
 // -------------------------------------------------------- discover / relics

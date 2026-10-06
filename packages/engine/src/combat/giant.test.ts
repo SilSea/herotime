@@ -58,22 +58,22 @@ describe("Giant Robo", () => {
 
   it("enters at once when the board is at or under the threshold", () => {
     const r = simulateCombat([sentai(2, 2), sentai(4, 4)], [f("foe", 1, 1)], 1, { ...PRE, a: { giant } });
-    expect(ofType(r.events, "GIANT_ENTER")).toMatchObject([{ type: "GIANT_ENTER", unit: "Ag", side: "A", cardKey: "zyuoh_king", atk: 13, hp: 13 }]);
+    expect(ofType(r.events, "GIANT_ENTER")).toMatchObject([{ type: "GIANT_ENTER", unit: "Ag", side: "A", cardKey: "zyuoh_king", atk: 16, hp: 16 }]);
     expect(r.survivorsA.map((s) => s.uid)).toEqual(["A0", "A1", "Ag"]);
   });
 
-  it("scales with half of the Sentai's total ATK/HP", () => {
-    // sentai total atk 2+4=6, hp 2+4=6 -> +3/+3
+  it("by default adds the Sentai's whole total ATK/HP", () => {
+    // sentai total atk 2+4=6, hp 2+4=6 -> +6/+6
     const r = simulateCombat([sentai(2, 2), sentai(4, 4)], [f("foe", 1, 1)], 1, { ...PRE, a: { giant } });
-    expect(r.survivorsA.find((s) => s.uid === "Ag")).toMatchObject({ atk: 13, hp: 13 });
+    expect(r.survivorsA.find((s) => s.uid === "Ag")).toMatchObject({ atk: 16, hp: 16 });
   });
 
-  it("scaling uses the giantSentaiScale rule", () => {
+  it("scaling uses the giantSentaiScale rule (half here)", () => {
     const r = simulateCombat([sentai(2, 2), sentai(4, 4)], [f("foe", 1, 1)], 1, {
       ...PRE,
-      a: { giant, rules: { giantSentaiScale: 1 } },
+      a: { giant, rules: { giantSentaiScale: 0.5 } },
     });
-    expect(r.survivorsA.find((s) => s.uid === "Ag")).toMatchObject({ atk: 16, hp: 16 });
+    expect(r.survivorsA.find((s) => s.uid === "Ag")).toMatchObject({ atk: 13, hp: 13 });
   });
 
   it("scaling includes the Roll Call buff", () => {
@@ -81,8 +81,8 @@ describe("Giant Robo", () => {
       ...PRE,
       a: { giant, rules: { giantEntryThreshold: 9 } },
     });
-    // each ranger 2/2 after Roll Call: total 10 -> +5
-    expect(r.survivorsA.find((s) => s.uid === "Ag")).toMatchObject({ atk: 15, hp: 15 });
+    // each ranger 2/2 after Roll Call: total 10 -> +10
+    expect(r.survivorsA.find((s) => s.uid === "Ag")).toMatchObject({ atk: 20, hp: 20 });
   });
 
   it("stays out while the board is above the threshold", () => {
