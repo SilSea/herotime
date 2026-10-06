@@ -75,3 +75,23 @@ export interface AuditEntry {
   after: unknown;
   at: string;
 }
+
+export interface SimRow {
+  key: string;
+  name: string;
+  count: number;
+  avgPlacement: number;
+  winRate: number;
+}
+
+export interface SimulationReport {
+  target: "draft" | "published";
+  matches: number;
+  requested: number;
+  expected: number;
+  avgTurns: number;
+  heroes: SimRow[];
+  cards: SimRow[];
+  factions: SimRow[];
+  neverUsed: string[];
+}

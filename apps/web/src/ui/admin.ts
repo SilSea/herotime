@@ -1,6 +1,6 @@
 import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
-import type { AdminDraft, AuditEntry, ContentSnapshot, VersionMeta } from "../protocol.js";
+import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta } from "../protocol.js";
 import { ENTITIES, entityInfo, type EntityKind, type RefKind } from "./admin-schema.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
@@ -22,14 +22,17 @@ interface EditorState {
   dirty: boolean;
   busy: boolean;
   raw: boolean;
-  panel: "edit" | "versions" | "audit";
+  panel: "edit" | "versions" | "audit" | "simulate";
+  sim?: SimulationReport;
+  simMatches: number;
+  simTarget: "draft" | "published";
   versions?: { current: number; versions: VersionMeta[] };
   audit?: AuditEntry[];
   /** Problems from the last failed publish (the draft's own issues are in draft.issues). */
   publishIssues: string[];
 }
 
-const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [] };
+const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft" };
 
 /** The element the screen was last drawn into: the app redraws and replaces it, so async work must not hold on to an old one. */
 let host: HTMLElement | undefined;
@@ -110,7 +113,7 @@ export function renderAdmin(root: HTMLElement, ctx: Ctx): void {
   const datalists = (["cards", "factions", "series", "gauges", "heroes", "relics"] as RefKind[]).map((k) => h("datalist", { id: `dl-${k}` }, ...refs(k).map((v) => h("option", { value: v }))));
 
   const panel =
-    ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : editorBody(ctx, refs);
+    ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : ed.panel === "simulate" ? simulatePanel(ctx) : editorBody(ctx, refs);
 
   mount(root, h("div", { class: "admin" }, ...datalists, toolbar(ctx), issuesBox(), panel));
 }
@@ -145,6 +148,7 @@ function toolbar(ctx: Ctx): HTMLElement {
     b("Publish", () => void publish(ctx), { title: "Make the draft the content new matches use. Matches already running are not affected." }),
     b("Discard draft", () => void discard(ctx), { danger: true, off: !d.saved && !ed.dirty }),
     b("Versions", () => void showVersions(ctx)),
+    b("Simulate", () => ((ed.panel = "simulate"), redraw()), { title: "Play bot matches on the content and see what stands out" }),
     b("History", () => void showAudit(ctx)),
     ed.panel !== "edit" && b("Back to editing", () => ((ed.panel = "edit"), redraw())),
   );
@@ -226,6 +230,52 @@ async function restore(ctx: Ctx, n: number): Promise<void> {
   ed.index = undefined;
   ed.panel = "edit";
   ctx.toast(`Version ${n} copied into the draft. Publish it to make it live.`);
+}
+
+// ----------------------------------------------------------------- simulation
+
+async function runSimulation(ctx: Ctx): Promise<void> {
+  // The server simulates the saved draft, so save pending edits first.
+  if (ed.simTarget === "draft" && ed.dirty && !(await save(ctx))) return;
+  const r = await guarded(ctx, () => ctx.api.adminSimulate(token(ctx), ed.simMatches, ed.simTarget));
+  if (r) {
+    ed.sim = r;
+    redraw(); // guarded() already redrew, before the result was stored
+  }
+}
+
+function simTable(title: string, rows: SimRow[], expected: number, limit = 15): HTMLElement {
+  const shown = rows.slice(0, limit);
+  return h(
+    "div",
+    { class: "panel sim-table" },
+    h("h3", { text: title }),
+    shown.length === 0 ? h("p", { class: "muted", text: "Nothing to show." }) : h("table", { class: "admin-table" }, h("tr", null, ...["", "Seen", "Avg place", "Win %"].map((t) => h("th", { text: t }))), ...shown.map((r) => h("tr", { class: r.avgPlacement <= expected - 0.7 ? "sim-good" : r.avgPlacement >= expected + 0.7 ? "sim-bad" : "" }, h("td", { text: r.name }), h("td", { text: String(r.count) }), h("td", { text: r.avgPlacement.toFixed(2) }), h("td", { text: `${(r.winRate * 100).toFixed(0)}%` })))),
+  );
+}
+
+function simulatePanel(ctx: Ctx): HTMLElement {
+  const matches = h("input", { type: "number", value: String(ed.simMatches), attrs: { min: "1", max: "300" } });
+  matches.addEventListener("input", () => (ed.simMatches = Math.max(1, Math.min(300, Math.trunc(matches.valueAsNumber) || 1))));
+  const target = h("select", null, h("option", { value: "draft", text: "the draft", selected: ed.simTarget === "draft" }), h("option", { value: "published", text: "what is published", selected: ed.simTarget === "published" }));
+  target.addEventListener("change", () => (ed.simTarget = target.value as "draft" | "published"));
+  const r = ed.sim;
+  const cards = r ? r.cards.filter((c) => c.count >= Math.max(3, r.matches / 4)) : [];
+  return h(
+    "div",
+    null,
+    h("div", { class: "panel" }, h("h3", { text: "Sandbox: bots play full matches" }), h("p", { class: "muted", text: "Eight bots per match. Read it as 'does anything stand out' rather than a verdict: the bots play simply. Green = places well, red = places badly, against the average." }), h("div", { class: "row" }, matches, "matches on", target, h("button", { class: "btn primary", text: ed.busy ? "Running..." : "Run", disabled: ed.busy, on: { click: () => void runSimulation(ctx) } }))),
+    r &&
+      h(
+        "div",
+        { class: "sim-grid" },
+        h("div", { class: "panel" }, h("strong", { text: `${r.matches} of ${r.requested} matches` }), h("p", { class: "muted", text: `Average place ${r.expected}. Average length ${r.avgTurns} turns (${r.target}).` }), r.neverUsed.length > 0 && h("p", { text: `Never on a final board: ${r.neverUsed.map(ctx.ix.cardName).join(", ")}` })),
+        simTable("Heroes", r.heroes, r.expected),
+        simTable("Factions (3+ units on the final board)", r.factions, r.expected),
+        simTable("Best cards", cards, r.expected),
+        simTable("Worst cards", [...cards].reverse(), r.expected),
+      ),
+  );
 }
 
 // ----------------------------------------------------------------- versions, history

@@ -375,3 +375,8 @@ input.bad { border-color: var(--bad); background: #3b1511; }
   .frow { grid-template-columns: 1fr; }
   .fhint { grid-column: 1; }
 }
+
+.sim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-top: 12px; align-items: start; }
+.sim-good td { color: #b9f58b; }
+.sim-bad td { color: #ff9a85; }
+.sim-table { min-width: 0; }

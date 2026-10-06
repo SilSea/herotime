@@ -23,6 +23,7 @@ import type { PublicUser } from "../auth/auth.service.js";
 import { JwtAuthGuard } from "../auth/auth.controller.js";
 import { CONTENT_REPOSITORY, type ContentData, type ContentRepository } from "../persistence/repositories.js";
 import { ContentInvalidError, ContentService, inspectContent, snapshotOf } from "./content.service.js";
+import { simulate } from "./simulate.js";
 
 type AuthedRequest = Request & { user?: PublicUser };
 
@@ -104,6 +105,28 @@ export class AdminController {
       if (e instanceof ContentInvalidError) throw new UnprocessableEntityException({ message: "the draft is not playable", issues: e.issues });
       throw e;
     }
+  }
+
+  /**
+   * Play bot-only matches on the working copy (or the published content) and report how heroes, cards and
+   * factions fare. Runs on this thread, so it is capped; it stops early after about ten seconds.
+   */
+  @Post("simulate")
+  simulate(@Body() body: { matches?: number; seed?: number; target?: "draft" | "published" } | undefined) {
+    const matches = Math.min(300, Math.max(1, Math.trunc(Number(body?.matches ?? 40)) || 40));
+    const seed = Number.isInteger(body?.seed) ? (body?.seed as number) : 1;
+    return this.simulateTarget(body?.target === "published" ? "published" : "draft", matches, seed);
+  }
+
+  private async simulateTarget(target: "draft" | "published", matches: number, seed: number) {
+    let content = this.content.latest.content;
+    if (target === "draft") {
+      const saved = await this.repo.loadDraft();
+      const r = inspectContent(saved?.data ?? this.content.authored());
+      if (!r.content) throw new UnprocessableEntityException({ message: "the draft is not playable, so it cannot be simulated", issues: r.issues });
+      content = r.content;
+    }
+    return { target, ...simulate(content, { matches, seed, budgetMs: 10_000 }) };
   }
 
   @Get("versions")

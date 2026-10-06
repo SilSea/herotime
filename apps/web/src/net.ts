@@ -1,4 +1,4 @@
-import type { Ack, AdminDraft, AuditEntry, AuthResult, ContentSnapshot, EventMessage, Intent, PracticeOptions, QueueStatus, VersionMeta, ViewMessage } from "./protocol.js";
+import type { Ack, AdminDraft, SimulationReport, AuditEntry, AuthResult, ContentSnapshot, EventMessage, Intent, PracticeOptions, QueueStatus, VersionMeta, ViewMessage } from "./protocol.js";
 
 /** The slice of a socket.io client we use, so tests can plug in a fake. */
 export interface SocketLike {
@@ -129,6 +129,7 @@ export class Api {
   adminPublish = (t: string, notes: string, force: boolean): Promise<{ version: number }> => this.admin(t, "POST", "publish", { notes, force });
   adminVersions = (t: string): Promise<{ current: number; versions: VersionMeta[] }> => this.admin(t, "GET", "versions");
   adminRestore = (t: string, n: number): Promise<AdminDraft> => this.admin(t, "POST", `versions/${n}/restore`, {});
+  adminSimulate = (t: string, matches: number, target: "draft" | "published"): Promise<SimulationReport> => this.admin(t, "POST", "simulate", { matches, target });
   adminAudit = (t: string): Promise<{ entries: AuditEntry[] }> => this.admin(t, "GET", "audit");
   me = (token: string): Promise<AuthResult["user"]> => this.json("/me", { headers: { authorization: `Bearer ${token}` } });
 }

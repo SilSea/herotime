@@ -171,3 +171,29 @@ describe("matches keep the content they started with", () => {
     registry.release("h1");
   });
 });
+
+describe("sandbox simulation", () => {
+  it("needs an admin, and reports on the draft or the published content", async () => {
+    expect((await call("POST", "/admin/simulate", player.token, {})).status).toBe(403);
+    const r = await call("POST", "/admin/simulate", admin.token, { matches: 3, seed: 2 });
+    expect(r.status).toBe(201);
+    expect(r.body).toMatchObject({ target: "draft", requested: 3, expected: 4.5 });
+    expect(r.body.matches).toBeGreaterThan(0);
+    expect(r.body.heroes.length).toBeGreaterThan(0);
+    const pub = await call("POST", "/admin/simulate", admin.token, { matches: 2, target: "published" });
+    expect(pub.body.target).toBe("published");
+  }, 60_000);
+
+  it("caps the number of matches and refuses a draft that is not playable", async () => {
+    const big = await call("POST", "/admin/simulate", admin.token, { matches: 100000, seed: 1 });
+    expect(big.body.requested).toBe(300);
+    const d = (await call("GET", "/admin/draft", admin.token)).body;
+    const broken = structuredClone(d.data);
+    broken.cards[0].series = "nope";
+    await call("PUT", "/admin/draft", admin.token, { data: broken });
+    const refused = await call("POST", "/admin/simulate", admin.token, {});
+    expect(refused.status).toBe(422);
+    expect(refused.body.issues.join()).toMatch(/nope/);
+    await call("POST", "/admin/draft/reset", admin.token);
+  }, 90_000);
+});
