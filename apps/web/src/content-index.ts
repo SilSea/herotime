@@ -1,5 +1,11 @@
 import type { CardDef, ContentSnapshot, FactionDef, HeroDef, RelicDef } from "./protocol.js";
 
+/** An uploaded file name becomes /art/<name>; a full URL or absolute path is used as it is. */
+export function resolveArt(art: string | undefined): string | undefined {
+  if (!art) return undefined;
+  return /^(https?:)?\//.test(art) ? art : `/art/${art}`;
+}
+
 /** Lookups over the content the server sent. Unknown keys fall back to the key itself so a stale client never crashes. */
 export class ContentIndex {
   readonly cards = new Map<string, CardDef>();
@@ -38,8 +44,14 @@ export class ContentIndex {
 
   /** Where the card's art lives, or undefined to draw the placeholder. */
   artUrl(key: string): string | undefined {
-    const art = this.cards.get(key)?.art;
-    if (!art) return undefined;
-    return /^(https?:)?\//.test(art) ? art : `/art/${art}`;
+    return resolveArt(this.cards.get(key)?.art);
+  }
+
+  heroArt(key: string | undefined): string | undefined {
+    return key ? resolveArt(this.heroes.get(key)?.art) : undefined;
+  }
+
+  relicArt(key: string): string | undefined {
+    return resolveArt(this.relics.get(key)?.art);
   }
 }

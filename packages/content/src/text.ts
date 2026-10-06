@@ -1,7 +1,7 @@
 import type { Action, CardDef, Condition, Effect, HeroDef, KeywordKey, RelicDef, Target, Trigger } from "@herotime/shared";
 
-/** Resolves a card key to a display name. */
-export type Names = (cardKey: string) => string;
+/** Resolves a card, faction or series key to its display name (unknown keys come back unchanged). */
+export type Names = (key: string) => string;
 
 const KEYWORD: Record<KeywordKey, string> = {
   GUARD: "Guard",
@@ -34,34 +34,36 @@ const TRIGGER: Record<Trigger, string> = {
 const signed = (n: number): string => (n >= 0 ? `+${n}` : `${n}`);
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
-function who(t: Target | undefined): string {
-  const filter = [t?.faction, t?.series].filter(Boolean).join(" ");
-  const f = filter ? `${filter} ` : "";
+function who(t: Target | undefined, names: Names): string {
+  // "the leftmost Ally unit" reads better than "the leftmost ally ally".
+  const filter = [t?.faction, t?.series].filter((x): x is string => !!x).map(names).join(" ");
+  const one = filter ? `${filter} unit` : "ally";
+  const many = filter ? `${filter} units` : "allies";
   switch (t?.selector ?? "SELF") {
     case "SELF": return "this";
     case "ADJACENT": return "adjacent units";
-    case "LEFTMOST_FRIENDLY": return `the leftmost ${f}ally`;
-    case "RIGHTMOST_FRIENDLY": return `the rightmost ${f}ally`;
-    case "RANDOM_FRIENDLY": return `another random ${f}ally`;
-    case "ALL_FRIENDLY": return `all ${f}allies`;
+    case "LEFTMOST_FRIENDLY": return `the leftmost ${one}`;
+    case "RIGHTMOST_FRIENDLY": return `the rightmost ${one}`;
+    case "RANDOM_FRIENDLY": return `another random ${one}`;
+    case "ALL_FRIENDLY": return `all ${many}`;
     case "LEFTMOST_ENEMY": return "the leftmost enemy";
     case "RANDOM_ENEMY": return "a random enemy";
     case "ALL_ENEMY": return "all enemies";
   }
 }
 
-function condition(c: Condition | undefined): string {
+function condition(c: Condition | undefined, names: Names): string {
   if (!c) return "";
   switch (c.type) {
     case "TEAM_UP_COLORS_GTE": return `If you have ${c.value}+ ranger colors, `;
-    case "FACTION_COUNT_GTE": return `If you have ${c.value}+ ${c.faction} units, `;
-    case "SERIES_COUNT_GTE": return `If you have ${c.value}+ ${c.series} units, `;
+    case "FACTION_COUNT_GTE": return `If you have ${c.value}+ ${names(c.faction)} units, `;
+    case "SERIES_COUNT_GTE": return `If you have ${c.value}+ ${names(c.series)} units, `;
     case "ENERGY_GTE": return `If you have ${c.value}+ Energy, `;
   }
 }
 
 function action(a: Action, target: Target | undefined, names: Names): string {
-  const t = who(target);
+  const t = who(target, names);
   switch (a.type) {
     case "BUFF": {
       const stats = `${signed(a.atk)}/${signed(a.hp)}`;
@@ -74,19 +76,52 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "DESTROY": return `destroy ${t}`;
     case "GAIN_ENERGY": return `gain ${a.amount} Energy`;
     case "GAUGE_ADD": return `add ${a.amount} to the ${a.gauge} gauge`;
-    case "MODIFY_RULE": {
-      const verb = a.op === "SET" ? "set to" : a.op === "ADD" ? "change by" : "multiply by";
-      return `rule ${a.rule}: ${verb} ${a.value}`;
-    }
+    case "MODIFY_RULE": return ruleText(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `add ${names(a.cardKey)} to your hand`;
     case "DISCOVER_GIANT": return "discover a Giant Robo";
   }
 }
 
+/** How players read the rules that relics, heroes and cards can change. */
+const RULE_LABEL: Record<string, string> = {
+  startEnergy: "your starting Energy",
+  energyPerTurn: "the Energy you gain each turn",
+  maxEnergy: "your maximum Energy",
+  buyCost: "the cost to buy a unit",
+  sellValue: "the Energy you get for selling",
+  refreshCost: "the cost to Refresh",
+  boardSize: "your board size",
+  handSize: "your hand size",
+  maxRank: "your maximum rank",
+  freeRefreshesPerTurn: "your free Refreshes each turn",
+  rollCallColors: "the colours Roll Call needs",
+  rollCallBuff: "the Roll Call bonus",
+  gattaiSize: "the units Gattai needs",
+  giantEntryThreshold: "the units left when your Giant Robo joins",
+  giantSentaiScale: "the share of Sentai stats your Giant Robo gets",
+  kyodaikaMultiplier: "the Kyodaika stat multiplier",
+};
+
+export function ruleText(rule: string, op: "SET" | "ADD" | "MUL", value: number): string {
+  if (op === "SET") {
+    switch (rule) {
+      case "freeRefreshesPerTurn": return `get ${value} free Refresh${value === 1 ? "" : "es"} each turn`;
+      case "gattaiSize": return `Gattai needs only ${value} adjacent units`;
+      case "rollCallColors": return `Roll Call needs only ${value} colours`;
+      case "giantEntryThreshold": return `your Giant Robo joins when ${value} or fewer of your units are left`;
+      case "kyodaikaMultiplier": return `Kyodaika units return with x${value} stats`;
+    }
+  }
+  const label = RULE_LABEL[rule] ?? `rule "${rule}"`;
+  if (op === "SET") return `${label} becomes ${value}`;
+  if (op === "ADD") return `${label} ${value >= 0 ? "+" : ""}${value}`;
+  return `${label} x${value}`;
+}
+
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   const body = e.actions.map((a) => action(a, e.target, names)).join(", then ");
-  const text = `${trigger}: ${condition(e.condition)}${body}.`;
+  const text = `${trigger}: ${condition(e.condition, names)}${body}.`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;
 }
 
@@ -106,6 +141,7 @@ export function heroText(h: HeroDef, names: Names): string {
   const p = h.power;
   if (!p) return h.armor > 0 ? `${h.armor} armor.` : "";
   const mode = p.mode === "ACTIVE" ? `Hero Power (${p.cost ?? 0} Energy, once per turn)` : p.mode === "ONCE" ? `Hero Power (${p.cost ?? 0} Energy, once per game)` : "Passive";
-  const body = p.effects.map((e) => cap(effectText(e, names).replace(/^[^:]+: /, ""))).join(" ");
+  // "When used" and "When acquired" go without saying for a hero power; any other trigger (each turn, combat) is kept.
+  const body = p.effects.map((e) => { const t = effectText(e, names); return cap(e.trigger === "ON_USE" || e.trigger === "ON_ACQUIRE" ? t.replace(/^[^:]+: /, "") : t); }).join(" ");
   return `${mode}: ${body}${h.armor > 0 ? ` ${h.armor} armor.` : ""}`;
 }

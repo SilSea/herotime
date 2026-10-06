@@ -1,4 +1,5 @@
 import { stars } from "../format.js";
+import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
 import { h, mount } from "./dom.js";
@@ -26,7 +27,7 @@ export function renderLibrary(root: HTMLElement, ctx: Ctx): void {
       if (cards.length === 0) list.append(h("p", { class: "muted", text: "No cards match." }));
     } else if (tab === "heroes") {
       for (const hero of ix.heroes.values()) {
-        list.append(h("div", { class: "info-card" }, h("h3", { text: hero.name }), h("p", { text: hero.text || "No hero power." }), hero.armor > 0 && h("p", { class: "muted", text: `${hero.armor} armor` })));
+        list.append(h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(hero.key), hero.name), h("h3", { text: hero.name }), h("p", { text: hero.text || "No hero power." }), hero.armor > 0 && h("p", { class: "muted", text: `${hero.armor} armor` })));
       }
     } else {
       for (const r of ix.relics.values()) {
@@ -34,6 +35,7 @@ export function renderLibrary(root: HTMLElement, ctx: Ctx): void {
           h(
             "div",
             { class: "info-card" },
+            artBox("relic-art", ix.relicArt(r.key), r.name),
             h("h3", { text: r.name }),
             h("p", { class: "muted", text: `${r.tier === "LESSER" ? "Lesser" : "Greater"} relic - ${r.cost} Energy${r.factions.length ? ` - ${r.factions.map(ix.factionName).join(", ")}` : ""}` }),
             h("p", { text: r.text }),

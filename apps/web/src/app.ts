@@ -224,7 +224,8 @@ export function startApp(root: HTMLElement): void {
     const key = `${s.matchId}:${s.view.turn}:${s.view.phase}`;
     if (key === bannerKey) return;
     bannerKey = key;
-    const text = s.view.phase === "RECRUIT" ? `Turn ${s.view.turn}` : s.view.phase === "BATTLE" ? "Battle!" : s.view.phase === "HERO_SELECT" ? "Choose your hero" : "";
+    // No banner for battles: the replay opens at that moment and would be covered by it.
+    const text = s.view.phase === "RECRUIT" ? `Turn ${s.view.turn}` : s.view.phase === "HERO_SELECT" ? "Choose your hero" : "";
     if (!text) return;
     const el = h("div", { class: "banner", text });
     document.body.append(el);

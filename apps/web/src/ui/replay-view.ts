@@ -105,7 +105,7 @@ export class ReplayView {
 
   private fighter(f: Fighter, flags: { attacker: boolean; target: boolean; focus: boolean; dying: boolean; fresh: boolean }): HTMLElement {
     const classes = [flags.attacker ? "attacking" : "", flags.target ? "hit" : "", flags.focus && !flags.attacker && !flags.target ? "focus" : "", flags.dying ? "dying" : "", flags.fresh ? "entering" : "", f.ghost ? "ghost" : "", f.huge ? "huge" : ""];
-    return cardEl(this.ix, { key: f.cardKey, atk: f.atk, hp: Math.max(0, f.hp), small: true, hideText: true, barrier: f.barrier, extraKeywords: f.keywords, classes });
+    return cardEl(this.ix, { key: f.cardKey, atk: f.atk, hp: Math.max(0, f.hp), small: true, minion: true, hideText: true, barrier: f.barrier, extraKeywords: f.keywords, classes });
   }
 
   private draw(state: ReplayState, focus: readonly string[], step: Step | undefined, dying: readonly string[] = []): void {

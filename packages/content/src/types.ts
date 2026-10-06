@@ -13,7 +13,8 @@ export interface ContentSetData {
 
 /** Fill in rules text for anything whose author did not write any. */
 export function withGeneratedText(set: ContentSetData): ContentSetData {
-  const byKey = new Map(set.cards.map((c) => [c.key, c.name]));
+  // Cards first, then factions and series, so a target filter reads "Ally units", not "ally units".
+  const byKey = new Map<string, string>([...set.series.map((s) => [s.key, s.name] as const), ...set.factions.map((f) => [f.key, f.name] as const), ...set.cards.map((c) => [c.key, c.name] as const)]);
   const names = (key: string): string => byKey.get(key) ?? key;
   return {
     ...set,

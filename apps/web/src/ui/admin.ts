@@ -2,6 +2,7 @@ import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
 import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta } from "../protocol.js";
 import { ENTITIES, entityInfo, type EntityKind, type RefKind } from "./admin-schema.js";
+import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
 import { h, mount } from "./dom.js";
@@ -469,10 +470,10 @@ function updatePreview(): void {
   if (ed.kind === "cards") {
     return mount(previewEl, h("h3", { text: "Preview" }), cardEl(ix, { key: String(entity.key) }), h("div", { class: "preview-small" }, cardEl(ix, { key: String(entity.key), small: true })), note);
   }
-  if (ed.kind === "heroes") return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, h("h3", { text: String(entity.name ?? "") }), h("p", { text: ix.heroes.get(String(entity.key))?.text || "No hero power." }), Number(entity.armor) > 0 && h("p", { class: "muted", text: `${entity.armor} armor` })), note);
+  if (ed.kind === "heroes") return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(String(entity.key)), String(entity.name ?? "")), h("h3", { text: String(entity.name ?? "") }), h("p", { text: ix.heroes.get(String(entity.key))?.text || "No hero power." }), Number(entity.armor) > 0 && h("p", { class: "muted", text: `${entity.armor} armor` })), note);
   if (ed.kind === "relics") {
     const r = ix.relics.get(String(entity.key));
-    return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, h("h3", { text: String(entity.name ?? "") }), h("p", { class: "muted", text: `${entity.tier === "GREATER" ? "Greater" : "Lesser"} relic - ${entity.cost} Energy` }), h("p", { text: r?.text ?? "" })), note);
+    return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, artBox("relic-art", ix.relicArt(String(entity.key)), String(entity.name ?? "")), h("h3", { text: String(entity.name ?? "") }), h("p", { class: "muted", text: `${entity.tier === "GREATER" ? "Greater" : "Lesser"} relic - ${entity.cost} Energy` }), h("p", { text: r?.text ?? "" })), note);
   }
   if (ed.kind === "factions") return mount(previewEl, h("h3", { text: "Preview" }), h("span", { class: "chip", style: `--c:${String(entity.color ?? "#888")}`, text: String(entity.name ?? entity.key) }));
   mount(previewEl);

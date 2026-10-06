@@ -84,47 +84,98 @@ input, select, textarea { background: #140c05; border: 1px solid var(--line); bo
 .info-card { background: linear-gradient(var(--panel-2), var(--panel)); border: 2px solid #6b4d2c; border-radius: 10px; padding: 10px 14px; width: 280px; }
 .filters { margin-top: 8px; }
 
-/* ---- cards: parchment frame, oval art, name ribbon, gem stats ---- */
+/* ---- cards: ornate frame, oval art, notched ribbon, tier shield, gem stats ---- */
 .card {
   --w: 150px;
+  --frame: #c9a24a;
   position: relative; width: var(--w); height: calc(var(--w) * 1.42); flex: none;
-  background: linear-gradient(160deg, #f3e6bf, var(--parch) 40%, var(--parch-dark));
-  border: 3px solid var(--c, #8a7a5a); border-radius: 14px; color: var(--ink);
-  padding: 5px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px;
-  box-shadow: 0 3px 8px #000a, inset 0 0 0 1px #fff7, inset 0 -12px 18px #0002;
-  transition: transform .14s ease, box-shadow .14s ease; user-select: none;
+  border-radius: 16px; color: var(--ink); user-select: none;
+  padding: 6px 7px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  /* outer gold bevel, a dark line, then the faction colour around a parchment face */
+  background:
+    linear-gradient(165deg, #f6ebc8 0%, var(--parch) 38%, var(--parch-dark) 100%) padding-box,
+    linear-gradient(160deg, color-mix(in srgb, var(--c, #8a7a5a) 70%, white), var(--c, #8a7a5a) 45%, color-mix(in srgb, var(--c, #8a7a5a) 55%, black)) border-box;
+  border: 4px solid transparent;
+  box-shadow: 0 0 0 2px #2a1a0a, 0 0 0 4px var(--frame), 0 6px 14px #000c, inset 0 0 0 1px #fff8, inset 0 -14px 22px #0002;
+  transition: transform .14s ease, box-shadow .14s ease;
 }
 .card.clickable { cursor: pointer; }
-.card.clickable:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 10px 18px #000b, 0 0 0 2px var(--gold); z-index: 5; }
-.card.small { --w: 104px; font-size: 10px; padding: 4px 4px 6px; border-width: 2px; border-radius: 11px; }
-.card.golden { border-color: #ffd54f; box-shadow: 0 0 14px 3px #ffd54faa, 0 3px 8px #000a, inset 0 0 22px #ffd54f66; background: linear-gradient(160deg, #fff4c2, #ffe18a 45%, #e8b94a); }
+.card.clickable:hover { transform: translateY(-8px) scale(1.05); box-shadow: 0 0 0 2px #2a1a0a, 0 0 0 4px #ffe58a, 0 0 22px 6px #ffd54f88, 0 12px 20px #000c; z-index: 5; }
+.card.small { --w: 104px; font-size: 10px; padding: 4px 4px 7px; border-width: 3px; border-radius: 12px; box-shadow: 0 0 0 1px #2a1a0a, 0 0 0 3px var(--frame), 0 4px 10px #000b, inset 0 0 0 1px #fff8; }
+.card.golden { --frame: #ffd54f; animation: golden-glow 2.4s ease-in-out infinite; background:
+    linear-gradient(165deg, #fff6cf 0%, #ffe08a 45%, #e3b13e 100%) padding-box,
+    linear-gradient(120deg, #fff2b0, #e0a82e 30%, #fff6c8 50%, #c88a12 70%, #fff2b0) border-box; }
+@keyframes golden-glow { 50% { box-shadow: 0 0 0 2px #2a1a0a, 0 0 0 4px #ffe58a, 0 0 22px 6px #ffd54fbb, 0 6px 14px #000c; } }
 .card.gear { border-style: dashed; }
-.card.giant { box-shadow: 0 0 14px var(--c), 0 3px 8px #000a; }
-.card.unaffordable { filter: saturate(.55) brightness(.78); }
+.card.giant { --frame: #9fb6c9; }
+.card.unaffordable { filter: saturate(.5) brightness(.75); }
+
 .card .art {
-  width: 82%; height: 40%; margin-top: 3px; border-radius: 50% / 46%;
+  width: 84%; height: 42%; margin-top: 4px; border-radius: 50% / 46%; flex: none;
   background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 75%, white), var(--c) 60%, #1a0f05) center/cover;
-  border: 2px solid #3a2815; box-shadow: inset 0 0 10px #0009, 0 1px 0 #fff8;
+  border: 3px solid #3a2815; box-shadow: 0 0 0 2px var(--frame), inset 0 0 14px #000a, 0 2px 4px #0008;
   display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 26px; color: #fffd; text-shadow: 0 2px 3px #000a; overflow: hidden;
 }
-.card.small .art { font-size: 18px; height: 46%; }
-.card .name { width: 108%; text-align: center; font-weight: 800; font-size: 12px; line-height: 1.05; padding: 2px 4px; margin-top: 1px; color: #fff; background: linear-gradient(#5a3d22, #2f1d0d); border-top: 1px solid #8a6a40; border-bottom: 1px solid #0007; text-shadow: 0 1px 1px #000; }
-.card.small .name { font-size: 10px; padding: 1px 2px; }
-.card .rank { color: #b8860b; font-size: 11px; letter-spacing: 1px; line-height: 1; text-shadow: 0 1px 0 #fff8; }
-.card .colors { display: flex; gap: 3px; justify-content: center; }
-.card .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid #0007; }
-.card .kws { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
-.card .kw { font-size: 9px; font-weight: 700; background: #3a2815; color: #f6e7c0; border-radius: 7px; padding: 0 5px; }
-.card .text { font-size: 10.5px; line-height: 1.15; text-align: center; color: var(--ink); flex: 1; padding: 0 12px; overflow: hidden; }
+.card.small .art { font-size: 18px; height: 46%; border-width: 2px; }
+/* the name sits on a ribbon with notched ends */
+.card .name {
+  position: relative; z-index: 1; width: 112%; margin-top: -10px; text-align: center; font-weight: 800; font-size: 12px; line-height: 1.05;
+  padding: 4px 12px; color: #fff; text-shadow: 0 1px 0 #000, 0 0 3px #000;
+  background: linear-gradient(#6b4626, #3a2210 60%, #2a170a); box-shadow: 0 2px 4px #0009;
+  clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
+}
+.card.small .name { font-size: 10px; padding: 2px 9px; margin-top: -8px; }
+/* rank: a small shield on top of the frame */
+.card .rank {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 3;
+  width: 26px; height: 30px; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(#ffe38a, #c8901a); color: #3a2400; font-weight: 900; font-size: 13px; text-shadow: 0 1px 0 #fff8;
+  clip-path: polygon(50% 100%, 0 70%, 0 0, 100% 0, 100% 70%); filter: drop-shadow(0 2px 2px #000a);
+}
+.card.small .rank { width: 20px; height: 24px; font-size: 11px; top: -10px; }
+.card .colors { display: flex; gap: 3px; justify-content: center; margin-top: 2px; }
+.card .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid #0007; box-shadow: 0 0 3px #0006; }
+.card .kws { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; margin-top: 1px; }
+.card .kw { font-size: 9px; font-weight: 800; background: linear-gradient(#4a3018, #2a170a); color: #f6e7c0; border-radius: 7px; padding: 0 5px; }
+.card .text { font-size: 10.5px; line-height: 1.15; text-align: center; color: var(--ink); flex: 1; margin: 2px 6px 0; padding: 3px 8px; overflow: hidden; background: #fff4; border-radius: 6px; box-shadow: inset 0 1px 3px #0003; }
 .card.small .text { display: none; }
+.card .icons { display: none; }
+.card .faction-plate { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 9px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: #fff; background: linear-gradient(var(--c), color-mix(in srgb, var(--c) 55%, black)); border: 1px solid #2a1a0a; border-radius: 8px; padding: 0 8px; white-space: nowrap; box-shadow: 0 2px 3px #0008; }
+.card.small .faction-plate { display: none; }
 .card .stats { display: contents; }
-.card .stats span { position: absolute; bottom: -9px; min-width: 32px; height: 32px; padding: 0 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; color: #fff; text-shadow: 0 2px 0 #000, 0 0 3px #000, 0 0 3px #000; border-radius: 50%; border: 2px solid #2a1a0a; box-shadow: 0 2px 4px #000a, inset 0 2px 3px #fff8; }
+.card .stats span { position: absolute; bottom: -10px; z-index: 3; min-width: 34px; height: 34px; padding: 0 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 19px; color: #fff; text-shadow: 0 2px 0 #000, 0 0 3px #000, 0 0 3px #000; border: 2px solid #2a1a0a; box-shadow: 0 2px 4px #000a, inset 0 2px 3px #fff8; }
 .card.small .stats span { min-width: 26px; height: 26px; font-size: 14px; bottom: -8px; }
-.card .atk { left: -9px; background: radial-gradient(circle at 35% 30%, #ffe27a, var(--atk) 60%, #a87400); }
-.card .hp { right: -9px; background: radial-gradient(circle at 35% 30%, #ff8a73, var(--hp) 60%, #7d140c); border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%; }
+/* attack: a gold gem; health: a red drop */
+.card .atk { left: -10px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe27a, var(--atk) 60%, #a87400); }
+.card .hp { right: -10px; background: radial-gradient(circle at 35% 30%, #ff8a73, var(--hp) 60%, #7d140c); border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%; }
 .card .stats.gear-label { display: flex; position: absolute; bottom: 4px; left: 0; right: 0; justify-content: center; color: #8a5a00; font-weight: 800; letter-spacing: 2px; }
-.card .cost { position: absolute; top: -10px; left: -10px; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe89a, var(--coin) 55%, #b8860b); color: #3a2400; border: 2px solid #7a5200; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; box-shadow: 0 2px 4px #000a; z-index: 2; }
-.card.has-barrier::after { content: ""; position: absolute; inset: -6px; border: 2px solid #7fd8ff; border-radius: 18px; box-shadow: 0 0 12px #7fd8ff, inset 0 0 12px #7fd8ff66; pointer-events: none; }
+.card .cost { position: absolute; top: -12px; left: -12px; width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe89a, var(--coin) 55%, #b8860b); color: #3a2400; border: 2px solid #7a5200; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; box-shadow: 0 2px 4px #000a, inset 0 1px 2px #fff9; z-index: 4; }
+.card.has-barrier::after, .card.minion.kw-barrier::after { content: ""; position: absolute; inset: -7px; border: 2px solid #ffe58a; border-radius: inherit; box-shadow: 0 0 14px #ffd54f, inset 0 0 14px #ffd54f88; background: radial-gradient(circle, transparent 60%, #ffe58a33); pointer-events: none; }
+
+/* ---- units in play: oval portraits, like minions on a Battlegrounds board */
+.card.minion {
+  --w: 96px;
+  height: calc(var(--w) * 1.25); padding: 0; border-radius: 50% / 46%; border-width: 4px; overflow: visible;
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 75%, white), var(--c) 60%, #1a0f05) padding-box,
+    linear-gradient(160deg, #f2d27a, #8a6418 50%, #f2d27a) border-box;
+  box-shadow: 0 0 0 2px #2a1a0a, 0 6px 12px #000c;
+}
+.card.minion .art { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: 0; border-radius: inherit; box-shadow: inset 0 0 18px #000c; }
+.card.minion .name, .card.minion .rank, .card.minion .colors, .card.minion .kws, .card.minion .text, .card.minion .faction-plate { display: none; }
+.card.minion .icons { display: flex; position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); gap: 2px; z-index: 2; }
+.card.minion .icon { min-width: 18px; height: 18px; padding: 0 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; color: #fff; background: radial-gradient(circle at 35% 30%, #5a3d22, #1c1006); border: 1px solid #c9a24a; border-radius: 9px; box-shadow: 0 1px 2px #000a; }
+.card.minion .stats span { bottom: 2px; }
+.card.minion .atk { left: -12px; }
+.card.minion .hp { right: -12px; }
+.card.minion.golden { background:
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 75%, white), var(--c) 60%, #1a0f05) padding-box,
+    linear-gradient(120deg, #fff2b0, #e0a82e 30%, #fff6c8 50%, #c88a12 70%, #fff2b0) border-box; }
+/* Guard: a heavy stone rim the enemy has to get through first */
+.card.minion.kw-guard { box-shadow: 0 0 0 2px #2a1a0a, 0 0 0 7px #8d97a3, 0 0 0 9px #2b3036, 0 6px 12px #000c; }
+.card.minion.kw-kyodaika .art { filter: saturate(1.2) contrast(1.05); }
+.card.minion.huge { transform: scale(1.15); }
+.card.minion.clickable:hover { transform: translateY(-6px) scale(1.06); }
 
 /* ---- match ---- */
 .match { display: flex; flex-direction: column; height: 100vh; position: relative; }
@@ -179,6 +230,7 @@ input, select, textarea { background: #140c05; border: 1px solid var(--line); bo
 .board-row { display: flex; gap: 18px; align-items: center; justify-content: center; }
 .board-cards { display: flex; gap: 14px; flex-wrap: nowrap; align-items: center; justify-content: center; min-height: 160px; padding: 10px 6px; }
 .board-cards .card { --w: 106px; }
+.board-cards .card.minion { --w: 92px; }
 .slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .slot[draggable="true"] { cursor: grab; }
 .slot-actions { display: none; position: absolute; left: 50%; bottom: -16px; transform: translateX(-50%); gap: 3px; z-index: 6; white-space: nowrap; }
@@ -190,6 +242,7 @@ body.dragging .end-drop, body.dragging .sell-zone { border-color: var(--gold); c
 .sell-zone { border: 2px dashed #ffffff44; border-radius: 12px; padding: 3px 14px; color: #ffffffaa; font-size: 12px; margin-left: auto; }
 .giant-slot { min-width: 112px; text-align: center; padding-left: 12px; border-left: 2px solid #0004; }
 .giant-slot .card { --w: 100px; }
+.giant-slot .card.minion { --w: 96px; }
 .empty-giant { height: 142px; width: 100px; border: 2px dashed #ffffff44; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ffffff77; font-size: 12px; }
 .gauges { display: flex; gap: 14px; }
 .gauge { display: flex; gap: 6px; align-items: center; font-size: 12px; }
@@ -265,6 +318,7 @@ body.dragging .end-drop, body.dragging .sell-zone { border-color: var(--gold); c
 .replay-field { display: flex; flex-direction: column; gap: 6px; min-height: 380px; justify-content: center; }
 .replay-row { display: flex; gap: 12px; justify-content: center; min-height: 170px; align-items: center; flex-wrap: wrap; }
 .replay-row .card { --w: 104px; }
+.replay-row .card.minion { --w: 90px; }
 .vs { text-align: center; color: #ffffffaa; letter-spacing: 6px; font-family: Georgia, serif; font-weight: 700; }
 .replay-log { height: 90px; overflow: auto; background: #140c05cc; border-radius: 6px; padding: 6px; font-size: 12px; margin: 8px 0; }
 .replay-controls { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
@@ -385,3 +439,12 @@ input.bad { border-color: var(--bad); background: #3b1511; }
 .upload-row input[type=file] { font-size: 12px; max-width: 420px; }
 
 .place-win { color: var(--gold); font-weight: 800; }
+
+/* ---- hero and relic art (initials when there is no picture) */
+.portrait.has-art, .hero-art.has-art, .relic-art.has-art { background-size: cover; background-position: center; }
+.hero-art, .relic-art { display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 2px solid #3a2815; box-shadow: inset 0 0 12px #0008; background: radial-gradient(circle at 35% 30%, #8a6a40, #3a2815 75%); color: #fbe9b5; font-family: Georgia, serif; font-weight: 800; text-shadow: 0 2px 3px #000; margin-bottom: 8px; }
+.hero-art { height: 150px; font-size: 48px; }
+.relic-art { height: 90px; font-size: 32px; background: radial-gradient(circle at 35% 30%, #a98be8, #3b2a66 75%); }
+.info-card .hero-art { height: 120px; }
+.art-initials { pointer-events: none; }
+.relic-icon { display: inline-block; width: 16px; height: 16px; border-radius: 4px; background-size: cover; background-position: center; vertical-align: -3px; margin-right: 4px; }

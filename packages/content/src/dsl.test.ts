@@ -41,7 +41,7 @@ describe("rules text", () => {
   it.each([
     [d.lastStand(d.summon("tok", 2)), "Last Stand: summon 2 Tokens."],
     [d.startOfCombat(d.buff(2, 2)), "Start of combat: give this +2/+2."],
-    [d.startOfCombat(d.buff(1, 0, true), { target: d.allAllies({ faction: "rider" }) }), "give all rider allies +1/+0 permanently"],
+    [d.startOfCombat(d.buff(1, 0, true), { target: d.allAllies({ faction: "rider" }) }), "give all rider units +1/+0 permanently"],
     [d.henshinCall(d.energy(2)), "Henshin Call: gain 2 Energy."],
     [d.endOfTurn(d.buff(1, 1), { condition: d.energyAtLeast(1), target: d.randomAlly() }), "End of turn: If you have 1+ Energy, give another random ally +1/+1."],
     [d.onAttack(d.damage(3), { target: d.randomFoe }), "When this attacks: deal 3 damage to a random enemy."],
@@ -54,14 +54,17 @@ describe("rules text", () => {
     [d.startOfCombat(d.buff(1, 1), { condition: d.seriesCount("s", 2) }), "If you have 2+ s units"],
     [d.henshinCall(d.toHand("tok")), "add Token to your hand"],
     [d.henshinCall(d.gauge("mecha", 2)), "add 2 to the mecha gauge"],
-    [d.player("ON_ACQUIRE", d.rule("rollCallColors", "SET", 4)), "rule rollCallColors: set to 4"],
-    [d.player("ON_ACQUIRE", d.rule("buyCost", "ADD", -1)), "change by -1"],
-    [d.player("ON_ACQUIRE", d.rule("kyodaikaMultiplier", "MUL", 2)), "multiply by 2"],
+    [d.player("ON_ACQUIRE", d.rule("rollCallColors", "SET", 4)), "Roll Call needs only 4 colours"],
+    [d.player("ON_ACQUIRE", d.rule("buyCost", "ADD", -1)), "the cost to buy a unit -1"],
+    [d.player("ON_ACQUIRE", d.rule("kyodaikaMultiplier", "MUL", 2)), "the Kyodaika stat multiplier x2"],
+    [d.player("ON_ACQUIRE", d.rule("freeRefreshesPerTurn", "SET", 1)), "get 1 free Refresh each turn"],
+    [d.player("ON_ACQUIRE", d.rule("gattaiSize", "SET", 2)), "Gattai needs only 2 adjacent units"],
+    [d.player("ON_ACQUIRE", d.rule("somethingNew", "SET", 3)), 'rule "somethingNew" becomes 3'],
     [d.player("ON_PLAY", d.discoverGiant()), "discover a Giant Robo"],
     [d.player("ON_TURN_START", d.summon("tok")), "At the start of each turn: summon Token."],
     [d.startOfCombat(d.buff(1, 1), { golden: 3 }), "(Golden: x3)"],
     [d.startOfCombat([d.buff(1, 1), d.give("RAPID")], { target: d.adjacent }), "give adjacent units +1/+1, then give adjacent units Rapid"],
-    [d.startOfCombat(d.buff(1, 1), { target: d.rightmost({ series: "q" }) }), "the rightmost q ally"],
+    [d.startOfCombat(d.buff(1, 1), { target: d.rightmost({ series: "q" }) }), "the rightmost q unit"],
   ])("%#", (effect, expected) => {
     expect(t(effect)).toContain(expected);
   });
@@ -81,6 +84,7 @@ describe("rules text", () => {
     expect(heroText(active, names)).toBe("Hero Power (2 Energy, once per turn): Give the leftmost ally +2/+2. 3 armor.");
     expect(heroText(d.hero("h", "H", { power: { mode: "ONCE", effects: [d.player("ON_USE", d.energy(1))] } }), names)).toMatch(/once per game/);
     expect(heroText(d.hero("h", "H", { power: { mode: "PASSIVE", effects: [d.player("ON_ACQUIRE", d.energy(1))] } }), names)).toMatch(/^Passive: /);
+    expect(heroText(d.hero("h", "H", { power: { mode: "PASSIVE", effects: [d.player("ON_TURN_START", d.summon("tok"))] } }), names)).toBe("Passive: At the start of each turn: summon Token.");
     expect(heroText(d.hero("h", "H", { armor: 4 }), names)).toBe("4 armor.");
     expect(heroText(d.hero("h", "H"), names)).toBe("");
   });

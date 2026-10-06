@@ -4,6 +4,7 @@ import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
+import { artBox, bg, initialsOf } from "./art.js";
 import { h, mount, type Child } from "./dom.js";
 
 type View = NonNullable<AppState["view"]>;
@@ -84,17 +85,13 @@ function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLE
   return h(
     "div",
     { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}`, title: tip },
-    h("div", { class: "portrait small-portrait" }, h("span", { text: initialsOf(hero) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
+    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
     h("div", { class: "pname" }, h("span", { class: "pname-text", text: p.name }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) })),
     h("div", { class: "pmeta", text: stars(p.rank) }),
     p.ready && p.alive && !p.isBot && h("span", { class: "ready-mark", text: "ready" }),
   );
 }
 
-const initialsOf = (name: string): string => {
-  const words = name.split(/[\s_-]+/).filter(Boolean);
-  return ((words[0]?.[0] ?? "?") + (words[1]?.[0] ?? "")).toUpperCase();
-};
 
 // ------------------------------------------------------------ log drawer
 
@@ -140,7 +137,7 @@ function heroSelect(ctx: Ctx, view: View): HTMLElement {
     h("h2", { text: chosen ? "Waiting for the other players..." : "Choose your hero" }),
     h("div", { class: "hero-options" }, ...view.me.heroOptions.map((key, i) => {
       const def = ctx.ix.heroes.get(key);
-      return h("div", { class: `hero-card ${chosen === key ? "picked" : ""} ${chosen ? "locked" : ""}`, on: { click: () => !chosen && void ctx.act({ type: "CHOOSE_HERO", index: i }) } }, h("h3", { text: def?.name ?? key }), h("p", { text: def?.text || "No hero power." }), (def?.armor ?? 0) > 0 && h("p", { class: "muted", text: `${def?.armor} armor` }));
+      return h("div", { class: `hero-card ${chosen === key ? "picked" : ""} ${chosen ? "locked" : ""}`, on: { click: () => !chosen && void ctx.act({ type: "CHOOSE_HERO", index: i }) } }, artBox("hero-art", ctx.ix.heroArt(key), def?.name ?? key), h("h3", { text: def?.name ?? key }), h("p", { text: def?.text || "No hero power." }), (def?.armor ?? 0) > 0 && h("p", { class: "muted", text: `${def?.armor} armor` }));
     })),
     view.factions.length > 0 && h("p", { class: "muted", text: `Factions this game: ${view.factions.map(ctx.ix.factionName).join(", ")}` }),
   );
@@ -221,11 +218,11 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
   const portrait = h(
     "div",
     { class: "hero-box" },
-    h("div", { class: "portrait", title: `${name}${heroDef?.text ? `\n${heroDef.text}` : ""}` }, h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
+    h("div", { class: `portrait ${ctx.ix.heroArt(hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(hero)), title: `${name}${heroDef?.text ? `\n${heroDef.text}` : ""}` }, !ctx.ix.heroArt(hero) && h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
     h("div", { class: "hero-name", text: name }),
     power && power.mode !== "PASSIVE" && h("button", { class: "hero-power", disabled: !power.usable, title: heroDef?.text ?? "Hero power", on: { click: () => void ctx.act({ type: "HERO_POWER" }) } }, h("span", { text: "Power" }), h("span", { class: "coin", text: String(power.cost) })),
     power && power.mode === "PASSIVE" && h("div", { class: "passive", text: "Passive", title: heroDef?.text ?? "" }),
-    ctx.store.state.view && h("div", { class: "relic-row" }, ...(self?.relics ?? []).map((r) => h("span", { class: "relic-chip", title: ctx.ix.relics.get(r)?.text ?? "", text: ctx.ix.relicName(r) }))),
+    ctx.store.state.view && h("div", { class: "relic-row" }, ...(self?.relics ?? []).map((r) => h("span", { class: "relic-chip", title: ctx.ix.relics.get(r)?.text ?? "" }, ctx.ix.relicArt(r) && h("span", { class: "relic-icon", style: bg(ctx.ix.relicArt(r)) }), ctx.ix.relicName(r)))),
   );
 
   const gold = h(
@@ -278,7 +275,7 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const st = view.me.boardStats[i] ?? { atk: 0, hp: 0 };
   const recruiting = view.phase === "RECRUIT" && view.me.alive;
   const last = view.me.state.board.length - 1;
-  const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true });
+  const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true });
   return h(
     "div",
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "board", i), dragend: () => document.body.classList.remove(DRAGGING), dragover: allowDrop, drop: dropOn(ctx, view, i) } },
@@ -323,7 +320,7 @@ function sellZone(ctx: Ctx, view: View): HTMLElement {
 
 function giantSlot(ctx: Ctx, view: View): HTMLElement {
   const g = view.me.state.giant;
-  return h("div", { class: "giant-slot" }, h("div", { class: "muted small", text: "Giant Robo" }), g ? cardEl(ctx.ix, { key: g.key, small: true }) : h("div", { class: "empty-giant", text: "empty" }));
+  return h("div", { class: "giant-slot" }, h("div", { class: "muted small", text: "Giant Robo" }), g ? cardEl(ctx.ix, { key: g.key, small: true, minion: true }) : h("div", { class: "empty-giant", text: "empty" }));
 }
 
 function gaugeBars(ctx: Ctx, view: View): HTMLElement {
@@ -355,7 +352,7 @@ function offersModal(ctx: Ctx, view: View): HTMLElement | null {
         h("div", { class: "cards" }, ...offer.options.map((key, i) => {
           const r = ctx.ix.relics.get(key);
           const cost = r?.cost ?? 0;
-          return h("div", { class: `relic-card ${cost > s.energy ? "unaffordable" : ""}`, title: r?.text ?? "", on: { click: () => cost <= s.energy && void ctx.act({ type: "CHOOSE_RELIC", index: i }) } }, h("div", { class: "cost", text: String(cost) }), h("h3", { text: r?.name ?? key }), h("p", { text: r?.text ?? "" }), (r?.factions.length ?? 0) > 0 && h("p", { class: "muted small", text: r?.factions.map(ctx.ix.factionName).join(", ") }));
+          return h("div", { class: `relic-card ${cost > s.energy ? "unaffordable" : ""}`, title: r?.text ?? "", on: { click: () => cost <= s.energy && void ctx.act({ type: "CHOOSE_RELIC", index: i }) } }, h("div", { class: "cost", text: String(cost) }), artBox("relic-art", ctx.ix.relicArt(key), r?.name ?? key), h("h3", { text: r?.name ?? key }), h("p", { text: r?.text ?? "" }), (r?.factions.length ?? 0) > 0 && h("p", { class: "muted small", text: r?.factions.map(ctx.ix.factionName).join(", ") }));
         })), hide),
     );
   }
