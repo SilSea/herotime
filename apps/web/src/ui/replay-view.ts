@@ -8,6 +8,8 @@ export interface ReplayOptions {
   /** Aim to finish within this many ms (the battle phase is short, so long fights speed up). */
   budgetMs: number;
   onClose: () => void;
+  /** "Next turn in 0:07": the shared countdown, shown beside the controls. */
+  nextTurnText: () => string;
 }
 
 /** Plays one fight on screen: enemy on top, you at the bottom. */
@@ -121,6 +123,7 @@ export class ReplayView {
       finished
         ? h("span", { class: `outcome ${r.winner === this.record.meSide ? "win" : r.winner === "DRAW" ? "draw" : "loss"}`, text: `${outcome}${this.record.damageTaken > 0 ? ` - you took ${this.record.damageTaken} damage` : this.record.damageDealt > 0 ? ` - dealt ${this.record.damageDealt} damage` : ""}` })
         : h("span", { class: "muted", text: `${this.index + 1}/${this.steps.length}` }),
+      h("span", { class: "next-turn", id: "replay-timer", text: this.opts.nextTurnText() }),
       !finished && h("button", { class: "btn", text: this.paused ? "Resume" : "Pause", on: { click: () => this.togglePause() } }),
       !finished && h("button", { class: "btn", text: `${this.speed}x`, title: "Change speed", on: { click: () => ((this.speed = this.speed === 1 ? 2 : this.speed === 2 ? 4 : 1), this.drawControls(), this.schedule(0)) } }),
       !finished && h("button", { class: "btn", text: "Skip", on: { click: () => this.skip() } }),

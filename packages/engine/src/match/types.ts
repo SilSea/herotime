@@ -17,7 +17,8 @@ export type Intent =
   | { type: "HERO_POWER" }
   | { type: "PICK_DISCOVER"; index: number }
   | { type: "CHOOSE_RELIC"; index: number }
-  | { type: "READY" };
+  | { type: "READY" }
+  | { type: "SURRENDER" };
 
 export interface Entrant {
   id: string;

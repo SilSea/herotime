@@ -21,6 +21,7 @@ export const IntentSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("PICK_DISCOVER"), index: slot }).strict(),
   z.object({ type: z.literal("CHOOSE_RELIC"), index: slot }).strict(),
   z.object({ type: z.literal("READY") }).strict(),
+  z.object({ type: z.literal("SURRENDER") }).strict(),
 ]);
 export type IntentInput = z.infer<typeof IntentSchema>;
 

@@ -243,6 +243,10 @@ export class Match {
     if (this.phase === "ENDED") throw new RuleError("the match is over");
     if (!p.alive) throw new RuleError("you have been eliminated");
 
+    if (intent.type === "SURRENDER") {
+      this.surrender(p, now);
+      return;
+    }
     if (intent.type === "CHOOSE_HERO") {
       if (this.phase !== "HERO_SELECT") throw new RuleError("hero select is over");
       this.chooseHero(p, intent.index);
@@ -296,6 +300,22 @@ export class Match {
     }
   }
 
+  /** A player gives up: out at once, placed just above everyone already out, whatever the phase. */
+  private surrender(p: MatchPlayer, now: number): void {
+    p.alive = false;
+    p.ready = false;
+    p.hp = 0;
+    p.placement = this.aliveCount + 1; // aliveCount no longer counts p
+    this.events.push({ type: "ELIMINATED", playerId: p.id, placement: p.placement });
+    const humansLeft = this.players.some((x) => x.alive && !x.isBot);
+    if (this.aliveCount <= 1 || !humansLeft) {
+      this.end();
+      return;
+    }
+    if (this.phase === "HERO_SELECT") this.maybeStartRecruit(now);
+    else if (this.phase === "RECRUIT" && this.players.filter((x) => x.alive && !x.isBot).every((x) => x.ready)) this.finishRecruit(now);
+  }
+
   /** Advance every phase whose deadline has passed (catching up if the caller was late). */
   tick(now: number): void {
     for (let guard = 0; guard < 500 && this.deadline !== null && now >= this.deadline; guard++) {
@@ -333,7 +353,7 @@ export class Match {
   }
 
   private maybeStartRecruit(now: number): void {
-    if (this.phase === "HERO_SELECT" && this.players.every((p) => p.state.hero !== undefined)) {
+    if (this.phase === "HERO_SELECT" && this.players.every((p) => !p.alive || p.state.hero !== undefined)) {
       this.startRecruit(1, now);
     }
   }

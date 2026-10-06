@@ -30,6 +30,7 @@ export interface AppState {
   toasts: Toast[];
   screen: "auth" | "lobby" | "library" | "match";
   showDebug: boolean;
+  showLog: boolean;
   hideOffers: boolean;
   selected: Selection;
 }
@@ -42,6 +43,7 @@ export const initialState = (): AppState => ({
   toasts: [],
   screen: "auth",
   showDebug: false,
+  showLog: false,
   hideOffers: false,
   selected: undefined,
 });

@@ -677,3 +677,65 @@ describe("what the view says things cost", () => {
     expect(m.view("h1").me.heroPower?.usable).toBe(false);
   });
 });
+
+describe("surrender", () => {
+  it("puts the player out at once, in last place among those still in", () => {
+    const m = recruiting(humans(3));
+    m.dispatch("h1", { type: "SURRENDER" }, T0 + 1000);
+    expect(m.player("h1").alive).toBe(false);
+    expect(m.player("h1").placement).toBe(3);
+    expect(m.player("h1").hp).toBe(0);
+    expect(m.drainEvents().some((e) => e.type === "ELIMINATED" && e.playerId === "h1" && e.placement === 3)).toBe(true);
+    expect(() => m.dispatch("h1", { type: "BUY", index: 0 }, T0 + 1500)).toThrow(RuleError);
+  });
+
+  it("a surrendered player no longer holds up READY, and is skipped by later pairings", () => {
+    const m = recruiting(humans(3));
+    m.dispatch("h0", { type: "READY" }, T0 + 1000);
+    m.dispatch("h1", { type: "READY" }, T0 + 1100);
+    expect(m.phase).toBe("RECRUIT");
+    m.dispatch("h2", { type: "SURRENDER" }, T0 + 1200);
+    expect(m.phase).toBe("BATTLE");
+    expect(m.player("h2").lastCombat).toBeUndefined();
+  });
+
+  it("the last survivor wins the match immediately", () => {
+    const m = recruiting(humans(2));
+    m.dispatch("h0", { type: "SURRENDER" }, T0 + 1000);
+    expect(m.phase).toBe("ENDED");
+    expect(m.player("h1").placement).toBe(1);
+    expect(m.player("h0").placement).toBe(2);
+  });
+
+  it("the match ends when no human is left, even with bots alive", () => {
+    const m = recruiting([...humans(1), ...bots(3)]);
+    m.dispatch("h0", { type: "SURRENDER" }, T0 + 1000);
+    expect(m.phase).toBe("ENDED");
+    expect(m.player("h0").placement).toBe(4);
+    const places = m.players.map((p) => p.placement).sort();
+    expect(places).toEqual([1, 2, 3, 4]);
+  });
+
+  it("works during hero select and during battle", () => {
+    const early = make(humans(3));
+    early.dispatch("h0", { type: "SURRENDER" }, T0 + 500);
+    early.dispatch("h1", { type: "CHOOSE_HERO", index: 0 }, T0 + 600);
+    early.dispatch("h2", { type: "CHOOSE_HERO", index: 0 }, T0 + 700);
+    expect(early.phase).toBe("RECRUIT");
+
+    const m = recruiting(humans(3));
+    toBattle(m, T0 + 1000);
+    expect(m.phase).toBe("BATTLE");
+    m.dispatch("h0", { type: "SURRENDER" }, T0 + 1500);
+    expect(m.player("h0").alive).toBe(false);
+    m.tick(T0 + 1000 + DEFAULT_MATCH_CONFIG.battleMs);
+    expect(m.phase).toBe("RECRUIT");
+    expect(m.turn).toBe(2);
+  });
+
+  it("is refused once the match is over", () => {
+    const m = recruiting(humans(2));
+    m.dispatch("h0", { type: "SURRENDER" }, T0 + 1000);
+    expect(() => m.dispatch("h1", { type: "SURRENDER" }, T0 + 1100)).toThrow(RuleError);
+  });
+});

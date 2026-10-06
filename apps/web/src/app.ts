@@ -169,6 +169,7 @@ export function startApp(root: HTMLElement): void {
       const budget = Math.max(3000, (clock.remaining(s.view?.deadline ?? null) ?? 15_000) - 2500);
       replay = new ReplayView(replayHost, pending, content as ContentIndex, {
         budgetMs: budget,
+        nextTurnText: () => `Next turn in ${formatClock(clock.remaining(store.state.view?.deadline ?? null))}`,
         onClose: () => {
           replay = undefined;
           store.update((st) => (st.replayPending?.turn === pending.turn ? { ...st, replayPending: undefined } : st));
@@ -206,6 +207,11 @@ export function startApp(root: HTMLElement): void {
     const s = store.state;
     const timer = document.getElementById("timer");
     if (timer && s.view) timer.textContent = formatClock(clock.remaining(s.view.deadline));
+    const left = s.view ? formatClock(clock.remaining(s.view.deadline)) : "";
+    for (const id of ["timer-big", "replay-timer"]) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = id === "replay-timer" ? `Next turn in ${left}` : left;
+    }
     const fill = document.getElementById("fill-countdown");
     if (fill && s.status.state === "queued" && s.status.fillAt) fill.textContent = `Bots join in ${formatClock(clock.remaining(s.status.fillAt))}`;
   }, 250);
@@ -218,7 +224,8 @@ export function startApp(root: HTMLElement): void {
     if (s.screen !== "match" || !s.view) return;
     const intent: Intent | undefined = { r: { type: "REFRESH" }, f: { type: "FREEZE" }, u: { type: "UPGRADE" } }[e.key.toLowerCase() as "r" | "f" | "u"] as Intent | undefined;
     if (e.key.toLowerCase() === "d") store.set({ showDebug: !s.showDebug });
-    else if (e.key === "Enter") void ctx().act({ type: "READY" });
+    else if (e.key.toLowerCase() === "l") store.set({ showLog: !s.showLog });
+    else if (e.key === "Enter" && s.view.phase === "RECRUIT") void ctx().act({ type: "READY" });
     else if (intent) void ctx().act(intent);
   });
 

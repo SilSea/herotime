@@ -19,71 +19,85 @@ export function renderMatch(root: HTMLElement, ctx: Ctx): void {
   mount(root, matchFrame(ctx, view, table(ctx, view)));
 }
 
-function matchFrame(ctx: Ctx, view: View, center: HTMLElement): HTMLElement {
+function matchFrame(ctx: Ctx, view: View, stage: HTMLElement): HTMLElement {
   return h(
     "div",
     { class: "match" },
     topBar(ctx, view),
-    h("div", { class: "match-body" }, playersPanel(ctx, view), center, sidePanel(ctx, view)),
+    h("div", { class: "match-body" }, leaderboard(ctx, view), stage),
+    ctx.store.state.showLog && logDrawer(ctx, view),
   );
 }
 
 // ------------------------------------------------------------------ top bar
 
+/** Phase, a fuse that burns down with the clock, the lineup, and the way out of the match. */
 function topBar(ctx: Ctx, view: View): HTMLElement {
   const me = view.me;
-  const power = me.heroPower;
-  const hero = me.state.hero;
-  const recruiting = view.phase === "RECRUIT" && me.alive;
+  const state = ctx.store.state;
   const timer = h("span", { class: "timer", id: "timer", data: { deadline: String(view.deadline ?? "") }, text: formatClock(ctx.clock.remaining(view.deadline)) });
-
-  const energy = h("div", { class: "energy", title: `Energy ${me.state.energy}/${me.limits.maxEnergy}` }, ...Array.from({ length: me.limits.maxEnergy }, (_, i) => h("span", { class: `pip ${i < me.state.energy ? "full" : ""}` })), h("span", { class: "energy-num", text: `${me.state.energy}` }));
+  const out = view.phase !== "ENDED" && !me.alive;
 
   return h(
     "div",
     { class: "topbar" },
-    h("div", { class: "phase" }, h("strong", { text: PHASE_LABEL[view.phase] ?? view.phase }), view.turn > 0 && h("span", { class: "muted", text: ` - turn ${view.turn}` }), " ", timer),
-    energy,
+    h("div", { class: "phase" }, h("strong", { text: PHASE_LABEL[view.phase] ?? view.phase }), view.turn > 0 && h("span", { class: "turn", text: `Turn ${view.turn}` }), timer),
     h("div", { class: "factions" }, ...view.factions.map((f) => h("span", { class: "chip", style: `--c:${ctx.ix.factionColor(f)}`, title: ctx.ix.factions.get(f)?.text ?? "", text: ctx.ix.factionName(f) }))),
     h(
       "div",
       { class: "top-actions" },
-      hero && h("span", { class: "hero-name", title: ctx.ix.heroes.get(hero)?.text ?? "", text: ctx.ix.heroName(hero) }),
-      power && power.mode !== "PASSIVE" && h("button", { class: "btn", disabled: !power.usable, title: ctx.ix.heroes.get(hero ?? "")?.text ?? "", text: `Hero power (${power.cost})`, on: { click: () => void ctx.act({ type: "HERO_POWER" }) } }),
-      h("button", { class: "btn", disabled: !recruiting || me.upgradeCost === null, text: me.upgradeCost === null ? "Max rank" : `Upgrade ${stars(me.state.rank + 1)} (${me.upgradeCost})`, title: "U", on: { click: () => void ctx.act({ type: "UPGRADE" }) } }),
-      h("button", { class: `btn ${me.ready ? "on" : "primary"}`, disabled: !recruiting || me.ready, text: me.ready ? "Ready!" : "Ready", title: "Enter", on: { click: () => void ctx.act({ type: "READY" }) } }),
+      h("button", { class: `btn ${state.showLog ? "on" : ""}`, text: "Log", title: "L", on: { click: () => ctx.store.set({ showLog: !state.showLog }) } }),
+      view.phase !== "ENDED" && me.alive && h("button", { class: "btn danger", text: "Surrender", title: "Give up and take your current place", on: { click: () => void surrender(ctx, view) } }),
+      out && h("button", { class: "btn", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
     ),
   );
 }
 
+async function surrender(ctx: Ctx, view: View): Promise<void> {
+  const place = view.players.filter((p) => p.alive).length;
+  if (!window.confirm(`Surrender? You will finish ${ordinal(place)} and the match goes on without you.`)) return;
+  await ctx.act({ type: "SURRENDER" });
+}
+
 // ------------------------------------------------------------ left: players
 
-function playersPanel(ctx: Ctx, view: View): HTMLElement {
+/** A column of portraits, best on top, like the sidebar in Battlegrounds. */
+function leaderboard(ctx: Ctx, view: View): HTMLElement {
   const opp = ctx.store.state.combat?.opponentId;
   const sorted = [...view.players].sort((a, b) => Number(b.alive) - Number(a.alive) || (a.placement ?? 0) - (b.placement ?? 0) || b.hp - a.hp);
-  return h(
-    "div",
-    { class: "panel players" },
-    h("h3", { text: "Players" }),
-    ...sorted.map((p) => playerRow(ctx, p, p.id === view.me.id, p.id === opp)),
-  );
+  return h("div", { class: "leaderboard" }, ...sorted.map((p) => playerRow(ctx, p, p.id === view.me.id, p.id === opp)));
 }
 
 function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLElement {
-  const hpPct = Math.max(0, Math.min(100, (p.hp / 30) * 100));
+  const hero = p.hero ? ctx.ix.heroName(p.hero) : p.name;
+  const tip = [
+    `${p.name}${p.isBot ? " (bot)" : ""}${mine ? " (you)" : ""}`,
+    p.hero ? `Hero: ${hero}` : "",
+    `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} armor` : ""}, tavern ${stars(p.rank)}`,
+    p.relics.length > 0 ? `Relics: ${p.relics.map(ctx.ix.relicName).join(", ")}` : "",
+    !p.alive && p.placement !== undefined ? `Out: ${ordinal(p.placement)}` : "",
+    opponent ? "You fought them last" : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
   return h(
     "div",
-    { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}` },
-    h("div", { class: "pname" }, h("span", { text: p.name }), p.isBot && h("span", { class: "tag", text: "bot" }), mine && h("span", { class: "tag you", text: "you" }), opponent && h("span", { class: "tag", text: "last foe" }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) }), p.ready && p.alive && !p.isBot && h("span", { class: "tag", text: "ready" })),
-    h("div", { class: "hp-bar", title: `${p.hp} HP${p.armor ? ` + ${p.armor} armor` : ""}` }, h("div", { class: "hp-fill", style: `width:${hpPct}%` }), h("span", { class: "hp-text", text: `${Math.max(0, p.hp)}${p.armor ? ` +${p.armor}` : ""}` })),
-    h("div", { class: "pmeta muted", text: `${stars(p.rank)}${p.hero ? ` - ${ctx.ix.heroName(p.hero)}` : ""}` }),
-    p.relics.length > 0 && h("div", { class: "relics" }, ...p.relics.map((r) => h("span", { class: "relic-chip", title: ctx.ix.relics.get(r)?.text ?? "", text: ctx.ix.relicName(r) }))),
+    { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}`, title: tip },
+    h("div", { class: "portrait small-portrait" }, h("span", { text: initialsOf(hero) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
+    h("div", { class: "pname" }, h("span", { class: "pname-text", text: p.name }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) })),
+    h("div", { class: "pmeta", text: stars(p.rank) }),
+    p.ready && p.alive && !p.isBot && h("span", { class: "ready-mark", text: "ready" }),
   );
 }
 
-// ------------------------------------------------------------ right: log
+const initialsOf = (name: string): string => {
+  const words = name.split(/[\s_-]+/).filter(Boolean);
+  return ((words[0]?.[0] ?? "?") + (words[1]?.[0] ?? "")).toUpperCase();
+};
 
-function sidePanel(ctx: Ctx, view: View): HTMLElement {
+// ------------------------------------------------------------ log drawer
+
+function logDrawer(ctx: Ctx, view: View): HTMLElement {
   const state = ctx.store.state;
   const debug = state.showDebug
     ? h(
@@ -95,10 +109,10 @@ function sidePanel(ctx: Ctx, view: View): HTMLElement {
     : null;
   return h(
     "div",
-    { class: "panel side" },
-    h("h3", { text: "Match log" }),
+    { class: "drawer" },
+    h("div", { class: "row" }, h("h3", { text: "Match log" }), h("span", { class: "spacer" }), h("button", { class: "btn", text: "Close", on: { click: () => ctx.store.set({ showLog: false }) } })),
     h("div", { class: "log", id: "log" }, ...state.log.map((l) => h("div", { text: l }))),
-    h("p", { class: "muted small", text: "R refresh - F freeze - U upgrade - Enter ready - D debug" }),
+    h("p", { class: "muted small", text: "R refresh - F freeze - U upgrade - Enter ready - L log - D debug" }),
     debug,
   );
 }
@@ -148,38 +162,82 @@ function endScreen(ctx: Ctx, view: View): HTMLElement {
 
 // ------------------------------------------------------------------- table
 
+/**
+ * The Battlegrounds layout: the tavern across the top, your warband in the middle, and along the bottom
+ * your hero, your hand and your gold. Tavern-tier upgrade sits left of the shop, refresh and freeze right of it.
+ */
 function table(ctx: Ctx, view: View): HTMLElement {
   const me = view.me;
   const recruiting = view.phase === "RECRUIT" && me.alive;
   const s = me.state;
   const energy = s.energy;
+  const canBuy = recruiting && energy >= me.limits.buyCost && s.hand.length < me.limits.handSize;
 
-  const shop = h(
+  const upgrade = h(
+    "button",
+    { class: "tier-btn", disabled: !recruiting || me.upgradeCost === null || energy < (me.upgradeCost ?? 0), title: "Upgrade the tavern (U)", on: { click: () => void ctx.act({ type: "UPGRADE" }) } },
+    h("span", { class: "tier-stars", text: stars(s.rank) }),
+    h("span", { class: "tier-label", text: me.upgradeCost === null ? "Max" : "Upgrade" }),
+    me.upgradeCost !== null && h("span", { class: "coin", text: String(me.upgradeCost) }),
+  );
+  const side = h(
     "div",
-    { class: "zone shop" },
-    h("div", { class: "zone-head" }, h("strong", { text: `Shop ${stars(s.rank)}` }), h("span", { class: "spacer" }),
-      h("button", { class: "btn", disabled: !recruiting || energy < me.limits.refreshCost, text: `Refresh (${me.limits.refreshCost})`, title: "R", on: { click: () => void ctx.act({ type: "REFRESH" }) } }),
-      h("button", { class: `btn ${s.frozen ? "on" : ""}`, disabled: !recruiting, text: s.frozen ? "Frozen" : "Freeze", title: "F", on: { click: () => void ctx.act({ type: "FREEZE" }) } })),
-    h("div", { class: "cards" }, ...s.shop.map((key, i) => cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [recruiting && energy >= me.limits.buyCost && s.hand.length < me.limits.handSize ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) })), s.shop.length === 0 && h("p", { class: "muted", text: "The shop is empty." })),
+    { class: "tavern-side" },
+    h("button", { class: "round-btn", disabled: !recruiting || energy < me.limits.refreshCost, title: "Refresh the tavern (R)", on: { click: () => void ctx.act({ type: "REFRESH" }) } }, h("span", { class: "round-icon", text: "↻" }), h("span", { class: "coin", text: String(me.limits.refreshCost) })),
+    h("button", { class: `round-btn ${s.frozen ? "on" : ""}`, disabled: !recruiting, title: "Freeze the tavern (F)", on: { click: () => void ctx.act({ type: "FREEZE" }) } }, h("span", { class: "round-icon", text: "❄" })),
+  );
+  const tavern = h(
+    "div",
+    { class: "tavern" },
+    upgrade,
+    h("div", { class: "cards shop-cards" }, ...s.shop.map((key, i) => cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) })), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
+    side,
   );
 
-  const boardSlots: Child[] = s.board.map((u, i) => boardCard(ctx, view, i));
+  const boardSlots: Child[] = s.board.map((_u, i) => boardCard(ctx, view, i));
   const board = h(
     "div",
-    { class: "zone board" },
-    h("div", { class: "zone-head" }, h("strong", { text: `Board ${s.board.length}/${me.limits.boardSize}` }), h("span", { class: "spacer" }), gaugeBars(ctx, view)),
-    h("div", { class: "board-row" }, h("div", { class: "cards" }, ...boardSlots, endDrop(ctx, view)), giantSlot(ctx, view)),
+    { class: "warband" },
+    h("div", { class: "band-head" }, h("span", { class: "band-count", text: `${s.board.length}/${me.limits.boardSize}` }), gaugeBars(ctx, view), sellZone(ctx, view)),
+    h("div", { class: "board-row" }, h("div", { class: "cards board-cards" }, ...boardSlots, endDrop(ctx, view)), giantSlot(ctx, view)),
   );
 
-  const hand = h(
+  const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: "Buy a card from the tavern, then drag it onto your warband." }));
+
+  return h("div", { class: "stage table" }, tavern, board, bottomBar(ctx, view, hand), offersModal(ctx, view));
+}
+
+/** Hero portrait with its power on the left, the hand in the middle, gold and the end-turn button on the right. */
+function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
+  const me = view.me;
+  const recruiting = view.phase === "RECRUIT" && me.alive;
+  const hero = me.state.hero;
+  const power = me.heroPower;
+  const self = view.players.find((p) => p.id === me.id);
+  const heroDef = hero ? ctx.ix.heroes.get(hero) : undefined;
+  const name = hero ? ctx.ix.heroName(hero) : "Hero";
+
+  const portrait = h(
     "div",
-    { class: "zone hand" },
-    h("div", { class: "zone-head" }, h("strong", { text: `Hand ${s.hand.length}/${me.limits.handSize}` }), h("span", { class: "spacer" }), sellZone(ctx, view)),
-    h("div", { class: "cards" }, ...s.hand.map((u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted", text: "Buy cards from the shop; click one here to play it." })),
+    { class: "hero-box" },
+    h("div", { class: "portrait", title: `${name}${heroDef?.text ? `\n${heroDef.text}` : ""}` }, h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
+    h("div", { class: "hero-name", text: name }),
+    power && power.mode !== "PASSIVE" && h("button", { class: "hero-power", disabled: !power.usable, title: heroDef?.text ?? "Hero power", on: { click: () => void ctx.act({ type: "HERO_POWER" }) } }, h("span", { text: "Power" }), h("span", { class: "coin", text: String(power.cost) })),
+    power && power.mode === "PASSIVE" && h("div", { class: "passive", text: "Passive", title: heroDef?.text ?? "" }),
+    ctx.store.state.view && h("div", { class: "relic-row" }, ...(self?.relics ?? []).map((r) => h("span", { class: "relic-chip", title: ctx.ix.relics.get(r)?.text ?? "", text: ctx.ix.relicName(r) }))),
   );
 
-  const offers = offersModal(ctx, view);
-  return h("div", { class: "center table" }, shop, board, hand, offers);
+  const gold = h(
+    "div",
+    { class: "gold", title: `Energy ${me.state.energy}/${me.limits.maxEnergy}` },
+    h("div", { class: "gold-num" }, h("span", { class: "coin big-coin", text: String(me.state.energy) }), h("span", { class: "gold-max", text: `/${me.limits.maxEnergy}` })),
+    h("div", { class: "pips" }, ...Array.from({ length: me.limits.maxEnergy }, (_, i) => h("span", { class: `pip ${i < me.state.energy ? "full" : ""}` }))),
+    view.phase === "RECRUIT" && me.alive && h("button", { class: `end-turn ${me.ready ? "waiting" : ""}`, disabled: me.ready, title: "Enter", text: me.ready ? "Waiting..." : "Ready", on: { click: () => void ctx.act({ type: "READY" }) } }),
+    // Time is up: no more Ready. Everyone's next turn starts together when this reaches zero.
+    view.phase === "BATTLE" && h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: "Next turn in" }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
+  );
+
+  return h("div", { class: "bottom" }, portrait, hand, gold);
 }
 
 function dragData(e: DragEvent, zone: string, index: number): void {
