@@ -23,6 +23,8 @@ export const CardDef = z.object({
   token: z.boolean().default(false),
   /** Rules text shown on the card (the engine never reads it). */
   text: z.string().default(""),
+  /** The same in Thai; empty = generated from the effects, or the English text when that was written by hand. */
+  textTh: z.string().default(""),
   /** Image path or URL, resolved by the client. */
   art: z.string().optional(),
   /**
@@ -42,6 +44,7 @@ export const FactionDef = z.object({
   /** CSS colour used for the faction badge. */
   color: z.string().default("#888888"),
   text: z.string().default(""),
+  textTh: z.string().default(""),
 });
 export type FactionDef = z.infer<typeof FactionDef>;
 
@@ -93,6 +96,7 @@ export const RelicDef = z.object({
   weight: z.number().int().min(0).default(100),
   effects: z.array(Effect).default([]),
   text: z.string().default(""),
+  textTh: z.string().default(""),
   art: z.string().optional(),
 });
 export type RelicDef = z.infer<typeof RelicDef>;
@@ -102,6 +106,7 @@ export const HeroDef = z.object({
   name: z.string().min(1),
   armor: z.number().int().min(0).default(0),
   text: z.string().default(""),
+  textTh: z.string().default(""),
   art: z.string().optional(),
   power: z
     .object({

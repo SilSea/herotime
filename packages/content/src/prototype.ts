@@ -43,13 +43,13 @@ import type { ContentSetData } from "./types.js";
  */
 
 const factions = [
-  faction("rider", "Rider", "#e53935", "Henshin: transform after turns on the board. Rider Kick hits twice as hard on the first strike."),
-  faction("sentai", "Sentai", "#1e88e5", "Five colours. Team-Up bonuses and the Roll Call that charges the Mecha Gauge."),
-  faction("mecha", "Mecha", "#78909c", "Gattai: line up a core and its parts, press Combine, and they become one robot for good."),
-  faction("kaijin", "Kaijin", "#8e24aa", "Kyodaika: the first time it dies it comes back twice as big."),
-  faction("grunt", "Grunt", "#6d4c41", "Swarms of cheap bodies that leave more bodies behind."),
-  faction("ally", "Ally", "#43a047", "Economy and support: Energy, buffs and cards in hand."),
-  faction("dark_rider", "Dark Rider", "#37474f", "Sacrifice allies to grow monstrous."),
+  faction("rider", "Rider", "#e53935", "Henshin: transform after turns on the board. Rider Kick hits twice as hard on the first strike.", "Henshin: แปลงร่างเมื่ออยู่บนบอร์ดครบเทิร์น · Rider Kick ตีครั้งแรกแรง ×2"),
+  faction("sentai", "Sentai", "#1e88e5", "Five colours. Team-Up bonuses and the Roll Call that charges the Mecha Gauge.", "ทีม 5 สี: โบนัส Team-Up และ Roll Call ที่เติม Mecha Gauge"),
+  faction("mecha", "Mecha", "#78909c", "Gattai: line up a core and its parts, press Combine, and they become one robot for good.", "Gattai: วาง core กับชิ้นส่วนเรียงกัน กด Combine แล้วรวมเป็นหุ่นตัวเดียวถาวร"),
+  faction("kaijin", "Kaijin", "#8e24aa", "Kyodaika: the first time it dies it comes back twice as big.", "Kyodaika: ตายครั้งแรกฟื้นเป็นร่างยักษ์ stat ×2"),
+  faction("grunt", "Grunt", "#6d4c41", "Swarms of cheap bodies that leave more bodies behind.", "ลูกน้องจำนวนมาก ตายแล้วเรียกลูกน้องเพิ่ม"),
+  faction("ally", "Ally", "#43a047", "Economy and support: Energy, buffs and cards in hand.", "เศรษฐกิจและสนับสนุน: Energy, บัฟ, การ์ดเข้ามือ"),
+  faction("dark_rider", "Dark Rider", "#37474f", "Sacrifice allies to grow monstrous.", "สังเวยพวกเดียวกันเพื่อแข็งแกร่งขึ้น"),
 ];
 
 const proSentai = series("proto_sentai", "Proto Squad", {
@@ -194,7 +194,7 @@ const relics = [
   // greater
   relic("prototype_driver", "Prototype Driver", "GREATER", 4, [player("START_OF_COMBAT", give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })], { factions: ["rider"] }),
   relic("mecha_gauge_core", "Mecha Gauge Core", "GREATER", 3, [player("ON_ACQUIRE", [gauge("mecha", 2), rule("giantEntryThreshold", "SET", 3)])], { factions: ["mecha", "sentai"] }),
-  relic("team_spirit_banner", "Team Spirit Banner", "GREATER", 4, [player("ON_ACQUIRE", rule("rollCallColors", "SET", 4))], { factions: ["sentai"] }),
+  relic("team_spirit_banner", "Team Spirit Banner", "GREATER", 4, [player("ON_ACQUIRE", rule("rollCallColors", "SET", 2))], { factions: ["sentai"] }),
   relic("kaijin_cell", "Kaijin Cell", "GREATER", 3, [player("ON_ACQUIRE", rule("kyodaikaMultiplier", "SET", 3))], { factions: ["kaijin"] }),
   relic("dark_throne", "Dark Throne", "GREATER", 2, [player("START_OF_COMBAT", buff(3, 0), { target: allAllies({ faction: "dark_rider" }) })], { factions: ["dark_rider"] }),
   relic("universal_belt", "Universal Belt", "GREATER", 6, [player("ON_ACQUIRE", rule("freeRefreshesPerTurn", "SET", 2))]),
@@ -213,4 +213,4 @@ const heroes = [
 ];
 
 /** As authored: no generated rules text yet (that is filled in when a set is loaded). */
-export const prototypeRaw: ContentSetData = { factions, series: [proSentai, proRider], cards: [...cards, ...tavernGear], gauges, relics, heroes };
+export const prototypeRaw: ContentSetData = { rules: { rollCallColors: 3 }, factions, series: [proSentai, proRider], cards: [...cards, ...tavernGear], gauges, relics, heroes };

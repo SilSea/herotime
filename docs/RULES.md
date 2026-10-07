@@ -83,7 +83,7 @@
 ## 6. Giant Robo — Mecha Gauge
 โครงเดียวกับตอนในซีรีส์: **รวมทีม → ประกาศชื่อ → สัตว์ประหลาดขยายร่าง → เรียกหุ่น**
 
-1. **Roll Call** — Start of Combat ถ้ามี Sentai **ครบ 5 สีไม่ซ้ำ** (Extra = wildcard) → Sentai ทุกตัว +1/+1 ในการสู้นั้น และ **Mecha Gauge +1**. ถ้าชนะการสู้นั้นได้อีก +1 (สูงสุด +2/เทิร์น)
+1. **Roll Call** — Start of Combat ถ้ามี Sentai **3 สีไม่ซ้ำ** (ค่า `rollCallColors` ของชุด content; engine default 5) (Extra = wildcard) → Sentai ทุกตัว +1/+1 ในการสู้นั้น และ **Mecha Gauge +1**. ถ้าชนะการสู้นั้นได้อีก +1 (สูงสุด +2/เทิร์น)
 2. **Gauge ครบ 3** → ได้การ์ด Gear **"Kyodai Gattai!"** ใส่มือ
 3. **เล่นการ์ด** → Discover หุ่น 1 จาก 3 — หุ่นของขบวนการที่มีสมาชิกบนบอร์ดมากที่สุดออกแน่นอน 1 ตัวเลือก
 4. หุ่นอยู่ใน **Giant Slot** (นอกบอร์ด 7 ช่อง) ถาวร
@@ -264,7 +264,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 | Kaijin Cell | Kaijin | 3 | Kyodaika ฟื้นด้วย stat ×3 แทน ×2 |
 | Dark Contract | Dark Rider | 2 | Sacrifice แล้วได้ Energy +1 |
 | Universal Belt | ทั่วไป | 6 | ทุกครั้งที่ Refresh มียูนิต Rank เท่ากับ Base Rank ของเรา ≥1 ตัวในร้าน |
-| Team Spirit Banner | Sentai | 4 | Roll Call ใช้แค่ 4 สี |
+| Team Spirit Banner | Sentai | 4 | Roll Call ใช้แค่ 2 สี |
 
 ### 13.5 อื่นๆ
 - เขียนผลด้วย Ability DSL (owner scope `PLAYER`) — ส่วนใหญ่ใช้ `MODIFY_RULE` หรือ trigger ระดับผู้เล่น

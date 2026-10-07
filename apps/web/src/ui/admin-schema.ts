@@ -180,6 +180,7 @@ const CARD_ROWS: Row[] = [
   { key: "gattaiInto", label: "gattai form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Gattai core: when this is the leftmost of a Gattai group, the group becomes this card (needs the GATTAI keyword)" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
+  { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
   { key: "effects", field: effects() },
 ];
@@ -189,6 +190,7 @@ const HERO_ROWS: Row[] = [
   { key: "name", field: text },
   { key: "armor", field: int(0) },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the power" },
+  { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
   {
     key: "power",
@@ -214,6 +216,7 @@ const RELIC_ROWS: Row[] = [
   { key: "factions", field: { kind: "tags", to: "factions" }, hint: "Offered more to players with these factions" },
   { key: "series", field: { kind: "ref", to: "series" }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
+  { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
   { key: "effects", field: effects() },
 ];
@@ -223,6 +226,7 @@ const FACTION_ROWS: Row[] = [
   { key: "name", field: text },
   { key: "color", field: { kind: "text", placeholder: "#e53935" } },
   { key: "text", field: { kind: "text", area: true } },
+  { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true } },
 ];
 
 const SERIES_ROWS: Row[] = [

@@ -176,6 +176,10 @@ describe("gaugeText", async () => {
     expect(t.rewards).toEqual(["At 3: get Kyodai Gattai! (once per game)"]);
     expect(t.short).toBe("at 3 → Kyodai Gattai!");
   });
+  it("says how many colours Roll Call needs in this content", () => {
+    const t = gaugeText({ name: "Mecha Gauge", max: 6, sources: [{ trigger: "ON_ROLL_CALL", amount: 1 }], thresholds: [] }, name, 3);
+    expect(t.fills).toEqual(["+1 when Roll Call fires (Sentai of 3 different colours at the start of a fight)"]);
+  });
   it("explains a repeating reward", () => {
     const t = gaugeText({ name: "Rider Gauge", max: 6, sources: [{ trigger: "HENSHIN", amount: 1 }], thresholds: [{ at: 2, once: false, reward: [{ type: "ADD_TO_HAND", cardKey: "ultimate_form" }] }] }, name);
     expect(t.rewards).toEqual(["Every 2: get Ultimate Form"]);

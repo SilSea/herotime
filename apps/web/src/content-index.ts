@@ -24,6 +24,11 @@ export class ContentIndex {
     return this.cards.get(key);
   }
 
+  /** Different Sentai colours Roll Call needs in this content (engine default 5). */
+  get rollCallColors(): number {
+    return this.snapshot.rules?.rollCallColors ?? 5;
+  }
+
   cardName = (key: string): string => this.cards.get(key)?.name ?? key;
   heroName = (key: string): string => this.heroes.get(key)?.name ?? key;
   relicName = (key: string): string => this.relics.get(key)?.name ?? key;

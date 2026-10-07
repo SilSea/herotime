@@ -4,6 +4,7 @@ import { withGeneratedText, type ContentSetData } from "./types.js";
 
 export * from "./dsl.js";
 export * from "./text.js";
+export * from "./text-th.js";
 export * from "./types.js";
 
 /** Sets exactly as authored: this is what gets stored as the first published version. */

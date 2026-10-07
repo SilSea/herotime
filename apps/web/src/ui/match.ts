@@ -635,7 +635,7 @@ function gaugeBars(ctx: Ctx, view: View): HTMLElement {
     { class: "gauges" },
     ...ctx.ix.snapshot.gauges.map((g) => {
       const value = view.me.state.gauges[g.key] ?? 0;
-      const t = gaugeText(g, ctx.ix.cardName);
+      const t = gaugeText(g, ctx.ix.cardName, ctx.ix.rollCallColors);
       const el = h("div", { class: "gauge" }, h("span", { class: "gname", text: g.name }), h("div", { class: "gbar" }, h("div", { class: "gfill", style: `width:${(value / g.max) * 100}%` }), ...g.thresholds.map((th) => h("div", { class: "gmark", style: `left:${(th.at / g.max) * 100}%` }))), h("span", { class: "gnum", text: `${value}/${g.max}` }), h("span", { class: "ghint", text: t.short }));
       el.addEventListener("mouseenter", () => showGaugeCard(ctx, view, el, g));
       el.addEventListener("mouseleave", hidePlayerCard);
@@ -647,7 +647,7 @@ function gaugeBars(ctx: Ctx, view: View): HTMLElement {
 /** A gauge explained: how it fills, what it pays, the reward card, and cards in this match that fill it. */
 function showGaugeCard(ctx: Ctx, view: View, anchor: HTMLElement, g: (typeof ctx.ix.snapshot.gauges)[number]): void {
   hidePlayerCard();
-  const t = gaugeText(g, ctx.ix.cardName);
+  const t = gaugeText(g, ctx.ix.cardName, ctx.ix.rollCallColors);
   const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
   const shopUnits = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
   const triggers = new Set(g.sources.map((s) => s.trigger));

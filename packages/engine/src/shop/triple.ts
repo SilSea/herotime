@@ -1,6 +1,6 @@
 import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
 import type { Rng } from "../rng/rng.js";
-import type { Unit } from "../content.js";
+import { recordBuff, type Unit } from "../content.js";
 import { RuleError, type PlayerState } from "./economy.js";
 import { withRules } from "../rules.js";
 import type { Pool } from "./pool.js";
@@ -26,6 +26,26 @@ function findTripleKey(player: PlayerState): string | undefined {
     }
   }
   return undefined;
+}
+
+/** The Final Form keeps everything the copies earned: their permanent stats, granted keywords and Henshin progress. */
+function mergeCopies(key: string, copies: readonly Unit[]): Unit {
+  const golden: Unit = { key, golden: true };
+  const atk = copies.reduce((n, u) => n + (u.bonusAtk ?? 0), 0);
+  const hp = copies.reduce((n, u) => n + (u.bonusHp ?? 0), 0);
+  if (atk) golden.bonusAtk = atk;
+  if (hp) golden.bonusHp = hp;
+  const keywords = [...new Set(copies.flatMap((u) => u.keywords ?? []))];
+  if (keywords.length > 0) golden.keywords = keywords;
+  const turns = Math.max(0, ...copies.map((u) => u.turns ?? 0));
+  if (turns) golden.turns = turns;
+  for (const u of copies) {
+    for (const b of u.buffs ?? []) {
+      recordBuff(golden, b, b.atk, b.hp);
+      for (const k of b.keywords ?? []) recordBuff(golden, b, 0, 0, k);
+    }
+  }
+  return golden;
 }
 
 /** Up to 3 distinct cards of exactly `rank`, drawn from the pool (unpicked ones go back on choose). */
@@ -57,22 +77,22 @@ export function resolveTriples(
   const results: TripleResult[] = [];
 
   for (let key = findTripleKey(player); key !== undefined; key = findTripleKey(player)) {
-    let removed = 0;
+    const merged: Unit[] = [];
     let anchor: { zone: Unit[]; index: number } | undefined;
     for (const zone of [player.board, player.hand]) {
-      for (let i = 0; i < zone.length && removed < 3; ) {
+      for (let i = 0; i < zone.length && merged.length < 3; ) {
         const u = zone[i] as Unit;
-        if (u.key === key && !u.golden) {
+        if (u.key === key && !u.golden && !u.components) {
           zone.splice(i, 1);
           anchor ??= { zone, index: i };
-          removed++;
+          merged.push(u);
         } else {
           i++;
         }
       }
     }
     if (!anchor) throw new Error("unreachable: findTripleKey guarantees 3 copies");
-    anchor.zone.splice(anchor.index, 0, { key, golden: true });
+    anchor.zone.splice(anchor.index, 0, mergeCopies(key, merged));
 
     const offer = drawOffer(pool, rng, Math.min(player.rank + 1, cfg.maxRank));
     if (offer.length > 0) player.discovers.push({ options: offer, destination: "HAND" });

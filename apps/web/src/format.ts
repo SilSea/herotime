@@ -77,14 +77,14 @@ export interface GaugeLike {
 }
 
 const GAUGE_SOURCE: Record<string, string> = {
-  ON_ROLL_CALL: "when Roll Call fires (Sentai of 5 different colours at the start of a fight)",
+  ON_ROLL_CALL: "when Roll Call fires (Sentai of {colors} different colours at the start of a fight)",
   ON_ROLL_CALL_WIN: "more if you also win that fight",
   HENSHIN: "each time one of your units transforms (Henshin)",
 };
 
 /** What a gauge does, in words, from its data: how it fills and what it pays out. */
-export function gaugeText(g: GaugeLike, cardName: (key: string) => string): { fills: string[]; rewards: string[]; short: string } {
-  const fills = g.sources.map((s) => `+${s.amount} ${GAUGE_SOURCE[s.trigger] ?? s.trigger}`);
+export function gaugeText(g: GaugeLike, cardName: (key: string) => string, rollCallColors = 5): { fills: string[]; rewards: string[]; short: string } {
+  const fills = g.sources.map((s) => `+${s.amount} ${(GAUGE_SOURCE[s.trigger] ?? s.trigger).replace("{colors}", String(rollCallColors))}`);
   const reward = (r: { type: string; cardKey?: string }): string =>
     r.type === "ADD_TO_HAND" && r.cardKey ? `get ${cardName(r.cardKey)}` : r.type === "DISCOVER_GIANT" ? "discover a Giant Robo" : r.type.toLowerCase().replace(/_/g, " ");
   const rewards = [...g.thresholds].sort((a, b) => a.at - b.at).map((t) => `${t.once ? `At ${t.at}` : `Every ${t.at}`}: ${t.reward.map(reward).join(", then ")}${t.once ? " (once per game)" : ""}`);

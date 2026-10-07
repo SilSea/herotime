@@ -34,6 +34,8 @@ export interface ContentSnapshot {
   gauges: GaugeDef[];
   relics: RelicDef[];
   heroes: HeroDef[];
+  /** Game-rule numbers the set overrides (missing = engine default). */
+  rules?: Partial<Record<string, number>>;
 }
 
 export interface AuthResult {

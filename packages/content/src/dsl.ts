@@ -147,7 +147,7 @@ export function gear(key: string, name: string, effects: ReturnType<typeof playe
 }
 
 // ------------------------------------------------------------ other content
-export const faction = (key: string, name: string, color: string, text = "") => FactionDef.parse({ key, name, color, text });
+export const faction = (key: string, name: string, color: string, text = "", textTh = "") => FactionDef.parse({ key, name, color, text, textTh });
 
 export const series = (
   key: string,

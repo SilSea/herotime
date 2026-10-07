@@ -28,6 +28,22 @@ beforeEach(() => {
 });
 
 describe("resolveTriples", () => {
+  it("keeps the permanent buffs, keywords and records of the merged copies", () => {
+    p.board = [
+      { key: "a", golden: false, bonusAtk: 2, bonusHp: 1, buffs: [{ kind: "gear", key: "g1", atk: 2, hp: 1 }], turns: 1 },
+      { key: "a", golden: false, bonusHp: 3, keywords: ["GUARD"], buffs: [{ kind: "gear", key: "g1", atk: 0, hp: 3, keywords: ["GUARD"] }] },
+    ];
+    p.hand = [{ key: "a", golden: false, bonusAtk: 1, buffs: [{ kind: "hero", key: "h", atk: 1, hp: 0 }] }];
+    resolveTriples(p, pool, rng);
+    expect(p.board).toEqual([
+      {
+        key: "a", golden: true, bonusAtk: 3, bonusHp: 4, keywords: ["GUARD"], turns: 1,
+        buffs: [{ kind: "gear", key: "g1", atk: 2, hp: 4, keywords: ["GUARD"] }, { kind: "hero", key: "h", atk: 1, hp: 0 }],
+      },
+    ]);
+    expect(p.hand).toEqual([]);
+  });
+
   it("does nothing with fewer than 3 copies", () => {
     p.hand = [u("a"), u("a"), u("b")];
     expect(resolveTriples(p, pool, rng)).toEqual([]);
