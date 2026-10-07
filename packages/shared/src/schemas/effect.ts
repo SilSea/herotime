@@ -52,6 +52,8 @@ export const Condition = z.discriminatedUnion("type", [
   z.object({ type: z.literal("FACTION_COUNT_GTE"), faction: z.string(), value: z.number().int().min(1) }),
   z.object({ type: z.literal("SERIES_COUNT_GTE"), series: z.string(), value: z.number().int().min(1) }),
   z.object({ type: z.literal("ENERGY_GTE"), value: z.number().int().min(0) }),
+  /** A friendly unit is one of these cards (or a form one of them turned into). */
+  z.object({ type: z.literal("HAS_CARD"), cards: z.array(z.string()).min(1) }),
 ]);
 export type Condition = z.infer<typeof Condition>;
 
@@ -79,6 +81,8 @@ export const Target = z.object({
   /** Only friendly selectors: restrict to units with this faction / series. */
   faction: z.string().optional(),
   series: z.string().optional(),
+  /** Only units that are one of these cards (or a form one of them turned into). */
+  cards: z.array(z.string()).min(1).optional(),
 });
 export type Target = z.infer<typeof Target>;
 

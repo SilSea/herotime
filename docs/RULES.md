@@ -178,7 +178,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
   "scope": "UNIT",                       // UNIT (ผูกกับยูนิต) | PLAYER (Hero Power, Relic, Series Bond, Gear)
   "trigger": "START_OF_COMBAT",
   "condition": { "type": "TEAM_UP_COLORS_GTE", "value": 3 },
-  "target": { "selector": "SELF" },      // + faction / series filter สำหรับ selector ฝั่งเรา
+  "target": { "selector": "SELF" },      // + faction / series / cards filter สำหรับ selector ฝั่งเรา
   "actions": [
     { "type": "BUFF", "atk": 2, "hp": 2, "permanent": false },
     { "type": "SUMMON", "cardKey": "beast_cub", "count": 1 }
@@ -195,7 +195,8 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 | แหล่ง Gauge | `ON_ROLL_CALL`, `ON_ROLL_CALL_WIN`, `HENSHIN` |
 
 ### 12.2 Conditions / Selectors / Actions
-- **Conditions**: `TEAM_UP_COLORS_GTE`, `FACTION_COUNT_GTE`, `SERIES_COUNT_GTE`, `ENERGY_GTE` (ใน combat ไม่มี energy → ไม่ผ่าน)
+- **Conditions**: `TEAM_UP_COLORS_GTE`, `FACTION_COUNT_GTE`, `SERIES_COUNT_GTE`, `ENERGY_GTE` (ใน combat ไม่มี energy → ไม่ผ่าน), `HAS_CARD {cards}` (บนบอร์ดมีการ์ดใบใดใบหนึ่งในรายการ)
+- **กรองด้วยชื่อการ์ด**: `target.cards` = รายการ key ของการ์ด ยูนิตที่ตรงใบใดใบหนึ่งเท่านั้นที่โดน (แบบ "หรือ") เช่น Deploy: ให้ Agent Number 7 หรือ Kamen Rider Zeztz +2/+2. ทั้ง `target.cards` และ `HAS_CARD` **นับร่างที่แปลงแล้วด้วย** (ร่างที่ได้จาก `henshin.into` หรือ `ultimateInto` ของการ์ดในรายการ ไล่ต่อกันได้หลายขั้น) แต่ไม่นับ `TRANSFORM` หรือ Gattai
 - **Selectors**: `SELF`, `ADJACENT`, `LEFTMOST_FRIENDLY`, `RIGHTMOST_FRIENDLY`, `RANDOM_FRIENDLY` (**ไม่เลือกตัวเอง**), `ALL_FRIENDLY`, `CHOSEN_FRIENDLY` (ผู้เล่นเลือก ใช้กับ Gear; ที่อื่น = ซ้ายสุด), `SUMMONED` (ตัวที่เพิ่งถูกเรียก ใช้กับ `ALLY_SUMMONED`), `GIANT_SLOT` (หุ่นในช่อง Giant), `LEFTMOST_ENEMY`, `RANDOM_ENEMY`, `ALL_ENEMY` (selector ศัตรูใช้ได้เฉพาะใน combat)
 - **Actions**: `BUFF`, `SUMMON`, `DAMAGE` (combat เท่านั้น), `GIVE_KEYWORD`, `TRANSFORM`, `DESTROY`, `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`, `DISCOVER_UNIT` (เลือกรับยูนิต 1 จาก 3 กรองเผ่าได้), `SUPER_GATTAI`, `RANDOM_CARD` (Gear หรือยูนิตแบบสุ่มเข้ามือ), `ULTIMATE_FORM` (เปลี่ยนเป็น `ultimateInto` ของการ์ด บัฟเดิมติดไปด้วย), `BUFF_SHOP` (ยูนิตในร้าน +atk/+hp จนจบเกม), `DEVOUR_SHOP` (กินยูนิตในร้าน: สุ่ม/แรงสุด/อ่อนสุด กรองเผ่าได้ เป้าหมายได้ค่าพลังถาวร), `SUMMON_FROM_HAND` (ช่วงซื้อของ: การ์ดในมือลงบอร์ด ไม่ทำ Deploy / ตอนสู้: สำเนายูนิตในมือลงสนาม), `DISCARD` (ทิ้งการ์ดในมือ สุ่ม/ซ้าย/ขวา เฉพาะยูนิตหรือ Gear ได้).
 - **ทุก effect**: `repeat` (ทำงาน N ครั้งต่อการเกิด 1 ครั้ง, 1–5) และ `limit` (ไม่เกิน N ครั้งต่อเทิร์น/ต่อเกม นับแยกต่อยูนิต หรือต่อ Relic/Hero/Gear; ตอนสู้นับต่อการสู้; ครั้งที่เงื่อนไขไม่ผ่านไม่นับ) ยังไม่มี: `STEAL_STATS`, `MERGE`, `COPY_KEYWORD`, `DISCOVER` ทั่วไป (ซีรีส์ Gokaiger/Kyoryuger/W/Den-O/OOO ใช้ตอน content pass: เพิ่ม handler ตามต้องการ)

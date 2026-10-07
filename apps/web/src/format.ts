@@ -7,11 +7,17 @@ const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY"
  * Board slots a gear can be used on, or null when it goes on nobody in particular. Same rule as the
  * engine: a unit qualifies when it passes the faction / series filter of every chosen-target effect.
  */
-export function gearTargetSlots(gear: CardDef | undefined, board: readonly (CardDef | undefined)[]): number[] | null {
+export function gearTargetSlots(gear: CardDef | undefined, board: readonly (CardDef | undefined)[], lineage: (key: string) => readonly string[] = (k) => [k]): number[] | null {
   const chosen = (gear?.effects ?? []).filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some((a) => TARGETED_ACTIONS.has(a.type)));
   if (chosen.length === 0) return null;
   const fits = (d: CardDef | undefined): boolean =>
-    d !== undefined && chosen.every((e) => (e.target?.faction === undefined || d.factions.includes(e.target.faction)) && (e.target?.series === undefined || d.series === e.target.series));
+    d !== undefined &&
+    chosen.every(
+      (e) =>
+        (e.target?.faction === undefined || d.factions.includes(e.target.faction)) &&
+        (e.target?.series === undefined || d.series === e.target.series) &&
+        (e.target?.cards === undefined || lineage(d.key).some((k) => e.target?.cards?.includes(k))),
+    );
   return board.flatMap((d, i) => (fits(d) ? [i] : []));
 }
 

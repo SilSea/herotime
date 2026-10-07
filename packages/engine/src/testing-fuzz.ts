@@ -30,12 +30,13 @@ function randomEffect(rng: Rng): Effect {
     undefined,
     { type: "TEAM_UP_COLORS_GTE", value: 1 + rng.int(3) },
     { type: "FACTION_COUNT_GTE", faction: rng.pick(FACTIONS), value: 1 + rng.int(2) },
-  ][rng.int(3)];
+    { type: "HAS_CARD", cards: ["tok"] },
+  ][rng.int(4)];
   return effect({
     trigger: rng.pick(TRIGGERS),
     every: rng.int(3) === 0 ? 1 + rng.int(3) : undefined,
     condition,
-    target: { selector: rng.pick(SELECTORS), faction: rng.int(4) === 0 ? rng.pick(FACTIONS) : undefined },
+    target: { selector: rng.pick(SELECTORS), faction: rng.int(4) === 0 ? rng.pick(FACTIONS) : undefined, cards: rng.int(5) === 0 ? ["tok", "big"] : undefined },
     actions: [pickAction(), ...(rng.int(3) === 0 ? [pickAction()] : [])],
     goldenMultiplier: rng.int(5) === 0 ? 3 : undefined,
   });

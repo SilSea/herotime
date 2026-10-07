@@ -1,5 +1,5 @@
 import type { Action, Effect, Selector, Target } from "@herotime/shared";
-import { checkCondition, type UnitView } from "../conditions.js";
+import { checkCondition, isOneOf, type UnitView } from "../conditions.js";
 import { recordBuff, type BuffRecord, type Unit } from "../content.js";
 import { modifyRule, withRules } from "../rules.js";
 import { copiesOf, noteMoment, type PlayerState, returnToPool } from "../shop/economy.js";
@@ -7,7 +7,7 @@ import type { GameEnv } from "./env.js";
 
 export function unitView(env: GameEnv, unit: Unit): UnitView {
   const def = env.content.card(unit.key);
-  const view: UnitView = { factions: def.factions, colors: def.colors };
+  const view: UnitView = { factions: def.factions, colors: def.colors, names: env.content.lineage(unit.key) };
   if (def.series !== undefined) view.series = def.series;
   return view;
 }
@@ -15,10 +15,14 @@ export function unitView(env: GameEnv, unit: Unit): UnitView {
 export const needsTargets = (a: Action): boolean =>
   a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "ULTIMATE_FORM" || a.type === "DEVOUR_SHOP";
 
-/** Whether a unit passes a target's faction / series filter. */
+/** Whether a unit passes a target's faction / series / card filter. */
 export function matchesTarget(env: GameEnv, u: Unit, t: Target): boolean {
   const v = unitView(env, u);
-  return (t.faction === undefined || (v.factions?.includes(t.faction) ?? false)) && (t.series === undefined || v.series === t.series);
+  return (
+    (t.faction === undefined || (v.factions?.includes(t.faction) ?? false)) &&
+    (t.series === undefined || v.series === t.series) &&
+    (t.cards === undefined || isOneOf(v.names, t.cards))
+  );
 }
 
 function select(

@@ -83,10 +83,12 @@ export interface Ability {
   when: string;
   /** AVENGE: every N deaths. */
   every: number;
-  /** "" = always; otherwise TEAM_UP_COLORS_GTE | FACTION_COUNT_GTE | ENERGY_GTE. */
+  /** "" = always; otherwise TEAM_UP_COLORS_GTE | FACTION_COUNT_GTE | ENERGY_GTE | HAS_CARD. */
   condition: string;
   conditionValue: number;
   conditionFaction: string;
+  /** HAS_CARD: one of these is on the board. */
+  conditionCards: string[];
   do: string;
   atk: number;
   hp: number;
@@ -100,6 +102,8 @@ export interface Ability {
   target: string;
   /** Only units of this faction ("" = any). */
   targetFaction: string;
+  /** Only these cards (or their later forms); empty = any. */
+  targetCards: string[];
   /** RANDOM_CARD: a Gear or a unit. */
   cardKind: "GEAR" | "UNIT";
   /** How many times the whole ability happens (1 = once). */
@@ -144,6 +148,7 @@ export const newAbility = (type: CardType): Ability => ({
   condition: "",
   conditionValue: 2,
   conditionFaction: "",
+  conditionCards: [],
   do: "BUFF",
   atk: 1,
   hp: 1,
@@ -155,6 +160,7 @@ export const newAbility = (type: CardType): Ability => ({
   faction: "",
   target: type === "GEAR" ? "CHOSEN_FRIENDLY" : "SELF",
   targetFaction: "",
+  targetCards: [],
   cardKind: "GEAR",
   repeat: 1,
   pick: "RANDOM",
@@ -224,6 +230,7 @@ export function checkRecipe(r: Recipe, takenKeys: ReadonlySet<string>): string[]
     if (d?.targeted && !c.target.some((x) => x.key === a.target)) out.push(tr(`Ability ${n}: pick who it affects.`, `ความสามารถ ${n}: เลือกเป้าหมาย`));
     if ((a.do === "SUMMON" || a.do === "ADD_TO_HAND") && !a.cardKey) out.push(tr(`Ability ${n}: pick the card.`, `ความสามารถ ${n}: เลือกการ์ด`));
     if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Ultimate Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Ultimate (ตั้งในขั้นที่ 4)`));
+    if (a.condition === "HAS_CARD" && a.conditionCards.length === 0) out.push(tr(`Ability ${n}: pick the card(s) the condition looks for.`, `ความสามารถ ${n}: เลือกการ์ดที่ต้องมีในเงื่อนไข`));
     if (a.do === "BUFF" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the buff adds nothing.`, `ความสามารถ ${n}: บัฟเป็น 0`));
   });
   return out;
@@ -276,7 +283,9 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   if (!gear && a.when === "AVENGE") effect.every = Math.max(1, a.every);
   if (a.repeat > 1) effect.repeat = Math.min(5, a.repeat);
   if (a.limitTimes > 0) effect.limit = { times: a.limitTimes, per: a.limitPer };
-  if (d?.targeted) effect.target = { selector: a.target, ...(a.targetFaction ? { faction: a.targetFaction } : {}) };
+  const friendlyPick = !["SELF", "SUMMONED", "ADJACENT", "GIANT_SLOT"].includes(a.target) && !a.target.endsWith("_ENEMY");
+  if (d?.targeted) effect.target = { selector: a.target, ...(a.targetFaction ? { faction: a.targetFaction } : {}), ...(friendlyPick && a.targetCards.length > 0 ? { cards: [...a.targetCards] } : {}) };
+  if (a.condition === "HAS_CARD" && a.conditionCards.length > 0) effect.condition = { type: a.condition, cards: [...a.conditionCards] };
   if (a.condition === "TEAM_UP_COLORS_GTE" || a.condition === "ENERGY_GTE") effect.condition = { type: a.condition, value: a.conditionValue };
   if (a.condition === "FACTION_COUNT_GTE" && a.conditionFaction) effect.condition = { type: a.condition, faction: a.conditionFaction, value: a.conditionValue };
   return effect;
@@ -288,11 +297,13 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
     const when = r.type === "GEAR" ? tr("Use", "ใช้") : a.when === "AVENGE" ? `Avenge (${a.every})` : (WHEN.find((w) => w.key === a.when)?.label() ?? a.when);
     // The labels are written to stand alone ("A unit the player picks"); inside a sentence they start lower case.
     const label = TARGET.find((t) => t.key === a.target)?.label() ?? "";
-    const who = label.charAt(0).toLowerCase() + label.slice(1) + (a.targetFaction ? ` (${factionName(a.targetFaction)})` : "");
+    const only = [a.targetFaction ? factionName(a.targetFaction) : "", a.targetCards.map(cardName).join(tr(" or ", " หรือ "))].filter(Boolean).join(", ");
+    const who = label.charAt(0).toLowerCase() + label.slice(1) + (only ? ` (${only})` : "");
     const cond =
       a.condition === "TEAM_UP_COLORS_GTE" ? tr(`if you have ${a.conditionValue}+ Sentai colours, `, `ถ้ามี Sentai ${a.conditionValue} สีขึ้นไป `)
       : a.condition === "FACTION_COUNT_GTE" ? tr(`if you have ${a.conditionValue}+ ${factionName(a.conditionFaction)} units, `, `ถ้ามียูนิต ${factionName(a.conditionFaction)} ${a.conditionValue} ตัวขึ้นไป `)
       : a.condition === "ENERGY_GTE" ? tr(`if you have ${a.conditionValue}+ Energy, `, `ถ้ามี Energy ${a.conditionValue} ขึ้นไป `)
+      : a.condition === "HAS_CARD" ? tr(`if you have ${a.conditionCards.map(cardName).join(" or ")}, `, `ถ้ามี ${a.conditionCards.map(cardName).join(" หรือ ")} `)
       : "";
     const sign = (n: number): string => (n >= 0 ? `+${n}` : String(n));
     const what =

@@ -197,6 +197,13 @@ describe("gearTargetSlots", async () => {
     expect(gearTargetSlots(onChosen({ faction: "rider" }), board)).toEqual([0, 2]);
     expect(gearTargetSlots(onChosen({ series: "w" }), board)).toEqual([2]);
   });
+  it("honours a named-card filter, later forms included", () => {
+    const zeztz = def({ key: "zeztz" });
+    const form = def({ key: "zeztz_form" });
+    const lineage = (k: string) => (k === "zeztz_form" ? ["zeztz_form", "zeztz"] : [k]);
+    expect(gearTargetSlots(onChosen({ cards: ["zeztz"] }), [board[0], zeztz, form], lineage)).toEqual([1, 2]);
+    expect(gearTargetSlots(onChosen({ cards: ["agent7"] }), [board[0], zeztz], lineage)).toEqual([]);
+  });
   it("is null for gear that needs no unit", () => {
     expect(gearTargetSlots(def({ kind: "GEAR", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", actions: [{ type: "DISCOVER_UNIT", faction: "rider" }] }] }), board)).toBeNull();
   });

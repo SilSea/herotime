@@ -1,5 +1,5 @@
 import type { Action, Effect, SentaiColor, Selector, Target } from "@herotime/shared";
-import { checkCondition, sentaiColorCount } from "../conditions.js";
+import { checkCondition, isOneOf, sentaiColorCount } from "../conditions.js";
 import {
   DEFAULT_COMBAT_RULES,
   DEFAULT_CONFIG,
@@ -163,8 +163,13 @@ export function simulateCombat(
   const friendly = (s: SideState): Fighter[] => s.list.filter(alive);
 
   // ---- targets ----
+  const namesOf = (key: string): readonly string[] => options.content?.lineage(key) ?? [key];
   const matches = (f: Fighter, t: Target): boolean =>
-    (t.faction === undefined || f.factions.includes(t.faction)) && (t.series === undefined || f.series === t.series);
+    (t.faction === undefined || f.factions.includes(t.faction)) &&
+    (t.series === undefined || f.series === t.series) &&
+    (t.cards === undefined || isOneOf(namesOf(f.cardKey), t.cards));
+  /** What conditions look at: the living friendly units, with their card names. */
+  const views = (s: SideState) => friendly(s).map((f) => ({ factions: f.factions, colors: f.colors, series: f.series, names: namesOf(f.cardKey) }));
 
   const select = (selector: Selector, t: Target, source: Fighter | null, s: SideState, subject?: Fighter): Fighter[] => {
     const mine = friendly(s).filter((f) => matches(f, t));
@@ -345,7 +350,7 @@ export function simulateCombat(
   };
 
   const runEffectOnce = (effect: Effect, source: Fighter | null, s: SideState, at: () => number, subject?: Fighter): void => {
-    if (!checkCondition(effect.condition, friendly(s))) return;
+    if (!checkCondition(effect.condition, views(s))) return;
     const mult = source?.golden ? (effect.goldenMultiplier ?? 2) : 1;
     const target: Target = effect.target ?? { selector: "SELF" };
     // Select once so a single random pick feeds every action in the effect.
@@ -359,7 +364,7 @@ export function simulateCombat(
       if (deaths !== undefined && deaths % (e.every ?? 1) !== 0) return;
       if (e.limit) {
         // In a fight a limit counts per fight, whatever its period.
-        if (!checkCondition(e.condition, friendly(s))) return;
+        if (!checkCondition(e.condition, views(s))) return;
         const key = `${trigger}#${i}`;
         const used = fightUses.get(f)?.[key] ?? 0;
         if (used >= e.limit.times) return;
@@ -527,7 +532,8 @@ export function simulateCombat(
     const swings = attacker.keywords.has("RAPID") ? 2 : 1;
 
     for (let swing = 0; swing < swings; swing++) {
-      if (!alive(attacker) || !s.list.includes(attacker)) break;
+      // A Rapid unit's second swing must not take the fight past the attack cap.
+      if (!alive(attacker) || !s.list.includes(attacker) || attacks >= maxAttacks) break;
 
       fire("ON_ATTACK", attacker, s, rightOf(s, attacker));
       settle(order);

@@ -43,6 +43,18 @@ function who(t: Target | undefined, names: Names): string {
   const filter = [t?.faction, t?.series].filter((x): x is string => !!x).map(names).join(" ");
   const one = filter ? `${filter} unit` : "ally";
   const many = filter ? `${filter} units` : "allies";
+  if (t?.cards) {
+    // Named cards: "your Agent Number 7 or Kamen Rider Zeztz".
+    const list = [filter, t.cards.map(names).join(" or ")].filter(Boolean).join(" ");
+    switch (t.selector) {
+      case "LEFTMOST_FRIENDLY": return `your leftmost ${list}`;
+      case "RIGHTMOST_FRIENDLY": return `your rightmost ${list}`;
+      case "RANDOM_FRIENDLY": return `another random ${list}`;
+      case "ALL_FRIENDLY": return `your ${list}`;
+      case "CHOSEN_FRIENDLY": return `a chosen ${list}`;
+      default: break;
+    }
+  }
   switch (t?.selector ?? "SELF") {
     case "SELF": return "this";
     case "ADJACENT": return "adjacent units";
@@ -66,6 +78,7 @@ function condition(c: Condition | undefined, names: Names): string {
     case "FACTION_COUNT_GTE": return `If you have ${c.value}+ ${names(c.faction)} units, `;
     case "SERIES_COUNT_GTE": return `If you have ${c.value}+ ${names(c.series)} units, `;
     case "ENERGY_GTE": return `If you have ${c.value}+ Energy, `;
+    case "HAS_CARD": return `If you have ${c.cards.map(names).join(" or ")}, `;
   }
 }
 

@@ -98,6 +98,27 @@ export class Content {
     if (problems.length > 0) throw new Error(`invalid content:\n- ${problems.join("\n- ")}`);
   }
 
+  private lineageCache = new Map<string, readonly string[]>();
+
+  /**
+   * The card key plus every card that turns into it through Henshin or Ultimate Form
+   * (Zeztz Ultimate -> [zeztz_ultimate, zeztz]), so a filter naming a card also finds its later forms.
+   */
+  lineage(key: string): readonly string[] {
+    const hit = this.lineageCache.get(key);
+    if (hit) return hit;
+    const from = new Map<string, string[]>();
+    for (const c of this.cards.values()) {
+      for (const into of [c.henshin?.into, c.ultimateInto]) {
+        if (into !== undefined) from.set(into, [...(from.get(into) ?? []), c.key]);
+      }
+    }
+    const out = [key];
+    for (let i = 0; i < out.length; i++) for (const k of from.get(out[i]!) ?? []) if (!out.includes(k)) out.push(k);
+    this.lineageCache.set(key, out);
+    return out;
+  }
+
   card(key: string): CardDef {
     const def = this.cards.get(key);
     if (!def) throw new Error(`unknown card: ${key}`);
@@ -123,6 +144,8 @@ export class Content {
       for (const e of effects) {
         needFaction(e.target?.faction, from);
         if (e.condition?.type === "FACTION_COUNT_GTE") needFaction(e.condition.faction, from);
+        for (const k of e.target?.cards ?? []) needCard(k, from);
+        if (e.condition?.type === "HAS_CARD") for (const k of e.condition.cards) needCard(k, from);
         checkPhase(e, from);
       }
     };

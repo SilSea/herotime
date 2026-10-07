@@ -5,7 +5,13 @@ export interface UnitView {
   factions?: readonly string[];
   colors?: readonly SentaiColor[];
   series?: string;
+  /** Its card key plus every card it is a later form of (see Content.lineage). */
+  names?: readonly string[];
 }
+
+/** Whether a unit is one of `cards` (or a form one of them turned into). */
+export const isOneOf = (names: readonly string[] | undefined, cards: readonly string[]): boolean =>
+  names !== undefined && names.some((n) => cards.includes(n));
 
 const REAL_COLORS: readonly SentaiColor[] = ["RED", "BLUE", "YELLOW", "GREEN", "PINK"];
 
@@ -40,5 +46,7 @@ export function checkCondition(
       return friendly.filter((u) => u.series === condition.series).length >= condition.value;
     case "ENERGY_GTE":
       return energy !== undefined && energy >= condition.value;
+    case "HAS_CARD":
+      return friendly.some((u) => isOneOf(u.names, condition.cards));
   }
 }

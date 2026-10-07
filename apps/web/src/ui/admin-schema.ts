@@ -51,7 +51,7 @@ export const TRIGGERS = [
   "ON_ROLL_CALL_WIN",
 ] as const;
 export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "GIANT_SLOT", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
-export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE"] as const;
+export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE", "HAS_CARD"] as const;
 export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
@@ -60,6 +60,9 @@ export const TIERS = ["LESSER", "GREATER"] as const;
 export const RULE_OPS = ["SET", "ADD", "MUL"] as const;
 /** Rules MODIFY_RULE understands (engine rules.ts); the field still accepts any text. */
 export const RULE_NAMES = ["startEnergy", "energyPerTurn", "maxEnergy", "buyCost", "sellValue", "refreshCost", "boardSize", "handSize", "maxRank", "freeRefreshesPerTurn", "rollCallColors", "rollCallBuff", "gattaiSize", "giantEntryThreshold", "giantSentaiScale", "kyodaikaMultiplier"] as const;
+
+/** Several card keys, one searchable picker each ("this card or that card"). */
+const CARD_LIST: Field = { kind: "list", of: { kind: "ref", to: "cards" }, make: () => "", title: () => "card", min: 1 };
 
 const int = (min?: number, max?: number): Field => ({ kind: "int", ...(min !== undefined ? { min } : {}), ...(max !== undefined ? { max } : {}) });
 const text: Field = { kind: "text" };
@@ -158,12 +161,14 @@ const CONDITION_FIELDS: Record<(typeof CONDITION_TYPES)[number], Row[]> = {
     { key: "value", label: "at least", field: int(1) },
   ],
   ENERGY_GTE: [{ key: "value", label: "energy at least", field: int(0) }],
+  HAS_CARD: [{ key: "cards", label: "any of these cards", field: CARD_LIST, hint: "Holds while one of these (or a later form of one) is on your board" }],
 };
 const CONDITION_DEFAULTS: Record<(typeof CONDITION_TYPES)[number], Record<string, unknown>> = {
   TEAM_UP_COLORS_GTE: { value: 3 },
   FACTION_COUNT_GTE: { faction: "", value: 2 },
   SERIES_COUNT_GTE: { series: "", value: 2 },
   ENERGY_GTE: { value: 1 },
+  HAS_CARD: { cards: [""] },
 };
 export const CONDITION: Field = { kind: "union", tag: "type", variants: CONDITION_FIELDS, make: (tag) => ({ type: tag, ...structuredClone(CONDITION_DEFAULTS[tag as keyof typeof CONDITION_DEFAULTS] ?? {}) }) };
 
@@ -174,6 +179,7 @@ export const TARGET: Field = {
     { key: "selector", field: { kind: "enum", options: SELECTORS } },
     { key: "faction", field: { kind: "ref", to: "factions" }, optional: true, hint: "only units of this faction" },
     { key: "series", field: { kind: "ref", to: "series" }, optional: true, hint: "only units of this series" },
+    { key: "cards", field: CARD_LIST, optional: true, hint: "only these cards (or their later forms: Henshin / Ultimate)" },
   ],
 };
 

@@ -42,6 +42,24 @@ describe("card wizard", () => {
     expect(gear.target.map((t) => t.key)).not.toContain("SELF");
   });
 
+  it("limits a target to named cards and checks for a named card", () => {
+    const zeztz = CardDef.parse({ key: "zeztz", name: "Kamen Rider Zeztz", rank: 1, atk: 2, hp: 2 });
+    const r = recipe({
+      key: "fan",
+      abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", condition: "HAS_CARD", conditionCards: ["zeztz"], do: "BUFF", atk: 2, hp: 2, target: "ALL_FRIENDLY", targetCards: ["zeztz", "cub"] }],
+    });
+    const card = buildCard(r);
+    expect(card.effects).toEqual([
+      { scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "BUFF", atk: 2, hp: 2, permanent: false }], target: { selector: "ALL_FRIENDLY", cards: ["zeztz", "cub"] }, condition: { type: "HAS_CARD", cards: ["zeztz"] } },
+    ]);
+    expect(() => new Content({ cards: [cub, zeztz, CardDef.parse(card)] } as never)).not.toThrow();
+    const name = (k: string) => ({ zeztz: "Zeztz", cub: "Cub" })[k] ?? k;
+    expect(describeRecipe(r, name, (k) => k)[0]).toContain("if you have Zeztz, give all your units (Zeztz or Cub) +2/+2");
+    expect(checkRecipe({ ...r, abilities: [{ ...r.abilities[0]!, conditionCards: [] }] }, new Set())).toEqual([expect.stringMatching(/condition looks for/)]);
+    // A target that is the unit itself takes no card filter.
+    expect(buildCard(recipe({ abilities: [{ ...newAbility("UNIT"), targetCards: ["cub"] }] })).effects).toEqual([expect.objectContaining({ target: { selector: "SELF" } })]);
+  });
+
   it("builds cards the engine accepts: a summoner, a pack leader and a gear", () => {
     const summoner = buildCard(recipe({ key: "den", factions: ["beast"], abilities: [{ ...newAbility("UNIT"), when: "LAST_STAND", do: "SUMMON", cardKey: "cub", count: 2 }] }));
     expect(summoner).toMatchObject({ kind: "UNIT", token: false, effects: [{ scope: "UNIT", trigger: "LAST_STAND", actions: [{ type: "SUMMON", cardKey: "cub", count: 2 }] }] });

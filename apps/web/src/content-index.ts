@@ -25,6 +25,15 @@ export class ContentIndex {
     return this.cards.get(key);
   }
 
+  /** The card key plus every card that turns into it by Henshin or Ultimate Form (same as the engine's Content.lineage). */
+  lineage = (key: string): string[] => {
+    const out = [key];
+    for (let i = 0; i < out.length; i++) {
+      for (const c of this.cards.values()) if ((c.henshin?.into === out[i] || c.ultimateInto === out[i]) && !out.includes(c.key)) out.push(c.key);
+    }
+    return out;
+  };
+
   /** Different Sentai colours Roll Call needs in this content (engine default 5). */
   get rollCallColors(): number {
     return this.snapshot.rules?.rollCallColors ?? 5;

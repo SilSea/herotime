@@ -106,6 +106,21 @@ function cardPick(value: string, cards: readonly CardDef[], set: (key: string) =
   return h("span", { class: "wz-picker" }, input, list, shown);
 }
 
+/** Several cards: the picked ones (each with a remove button) and a picker that adds one more. */
+function cardsPick(values: readonly string[], cards: readonly CardDef[], set: (keys: string[]) => void): HTMLElement {
+  const name = (k: string): string => cards.find((c) => c.key === k)?.name ?? k;
+  const chosen = values.map((k) =>
+    h("span", { class: "wz-chosen" }, name(k), h("button", { class: "mini", type: "button", text: "✕", title: tr("Remove", "เอาออก"), on: { click: () => (set(values.filter((x) => x !== k)), deps?.rerender()) } })),
+  );
+  const add = cardPick("", cards, (k) => {
+    if (k && !values.includes(k)) {
+      set([...values, k]);
+      deps?.rerender();
+    }
+  });
+  return h("span", { class: "wz-cards" }, ...chosen, add);
+}
+
 // ------------------------------------------------------------------ the screen
 
 export function wizardPanel(d: WizardDeps): HTMLElement {
@@ -257,9 +272,11 @@ function abilityBox(
           { value: "TEAM_UP_COLORS_GTE", label: tr("Sentai colours at least", "มีสี Sentai อย่างน้อย") },
           { value: "FACTION_COUNT_GTE", label: tr("units of a faction at least", "มียูนิตเผ่าหนึ่งอย่างน้อย") },
           { value: "ENERGY_GTE", label: tr("Energy at least", "มี Energy อย่างน้อย") },
+          { value: "HAS_CARD", label: tr("one of these cards is on the board", "มีการ์ดใบนี้อยู่บนบอร์ด (ใบใดใบหนึ่ง)") },
         ], (v) => (a.condition = v), true),
       ),
-      a.condition && field(tr("…how many", "…จำนวน"), num(a.conditionValue, (n) => (a.conditionValue = n), 0, 10)),
+      a.condition === "HAS_CARD" && field(tr("…cards (any one; later forms count)", "…การ์ด (ใบใดใบหนึ่ง นับร่างที่แปลงแล้วด้วย)"), cardsPick(a.conditionCards, o.units, (v) => (a.conditionCards = v))),
+      a.condition && a.condition !== "HAS_CARD" && field(tr("…how many", "…จำนวน"), num(a.conditionValue, (n) => (a.conditionValue = n), 0, 10)),
       a.condition === "FACTION_COUNT_GTE" && field(tr("…of faction", "…เผ่า"), pick(a.conditionFaction, o.factionOptions("—"), (v) => (a.conditionFaction = v))),
       field(tr("Do what", "ทำอะไร"), pick(a.do, c.do.map((x) => ({ value: x.key, label: x.label() })), (v) => (a.do = v), true)),
       a.do === "BUFF" && field("+ATK", num(a.atk, (n) => (a.atk = n), -20, 50)),
@@ -284,6 +301,7 @@ function abilityBox(
       a.limitTimes > 0 && field(tr("…per", "…ต่อ"), pick(a.limitPer, [{ value: "TURN", label: tr("turn", "เทิร์น") }, { value: "GAME", label: tr("game", "เกม") }], (v) => (a.limitPer = v as Ability["limitPer"]))),
       dd?.targeted && field(tr("Who", "กับใคร"), pick(a.target, c.target.map((t) => ({ value: t.key, label: t.label() })), (v) => (a.target = v), true)),
       dd?.targeted && !["SELF", "SUMMONED", "ADJACENT"].includes(a.target) && !a.target.endsWith("_ENEMY") && field(tr("…only faction", "…เฉพาะเผ่า"), pick(a.targetFaction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.targetFaction = v))),
+      dd?.targeted && !["SELF", "SUMMONED", "ADJACENT", "GIANT_SLOT"].includes(a.target) && !a.target.endsWith("_ENEMY") && field(tr("…only these cards (any one; later forms count)", "…เฉพาะการ์ดเหล่านี้ (ใบใดใบหนึ่ง นับร่างที่แปลงแล้วด้วย)"), cardsPick(a.targetCards, o.units, (v) => (a.targetCards = v))),
     ),
   );
 }

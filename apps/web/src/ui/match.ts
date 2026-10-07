@@ -698,7 +698,7 @@ function gearUsableHere(ctx: Ctx, view: View, handIndex: number): boolean {
 
 /** Slots the hand gear at `handIndex` can go on (null: it needs no unit). */
 const gearSlots = (ctx: Ctx, view: View, handIndex: number): number[] | null =>
-  gearTargetSlots(ctx.ix.card(view.me.state.hand[handIndex]?.key ?? ""), view.me.state.board.map((u) => ctx.ix.card(u.key)));
+  gearTargetSlots(ctx.ix.card(view.me.state.hand[handIndex]?.key ?? ""), view.me.state.board.map((u) => ctx.ix.card(u.key)), ctx.ix.lineage);
 
 /** The hand gear being aimed at a unit, if any (it must still be a gear in that slot). */
 function aimedGear(ctx: Ctx, view: View): number | undefined {

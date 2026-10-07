@@ -44,6 +44,18 @@ function who(t: Target | undefined, names: Names): string {
   const filter = [t?.faction, t?.series].filter((x): x is string => !!x).map(names).join(" ");
   const one = filter ? `ยูนิต ${filter} ` : "พันธมิตร";
   const many = filter ? `ยูนิต ${filter} ทุกตัว` : "พันธมิตรทุกตัว";
+  if (t?.cards) {
+    // การ์ดที่ระบุชื่อ: "Agent Number 7 หรือ Kamen Rider Zeztz"
+    const list = `ยูนิต ${[filter, t.cards.map(names).join(" หรือ ")].filter(Boolean).join(" ")}`;
+    switch (t.selector) {
+      case "LEFTMOST_FRIENDLY": return `${list} ตัวซ้ายสุด`;
+      case "RIGHTMOST_FRIENDLY": return `${list} ตัวขวาสุด`;
+      case "RANDOM_FRIENDLY": return `${list} ตัวอื่นแบบสุ่ม 1 ตัว`;
+      case "ALL_FRIENDLY": return `${list} ทุกตัว`;
+      case "CHOSEN_FRIENDLY": return `${list} ที่เลือก`;
+      default: break;
+    }
+  }
   switch (t?.selector ?? "SELF") {
     case "SELF": return "ตัวนี้";
     case "ADJACENT": return "ยูนิตที่อยู่ข้างๆ";
@@ -67,6 +79,7 @@ function condition(c: Condition | undefined, names: Names): string {
     case "FACTION_COUNT_GTE": return `ถ้ามียูนิต ${names(c.faction)} ${c.value} ตัวขึ้นไป `;
     case "SERIES_COUNT_GTE": return `ถ้ามียูนิต ${names(c.series)} ${c.value} ตัวขึ้นไป `;
     case "ENERGY_GTE": return `ถ้ามี Energy ${c.value} ขึ้นไป `;
+    case "HAS_CARD": return `ถ้ามี ${c.cards.map(names).join(" หรือ ")} `;
   }
 }
 

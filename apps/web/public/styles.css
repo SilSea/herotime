@@ -840,6 +840,8 @@ body.dragging .drop-marker.show { display: block; }
 .wz-picker { display: flex; flex-direction: column; gap: 2px; }
 .wz-picker input.bad { border-color: var(--magenta); }
 .wz-picked { color: var(--cyan); }
+.wz-cards { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start; }
+.wz-chosen { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 8px; border: 1px solid var(--cyan); border-radius: 999px; font-size: 0.85em; }
 .admin-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
 .admin-filters select { flex: 1 1 45%; min-width: 0; font-size: 12px; }
 .ref-field { display: flex; flex-direction: column; gap: 2px; }
