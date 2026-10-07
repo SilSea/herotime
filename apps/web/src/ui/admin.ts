@@ -1,6 +1,6 @@
 import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
-import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta } from "../protocol.js";
+import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta, GameStats, StatRow } from "../protocol.js";
 import { ENTITIES, entityInfo, RULE_DEFAULTS, RULE_ROWS, type EntityKind, type RefKind } from "./admin-schema.js";
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
@@ -24,7 +24,9 @@ interface EditorState {
   dirty: boolean;
   busy: boolean;
   raw: boolean;
-  panel: "edit" | "versions" | "audit" | "simulate";
+  panel: "edit" | "versions" | "audit" | "simulate" | "stats";
+  stats?: GameStats;
+  statsHumans: boolean;
   sim?: SimulationReport;
   simMatches: number;
   simTarget: "draft" | "published";
@@ -36,7 +38,7 @@ interface EditorState {
   publishIssues: string[];
 }
 
-const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft", simRelic: "" };
+const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft", simRelic: "", statsHumans: false };
 
 /** The element the screen was last drawn into: the app redraws and replaces it, so async work must not hold on to an old one. */
 let host: HTMLElement | undefined;
@@ -120,7 +122,7 @@ export function renderAdmin(root: HTMLElement, ctx: Ctx): void {
   const datalists = (["cards", "factions", "series", "gauges", "heroes", "relics"] as RefKind[]).map((k) => h("datalist", { id: `dl-${k}` }, ...refs(k).map((v) => h("option", { value: v }))));
 
   const panel =
-    ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : ed.panel === "simulate" ? simulatePanel(ctx) : editorBody(ctx, refs);
+    ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : ed.panel === "simulate" ? simulatePanel(ctx) : ed.panel === "stats" ? statsPanel(ctx) : editorBody(ctx, refs);
 
   mount(root, h("div", { class: "admin" }, ...datalists, toolbar(ctx), issuesBox(), panel));
 }
@@ -156,6 +158,7 @@ function toolbar(ctx: Ctx): HTMLElement {
     b("Discard draft", () => void discard(ctx), { danger: true, off: !d.saved && !ed.dirty }),
     b("Versions", () => void showVersions(ctx)),
     b("Simulate", () => ((ed.panel = "simulate"), redraw()), { title: "Play bot matches on the content and see what stands out" }),
+    b("Stats", () => void showStats(ctx), { title: "Pick rate and results of cards, heroes and relics in real matches" }),
     b("History", () => void showAudit(ctx)),
     ed.panel !== "edit" && b("Back to editing", () => ((ed.panel = "edit"), redraw())),
   );
@@ -237,6 +240,75 @@ async function restore(ctx: Ctx, n: number): Promise<void> {
   ed.index = undefined;
   ed.panel = "edit";
   ctx.toast(`Version ${n} copied into the draft. Publish it to make it live.`);
+}
+
+// ----------------------------------------------------------------- statistics from real matches
+
+async function showStats(ctx: Ctx): Promise<void> {
+  ed.panel = "stats";
+  const r = await guarded(ctx, () => ctx.api.adminStats(token(ctx), ed.statsHumans, []));
+  if (r) {
+    ed.stats = r;
+    redraw();
+  }
+}
+
+function statRows(title: string, rows: readonly StatRow[], name: (k: string) => string, limit = 20): HTMLElement {
+  return h(
+    "div",
+    { class: "panel sim-table" },
+    h("h3", { text: title }),
+    rows.length === 0
+      ? h("p", { class: "muted", text: "No data yet." })
+      : h("table", { class: "admin-table" }, h("tr", null, ...["", "Seen", "Pick %", "Avg place", "Win %"].map((t) => h("th", { text: t }))),
+          ...rows.slice(0, limit).map((r) => h("tr", { class: r.count >= 5 && r.avgPlacement <= 3.8 ? "sim-good" : r.count >= 5 && r.avgPlacement >= 5.2 ? "sim-bad" : "" }, h("td", { text: name(r.key) }), h("td", { text: String(r.count) }), h("td", { text: `${(r.pickRate * 100).toFixed(1)}%` }), h("td", { text: r.avgPlacement.toFixed(2) }), h("td", { text: `${(r.winRate * 100).toFixed(0)}%` })))),
+  );
+}
+
+/** Copy the suggested relic weights into the draft (save to keep them, publish to use them). */
+function applyWeights(ctx: Ctx): void {
+  const s = ed.stats;
+  if (!s || !ed.draft) return;
+  let changed = 0;
+  for (const r of data().relics ?? []) {
+    const w = s.relicWeights.find((x) => x.key === r.key);
+    if (w && w.samples > 0 && w.suggested !== (r.weight ?? 100)) {
+      r.weight = w.suggested;
+      changed++;
+    }
+  }
+  if (changed > 0) ed.dirty = true;
+  ctx.toast(changed > 0 ? `${changed} relic weight${changed > 1 ? "s" : ""} changed in the draft. Save, then publish.` : "Nothing to change.");
+  redraw();
+}
+
+function statsPanel(ctx: Ctx): HTMLElement {
+  const s = ed.stats;
+  const humans = h("input", { type: "checkbox", checked: ed.statsHumans });
+  humans.addEventListener("change", () => {
+    ed.statsHumans = humans.checked;
+    void showStats(ctx);
+  });
+  const changes = s ? s.relicWeights.filter((w) => w.samples > 0 && w.suggested !== w.weight) : [];
+  return h(
+    "div",
+    null,
+    h("div", { class: "panel" }, h("h3", { text: "Statistics from real matches" }), h("p", { class: "muted", text: "Every finished match the server saved. A card counts once for each player whose last board had it. Green = its players place well (3.8 or better), red = badly (5.2 or worse), with 5+ samples." }),
+      h("label", { class: "row" }, humans, "humans only (leave bots out)"),
+      s && h("p", { text: `${s.matches} matches, ${s.players} players counted.` })),
+    s &&
+      h(
+        "div",
+        { class: "sim-grid" },
+        statRows("Heroes", s.heroes, ctx.ix.heroName),
+        statRows("Relics", s.relics, ctx.ix.relicName),
+        statRows("Cards: best", s.cards.filter((c) => c.count >= 5), ctx.ix.cardName),
+        statRows("Cards: most picked", [...s.cards].sort((a, b) => b.count - a.count), ctx.ix.cardName),
+        h("div", { class: "panel sim-table" }, h("h3", { text: "Relic weights" }), h("p", { class: "muted", text: "How often each relic is offered. The suggestion lowers the weight of relics whose holders place well and raises it for those that place badly (15% per place, at least 5 holders)." }),
+          changes.length === 0 ? h("p", { class: "muted", text: "No change suggested yet." }) : h("table", { class: "admin-table" }, h("tr", null, ...["", "Holders", "Weight", "Suggested"].map((t) => h("th", { text: t }))), ...changes.map((w) => h("tr", null, h("td", { text: ctx.ix.relicName(w.key) }), h("td", { text: String(w.samples) }), h("td", { text: String(w.weight) }), h("td", { text: String(w.suggested) })))),
+          changes.length > 0 && h("button", { class: "btn primary", text: "Apply to the draft", on: { click: () => applyWeights(ctx) } })),
+      ),
+  );
 }
 
 // ----------------------------------------------------------------- simulation

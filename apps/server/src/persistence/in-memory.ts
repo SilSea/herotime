@@ -13,6 +13,10 @@ import {
   type Standing,
   type UserRecord,
   type UserRepository,
+  aggregateStats,
+  type GameStats,
+  type StatLine,
+  type StatsFilter,
 } from "./repositories.js";
 
 export class InMemoryUserRepository implements UserRepository {
@@ -51,6 +55,14 @@ export class InMemoryMatchRepository implements MatchRepository {
       .filter((r) => r.players.some((p) => p.userId === userId))
       .slice(-limit)
       .reverse();
+  }
+
+  async stats(filter: StatsFilter): Promise<GameStats> {
+    const results = this.results.filter((r) => !filter.modes || filter.modes.includes(r.mode));
+    const lines: StatLine[] = results.flatMap((r) =>
+      r.players.filter((p) => !filter.humansOnly || !p.isBot).map((p) => ({ isBot: p.isBot, mode: r.mode, heroKey: p.heroKey, placement: p.placement, board: p.board ?? [], relics: p.relics ?? [] })),
+    );
+    return aggregateStats(lines, results.length);
   }
 
   /** Usernames are looked up by the caller's user repository, so pass one in to get names (tests may omit it). */

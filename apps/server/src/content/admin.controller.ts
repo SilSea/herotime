@@ -14,6 +14,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UnprocessableEntityException,
   UseGuards,
@@ -21,9 +22,10 @@ import {
 import type { Request } from "express";
 import type { PublicUser } from "../auth/auth.service.js";
 import { JwtAuthGuard } from "../auth/auth.controller.js";
-import { CONTENT_REPOSITORY, type ContentData, type ContentRepository } from "../persistence/repositories.js";
+import { CONTENT_REPOSITORY, MATCH_REPOSITORY, type ContentData, type ContentRepository, type MatchMode, type MatchRepository } from "../persistence/repositories.js";
 import { ContentInvalidError, ContentService, inspectContent, snapshotOf } from "./content.service.js";
 import { simulate } from "./simulate.js";
+import { suggestRelicWeights } from "./weights.js";
 import { UploadError, UploadStore } from "./uploads.js";
 
 type AuthedRequest = Request & { user?: PublicUser };
@@ -56,7 +58,22 @@ export class AdminController {
     @Inject(ContentService) private readonly content: ContentService,
     @Inject(CONTENT_REPOSITORY) private readonly repo: ContentRepository,
     @Inject(UploadStore) private readonly uploads: UploadStore,
+    @Inject(MATCH_REPOSITORY) private readonly matches: MatchRepository,
   ) {}
+
+  /**
+   * Statistics over the matches the server has saved: pick rate, average place and win rate of every card
+   * (on a player's last board), hero and relic, plus relic weights the numbers suggest for the draft.
+   * ?humans=1 leaves bots out; ?modes=queue,quick picks the kinds of match.
+   */
+  @Get("stats")
+  async stats(@Query("humans") humans?: string, @Query("modes") modes?: string) {
+    const known: MatchMode[] = ["queue", "quick", "practice"];
+    const picked = (modes ?? "").split(",").filter((m): m is MatchMode => (known as string[]).includes(m));
+    const stats = await this.matches.stats({ humansOnly: humans === "1" || humans === "true", ...(picked.length > 0 ? { modes: picked } : {}) });
+    const relics = [...this.content.latest.content.relics.values()].map((r) => ({ key: r.key, weight: r.weight }));
+    return { ...stats, relicWeights: suggestRelicWeights(relics, stats.relics) };
+  }
 
   /** The working copy: the saved draft, or the published version when nobody has started one. */
   @Get("draft")

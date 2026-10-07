@@ -119,6 +119,9 @@ export class MatchRegistry {
           isBot: p.isBot,
           heroKey: p.state.hero ?? null,
           placement: byId.get(p.id) as number,
+          // The board they last fought with (what got them their place); the current one if they never fought.
+          board: p.lastFightBoard ? p.lastFightBoard.map((u) => u.cardKey) : p.state.board.map((u) => u.key),
+          relics: [...p.state.relics],
         })),
       })
       .catch((e: unknown) => console.error(`could not save match ${runner.id}`, e));

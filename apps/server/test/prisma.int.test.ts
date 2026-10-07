@@ -213,6 +213,20 @@ describe.skipIf(!URL_)("Prisma repositories on real Postgres", () => {
     it("is empty when nobody has played enough", async () => {
       expect(await matches.leaderboard(10, 3)).toEqual([]);
     });
+
+    it("stores last boards and relics, and sums them into card, hero and relic statistics", async () => {
+      const at = new Date("2026-10-01T10:00:00Z");
+      const p = (placement: number, isBot: boolean, board: string[], relics: string[]) => ({ userId: null, name: "x", isBot, heroKey: "h1", placement, board, relics });
+      await matches.save({ matchId: "st1", mode: "queue", seed: 1, contentVersion: 1, startedAt: at, endedAt: at, players: [p(1, false, ["a", "b"], ["r1"]), p(2, true, ["b"], [])] });
+      await matches.save({ matchId: "st2", mode: "quick", seed: 2, contentVersion: 1, startedAt: at, endedAt: at, players: [p(2, false, ["a"], [])] });
+      const all = await matches.stats({});
+      expect(all).toMatchObject({ matches: 2, players: 3 });
+      expect(all.cards.find((c) => c.key === "a")).toMatchObject({ count: 2, avgPlacement: 1.5, winRate: 0.5 });
+      expect(all.relics).toEqual([{ key: "r1", count: 1, pickRate: 0.333, avgPlacement: 1, winRate: 1 }]);
+      expect(all.heroes[0]).toMatchObject({ key: "h1", count: 3 });
+      const humansInQueue = await matches.stats({ humansOnly: true, modes: ["queue"] });
+      expect(humansInQueue).toMatchObject({ matches: 1, players: 1 });
+    });
   });
 
   describe("content versions", () => {

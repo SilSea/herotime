@@ -35,7 +35,7 @@ describe("GET /content", () => {
     expect(body.factions).toHaveLength(7);
     expect(body.cards.length).toBeGreaterThan(50);
     expect(body.heroes.length).toBeGreaterThanOrEqual(6);
-    expect(body.relics.length).toBe(16);
+    expect(body.relics.length).toBe(21);
     expect(body.series.length).toBeGreaterThan(0);
     expect(body.gauges.length).toBe(2);
   });

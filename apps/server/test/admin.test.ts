@@ -205,6 +205,32 @@ describe("sandbox simulation", () => {
   }, 90_000);
 });
 
+describe("statistics from saved matches", () => {
+  it("needs an admin; counts cards on last boards, heroes and relics; filters bots and modes; suggests relic weights", async () => {
+    expect((await call("GET", "/admin/stats", player.token)).status).toBe(403);
+    const relic = [...server.content.latest.content.relics.keys()][0] as string;
+    const at = new Date();
+    const line = (placement: number, isBot: boolean, board: string[], relics: string[] = []) => ({ userId: isBot ? null : "u", name: "x", isBot, heroKey: "h1", placement, board, relics });
+    for (let i = 0; i < 6; i++) {
+      await server.matches.save({ matchId: `s${i}`, mode: "queue", seed: i, contentVersion: 1, startedAt: at, endedAt: at, players: [line(1, false, ["a", "a", "b"], [relic]), line(2, true, ["b"])] });
+    }
+    await server.matches.save({ matchId: "p", mode: "practice", seed: 9, contentVersion: 1, startedAt: at, endedAt: at, players: [line(2, false, ["c"])] });
+
+    const all = (await call("GET", "/admin/stats", admin.token)).body;
+    expect(all).toMatchObject({ matches: 7, players: 13 });
+    expect(all.cards.find((c: { key: string }) => c.key === "a")).toMatchObject({ count: 6, avgPlacement: 1, winRate: 1 }); // a card counts once per board
+    expect(all.cards.find((c: { key: string }) => c.key === "b")).toMatchObject({ count: 12, avgPlacement: 1.5 });
+
+    const humans = (await call("GET", "/admin/stats?humans=1&modes=queue", admin.token)).body;
+    expect(humans).toMatchObject({ matches: 6, players: 6 });
+    expect(humans.cards.find((c: { key: string }) => c.key === "c")).toBeUndefined();
+
+    const w = all.relicWeights.find((x: { key: string }) => x.key === relic);
+    expect(w.samples).toBe(6);
+    expect(w.suggested).toBeLessThan(w.weight); // its holders always win: offer it less
+  });
+});
+
 describe("card art upload", () => {
   // 1x1 transparent PNG
   const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");

@@ -78,7 +78,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F6.5** (P0) Upload รูป (PNG/JPEG/GIF/WebP ≤ ~1.4 MB, ตรวจชนิดจาก bytes ไม่รับ SVG, ตั้งชื่อไฟล์จาก hash, เก็บใน `UPLOAD_DIR`, เสิร์ฟที่ `/art/`)
 - [x] **F6.6** (P1) Sandbox: bot 8 ตัวเล่นเต็มแมตช์บน draft หรือชุดที่ publish (สูงสุด 300 แมตช์) สรุป hero/faction/การ์ดที่ชนะมากหรือน้อยผิดปกติ (ยังไม่ใช่การเลือกบอร์ด 2 ฝั่งเอง)
 - [~] **F6.7** (P1) Rollback (restore เวอร์ชันเก่าเข้า draft แล้ว publish) + Audit log ทำแล้ว; Diff ยังไม่ทำ
-- [ ] **F6.8** (P2) Stat dashboard (pick rate, win rate ต่อการ์ด)
+- [x] **F6.8** (P2) Stat dashboard (pick rate, win rate ต่อการ์ด): Admin → Stats จากแมตช์จริงที่บันทึกไว้ (บอร์ดสุดท้าย + Relic ต่อผู้เล่นเก็บใน MatchPlayer), การ์ด/Hero/Relic: Seen, Pick %, อันดับเฉลี่ย, Win %; กรองเฉพาะคน; API `GET /admin/stats?humans=1&modes=queue,quick`
 
 ## F7. Relic (ระบบสมบัติ) — ดู [RULES.md §13](RULES.md#13-relic-ระบบสมบัติ)
 - [x] **F7.1** (P0) เลือก Lesser Relic เทิร์น 5, Greater Relic เทิร์น 9 (1 จาก 4, มีราคา Energy, เลือกไม่ทันได้ตัวราคา 0)
@@ -90,4 +90,4 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F7.7** (P0) Bot เลือก Relic
 - [x] **F7.8** (P0) Content: production 10 Lesser + 8 Greater, prototype 9 + 7
 - [x] **F7.9** (P1) ใส่ Relic ใน admin sandbox: ตาราง Relic (อันดับเฉลี่ยของคนที่ถือ) + เลือก Relic ให้ bot 1 ถือตั้งแต่เริ่มทุกแมตช์แล้วดูอันดับ
-- [ ] **F7.10** (P1) ปรับ weight จากสถิติ pick/win rate, เพิ่ม content
+- [x] **F7.10** (P1) ปรับ weight จากสถิติ pick/win rate, เพิ่ม content: Admin → Stats เสนอ weight ใหม่ (ถือแล้วอันดับดี → สุ่มเจอน้อยลง 15%/อันดับ, ช่วง ×0.5–×1.5, ต้องมี ≥5 คนถือ) กด Apply to the draft; Relic ใหม่ 5 อัน (Scout Report, Belt Charm, Kaiju Egg, Hero Medal, Mecha Blueprint) รวม 21

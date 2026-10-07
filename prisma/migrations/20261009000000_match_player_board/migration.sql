@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "MatchPlayer" ADD COLUMN "board" TEXT[] DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "relics" TEXT[] DEFAULT ARRAY[]::TEXT[];

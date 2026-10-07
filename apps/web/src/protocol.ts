@@ -100,6 +100,24 @@ export interface SimulationReport {
   neverUsed: string[];
 }
 
+/** A card, hero or relic over saved matches (GET /admin/stats). */
+export interface StatRow {
+  key: string;
+  count: number;
+  pickRate: number;
+  avgPlacement: number;
+  winRate: number;
+}
+
+export interface GameStats {
+  matches: number;
+  players: number;
+  cards: StatRow[];
+  heroes: StatRow[];
+  relics: StatRow[];
+  relicWeights: { key: string; weight: number; suggested: number; samples: number }[];
+}
+
 export interface MyMatch {
   matchId: string;
   mode: "queue" | "quick" | "practice";

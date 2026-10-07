@@ -14,6 +14,10 @@ import {
   type Standing,
   type UserRecord,
   type UserRepository,
+  aggregateStats,
+  type GameStats,
+  type StatLine,
+  type StatsFilter,
 } from "./repositories.js";
 
 /** Prisma 7 talks to Postgres through a driver adapter. */
@@ -85,6 +89,8 @@ export class PrismaMatchRepository implements MatchRepository {
             isBot: p.isBot,
             heroKey: p.heroKey,
             placement: p.placement,
+            board: p.board ?? [],
+            relics: p.relics ?? [],
           })),
         },
       },
@@ -109,6 +115,26 @@ export class PrismaMatchRepository implements MatchRepository {
         .map((p) => ({ userId: p.userId, name: p.name, isBot: p.isBot, heroKey: p.heroKey, placement: p.placement }))
         .sort((a, b) => a.placement - b.placement),
     }));
+  }
+
+  async stats(filter: StatsFilter): Promise<GameStats> {
+    const where = filter.modes ? { mode: { in: filter.modes } } : {};
+    const [matches, players] = await Promise.all([
+      this.db.match.count({ where }),
+      this.db.matchPlayer.findMany({
+        where: { match: where, ...(filter.humansOnly ? { isBot: false } : {}) },
+        select: { isBot: true, heroKey: true, placement: true, board: true, relics: true, match: { select: { mode: true } } },
+      }),
+    ]);
+    const lines: StatLine[] = players.map((p) => ({
+      isBot: p.isBot,
+      mode: p.match.mode === "practice" || p.match.mode === "quick" ? p.match.mode : "queue",
+      heroKey: p.heroKey,
+      placement: p.placement,
+      board: p.board,
+      relics: p.relics,
+    }));
+    return aggregateStats(lines, matches);
   }
 
   async leaderboard(limit: number, minGames: number): Promise<Standing[]> {

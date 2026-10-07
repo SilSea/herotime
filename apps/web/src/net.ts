@@ -1,4 +1,4 @@
-import type { Ack, AdminDraft, LeaderboardRow, MyMatch, SimulationReport, AuditEntry, AuthResult, ContentSnapshot, EventMessage, Intent, PracticeOptions, QueueStatus, VersionMeta, ViewMessage } from "./protocol.js";
+import type { Ack, AdminDraft, LeaderboardRow, MyMatch, SimulationReport, AuditEntry, AuthResult, ContentSnapshot, EventMessage, Intent, PracticeOptions, QueueStatus, VersionMeta, ViewMessage, GameStats } from "./protocol.js";
 
 /** The slice of a socket.io client we use, so tests can plug in a fake. */
 export interface SocketLike {
@@ -132,6 +132,8 @@ export class Api {
   adminPublish = (t: string, notes: string, force: boolean): Promise<{ version: number }> => this.admin(t, "POST", "publish", { notes, force });
   adminVersions = (t: string): Promise<{ current: number; versions: VersionMeta[] }> => this.admin(t, "GET", "versions");
   adminRestore = (t: string, n: number): Promise<AdminDraft> => this.admin(t, "POST", `versions/${n}/restore`, {});
+  adminStats = (t: string, humansOnly: boolean, modes: string[]): Promise<GameStats> =>
+    this.admin(t, "GET", `stats?humans=${humansOnly ? 1 : 0}${modes.length > 0 ? `&modes=${modes.join(",")}` : ""}`);
   adminSimulate = (t: string, matches: number, target: "draft" | "published", relic?: string): Promise<SimulationReport> => this.admin(t, "POST", "simulate", { matches, target, ...(relic ? { relic } : {}) });
   adminUpload = (t: string, data: string): Promise<{ file: string; url: string }> => this.admin(t, "POST", "upload", { data });
   adminAudit = (t: string): Promise<{ entries: AuditEntry[] }> => this.admin(t, "GET", "audit");

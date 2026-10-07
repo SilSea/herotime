@@ -261,6 +261,12 @@ const relics = [
   relic("dark_throne", "Dark Throne", "GREATER", 2, [player("START_OF_COMBAT", buff(3, 0), { target: allAllies({ faction: "dark_rider" }) })], { factions: ["dark_rider"] }),
   relic("universal_belt", "Universal Belt", "GREATER", 6, [player("ON_ACQUIRE", rule("freeRefreshesPerTurn", "SET", 2))]),
   relic("veteran_crest", "Veteran Crest", "GREATER", 0, [player("ON_ACQUIRE", buff(1, 1), { target: allAllies() })]),
+  // more choice (F7.10)
+  relic("scout_report", "Scout Report", "LESSER", 1, [player("ON_ACQUIRE", discoverUnit())]),
+  relic("belt_charm", "Belt Charm", "LESSER", 2, [player("START_OF_COMBAT", buff(1, 2), { target: leftmost({ faction: "rider" }) })], { factions: ["rider"] }),
+  relic("kaiju_egg", "Kaiju Egg", "LESSER", 2, [player("START_OF_COMBAT", give("KYODAIKA"), { target: leftmost({ faction: "kaijin" }) })], { factions: ["kaijin"] }),
+  relic("hero_medal", "Hero Medal", "GREATER", 5, [player("ON_TURN_START", buff(1, 1), { target: randomAlly() })]),
+  relic("mecha_blueprint", "Mecha Blueprint", "GREATER", 3, [player("ON_ACQUIRE", rule("gattaiSize", "SET", 2))], { factions: ["mecha"] }),
 ];
 
 const heroes = [
