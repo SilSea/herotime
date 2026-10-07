@@ -47,6 +47,18 @@ describe("rules text for named cards", () => {
   });
 });
 
+describe("rules text for fight rewards", () => {
+  const blank = getContentSet("blank");
+  const set = withGeneratedText({
+    ...blank,
+    cards: [{ key: "miner", name: "Miner", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "ON_ATTACK", actions: [{ type: "GAIN_ENERGY", amount: 1 }] }] }] as never,
+  });
+  it("says the reward comes next turn", () => {
+    expect(set.cards[0]?.text).toBe("When this attacks: gain 1 Energy next turn.");
+    expect(set.cards[0]?.textTh).toMatch(/ในเทิร์นหน้า$/);
+  });
+});
+
 describe("shipped rules", () => {
   it("Roll Call needs 3 different colours in every set", () => {
     for (const name of ["prototype", "production", "blank"] as const) expect(getContentSet(name).rules?.rollCallColors).toBe(3);

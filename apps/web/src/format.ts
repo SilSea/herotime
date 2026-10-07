@@ -21,6 +21,11 @@ export function gearTargetSlots(gear: CardDef | undefined, board: readonly (Card
   return board.flatMap((d, i) => (fits(d) ? [i] : []));
 }
 
+/** Alphabetical by name (then key), ignoring case, numbers in order ("Unit 2" before "Unit 10"). */
+export const byName = (a: { name?: unknown; key?: unknown }, b: { name?: unknown; key?: unknown }): number =>
+  String(a.name ?? a.key ?? "").localeCompare(String(b.name ?? b.key ?? ""), undefined, { sensitivity: "base", numeric: true }) ||
+  String(a.key ?? "").localeCompare(String(b.key ?? ""));
+
 /** Plain-language explanations shown when hovering a keyword (names stay English: they are printed on cards). */
 export const KEYWORDS: Record<string, { name: string; text: string; textTh: string }> = {
   GUARD: { name: "Guard", text: "Enemies must attack this unit before any other.", textTh: "ศัตรูต้องโจมตียูนิตนี้ก่อนตัวอื่นเสมอ" },

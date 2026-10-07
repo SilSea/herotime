@@ -243,9 +243,11 @@ describe("other triggers and actions", () => {
     expect(run(true)).toMatchObject({ cardKey: "big", atk: 10, hp: 10 });
   });
 
-  it("rejects non-combat actions", () => {
-    const fx = effect({ trigger: "START_OF_COMBAT", actions: [{ type: "GAIN_ENERGY", amount: 1 }] });
-    expect(() => simulateCombat([f("a", 1, 1, { effects: [fx] })], [f("foe", 1, 1)], 1)).toThrow(/not valid during combat/);
+  it("rejects tavern-only actions, and keeps Energy for the next turn", () => {
+    const tavern = effect({ trigger: "START_OF_COMBAT", actions: [{ type: "DISCARD", count: 1 }] });
+    expect(() => simulateCombat([f("a", 1, 1, { effects: [tavern] })], [f("foe", 1, 1)], 1)).toThrow(/not valid during combat/);
+    const energy = effect({ trigger: "START_OF_COMBAT", actions: [{ type: "GAIN_ENERGY", amount: 1 }] });
+    expect(simulateCombat([f("a", 1, 1, { effects: [energy] })], [f("foe", 1, 1)], 1).rewards.A).toEqual([{ action: { type: "GAIN_ENERGY", amount: 1 }, mult: 1, from: "a" }]);
   });
 
   it("is deterministic with effects in play", () => {

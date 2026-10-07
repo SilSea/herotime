@@ -67,6 +67,8 @@ export function applyEvent(state: ReplayState, e: CombatEvent): ReplayState {
     }
     case "BARRIER_POP":
       return update(state, e.unit, (f) => ({ ...f, barrier: false }));
+    case "REWARD": // nothing changes on the field: the reward arrives next turn
+      return state;
     case "BUFF":
       return update(state, e.unit, (f) => ({ ...f, atk: f.atk + e.atk, hp: f.hp + e.hp }));
     case "EFFECT_DAMAGE":
@@ -168,12 +170,16 @@ function find(state: ReplayState, uid: string): Fighter | undefined {
   return state[sideOf(uid)].find((f) => f.uid === uid);
 }
 
+const REWARD_EN: Record<string, string> = { GAIN_ENERGY: "Energy", ADD_TO_HAND: "a card", RANDOM_CARD: "a random card", DISCOVER_UNIT: "a Discover", GAUGE_ADD: "Gauge", BUFF_SHOP: "a tavern buff" };
+const REWARD_TH: Record<string, string> = { GAIN_ENERGY: " Energy ", ADD_TO_HAND: "การ์ด", RANDOM_CARD: "การ์ดสุ่ม", DISCOVER_UNIT: "สิทธิ์เลือกยูนิต", GAUGE_ADD: " Gauge ", BUFF_SHOP: "บัฟยูนิตในร้าน" };
+
 /** A human-readable line for the combat log. `before` is the state before the event. */
 export function describe(e: CombatEvent, before: ReplayState, names: Names): string {
   const name = (uid: string): string => names(find(before, uid)?.cardKey ?? uid);
   switch (e.type) {
     case "ATTACK":
       return tr(`${name(e.attacker)} hits ${name(e.target)} for ${e.damageToTarget} and takes ${e.damageToAttacker}`, `${name(e.attacker)} ตี ${name(e.target)} ${e.damageToTarget} ดาเมจ และโดนคืน ${e.damageToAttacker}`);
+    case "REWARD": return tr(`${e.unit ? name(e.unit) : `Side ${e.side}`} earns ${REWARD_EN[e.action] ?? e.action} for next turn`, `${e.unit ? name(e.unit) : `ฝั่ง ${e.side}`} ได้${REWARD_TH[e.action] ?? e.action}ในเทิร์นหน้า`);
     case "BARRIER_POP": return tr(`${name(e.unit)}'s Barrier absorbs the hit`, `Barrier ของ ${name(e.unit)} กันดาเมจไว้`);
     case "BUFF": return `${name(e.unit)} ${tr("gets", "ได้")} ${e.atk >= 0 ? "+" : ""}${e.atk}/${e.hp >= 0 ? "+" : ""}${e.hp}`;
     case "EFFECT_DAMAGE": return e.amount > 0 ? tr(`${name(e.unit)} takes ${e.amount} damage`, `${name(e.unit)} โดน ${e.amount} ดาเมจ`) : tr(`${name(e.unit)} is not hurt`, `${name(e.unit)} ไม่เป็นอะไร`);
@@ -195,6 +201,7 @@ function focusOf(e: CombatEvent): string[] {
     case "ATTACK": return [e.attacker, e.target];
     case "GATTAI": return [e.into];
     case "ROLL_CALL": return [];
+    case "REWARD": return e.unit ? [e.unit] : [];
     case "GIANT_ENTER": case "SUMMON": return [e.unit];
     default: return "unit" in e ? [e.unit] : [];
   }

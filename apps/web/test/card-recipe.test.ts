@@ -25,7 +25,7 @@ describe("card wizard", () => {
   it("offers only what works at that moment", () => {
     const dies = { ...newAbility("UNIT"), when: "LAST_STAND" };
     const c = choicesFor(dies, "UNIT");
-    expect(c.do.map((d) => d.key)).not.toContain("GAIN_ENERGY"); // recruit-only
+    expect(c.do.map((d) => d.key)).not.toContain("DISCARD"); // tavern-only
     expect(c.do.map((d) => d.key)).toContain("DAMAGE");
     expect(c.target.map((t) => t.key)).toContain("RANDOM_ENEMY");
     expect(c.target.map((t) => t.key)).not.toContain("SUMMONED");
@@ -34,7 +34,7 @@ describe("card wizard", () => {
     expect(played.target.map((t) => t.key)).not.toContain("RANDOM_ENEMY");
     const onSummon = choicesFor({ ...newAbility("UNIT"), when: "ALLY_SUMMONED" }, "UNIT");
     expect(onSummon.target.map((t) => t.key)).toContain("SUMMONED");
-    expect(onSummon.do.map((d) => d.key)).not.toContain("GAIN_ENERGY");
+    expect(onSummon.do.map((d) => d.key)).not.toContain("DEVOUR_SHOP");
     expect(onSummon.do.map((d) => d.key)).not.toContain("DAMAGE");
     const gear = choicesFor(newAbility("GEAR"), "GEAR");
     expect(gear.when).toEqual([]);
@@ -58,6 +58,19 @@ describe("card wizard", () => {
     expect(checkRecipe({ ...r, abilities: [{ ...r.abilities[0]!, conditionCards: [] }] }, new Set())).toEqual([expect.stringMatching(/condition looks for/)]);
     // A target that is the unit itself takes no card filter.
     expect(buildCard(recipe({ abilities: [{ ...newAbility("UNIT"), targetCards: ["cub"] }] })).effects).toEqual([expect.objectContaining({ target: { selector: "SELF" } })]);
+  });
+
+  it("offers Energy and cards in fights (they arrive next turn) and Transform", () => {
+    const attack = choicesFor({ ...newAbility("UNIT"), when: "ON_ATTACK" }, "UNIT").do.map((d) => d.key);
+    for (const k of ["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "BUFF_SHOP", "TRANSFORM", "BUFF", "DAMAGE"]) expect(attack).toContain(k);
+    expect(attack).not.toContain("DISCARD");
+    const miner = recipe({ key: "miner", abilities: [{ ...newAbility("UNIT"), when: "ON_ATTACK", do: "GAIN_ENERGY", amount: 1 }] });
+    expect(playable(buildCard(miner))).toEqual([]);
+    expect(describeRecipe(miner, (k) => k, (k) => k)[0]).toMatch(/gain 1 Energy next turn$/);
+    const morph = recipe({ key: "morph", abilities: [{ ...newAbility("UNIT"), when: "START_OF_COMBAT", do: "TRANSFORM", target: "SELF", cardKey: "cub" }] });
+    expect(buildCard(morph).effects).toEqual([expect.objectContaining({ actions: [{ type: "TRANSFORM", into: "cub" }] })]);
+    expect(playable(buildCard(morph))).toEqual([]);
+    expect(checkRecipe({ ...morph, abilities: [{ ...morph.abilities[0]!, cardKey: "" }] }, new Set())).toEqual([expect.stringMatching(/pick the card/)]);
   });
 
   it("builds cards the engine accepts: a summoner, a pack leader and a gear", () => {
@@ -89,7 +102,7 @@ describe("card wizard", () => {
     const upgrade = buildCard(recipe({ key: "upg", type: "GEAR", abilities: [{ ...newAbility("GEAR"), do: "ULTIMATE_FORM", target: "GIANT_SLOT" }] }));
     for (const c of [supply, trader, scout, eater, caller, rider, upgrade]) expect(playable(c), String(c.key)).toEqual([]);
     expect(choicesFor({ ...newAbility("UNIT"), when: "LAST_STAND" }, "UNIT").do.map((d) => d.key)).toContain("SUMMON_FROM_HAND");
-    expect(choicesFor({ ...newAbility("UNIT"), when: "LAST_STAND" }, "UNIT").do.map((d) => d.key)).not.toContain("BUFF_SHOP");
+    expect(choicesFor({ ...newAbility("UNIT"), when: "LAST_STAND" }, "UNIT").do.map((d) => d.key)).not.toContain("DEVOUR_SHOP");
   });
 
   it("says what is missing in words", () => {
@@ -97,7 +110,7 @@ describe("card wizard", () => {
     expect(checkRecipe(recipe({ key: "cub" }), new Set(["cub"])).join()).toMatch(/already|อยู่แล้ว/);
     expect(checkRecipe(recipe({ type: "GEAR" }), new Set()).join()).toMatch(/at least one ability|อย่างน้อย 1/);
     expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), do: "SUMMON", cardKey: "" }] }), new Set()).join()).toMatch(/pick the card|เลือกการ์ด/);
-    expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "LAST_STAND", do: "GAIN_ENERGY" }] }), new Set()).join()).toMatch(/does not work|ใช้ในจังหวะนั้นไม่ได้/);
+    expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "LAST_STAND", do: "DISCARD" }] }), new Set()).join()).toMatch(/does not work|ใช้ในจังหวะนั้นไม่ได้/);
     expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "ON_ATTACK", do: "SUMMON", cardKey: "cub" }] }), new Set())).toEqual([]);
   });
 

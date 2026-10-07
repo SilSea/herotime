@@ -15,7 +15,7 @@ import {
 } from "../shop/economy.js";
 import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Keyword, Side } from "../types.js";
-import { fireGaugeTrigger, matchesTarget, needsTargets, resetTurnUses, runTrigger, swapKey, type Origin } from "./effects.js";
+import { fireGaugeTrigger, matchesTarget, needsTargets, resetTurnUses, runReward, runTrigger, swapKey, type Origin } from "./effects.js";
 import type { GameEnv } from "./env.js";
 
 // ------------------------------------------------------------ recruit intents
@@ -24,6 +24,10 @@ import type { GameEnv } from "./env.js";
 export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void {
   resetTurnUses(player);
   startTurn(player, turn, env.pool, env.rng, env.cfg, env.gear);
+  // What fight effects earned last turn arrives now, after the Energy refill (so Energy gained is on top of it).
+  const rewards = player.fightRewards ?? [];
+  delete player.fightRewards;
+  for (const r of rewards) runReward(r, player, env);
   for (const { effects, origin } of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env, origin);
 }
 
@@ -396,6 +400,7 @@ export function applyCombatOutcome(player: PlayerState, result: CombatResult, si
     unit.bonusHp = (unit.bonusHp ?? 0) + gain.hp;
     recordBuff(unit, { kind: "combat", key: null }, gain.atk, gain.hp);
   }
+  if (result.rewards[side].length > 0) player.fightRewards = [...(player.fightRewards ?? []), ...result.rewards[side]];
   if (result.rollCall[side]) {
     fireGaugeTrigger(player, env, "ON_ROLL_CALL");
     if (result.winner === side) fireGaugeTrigger(player, env, "ON_ROLL_CALL_WIN");

@@ -15,6 +15,7 @@ import type {
   CombatSideExtras,
   CombatSurvivor,
   CombatUnitInput,
+  FightReward,
   Keyword,
   Side,
 } from "../types.js";
@@ -68,7 +69,11 @@ interface SideState {
   sentaiAtk: number;
   sentaiHp: number;
   permanent: Map<string, { atk: number; hp: number }>;
+  rewards: FightReward[];
 }
+
+/** Recruit actions a fight effect may use: they wait for the start of the next turn (see CombatResult.rewards). */
+export const FIGHT_REWARD_ACTIONS: ReadonlySet<Action["type"]> = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
 
 const alive = (f: Fighter): boolean => f.hp > 0;
 const other = (s: Side): Side => (s === "A" ? "B" : "A");
@@ -144,6 +149,7 @@ export function simulateCombat(
     sentaiAtk: 0,
     sentaiHp: 0,
     permanent: new Map(),
+    rewards: [],
   });
   const sides: Record<Side, SideState> = {
     A: mkSide("A", boardA, options.a),
@@ -244,7 +250,13 @@ export function simulateCombat(
     s: SideState,
     targets: Fighter[],
     at: () => number,
+    source: Fighter | null = null,
   ): void => {
+    if (FIGHT_REWARD_ACTIONS.has(action.type)) {
+      s.rewards.push({ action, mult, from: source?.cardKey ?? null });
+      events.push({ type: "REWARD", side: s.id, unit: source?.uid ?? null, action: action.type });
+      return;
+    }
     switch (action.type) {
       case "BUFF": {
         const atk = action.atk * mult;
@@ -355,7 +367,7 @@ export function simulateCombat(
     const target: Target = effect.target ?? { selector: "SELF" };
     // Select once so a single random pick feeds every action in the effect.
     const targets = effect.actions.some(needsTargets) ? select(target.selector, target, source, s, subject) : [];
-    for (const action of effect.actions) runAction(action, mult, s, targets, at);
+    for (const action of effect.actions) runAction(action, mult, s, targets, at, source);
   };
 
   function fire(trigger: Effect["trigger"], f: Fighter, s: SideState, at: () => number, deaths?: number, subject?: Fighter): void {
@@ -518,6 +530,7 @@ export function simulateCombat(
       attacks,
       rollCall: { A: sides.A.rollCall, B: sides.B.rollCall },
       permanent: { A: perm(sides.A), B: perm(sides.B) },
+      rewards: { A: sides.A.rewards, B: sides.B.rewards },
     };
   };
 

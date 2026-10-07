@@ -17,7 +17,8 @@ export const fuzzWorld = content({ cards: [card("tok", { atk: 1, hp: 1, token: t
 
 function randomEffect(rng: Rng): Effect {
   const pickAction = (): object => {
-    switch (rng.int(6)) {
+    switch (rng.int(7)) {
+      case 6: return { type: "GAIN_ENERGY", amount: 1 }; // a reward for the next turn
       case 0: return { type: "BUFF", atk: rng.int(3), hp: rng.int(3), permanent: rng.int(2) === 0 };
       case 1: return { type: "SUMMON", cardKey: "tok", count: 1 + rng.int(2) };
       case 2: return { type: "DAMAGE", amount: 1 + rng.int(3) };

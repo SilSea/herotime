@@ -177,6 +177,16 @@ describe("steps and log text", () => {
   });
 });
 
+describe("fight rewards in the log", () => {
+  it("say who earned what for next turn, and change nothing on the field", () => {
+    const rec = record([unit("miner", 1, 5)], [unit("foe", 2, 3)], [{ type: "REWARD", side: "A", unit: "A0", action: "GAIN_ENERGY" }]);
+    const { initial, steps } = buildSteps(rec, names);
+    expect(steps[0]?.state).toEqual(initial);
+    expect(steps[0]?.text).toMatch(/earns Energy for next turn/);
+    expect(steps[0]?.focus).toEqual(["A0"]);
+  });
+});
+
 describe("pacing", () => {
   const steps = (n: number) => buildSteps(record([unit("a", 1, 1)], [unit("b", 1, 1)], Array.from({ length: n }, () => ({ type: "BUFF", unit: "A0", atk: 0, hp: 0 }) as CombatEvent)), names).steps;
 

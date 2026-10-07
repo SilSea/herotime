@@ -918,7 +918,7 @@ describe("buff records", () => {
     const m = recruiting(humans(2));
     const s = m.player("h0").state;
     s.board.push({ key: s.shop[0] as string, golden: false });
-    const result = { permanent: { A: { "board:0": { atk: 2, hp: 1 } }, B: {} }, rollCall: { A: false, B: false }, winner: "A" };
+    const result = { permanent: { A: { "board:0": { atk: 2, hp: 1 } }, B: {} }, rollCall: { A: false, B: false }, rewards: { A: [], B: [] }, winner: "A" };
     applyCombatOutcome(s, result as never, "A", (m as unknown as { env: never }).env);
     expect(s.board[0]?.buffs).toEqual([{ kind: "combat", key: null, atk: 2, hp: 1 }]);
   });

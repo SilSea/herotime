@@ -1,5 +1,6 @@
 import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
 import type { Unit } from "../content.js";
+import type { FightReward } from "../types.js";
 import type { Rng } from "../rng/rng.js";
 import { withRules } from "../rules.js";
 import type { Pool } from "./pool.js";
@@ -53,6 +54,8 @@ export interface PlayerState {
    * units transformed (with the last form), cards discarded.
    */
   moments?: { triples: number; transforms: number; lastForm?: string; discards: number };
+  /** Earned in the last fight (Energy, cards, Gauge...); given at the start of the next turn. */
+  fightRewards?: FightReward[];
   /** BUFF_SHOP: what every unit in this player's tavern gets (kept when bought). */
   shopBonus?: { atk: number; hp: number };
   /** Limited player-scope effects (relics, hero, gear): times used this game / this turn, by source and effect. */

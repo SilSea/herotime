@@ -1,4 +1,4 @@
-import type { Effect, KeywordKey, SentaiColor } from "@herotime/shared";
+import type { Action, Effect, KeywordKey, SentaiColor } from "@herotime/shared";
 import type { CombatRules } from "./config.js";
 
 export type Keyword = KeywordKey;
@@ -38,6 +38,8 @@ export interface CombatSideExtras {
 export type CombatEvent =
   | { type: "ATTACK"; attacker: string; target: string; damageToTarget: number; damageToAttacker: number; targetHp: number; attackerHp: number }
   | { type: "BARRIER_POP"; unit: string }
+  /** A fight effect earned a recruit action (Energy, a card, Gauge...) for the start of the next turn. */
+  | { type: "REWARD"; side: Side; unit: string | null; action: Action["type"] }
   | { type: "REVIVE"; unit: string; hp: number }
   /** `returns`: it stays in its slot because Revive or Kyodaika brings it straight back. */
   | { type: "DEATH"; unit: string; returns: boolean }
@@ -72,4 +74,15 @@ export interface CombatResult {
   rollCall: Record<Side, boolean>;
   /** Permanent buffs earned in combat, keyed by CombatUnitInput.sourceId. */
   permanent: Record<Side, Record<string, { atk: number; hp: number }>>;
+  /** Recruit actions fight effects earned (Energy, cards, Gauge...): the player gets them at the start of the next turn. */
+  rewards: Record<Side, FightReward[]>;
+}
+
+/** A recruit action earned in a fight, given at the start of the next turn. */
+export interface FightReward {
+  action: Action;
+  /** Golden multiplier of the unit that earned it. */
+  mult: number;
+  /** The card that earned it. */
+  from: string | null;
 }

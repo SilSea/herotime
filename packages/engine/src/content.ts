@@ -151,7 +151,8 @@ export class Content {
     };
     // Some actions and targets only make sense in one phase; the engine refuses them in the other at run time.
     const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
-    const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "DISCARD"]);
+    // GAIN_ENERGY, ADD_TO_HAND, RANDOM_CARD, DISCOVER_UNIT, GAUGE_ADD and BUFF_SHOP work in fights too: they arrive next turn.
+    const RECRUIT_ONLY = new Set(["MODIFY_RULE", "DISCOVER_GIANT", "SUPER_GATTAI", "ULTIMATE_FORM", "DEVOUR_SHOP", "DISCARD"]);
     const checkPhase = (e: Effect, from: string): void => {
       if (e.target?.selector === "SUMMONED" && e.trigger !== "ALLY_SUMMONED") problems.push(`${from}: target SUMMONED only works with ALLY_SUMMONED`);
       // A summon can happen in either phase, so its reactions must work in both.

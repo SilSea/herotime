@@ -150,9 +150,14 @@ export function ruleText(rule: string, op: "SET" | "ADD" | "MUL", value: number)
   return `${label} x${value}`;
 }
 
+const FIGHT_TRIGGERS = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
+const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
+
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
-  const body = e.actions.map((a) => action(a, e.target, names)).join(", then ");
+  // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
+  const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && LATER.has(a.type) ? " next turn" : "");
+  const body = e.actions.map((a) => action(a, e.target, names) + later(a)).join(", then ");
   const limit = e.limit ? (e.limit.times === 1 ? ` (once per ${e.limit.per === "TURN" ? "turn" : "game"})` : ` (up to ${e.limit.times} times per ${e.limit.per === "TURN" ? "turn" : "game"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}${limit}.`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;

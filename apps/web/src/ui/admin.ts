@@ -2,6 +2,7 @@ import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
 import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta, GameStats, StatRow } from "../protocol.js";
 import { ENTITIES, entityInfo, KEYWORDS, RULE_DEFAULTS, RULE_ROWS, TRIGGERS, type EntityKind, type RefKind } from "./admin-schema.js";
+import { byName } from "../format.js";
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
 import { wizardPanel } from "./card-wizard.js";
@@ -126,7 +127,7 @@ export function renderAdmin(root: HTMLElement, ctx: Ctx): void {
   const labelOf = (k: RefKind, x: Record<string, any>): string =>
     k === "cards" ? `${x.name ?? x.key} · ${x.kind === "GEAR" ? "Gear" : x.kind === "GIANT" ? "Giant" : `${x.atk}/${x.hp}`}${x.token ? " · token" : ""} · rank ${x.rank ?? 1}` : String(x.name ?? x.key);
   const datalists = (["cards", "factions", "series", "gauges", "heroes", "relics"] as RefKind[]).map((k) =>
-    h("datalist", { id: `dl-${k}` }, ...list(k as EntityKind).filter((x) => x.key).map((x) => h("option", { value: String(x.key), text: labelOf(k, x) }))),
+    h("datalist", { id: `dl-${k}` }, ...[...list(k as EntityKind)].filter((x) => x.key).sort(byName).map((x) => h("option", { value: String(x.key), text: labelOf(k, x) }))),
   );
 
   const panel =
@@ -526,6 +527,7 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
     listEl.replaceChildren(
       ...items
         .map((it, i) => ({ it, i }))
+        .sort((a, b) => byName(a.it, b.it))
         .filter(({ it }) => passes(it))
         .filter(({ it }) => !q || `${it.key} ${it.name} ${it.text ?? ""} ${it.textTh ?? ""}`.toLowerCase().includes(q))
         .map(({ it, i }) => h("button", { class: `admin-item ${i === ed.index ? "active" : ""}`, on: { click: () => ((ed.index = i), redraw()) } }, h("strong", { text: String(it.name ?? it.key) }), h("span", { class: "muted", text: ` ${it.key ?? ""}${typeof it.rank === "number" ? ` · rank ${it.rank}` : ""}` }))),

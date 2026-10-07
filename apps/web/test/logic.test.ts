@@ -187,6 +187,14 @@ describe("gaugeText", async () => {
   });
 });
 
+describe("byName", async () => {
+  const { byName } = await import("../src/format.js");
+  it("sorts A to Z by name, ignoring case, numbers in order, key when names tie", () => {
+    const list = [{ key: "z", name: "zeta" }, { key: "b2", name: "Alpha" }, { key: "u10", name: "Unit 10" }, { key: "a1", name: "alpha" }, { key: "u2", name: "Unit 2" }, { key: "k" }];
+    expect([...list].sort(byName).map((x) => x.key)).toEqual(["a1", "b2", "k", "u2", "u10", "z"]);
+  });
+});
+
 describe("gearTargetSlots", async () => {
   const { gearTargetSlots } = await import("../src/format.js");
   const def = (o: Record<string, unknown>) => ({ key: "x", name: "x", kind: "UNIT", rank: 1, atk: 1, hp: 1, factions: [], colors: [], keywords: [], effects: [], ...o }) as never;

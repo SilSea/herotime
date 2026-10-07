@@ -1,6 +1,6 @@
 import { buildCard, checkRecipe, choicesFor, DO, describeRecipe, keyFromName, newAbility, newRecipe, type Ability, type CardType, type Recipe } from "../card-recipe.js";
 import { ContentIndex } from "../content-index.js";
-import { KEYWORDS, keywordName, keywordText, SENTAI_COLORS } from "../format.js";
+import { byName, KEYWORDS, keywordName, keywordText, SENTAI_COLORS } from "../format.js";
 import { tr } from "../i18n.js";
 import type { CardDef } from "../protocol.js";
 import { cardEl } from "./card.js";
@@ -127,8 +127,8 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
   deps = d;
   const ix = d.ix;
   const factions = [...ix.factions.values()];
-  const cards = [...ix.cards.values()].filter((c) => c.key !== wz.key);
-  const units = cards.filter((c) => c.kind === "UNIT").sort((a, b) => Number(b.token) - Number(a.token) || a.rank - b.rank || a.name.localeCompare(b.name));
+  const cards = [...ix.cards.values()].filter((c) => c.key !== wz.key).sort(byName);
+  const units = cards.filter((c) => c.kind === "UNIT");
   const cardOptions = (list: CardDef[]) => [{ value: "", label: tr("— pick a card —", "— เลือกการ์ด —") }, ...list.map((c) => ({ value: c.key, label: `${c.name}${c.token ? " (token)" : ""} · ${c.atk}/${c.hp}` }))];
   const factionOptions = (none: string) => [{ value: "", label: none }, ...factions.map((f) => ({ value: f.key, label: f.name }))];
   const isGear = wz.type === "GEAR";
@@ -284,6 +284,7 @@ function abilityBox(
       a.do === "BUFF" && c.when.length > 0 && ["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE", "ALLY_SUMMONED"].includes(a.when) && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
       a.do === "GIVE_KEYWORD" && field("Keyword", pick(a.keyword, Object.keys(KEYWORDS).map((k) => ({ value: k, label: keywordName(k) })), (v) => (a.keyword = v))),
       a.do === "SUMMON" && field(tr("Card", "การ์ด"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
+      a.do === "TRANSFORM" && field(tr("…into", "…แปลงเป็น"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
       (a.do === "SUMMON" || a.do === "SUMMON_FROM_HAND") && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
       a.do === "ADD_TO_HAND" && field(tr("Card (a Gear or a unit)", "การ์ด (Gear หรือยูนิต)"), cardPick(a.cardKey, o.cards, (v) => (a.cardKey = v))),
       a.do === "RANDOM_CARD" && field(tr("Random", "สุ่ม"), pick(a.cardKind, [{ value: "GEAR", label: "Gear" }, { value: "UNIT", label: tr("Unit", "ยูนิต") }], (v) => (a.cardKind = v as Ability["cardKind"]))),

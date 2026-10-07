@@ -44,13 +44,14 @@ export const DO: DoOption[] = [
   { key: "GIVE_KEYWORD", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Give a keyword", "ให้ keyword") },
   { key: "SUMMON", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Summon a unit", "เรียกยูนิตเข้าสนาม") },
   { key: "DESTROY", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Destroy", "ทำลาย") },
+  { key: "TRANSFORM", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Transform into another card", "แปลงร่างเป็นการ์ดอื่น") },
   { key: "DAMAGE", phases: ["fight"], targeted: true, label: () => tr("Deal damage", "ทำดาเมจ") },
-  { key: "GAIN_ENERGY", phases: ["recruit"], targeted: false, label: () => tr("Gain Energy", "ได้ Energy") },
-  { key: "ADD_TO_HAND", phases: ["recruit"], targeted: false, label: () => tr("Add a card to your hand", "ได้การ์ดเข้ามือ") },
-  { key: "DISCOVER_UNIT", phases: ["recruit"], targeted: false, label: () => tr("Discover a unit (1 of 3)", "เลือกรับยูนิต 1 จาก 3") },
-  { key: "RANDOM_CARD", phases: ["recruit"], targeted: false, label: () => tr("Get a random Gear / unit", "ได้ Gear / ยูนิตแบบสุ่ม") },
+  { key: "GAIN_ENERGY", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Gain Energy", "ได้ Energy") },
+  { key: "ADD_TO_HAND", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Add a card to your hand", "ได้การ์ดเข้ามือ") },
+  { key: "DISCOVER_UNIT", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Discover a unit (1 of 3)", "เลือกรับยูนิต 1 จาก 3") },
+  { key: "RANDOM_CARD", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Get a random Gear / unit", "ได้ Gear / ยูนิตแบบสุ่ม") },
   { key: "SUMMON_FROM_HAND", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Summon units from your hand", "เรียกยูนิตจากบนมือ") },
-  { key: "BUFF_SHOP", phases: ["recruit"], targeted: false, label: () => tr("Buff the units in your tavern", "เพิ่มพลังยูนิตในร้านค้า") },
+  { key: "BUFF_SHOP", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Buff the units in your tavern", "เพิ่มพลังยูนิตในร้านค้า") },
   { key: "DEVOUR_SHOP", phases: ["recruit"], targeted: true, label: () => tr("Devour a tavern unit (gain its stats)", "กลืนกินยูนิตในร้าน (ได้ค่าพลังของมัน)") },
   { key: "DISCARD", phases: ["recruit"], targeted: false, label: () => tr("Discard cards from your hand", "ทิ้งการ์ดในมือ") },
   { key: "ULTIMATE_FORM", phases: ["recruit"], targeted: true, label: () => tr("Change into its upgraded form (Rider final form, upgraded robo…)", "เปลี่ยน/อัปเกรดร่าง (ร่างสุดท้าย Rider, หุ่นร่างอัปเกรด…)") },
@@ -228,7 +229,7 @@ export function checkRecipe(r: Recipe, takenKeys: ReadonlySet<string>): string[]
     const d = DO.find((x) => x.key === a.do);
     if (!c.do.some((x) => x.key === a.do)) out.push(tr(`Ability ${n}: "${d?.label() ?? a.do}" does not work at that moment.`, `ความสามารถ ${n}: "${d?.label() ?? a.do}" ใช้ในจังหวะนั้นไม่ได้`));
     if (d?.targeted && !c.target.some((x) => x.key === a.target)) out.push(tr(`Ability ${n}: pick who it affects.`, `ความสามารถ ${n}: เลือกเป้าหมาย`));
-    if ((a.do === "SUMMON" || a.do === "ADD_TO_HAND") && !a.cardKey) out.push(tr(`Ability ${n}: pick the card.`, `ความสามารถ ${n}: เลือกการ์ด`));
+    if ((a.do === "SUMMON" || a.do === "ADD_TO_HAND" || a.do === "TRANSFORM") && !a.cardKey) out.push(tr(`Ability ${n}: pick the card.`, `ความสามารถ ${n}: เลือกการ์ด`));
     if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Ultimate Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Ultimate (ตั้งในขั้นที่ 4)`));
     if (a.condition === "HAS_CARD" && a.conditionCards.length === 0) out.push(tr(`Ability ${n}: pick the card(s) the condition looks for.`, `ความสามารถ ${n}: เลือกการ์ดที่ต้องมีในเงื่อนไข`));
     if (a.do === "BUFF" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the buff adds nothing.`, `ความสามารถ ${n}: บัฟเป็น 0`));
@@ -272,6 +273,7 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   if (a.do === "GIVE_KEYWORD") action.keyword = a.keyword;
   if (a.do === "SUMMON") Object.assign(action, { cardKey: a.cardKey, count: Math.max(1, a.count) });
   if (a.do === "ADD_TO_HAND") action.cardKey = a.cardKey;
+  if (a.do === "TRANSFORM") action.into = a.cardKey;
   if (a.do === "DAMAGE" || a.do === "GAIN_ENERGY") action.amount = Math.max(1, a.amount);
   if (a.do === "DISCOVER_UNIT" && a.faction) action.faction = a.faction;
   if (a.do === "RANDOM_CARD") Object.assign(action, { cardKind: a.cardKind, ...(a.faction ? { faction: a.faction } : {}) });
@@ -290,6 +292,9 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   if (a.condition === "FACTION_COUNT_GTE" && a.conditionFaction) effect.condition = { type: a.condition, faction: a.conditionFaction, value: a.conditionValue };
   return effect;
 }
+
+/** Recruit actions a fight effect earns for the start of the next turn. */
+const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
 
 /** One line per ability in plain words, for the preview (the saved card gets the server's own text). */
 export function describeRecipe(r: Recipe, cardName: (key: string) => string, factionName: (key: string) => string): string[] {
@@ -310,6 +315,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       a.do === "BUFF" ? tr(`give ${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " permanently" : ""}`, `ให้${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " ถาวร" : ""}`)
       : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${a.keyword}`, `ให้${who}ได้ ${a.keyword}`)
       : a.do === "SUMMON" ? tr(`summon ${a.count > 1 ? `${a.count} × ` : ""}${cardName(a.cardKey)}`, `เรียก ${cardName(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
+      : a.do === "TRANSFORM" ? tr(`transform ${who} into ${cardName(a.cardKey)}`, `แปลง${who}เป็น ${cardName(a.cardKey)}`)
       : a.do === "DESTROY" ? tr(`destroy ${who}`, `ทำลาย${who}`)
       : a.do === "DAMAGE" ? tr(`deal ${a.amount} damage to ${who}`, `ทำดาเมจ ${a.amount} ใส่${who}`)
       : a.do === "GAIN_ENERGY" ? tr(`gain ${a.amount} Energy`, `ได้ ${a.amount} Energy`)
@@ -323,6 +329,8 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.do === "DISCOVER_UNIT" ? tr(`discover a ${a.faction ? `${factionName(a.faction)} ` : ""}unit`, `เลือกรับยูนิต${a.faction ? ` ${factionName(a.faction)}` : ""} 1 จาก 3`)
       : a.do;
     const limit = a.limitTimes > 0 ? tr(` (at most ${a.limitTimes} per ${a.limitPer === "TURN" ? "turn" : "game"})`, ` (ไม่เกิน ${a.limitTimes} ครั้งต่อ${a.limitPer === "TURN" ? "เทิร์น" : "เกม"})`) : "";
-    return `${when}: ${cond}${what}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}${limit}`;
+    // In a fight, Energy / cards / Gauge arrive at the start of the next turn.
+    const later = r.type !== "GEAR" && phaseOf(a.when, r.type) === "fight" && LATER.has(a.do) ? tr(" next turn", " ในเทิร์นหน้า") : "";
+    return `${when}: ${cond}${what}${later}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}${limit}`;
   });
 }

@@ -3,6 +3,7 @@ import { checkCondition, isOneOf, type UnitView } from "../conditions.js";
 import { recordBuff, type BuffRecord, type Unit } from "../content.js";
 import { modifyRule, withRules } from "../rules.js";
 import { copiesOf, noteMoment, type PlayerState, returnToPool } from "../shop/economy.js";
+import type { FightReward } from "../types.js";
 import type { GameEnv } from "./env.js";
 
 export function unitView(env: GameEnv, unit: Unit): UnitView {
@@ -311,6 +312,11 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
 }
 
 /** Run one effect in the recruit phase. `source` is the owning unit (null for player-scope effects). */
+/** Give a reward a fight effect earned (Energy, a card, Gauge...). */
+export function runReward(r: FightReward, player: PlayerState, env: GameEnv): void {
+  runAction(r.action, r.mult, null, [], player, env, { kind: "card", key: r.from });
+}
+
 export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin, chosen?: Unit): void {
   for (let n = 0; n < (effect.repeat ?? 1); n++) runEffectOnce(effect, source, player, env, origin, chosen);
 }
