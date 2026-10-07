@@ -183,6 +183,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .card .hp { right: -10px; background: linear-gradient(180deg, #ff8aa0, var(--hp) 55%, #8a0b24); }
 .card .stats.gear-label { display: block; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 9px; font-weight: 800; letter-spacing: .14em; color: #fff; background: #4b2fc0; border: 1px solid #c8b8ff; padding: 0 10px; box-shadow: 0 0 8px #8b6cff99; }
 .card .cost { position: absolute; top: -12px; left: -12px; width: 32px; height: 32px; background: linear-gradient(180deg, #7ff4ff, #18a9d4); color: #021320; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); filter: drop-shadow(0 0 6px #2fe4ff); z-index: 4; }
+.card .card-note { position: absolute; top: -10px; right: -10px; padding: 2px 6px; border-radius: 999px; background: linear-gradient(180deg, #ffe27a, #f5a623); color: #2a1600; font-weight: 900; font-size: 12px; box-shadow: 0 0 8px #f5a62399; z-index: 4; }
 .card.has-barrier::after { content: ""; position: absolute; inset: -7px; border: 2px solid #9cf6ff; border-radius: inherit; box-shadow: 0 0 16px #2fe4ff, inset 0 0 16px #2fe4ff88; background: radial-gradient(circle, transparent 60%, #2fe4ff22); pointer-events: none; }
 
 /* ---- units in play: round holo tokens */

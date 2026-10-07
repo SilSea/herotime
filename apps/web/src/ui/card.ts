@@ -23,6 +23,8 @@ export interface CardOpts {
   classes?: readonly string[];
   /** Replay: carries a live Barrier. */
   barrier?: boolean;
+  /** A small badge on the card, e.g. the extra stats a Gear gives now. */
+  note?: { text: string; title: string };
   /** Who buffed this unit (owned units only). */
   buffs?: readonly BuffLike[];
   onClick?: () => void;
@@ -123,6 +125,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
   return h(
     "div",
     { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip, kws: keywords.join(","), triggers: [...new Set((def?.effects ?? []).map((e) => e.trigger))].join(","), henshin: def?.henshin ? `${def.henshin.afterTurns}|${ix.cardName(def.henshin.into)}` : "", core: def?.gattaiInto ? ix.cardName(def.gattaiInto) : "" }, on: o.onClick ? { click: o.onClick } : {} },
+    o.note && h("div", { class: "card-note", text: o.note.text, title: o.note.title }),
     o.cost !== undefined && h("div", { class: `cost ${o.costHealth ? "health" : ""}`, text: String(o.cost), title: o.costHealth ? tr("Health cost: paid from your hero's Health", "ราคาเป็นเลือด: จ่ายจาก HP ของ Hero") : tr("Energy cost", "ราคา Energy") }),
     h("div", { class: "art", style: bg(art) }, art ? null : h("span", { text: ix.initials(o.key) })),
     h("div", { class: "name", text: ix.cardName(o.key) }),

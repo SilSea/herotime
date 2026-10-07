@@ -151,10 +151,12 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
   const c = withRules(player, env.cfg);
   switch (action.type) {
     case "BUFF": {
+      // BUFF_GEAR: a Gear that gives stats gives more.
+      const extra = origin.kind === "gear" ? (player.gearBonus ?? { atk: 0, hp: 0 }) : { atk: 0, hp: 0 };
       for (const t of targets) {
-        t.bonusAtk = (t.bonusAtk ?? 0) + action.atk * mult;
-        t.bonusHp = (t.bonusHp ?? 0) + action.hp * mult;
-        recordBuff(t, origin, action.atk * mult, action.hp * mult);
+        t.bonusAtk = (t.bonusAtk ?? 0) + action.atk * mult + extra.atk;
+        t.bonusHp = (t.bonusHp ?? 0) + action.hp * mult + extra.hp;
+        recordBuff(t, origin, action.atk * mult + extra.atk, action.hp * mult + extra.hp);
       }
       return;
     }
@@ -231,6 +233,11 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
         const into = env.content.card(t.key).ultimateInto;
         if (into && swapKey(t, into, env)) noteMoment(player, "transforms", into);
       }
+      return;
+    }
+    case "BUFF_GEAR": {
+      const now = player.gearBonus ?? { atk: 0, hp: 0 };
+      player.gearBonus = { atk: now.atk + action.atk * mult, hp: now.hp + action.hp * mult };
       return;
     }
     case "BUFF_SHOP": {

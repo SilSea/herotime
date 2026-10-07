@@ -56,6 +56,8 @@ export interface PlayerState {
   moments?: { triples: number; transforms: number; lastForm?: string; discards: number };
   /** Earned in the last fight (Energy, cards, Gauge...); given at the start of the next turn. */
   fightRewards?: FightReward[];
+  /** BUFF_GEAR: how much more every stat-giving Gear this player uses gives (each unit it buffs). */
+  gearBonus?: { atk: number; hp: number };
   /** BUFF_SHOP: what every unit in this player's tavern gets (kept when bought). */
   shopBonus?: { atk: number; hp: number };
   /** Limited player-scope effects (relics, hero, gear): times used this game / this turn, by source and effect. */

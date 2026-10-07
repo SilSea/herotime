@@ -73,7 +73,7 @@ interface SideState {
 }
 
 /** Recruit actions a fight effect may use: they wait for the start of the next turn (see CombatResult.rewards). */
-export const FIGHT_REWARD_ACTIONS: ReadonlySet<Action["type"]> = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
+export const FIGHT_REWARD_ACTIONS: ReadonlySet<Action["type"]> = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
 const alive = (f: Fighter): boolean => f.hp > 0;
 const other = (s: Side): Side => (s === "A" ? "B" : "A");
@@ -351,6 +351,7 @@ export function simulateCombat(
       case "RANDOM_CARD":
       case "ULTIMATE_FORM":
       case "BUFF_SHOP":
+      case "BUFF_GEAR":
       case "DEVOUR_SHOP":
       case "DISCARD":
         throw new Error(`action ${action.type} is not valid during combat`);

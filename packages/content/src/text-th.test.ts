@@ -53,6 +53,12 @@ describe("rules text for fight rewards", () => {
     ...blank,
     cards: [{ key: "miner", name: "Miner", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "ON_ATTACK", actions: [{ type: "GAIN_ENERGY", amount: 1 }] }] }] as never,
   });
+  it("names a Gear power-up", () => {
+    const g = withGeneratedText({ ...blank, cards: [{ key: "smith", name: "Smith", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "BUFF_GEAR", atk: 1, hp: 1 }] }] }] as never });
+    expect(g.cards[0]?.text).toBe("Deploy: your Gear give +1/+1 more for the rest of the game.");
+    expect(g.cards[0]?.textTh).toBe("Deploy: Gear ที่ให้ค่าพลังให้เพิ่มอีก +1/+1 จนจบเกม");
+  });
+
   it("says the reward comes next turn", () => {
     expect(set.cards[0]?.text).toBe("When this attacks: gain 1 Energy next turn.");
     expect(set.cards[0]?.textTh).toMatch(/ในเทิร์นหน้า$/);

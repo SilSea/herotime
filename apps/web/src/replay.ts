@@ -170,8 +170,8 @@ function find(state: ReplayState, uid: string): Fighter | undefined {
   return state[sideOf(uid)].find((f) => f.uid === uid);
 }
 
-const REWARD_EN: Record<string, string> = { GAIN_ENERGY: "Energy", ADD_TO_HAND: "a card", RANDOM_CARD: "a random card", DISCOVER_UNIT: "a Discover", GAUGE_ADD: "Gauge", BUFF_SHOP: "a tavern buff" };
-const REWARD_TH: Record<string, string> = { GAIN_ENERGY: " Energy ", ADD_TO_HAND: "การ์ด", RANDOM_CARD: "การ์ดสุ่ม", DISCOVER_UNIT: "สิทธิ์เลือกยูนิต", GAUGE_ADD: " Gauge ", BUFF_SHOP: "บัฟยูนิตในร้าน" };
+const REWARD_EN: Record<string, string> = { GAIN_ENERGY: "Energy", ADD_TO_HAND: "a card", RANDOM_CARD: "a random card", DISCOVER_UNIT: "a Discover", GAUGE_ADD: "Gauge", BUFF_SHOP: "a tavern buff", BUFF_GEAR: "a Gear power-up" };
+const REWARD_TH: Record<string, string> = { GAIN_ENERGY: " Energy ", ADD_TO_HAND: "การ์ด", RANDOM_CARD: "การ์ดสุ่ม", DISCOVER_UNIT: "สิทธิ์เลือกยูนิต", GAUGE_ADD: " Gauge ", BUFF_SHOP: "บัฟยูนิตในร้าน", BUFF_GEAR: "การเสริมพลัง Gear " };
 
 /** A human-readable line for the combat log. `before` is the state before the event. */
 export function describe(e: CombatEvent, before: ReplayState, names: Names): string {

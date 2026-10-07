@@ -52,7 +52,7 @@ export const TRIGGERS = [
 ] as const;
 export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "GIANT_SLOT", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
 export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE", "HAS_CARD"] as const;
-export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD"] as const;
+export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "BUFF_GEAR", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
 export const POWER_MODES = ["ACTIVE", "ONCE", "PASSIVE"] as const;
@@ -109,6 +109,10 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
     { key: "atk", field: int(), hint: "Units in your tavern get this for the rest of the game" },
     { key: "hp", field: int() },
   ],
+  BUFF_GEAR: [
+    { key: "atk", field: int(), hint: "For the rest of the game, every Gear you use that gives stats gives this much more" },
+    { key: "hp", field: int() },
+  ],
   DEVOUR_SHOP: [
     { key: "choose", field: { kind: "enum", options: ["RANDOM", "STRONGEST", "WEAKEST"] }, hint: "STRONGEST / WEAKEST: by ATK+HP" },
     { key: "faction", label: "only faction", field: { kind: "ref", to: "factions" }, optional: true },
@@ -138,6 +142,7 @@ const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unkn
   RANDOM_CARD: { cardKind: "GEAR" },
   ULTIMATE_FORM: {},
   BUFF_SHOP: { atk: 1, hp: 1 },
+  BUFF_GEAR: { atk: 1, hp: 1 },
   DEVOUR_SHOP: { choose: "RANDOM" },
   DISCARD: { count: 1, pick: "RANDOM", cardKind: "ANY" },
   SUMMON_FROM_HAND: { count: 1 },

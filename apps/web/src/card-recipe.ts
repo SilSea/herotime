@@ -52,6 +52,7 @@ export const DO: DoOption[] = [
   { key: "RANDOM_CARD", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Get a random Gear / unit", "ได้ Gear / ยูนิตแบบสุ่ม") },
   { key: "SUMMON_FROM_HAND", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Summon units from your hand", "เรียกยูนิตจากบนมือ") },
   { key: "BUFF_SHOP", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Buff the units in your tavern", "เพิ่มพลังยูนิตในร้านค้า") },
+  { key: "BUFF_GEAR", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Power up your Gear (+ATK/+HP more, for good)", "เสริมพลัง Gear (ให้ค่าพลังเพิ่ม ถาวร)") },
   { key: "DEVOUR_SHOP", phases: ["recruit"], targeted: true, label: () => tr("Devour a tavern unit (gain its stats)", "กลืนกินยูนิตในร้าน (ได้ค่าพลังของมัน)") },
   { key: "DISCARD", phases: ["recruit"], targeted: false, label: () => tr("Discard cards from your hand", "ทิ้งการ์ดในมือ") },
   { key: "ULTIMATE_FORM", phases: ["recruit"], targeted: true, label: () => tr("Change into its upgraded form (Rider final form, upgraded robo…)", "เปลี่ยน/อัปเกรดร่าง (ร่างสุดท้าย Rider, หุ่นร่างอัปเกรด…)") },
@@ -232,6 +233,7 @@ export function checkRecipe(r: Recipe, takenKeys: ReadonlySet<string>): string[]
     if ((a.do === "SUMMON" || a.do === "ADD_TO_HAND" || a.do === "TRANSFORM") && !a.cardKey) out.push(tr(`Ability ${n}: pick the card.`, `ความสามารถ ${n}: เลือกการ์ด`));
     if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Ultimate Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Ultimate (ตั้งในขั้นที่ 4)`));
     if (a.condition === "HAS_CARD" && a.conditionCards.length === 0) out.push(tr(`Ability ${n}: pick the card(s) the condition looks for.`, `ความสามารถ ${n}: เลือกการ์ดที่ต้องมีในเงื่อนไข`));
+    if (a.do === "BUFF_GEAR" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the Gear power-up adds nothing.`, `ความสามารถ ${n}: เสริมพลัง Gear เป็น 0`));
     if (a.do === "BUFF" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the buff adds nothing.`, `ความสามารถ ${n}: บัฟเป็น 0`));
   });
   return out;
@@ -277,7 +279,7 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   if (a.do === "DAMAGE" || a.do === "GAIN_ENERGY") action.amount = Math.max(1, a.amount);
   if (a.do === "DISCOVER_UNIT" && a.faction) action.faction = a.faction;
   if (a.do === "RANDOM_CARD") Object.assign(action, { cardKind: a.cardKind, ...(a.faction ? { faction: a.faction } : {}) });
-  if (a.do === "BUFF_SHOP") Object.assign(action, { atk: a.atk, hp: a.hp });
+  if (a.do === "BUFF_SHOP" || a.do === "BUFF_GEAR") Object.assign(action, { atk: a.atk, hp: a.hp });
   if (a.do === "SUMMON_FROM_HAND") action.count = Math.max(1, a.count);
   if (a.do === "DISCARD") Object.assign(action, { count: Math.max(1, a.count), pick: a.pick, cardKind: a.discardKind });
   if (a.do === "DEVOUR_SHOP") Object.assign(action, { choose: a.choose, ...(a.faction ? { faction: a.faction } : {}) });
@@ -294,7 +296,7 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
 }
 
 /** Recruit actions a fight effect earns for the start of the next turn. */
-const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
+const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
 /** One line per ability in plain words, for the preview (the saved card gets the server's own text). */
 export function describeRecipe(r: Recipe, cardName: (key: string) => string, factionName: (key: string) => string): string[] {
@@ -323,6 +325,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.do === "RANDOM_CARD" ? tr(`add a random ${a.faction ? `${factionName(a.faction)} ` : ""}${a.cardKind === "GEAR" ? "Gear" : "unit"} to your hand`, `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${factionName(a.faction)}` : ""}แบบสุ่มเข้ามือ`)
       : a.do === "SUMMON_FROM_HAND" ? tr(`summon ${a.count > 1 ? `${a.count} units` : "a unit"} from your hand`, `เรียกยูนิตจากมือ${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
       : a.do === "BUFF_SHOP" ? tr(`units in your tavern get ${sign(a.atk)}/${sign(a.hp)} for the rest of the game`, `ยูนิตในร้านได้ ${sign(a.atk)}/${sign(a.hp)} จนจบเกม`)
+      : a.do === "BUFF_GEAR" ? tr(`your Gear give ${sign(a.atk)}/${sign(a.hp)} more for the rest of the game`, `Gear ที่ให้ค่าพลังให้เพิ่มอีก ${sign(a.atk)}/${sign(a.hp)} จนจบเกม`)
       : a.do === "DEVOUR_SHOP" ? tr(`devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} tavern unit; ${who} gains its stats`, `กลืนกินยูนิตในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"} ${who}ได้ค่าพลังของมัน`)
       : a.do === "DISCARD" ? tr(`discard ${a.count} ${a.pick === "RANDOM" ? "random" : a.pick.toLowerCase()} ${a.discardKind === "ANY" ? "card" : a.discardKind === "GEAR" ? "Gear" : "unit"}${a.count > 1 ? "s" : ""} from your hand`, `ทิ้ง${a.discardKind === "ANY" ? "การ์ด" : a.discardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.pick === "RANDOM" ? "แบบสุ่ม" : a.pick === "LEFTMOST" ? "ซ้ายสุด" : "ขวาสุด"}ในมือ ${a.count} ใบ`)
       : a.do === "ULTIMATE_FORM" ? tr(`turn ${who} into its Ultimate Form`, `เปลี่ยน${who}เป็นร่าง Ultimate`)

@@ -103,6 +103,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "RANDOM_CARD": return `add a random ${a.faction ? `${names(a.faction)} ` : ""}${a.cardKind === "GEAR" ? "Gear" : "unit"} to your hand`;
     case "ULTIMATE_FORM": return `turn ${t} into its Ultimate Form`;
     case "BUFF_SHOP": return `units in your tavern get ${signed(a.atk)}/${signed(a.hp)} for the rest of the game`;
+    case "BUFF_GEAR": return `your Gear give ${signed(a.atk)}/${signed(a.hp)} more for the rest of the game`;
     case "DEVOUR_SHOP": return `devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} ${a.faction ? `${names(a.faction)} ` : ""}unit in your tavern and give its stats to ${t}`;
     case "DISCARD": {
       const what = a.cardKind === "GEAR" ? "Gear" : a.cardKind === "UNIT" ? "unit" : "card";
@@ -151,7 +152,7 @@ export function ruleText(rule: string, op: "SET" | "ADD" | "MUL", value: number)
 }
 
 const FIGHT_TRIGGERS = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
-const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
+const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];

@@ -538,8 +538,17 @@ function gearSlot(ctx: Ctx, view: View): HTMLElement | null {
     "div",
     { class: "gear-slot" },
     h("div", { class: "gear-slot-label", text: "Gear" }),
-    key ? draggableCard(cardEl(ctx.ix, { key, cost, costHealth: health, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: tr("Sold out until the next refresh", "หมดแล้ว รอรีเฟรชครั้งหน้า") }),
+    key ? draggableCard(cardEl(ctx.ix, { key, cost, costHealth: health, ...gearNote(ctx, view, key), classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: tr("Sold out until the next refresh", "หมดแล้ว รอรีเฟรชครั้งหน้า") }),
   );
+}
+
+/** BUFF_GEAR: a Gear that gives stats shows how much more it gives now. */
+function gearNote(ctx: Ctx, view: View, key: string): { note?: { text: string; title: string } } {
+  const bonus = view.me.state.gearBonus;
+  const def = ctx.ix.card(key);
+  if (!bonus || (bonus.atk === 0 && bonus.hp === 0) || def?.kind !== "GEAR" || !def.effects.some((e) => e.actions.some((a) => a.type === "BUFF"))) return {};
+  const sign = (n: number): string => (n >= 0 ? `+${n}` : String(n));
+  return { note: { text: `${sign(bonus.atk)}/${sign(bonus.hp)}`, title: tr(`Powered up: gives ${sign(bonus.atk)}/${sign(bonus.hp)} more to each unit it buffs`, `เสริมพลังแล้ว: ให้เพิ่มอีก ${sign(bonus.atk)}/${sign(bonus.hp)} กับทุกตัวที่บัฟ`) } };
 }
 
 /** Hero portrait with its power on the left, the hand in the middle, gold and the end-turn button on the right. */
@@ -782,7 +791,7 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
   return h(
     "div",
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: endDrag } },
-    cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [] }),
+    cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [], ...gearNote(ctx, view, u.key) }),
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini primary", text: gear ? (aimedGear(ctx, view) === i ? tr("Cancel", "ยกเลิก") : tr("Use", "ใช้")) : tr("Play", "ลงบอร์ด"), disabled: !gear && full, on: { click: () => (gear ? (aimedGear(ctx, view) === i ? ctx.store.set({ selected: undefined }) : useGearFromHand(ctx, view, i)) : void ctx.act({ type: "PLAY", handIndex: i, position: view.me.state.board.length })) } }),
       (!gear || !gearUsableHere(ctx, view, i)) && h("button", { class: "mini", text: `${tr("Sell", "ขาย")} +${view.me.limits.sellValue}`, title: gear ? tr("This gear has nothing to act on right now, so it can be sold", "Gear นี้ยังใช้ไม่ได้ตอนนี้ จึงขายได้") : "", on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),

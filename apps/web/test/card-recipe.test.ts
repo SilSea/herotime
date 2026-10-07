@@ -60,6 +60,14 @@ describe("card wizard", () => {
     expect(buildCard(recipe({ abilities: [{ ...newAbility("UNIT"), targetCards: ["cub"] }] })).effects).toEqual([expect.objectContaining({ target: { selector: "SELF" } })]);
   });
 
+  it("builds a Gear power-up", () => {
+    const smith = recipe({ key: "smith", abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", do: "BUFF_GEAR", atk: 1, hp: 2 }] });
+    expect(buildCard(smith).effects).toEqual([expect.objectContaining({ trigger: "ON_PLAY", actions: [{ type: "BUFF_GEAR", atk: 1, hp: 2 }] })]);
+    expect(playable(buildCard(smith))).toEqual([]);
+    expect(describeRecipe(smith, (k) => k, (k) => k)[0]).toContain("your Gear give +1/+2 more for the rest of the game");
+    expect(checkRecipe({ ...smith, abilities: [{ ...smith.abilities[0]!, atk: 0, hp: 0 }] }, new Set())).toEqual([expect.stringMatching(/adds nothing/)]);
+  });
+
   it("offers Energy and cards in fights (they arrive next turn) and Transform", () => {
     const attack = choicesFor({ ...newAbility("UNIT"), when: "ON_ATTACK" }, "UNIT").do.map((d) => d.key);
     for (const k of ["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "BUFF_SHOP", "TRANSFORM", "BUFF", "DAMAGE"]) expect(attack).toContain(k);

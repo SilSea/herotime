@@ -101,6 +101,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "RANDOM_CARD": return `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${names(a.faction)}` : ""}แบบสุ่มเข้ามือ`;
     case "ULTIMATE_FORM": return `เปลี่ยน${t}เป็นร่าง Ultimate`;
     case "BUFF_SHOP": return `ยูนิตในร้านได้ ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
+    case "BUFF_GEAR": return `Gear ที่ให้ค่าพลังให้เพิ่มอีก ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
     case "DEVOUR_SHOP": return `กลืนกินยูนิต${a.faction ? ` ${names(a.faction)}` : ""}ในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"} แล้วให้ค่าพลังของมันกับ${t}`;
     case "DISCARD": {
       const what = a.cardKind === "GEAR" ? "Gear" : a.cardKind === "UNIT" ? "ยูนิต" : "การ์ด";
@@ -148,7 +149,7 @@ export function ruleTextTh(rule: string, op: "SET" | "ADD" | "MUL", value: numbe
 }
 
 const FIGHT_TRIGGERS = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
-const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP"]);
+const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
 export function effectTextTh(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];

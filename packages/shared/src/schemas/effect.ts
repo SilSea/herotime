@@ -128,6 +128,8 @@ export const Action = z.discriminatedUnion("type", [
   z.object({ type: z.literal("ULTIMATE_FORM") }),
   /** Recruit only: from now on, units in your tavern have +atk/+hp (they keep it when bought). Stacks. */
   z.object({ type: z.literal("BUFF_SHOP"), atk: amount.default(1), hp: amount.default(1) }),
+  /** For the rest of the game, every Gear this player uses that gives stats gives this much more. */
+  z.object({ type: z.literal("BUFF_GEAR"), atk: amount.default(1), hp: amount.default(1) }),
   /**
    * Recruit only: eat a random unit from your tavern; each target gains its ATK/HP for good. Only units of
    * of `faction` can be eaten when it is set.
