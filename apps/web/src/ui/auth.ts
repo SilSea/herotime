@@ -46,7 +46,7 @@ export function renderAuth(root: HTMLElement, api: Api, onDone: (r: AuthResult) 
         "div",
         { class: "auth-screen" },
         h("h1", { class: "logo", text: "HeroTime" }),
-        h("p", { class: "tagline", text: tr("Rider x Sentai auto-battler - prototype", "เกม auto-battler Rider x Sentai - ต้นแบบ") }),
+        h("p", { class: "tagline", text: tr("Rider x Sentai auto-battler", "เกม auto-battler Rider x Sentai") }),
         h("div", { class: "lang-toggle" }, ...(["th", "en"] as const).map((l) => h("button", { class: `lang-btn ${lang() === l ? "active" : ""}`, type: "button", text: l.toUpperCase(), on: { click: () => ((setLang(l), draw())) } }))),
         h(
           "div",
