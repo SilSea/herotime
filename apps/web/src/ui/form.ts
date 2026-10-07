@@ -120,16 +120,21 @@ export function renderField(field: Field, value: unknown, set: (v: unknown) => v
       return el;
     }
     case "ref": {
-      const el = h("input", { type: "text", value: String(value ?? ""), attrs: { list: `dl-${field.to}` } });
+      // Type a key or part of a name: the list (a datalist labelled with names) narrows as you type.
+      const el = h("input", { type: "search", value: String(value ?? ""), placeholder: "type to search…", attrs: { list: `dl-${field.to}` } });
+      const label = (k: string): string => document.querySelector<HTMLOptionElement>(`#dl-${field.to} option[value="${CSS.escape(k)}"]`)?.textContent ?? "";
+      const shown = h("span", { class: "muted small ref-name" });
       const check = (): void => {
-        el.classList.toggle("bad", el.value !== "" && !env.refs(field.to).includes(el.value));
+        const ok = el.value === "" || env.refs(field.to).includes(el.value);
+        el.classList.toggle("bad", !ok);
+        shown.textContent = ok && el.value ? label(el.value) : el.value ? "not found" : "";
       };
       el.addEventListener("input", () => {
         set(el.value);
         check();
       });
-      check();
-      return el;
+      queueMicrotask(check);
+      return h("span", { class: "ref-field" }, el, shown);
     }
     case "tags": {
       const chosen = Array.isArray(value) ? ([...value] as string[]) : [];

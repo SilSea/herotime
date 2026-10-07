@@ -397,7 +397,7 @@ function table(ctx: Ctx, view: View): HTMLElement {
     { class: `tavern ${s.frozen ? "frozen" : ""} ${justFroze ? "just-frozen" : ""}`, on: { dragover: allowDrop, drop: tavernDrop(ctx, view) } },
     s.frozen && h("div", { class: "frozen-stamp", text: tr("❄ Frozen: kept for next turn", "❄ แช่ไว้: เก็บร้านไว้เทิร์นหน้า") }),
     upgrade,
-    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => draggableCard(cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) }), recruiting, "shop", i)), s.shop.length === 0 && h("p", { class: "muted", text: tr("The tavern is empty.", "ร้านว่าง") })),
+    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => draggableCard(cardEl(ctx.ix, { key, cost: me.limits.buyCost, ...(s.shopBonus ? { atk: (ctx.ix.card(key)?.atk ?? 0) + s.shopBonus.atk, hp: (ctx.ix.card(key)?.hp ?? 0) + s.shopBonus.hp } : {}), classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) }), recruiting, "shop", i)), s.shop.length === 0 && h("p", { class: "muted", text: tr("The tavern is empty.", "ร้านว่าง") })),
     gearSlot(ctx, view),
     side,
   );

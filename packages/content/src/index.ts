@@ -1,5 +1,6 @@
 import { productionRaw } from "./production.js";
 import { prototypeRaw } from "./prototype.js";
+import { blankRaw } from "./blank.js";
 import { withGeneratedText, type ContentSetData } from "./types.js";
 
 export * from "./dsl.js";
@@ -8,7 +9,7 @@ export * from "./text-th.js";
 export * from "./types.js";
 
 /** Sets exactly as authored: this is what gets stored as the first published version. */
-export const RAW_CONTENT_SETS: Record<string, ContentSetData> = { prototype: prototypeRaw, production: productionRaw };
+export const RAW_CONTENT_SETS: Record<string, ContentSetData> = { prototype: prototypeRaw, production: productionRaw, blank: blankRaw };
 
 /** Every set that can be selected with CONTENT_SET, with rules text filled in. */
 export const CONTENT_SETS: Record<string, ContentSetData> = Object.fromEntries(Object.entries(RAW_CONTENT_SETS).map(([k, v]) => [k, withGeneratedText(v)]));

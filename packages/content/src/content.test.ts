@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { CONTENT_SETS, getContentSet, type ContentSetData } from "./index.js";
 
 const build = (s: ContentSetData): Content => new Content(s);
-const entries = Object.entries(CONTENT_SETS);
+// The blank set is a deliberately empty start for building content in the editor: it has its own test below.
+const entries = Object.entries(CONTENT_SETS).filter(([name]) => name !== "blank");
 
 describe("content registry", () => {
   it("knows its sets and refuses an unknown one with the available names", () => {
@@ -185,5 +186,18 @@ describe("production set", () => {
 
   it("is a larger set than the prototype", () => {
     expect(shop.length).toBeGreaterThan(getContentSet("prototype").cards.filter((c) => c.kind === "UNIT" && !c.token).length);
+  });
+});
+
+describe("content set: blank", () => {
+  const set = getContentSet("blank");
+  it("is empty apart from what a match needs to start", () => {
+    expect(set.factions).toEqual([]);
+    expect(set.series).toEqual([]);
+    expect(set.gauges).toEqual([]);
+    expect(set.relics).toEqual([]);
+    expect(set.heroes.length).toBe(2);
+    expect(set.cards.filter((c) => c.kind === "UNIT" && !c.token)).toHaveLength(1);
+    expect(set.rules).toEqual({ rollCallColors: 3 });
   });
 });

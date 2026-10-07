@@ -26,6 +26,8 @@ export interface CombatSideExtras {
   /** Player-scope START_OF_COMBAT effects: relics and active Series Bonds. */
   playerEffects?: readonly Effect[];
   rules?: Partial<CombatRules>;
+  /** Unit cards in the player's hand (keys): SUMMON_FROM_HAND summons copies of them. */
+  hand?: readonly string[];
 }
 
 /**

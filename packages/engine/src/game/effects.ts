@@ -13,7 +13,7 @@ export function unitView(env: GameEnv, unit: Unit): UnitView {
 }
 
 export const needsTargets = (a: Action): boolean =>
-  a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY";
+  a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "ULTIMATE_FORM" || a.type === "DEVOUR_SHOP";
 
 /** Whether a unit passes a target's faction / series filter. */
 export function matchesTarget(env: GameEnv, u: Unit, t: Target): boolean {
@@ -51,6 +51,8 @@ function select(
       return mine;
     case "CHOSEN_FRIENDLY":
       return chosen && mine.includes(chosen) ? [chosen] : mine.slice(0, 1);
+    case "GIANT_SLOT":
+      return player.giant ? [player.giant] : [];
     case "SUMMONED": // ALLY_SUMMONED passes the newcomer in as `chosen`
       return chosen && board.includes(chosen) ? [chosen] : [];
     case "LEFTMOST_ENEMY":
@@ -124,6 +126,17 @@ function discoverUnits(player: PlayerState, env: GameEnv, faction: string | unde
     else options.push(key);
   }
   if (options.length > 0) player.discovers.push({ options, destination: "HAND" });
+}
+
+/** A tavern gear (not pooled) of at most the player's rank, of one faction when given. */
+function randomGear(player: PlayerState, env: GameEnv, faction: string | undefined): string | undefined {
+  const options = env.gear.filter((g) => g.rank <= player.rank && (faction === undefined || env.content.card(g.key).factions.includes(faction)));
+  return options.length > 0 ? env.rng.pick(options).key : undefined;
+}
+
+/** A unit drawn from the pool (so it counts against the copies left), of at most the player's rank. */
+function randomUnit(player: PlayerState, env: GameEnv, faction: string | undefined): string | undefined {
+  return env.pool.draw(env.rng, player.rank, 1, (key) => faction === undefined || env.content.card(key).factions.includes(faction));
 }
 
 /** What caused an effect, so a buff can be credited to it on the card. */
@@ -201,6 +214,56 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       for (let n = 0; n < mult; n++) discoverUnits(player, env, action.faction);
       return;
     }
+    case "RANDOM_CARD": {
+      for (let n = 0; n < mult && player.hand.length < c.handSize; n++) {
+        const key = action.cardKind === "GEAR" ? randomGear(player, env, action.faction) : randomUnit(player, env, action.faction);
+        if (key) player.hand.push({ key, golden: false });
+      }
+      return;
+    }
+    case "ULTIMATE_FORM": {
+      for (const t of targets) {
+        const into = env.content.card(t.key).ultimateInto;
+        if (into) swapKey(t, into, env);
+      }
+      return;
+    }
+    case "BUFF_SHOP": {
+      const now = player.shopBonus ?? { atk: 0, hp: 0 };
+      player.shopBonus = { atk: now.atk + action.atk * mult, hp: now.hp + action.hp * mult };
+      return;
+    }
+    case "DEVOUR_SHOP": {
+      for (let n = 0; n < mult && player.shop.length > 0; n++) {
+        const i = env.rng.int(player.shop.length);
+        const key = player.shop.splice(i, 1)[0] as string;
+        const eaten = env.content.card(key);
+        const atk = eaten.atk + (player.shopBonus?.atk ?? 0);
+        const hp = eaten.hp + (player.shopBonus?.hp ?? 0);
+        if (env.pool.has(key)) env.pool.give(key);
+        for (const t of targets) {
+          t.bonusAtk = (t.bonusAtk ?? 0) + atk;
+          t.bonusHp = (t.bonusHp ?? 0) + hp;
+          recordBuff(t, origin, atk, hp);
+        }
+      }
+      return;
+    }
+    case "SUMMON_FROM_HAND": {
+      for (let n = 0; n < action.count * mult && player.board.length < c.boardSize; n++) {
+        const options = player.hand.filter((u) => env.content.card(u.key).kind === "UNIT");
+        if (options.length === 0) break;
+        const unit = env.rng.pick(options);
+        player.hand.splice(player.hand.indexOf(unit), 1);
+        const at = source && player.board.includes(source) ? player.board.indexOf(source) + 1 : player.board.length;
+        player.board.splice(at, 0, unit);
+        for (const mate of [...player.board]) {
+          if (mate === unit || !player.board.includes(mate)) continue;
+          runTrigger(env.content.card(mate.key).effects, "ALLY_SUMMONED", "UNIT", mate, player, env, undefined, unit);
+        }
+      }
+      return;
+    }
     case "SUPER_GATTAI": {
       const now = player.superGattai ?? { atk: 0, hp: 0 };
       player.superGattai = { atk: now.atk + action.atk * mult, hp: now.hp + action.hp * mult };
@@ -213,6 +276,10 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
 
 /** Run one effect in the recruit phase. `source` is the owning unit (null for player-scope effects). */
 export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin, chosen?: Unit): void {
+  for (let n = 0; n < (effect.repeat ?? 1); n++) runEffectOnce(effect, source, player, env, origin, chosen);
+}
+
+function runEffectOnce(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin, chosen?: Unit): void {
   const board = player.board.map((u) => unitView(env, u));
   if (!checkCondition(effect.condition, board, player.energy)) return;
   const mult = source?.golden ? (effect.goldenMultiplier ?? 2) : 1;

@@ -1,7 +1,7 @@
 import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
 import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta, GameStats, StatRow } from "../protocol.js";
-import { ENTITIES, entityInfo, RULE_DEFAULTS, RULE_ROWS, type EntityKind, type RefKind } from "./admin-schema.js";
+import { ENTITIES, entityInfo, KEYWORDS, RULE_DEFAULTS, RULE_ROWS, TRIGGERS, type EntityKind, type RefKind } from "./admin-schema.js";
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
 import { wizardPanel } from "./card-wizard.js";
@@ -28,6 +28,8 @@ interface EditorState {
   panel: "edit" | "versions" | "audit" | "simulate" | "stats" | "wizard";
   stats?: GameStats;
   statsHumans: boolean;
+  /** Card list filters ("" = all). */
+  filter: { kind: string; faction: string; rank: string; keyword: string };
   sim?: SimulationReport;
   simMatches: number;
   simTarget: "draft" | "published";
@@ -39,7 +41,7 @@ interface EditorState {
   publishIssues: string[];
 }
 
-const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft", simRelic: "", statsHumans: false };
+const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft", simRelic: "", statsHumans: false, filter: { kind: "", faction: "", rank: "", keyword: "" } };
 
 /** The element the screen was last drawn into: the app redraws and replaces it, so async work must not hold on to an old one. */
 let host: HTMLElement | undefined;
@@ -120,7 +122,11 @@ export function renderAdmin(root: HTMLElement, ctx: Ctx): void {
   }
 
   const refs = (k: RefKind): string[] => (k === "cards" || k === "factions" || k === "series" || k === "gauges" || k === "heroes" || k === "relics" ? list(k).map((x) => String(x.key ?? "")).filter(Boolean) : []);
-  const datalists = (["cards", "factions", "series", "gauges", "heroes", "relics"] as RefKind[]).map((k) => h("datalist", { id: `dl-${k}` }, ...refs(k).map((v) => h("option", { value: v }))));
+  const labelOf = (k: RefKind, x: Record<string, any>): string =>
+    k === "cards" ? `${x.name ?? x.key} · ${x.kind === "GEAR" ? "Gear" : x.kind === "GIANT" ? "Giant" : `${x.atk}/${x.hp}`}${x.token ? " · token" : ""} · rank ${x.rank ?? 1}` : String(x.name ?? x.key);
+  const datalists = (["cards", "factions", "series", "gauges", "heroes", "relics"] as RefKind[]).map((k) =>
+    h("datalist", { id: `dl-${k}` }, ...list(k as EntityKind).filter((x) => x.key).map((x) => h("option", { value: String(x.key), text: labelOf(k, x) }))),
+  );
 
   const panel =
     ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : ed.panel === "simulate" ? simulatePanel(ctx) : ed.panel === "stats" ? statsPanel(ctx) : ed.panel === "wizard" ? wizard(ctx) : editorBody(ctx, refs);
@@ -443,12 +449,26 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
     fillList();
   });
   const listEl = h("div", { class: "admin-list" });
+  const f = ed.filter;
+  const passes = (it: Record<string, any>): boolean => {
+    if (kind !== "cards") return true;
+    const kindOf = it.kind === "GEAR" ? "GEAR" : it.kind === "GIANT" ? "GIANT" : it.token ? "TOKEN" : "UNIT";
+    const factions: string[] = it.factions ?? [];
+    const kws: string[] = it.keywords ?? [];
+    return (
+      (!f.kind || kindOf === f.kind) &&
+      (!f.faction || (f.faction === "_none" ? factions.length === 0 : factions.includes(f.faction))) &&
+      (!f.rank || String(it.rank ?? 1) === f.rank) &&
+      (!f.keyword || kws.includes(f.keyword) || JSON.stringify(it.effects ?? []).includes(`"${f.keyword}"`))
+    );
+  };
   const fillList = (): void => {
     const q = ed.query.toLowerCase();
     listEl.replaceChildren(
       ...items
         .map((it, i) => ({ it, i }))
-        .filter(({ it }) => !q || `${it.key} ${it.name}`.toLowerCase().includes(q))
+        .filter(({ it }) => passes(it))
+        .filter(({ it }) => !q || `${it.key} ${it.name} ${it.text ?? ""} ${it.textTh ?? ""}`.toLowerCase().includes(q))
         .map(({ it, i }) => h("button", { class: `admin-item ${i === ed.index ? "active" : ""}`, on: { click: () => ((ed.index = i), redraw()) } }, h("strong", { text: String(it.name ?? it.key) }), h("span", { class: "muted", text: ` ${it.key ?? ""}${typeof it.rank === "number" ? ` · rank ${it.rank}` : ""}` }))),
     );
     if (listEl.childElementCount === 0) listEl.append(h("p", { class: "muted", text: "Nothing here." }));
@@ -456,7 +476,26 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
   fillList();
 
   const add = h("button", { class: "btn", text: `+ New ${info.singular}`, disabled: ed.busy, on: { click: () => newEntity(ctx) } });
-  const left = h("div", { class: "admin-left" }, tabs, search, add, listEl);
+  const sel = (key: keyof EditorState["filter"], options: [string, string][]): HTMLElement => {
+    const el = h("select", null, ...options.map(([v, label]) => h("option", { value: v, text: label, selected: f[key] === v }))) as HTMLSelectElement;
+    el.addEventListener("change", () => {
+      f[key] = el.value;
+      fillList();
+    });
+    return el;
+  };
+  const filters =
+    kind === "cards" &&
+    h(
+      "div",
+      { class: "admin-filters" },
+      sel("kind", [["", "All kinds"], ["UNIT", "Units (shop)"], ["TOKEN", "Tokens"], ["GEAR", "Gear"], ["GIANT", "Giants"]]),
+      sel("faction", [["", "All factions"], ...list("factions").map((x) => [String(x.key), String(x.name ?? x.key)] as [string, string]), ["_none", "Neutral"]]),
+      sel("rank", [["", "All ranks"], ...[1, 2, 3, 4, 5, 6].map((r) => [String(r), `Rank ${r}`] as [string, string])]),
+      sel("keyword", [["", "Any keyword/trigger"], ...[...KEYWORDS, ...TRIGGERS].map((k) => [k, k] as [string, string])]),
+      h("button", { class: "mini", text: "Clear", on: { click: () => ((ed.filter = { kind: "", faction: "", rank: "", keyword: "" }), (ed.query = ""), redraw()) } }),
+    );
+  const left = h("div", { class: "admin-left" }, tabs, search, filters, add, listEl);
 
   const entity = ed.index !== undefined ? items[ed.index] : undefined;
   const middle = h("div", { class: "admin-middle" }, entity ? entityEditor(ctx, entity, refs) : h("p", { class: "muted", text: `Pick a ${info.singular} on the left, or create a new one.` }));

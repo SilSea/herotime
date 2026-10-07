@@ -41,6 +41,8 @@ import {
   randomFoe,
   onSummon,
   summoned,
+  ultimateForm,
+  giantSlot,
 } from "./dsl.js";
 import type { ContentSetData } from "./types.js";
 
@@ -104,11 +106,21 @@ const cards = [
   token("rider_form", "Rider Form", { atk: 4, hp: 4, factions: ["rider"], keywords: ["RIDER_KICK"] }),
   token("super_form", "Super Form", { atk: 9, hp: 9, factions: ["rider"], keywords: ["RIDER_KICK", "RAPID"] }),
   gear("kyodai_gattai", "Kyodai Gattai!", [player("ON_PLAY", discoverGiant())]),
-  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [buff(4, 4, true), give("RIDER_KICK")], { target: chosen({ faction: "rider" }) })]),
-  giant("gokai_oh", "Gokai Oh", { atk: 9, hp: 9, series: "gokaiger", factions: ["mecha"], keywords: ["FINAL_BLOW"] }),
-  giant("kyoryuzin", "Kyoryuzin", { atk: 8, hp: 11, series: "kyoryuger", factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"] }),
-  giant("shinken_oh", "Shinken Oh", { atk: 7, hp: 12, series: "shinkenger", factions: ["mecha"], keywords: ["FINAL_BLOW", "BARRIER"] }),
-  giant("garuda_oh", "Garuda Oh", { atk: 11, hp: 8, series: "himmapan", factions: ["mecha"], keywords: ["FINAL_BLOW", "REVIVE"] }),
+  // Ultimate Form (Rider Gauge): the chosen Rider becomes its series' final form, and grows.
+  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [ultimateForm(), buff(2, 2, true)], { target: chosen({ faction: "rider" }) })]),
+  token("w_xtreme", "Kamen Rider W CycloneJokerXtreme", { rank: 6, atk: 10, hp: 10, factions: ["rider"], series: "w", keywords: ["RAPID", "BARRIER"] }),
+  token("den_o_liner", "Kamen Rider Den-O Liner Form", { rank: 6, atk: 11, hp: 9, factions: ["rider"], series: "den_o", keywords: ["RIDER_KICK", "RAPID"] }),
+  token("ooo_putotyra", "Kamen Rider OOO Putotyra Combo", { rank: 6, atk: 12, hp: 12, factions: ["rider"], series: "ooo", keywords: ["RIDER_KICK", "GUARD"] }),
+  token("final_rider_ultimate", "Final Rider Ultimate", { rank: 6, atk: 16, hp: 16, factions: ["rider"], keywords: ["RIDER_KICK", "RAPID"] }),
+  // Upgraded Giant Robos (Robo Upgrade gear)
+  giant("kanzen_gokai_oh", "Kanzen Gokai Oh", { atk: 13, hp: 13, series: "gokaiger", factions: ["mecha"], keywords: ["FINAL_BLOW", "RAPID"] }),
+  giant("gigant_kyoryuzin", "Gigant Kyoryuzin", { atk: 12, hp: 15, series: "kyoryuger", factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"] }),
+  giant("daikai_shinken_oh", "Daikai Shinken Oh", { atk: 11, hp: 16, series: "shinkenger", factions: ["mecha"], keywords: ["FINAL_BLOW", "BARRIER"] }),
+  giant("himmapan_king", "Himmapan King", { atk: 15, hp: 11, series: "himmapan", factions: ["mecha"], keywords: ["FINAL_BLOW", "REVIVE"] }),
+  giant("gokai_oh", "Gokai Oh", { atk: 9, hp: 9, series: "gokaiger", factions: ["mecha"], keywords: ["FINAL_BLOW"], ultimateInto: "kanzen_gokai_oh" }),
+  giant("kyoryuzin", "Kyoryuzin", { atk: 8, hp: 11, series: "kyoryuger", factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"], ultimateInto: "gigant_kyoryuzin" }),
+  giant("shinken_oh", "Shinken Oh", { atk: 7, hp: 12, series: "shinkenger", factions: ["mecha"], keywords: ["FINAL_BLOW", "BARRIER"], ultimateInto: "daikai_shinken_oh" }),
+  giant("garuda_oh", "Garuda Oh", { atk: 11, hp: 8, series: "himmapan", factions: ["mecha"], keywords: ["FINAL_BLOW", "REVIVE"], ultimateInto: "himmapan_king" }),
 
   // ---- neutral: no faction, always in the shop
   unit("n1", "Wandering Fighter", { rank: 1, atk: 2, hp: 2 }),
@@ -148,14 +160,14 @@ const cards = [
   ranger("hm6", "Mythic Ranger", 6, 9, 11, "himmapan", "EXTRA", [lastStand(buff(3, 3, true), { target: allAllies({ series: "himmapan" }) })], ["BARRIER"]),
 
   // ---- Rider
-  unit("rd1", "Rookie Rider", { rank: 1, atk: 2, hp: 2, factions: ["rider"], henshin: { after: 2, into: "rider_form" } }),
-  unit("rd2", "Kamen Rider Double", { rank: 2, atk: 3, hp: 3, factions: ["rider"], series: "w", effects: [startOfCombat(buff(2, 2), { condition: seriesCount("w", 2) })] }),
-  unit("rb", "Kamen Rider Birth", { rank: 2, atk: 2, hp: 4, factions: ["rider"], series: "ooo", effects: [deploy(buff(1, 1), { target: adjacent })] }),
-  unit("rd3", "Kamen Rider Accel", { rank: 3, atk: 4, hp: 4, factions: ["rider"], series: "w", keywords: ["RIDER_KICK"] }),
-  unit("rd4", "Kamen Rider Den-O", { rank: 4, atk: 5, hp: 5, factions: ["rider"], series: "den_o", henshin: { after: 2, into: "super_form" } }),
-  unit("rz", "Kamen Rider Zeronos", { rank: 5, atk: 6, hp: 7, factions: ["rider"], series: "den_o", keywords: ["RIDER_KICK"], effects: [startOfCombat(buff(2, 0), { target: allAllies({ series: "den_o" }) })] }),
-  unit("rd5", "Kamen Rider OOO", { rank: 5, atk: 7, hp: 8, factions: ["rider"], series: "ooo", effects: [startOfCombat(give("RAPID"), { condition: seriesCount("ooo", 3) }), startOfCombat(buff(1, 1), { target: allAllies({ faction: "rider" }) })] }),
-  unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
+  unit("rd1", "Rookie Rider", { rank: 1, atk: 2, hp: 2, factions: ["rider"], henshin: { after: 2, into: "rider_form" }, ultimateInto: "super_form" }),
+  unit("rd2", "Kamen Rider Double", { rank: 2, atk: 3, hp: 3, factions: ["rider"], series: "w", ultimateInto: "w_xtreme", effects: [startOfCombat(buff(2, 2), { condition: seriesCount("w", 2) })] }),
+  unit("rb", "Kamen Rider Birth", { rank: 2, atk: 2, hp: 4, factions: ["rider"], series: "ooo", ultimateInto: "ooo_putotyra", effects: [deploy(buff(1, 1), { target: adjacent })] }),
+  unit("rd3", "Kamen Rider Accel", { rank: 3, atk: 4, hp: 4, factions: ["rider"], series: "w", ultimateInto: "w_xtreme", keywords: ["RIDER_KICK"] }),
+  unit("rd4", "Kamen Rider Den-O", { rank: 4, atk: 5, hp: 5, factions: ["rider"], series: "den_o", ultimateInto: "den_o_liner", henshin: { after: 2, into: "super_form" } }),
+  unit("rz", "Kamen Rider Zeronos", { rank: 5, atk: 6, hp: 7, factions: ["rider"], series: "den_o", ultimateInto: "den_o_liner", keywords: ["RIDER_KICK"], effects: [startOfCombat(buff(2, 0), { target: allAllies({ series: "den_o" }) })] }),
+  unit("rd5", "Kamen Rider OOO", { rank: 5, atk: 7, hp: 8, factions: ["rider"], series: "ooo", ultimateInto: "ooo_putotyra", effects: [startOfCombat(give("RAPID"), { condition: seriesCount("ooo", 3) }), startOfCombat(buff(1, 1), { target: allAllies({ faction: "rider" }) })] }),
+  unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], ultimateInto: "final_rider_ultimate", keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
 
   // ---- Mecha (Gattai)
   unit("mc1", "Zord Cub", { rank: 1, atk: 2, hp: 2, factions: ["mecha"], keywords: ["GATTAI"], gattaiInto: "f_cub" }),
@@ -233,6 +245,7 @@ const tavernGear = [
   shopGear("g_blood", "Blood Oath", 2, 3, [player("ON_PLAY", buff(3, 3), { target: chosen() })], { costType: "HEALTH" }),
   shopGear("g_revive", "Revive Chip", 5, 4, [player("ON_PLAY", give("REVIVE"), { target: chosen() })]),
   // a unit of one faction (only offered when that faction is in the match)
+  shopGear("g_robo_upgrade", "Robo Upgrade", 4, 3, [player("ON_PLAY", [ultimateForm(), buff(2, 2)], { target: giantSlot })], { factions: ["sentai", "mecha"] }),
   shopGear("g_call_rider", "Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("rider"))], { factions: ["rider"] }),
   shopGear("g_call_sentai", "Sentai Call", 2, 3, [player("ON_PLAY", discoverUnit("sentai"))], { factions: ["sentai"] }),
   shopGear("g_call_mecha", "Mecha Call", 2, 3, [player("ON_PLAY", discoverUnit("mecha"))], { factions: ["mecha"] }),

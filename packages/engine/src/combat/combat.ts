@@ -183,6 +183,8 @@ export function simulateCombat(
         return mine.slice(0, 1);
       case "SUMMONED":
         return subject && alive(subject) ? [subject] : [];
+      case "GIANT_SLOT":
+        return s.list.filter((f) => f.uid === `${s.id}g` && alive(f));
       case "RIGHTMOST_FRIENDLY":
         return mine.slice(-1);
       case "RANDOM_FRIENDLY": {
@@ -309,6 +311,19 @@ export function simulateCombat(
         }
         return;
       }
+      case "SUMMON_FROM_HAND": {
+        const hand = s.extras.hand ?? [];
+        for (let n = 0; n < action.count * mult && hand.length > 0 && friendly(s).length < boardLimit; n++) {
+          const key = rng.pick([...hand]);
+          const uid = `${s.id}s${spawned++}`;
+          const f = fighterFromCard(key, uid, s.id);
+          const index = Math.min(at(), s.list.length);
+          insertAt(s, index, f);
+          events.push({ type: "SUMMON", unit: uid, cardKey: key, side: s.id, index, atk: f.atk, hp: f.hp, keywords: [...f.keywords] });
+          for (const mate of friendly(s)) if (mate !== f) fire("ALLY_SUMMONED", mate, s, rightOf(s, mate), undefined, f);
+        }
+        return;
+      }
       case "GAIN_ENERGY":
       case "GAUGE_ADD":
       case "MODIFY_RULE":
@@ -316,11 +331,19 @@ export function simulateCombat(
       case "DISCOVER_GIANT":
       case "DISCOVER_UNIT":
       case "SUPER_GATTAI":
+      case "RANDOM_CARD":
+      case "ULTIMATE_FORM":
+      case "BUFF_SHOP":
+      case "DEVOUR_SHOP":
         throw new Error(`action ${action.type} is not valid during combat`);
     }
   };
 
   const runEffect = (effect: Effect, source: Fighter | null, s: SideState, at: () => number, subject?: Fighter): void => {
+    for (let n = 0; n < (effect.repeat ?? 1); n++) runEffectOnce(effect, source, s, at, subject);
+  };
+
+  const runEffectOnce = (effect: Effect, source: Fighter | null, s: SideState, at: () => number, subject?: Fighter): void => {
     if (!checkCondition(effect.condition, friendly(s))) return;
     const mult = source?.golden ? (effect.goldenMultiplier ?? 2) : 1;
     const target: Target = effect.target ?? { selector: "SELF" };

@@ -39,7 +39,9 @@ export function playUnit(player: PlayerState, handIndex: number, position: numbe
   if (def.kind !== "UNIT") throw new RuleError(`${def.name} is not a unit${def.kind === "GEAR" ? " (use it instead)" : ""}`);
 
   play(player, handIndex, position, env.cfg);
-  runTrigger(def.effects, "ON_PLAY", "UNIT", card, player, env);
+  // ECHO: while another unit with it is on the board, Deploy happens twice.
+  const echo = player.board.some((u) => u !== card && (env.content.card(u.key).keywords.includes("ECHO") || (u.keywords ?? []).includes("ECHO")));
+  for (let n = 0; n < (echo ? 2 : 1); n++) runTrigger(def.effects, "ON_PLAY", "UNIT", card, player, env);
   return resolveTriples(player, env.pool, env.rng, env.cfg);
 }
 
@@ -109,8 +111,13 @@ export function buyGear(player: PlayerState, env: GameEnv, payHealth?: (amount: 
  * A unit qualifies when it passes the filter of every chosen-target effect.
  */
 export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv): number[] | null {
-  const chosen = env.content.card(gearKey).effects.filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some(needsTargets));
-  if (chosen.length === 0) return null;
+  const effects = env.content.card(gearKey).effects;
+  const chosen = effects.filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some(needsTargets));
+  if (chosen.length === 0) {
+    // A gear for the Giant Robo is wasted without one.
+    if (effects.some((e) => e.target?.selector === "GIANT_SLOT") && !player.giant) return [];
+    return null;
+  }
   return player.board.flatMap((u, i) => (chosen.every((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) ? [i] : []));
 }
 
@@ -139,7 +146,10 @@ export function useGear(player: PlayerState, handIndex: number, env: GameEnv, ta
 export function sellUnit(player: PlayerState, from: "board" | "hand", index: number, env: GameEnv): void {
   const unit = (from === "board" ? player.board : player.hand)[index];
   if (unit !== undefined && env.content.card(unit.key).kind === "GEAR") throw new RuleError("gear cannot be sold");
-  sell(player, from, index, env.pool, env.cfg);
+  // "When sold" effects run while the unit is still there, so it can still act on (or from) the board.
+  if (unit !== undefined) runTrigger(env.content.card(unit.key).effects, "ON_SELL", "UNIT", unit, player, env);
+  const at = (from === "board" ? player.board : player.hand).indexOf(unit as Unit);
+  if (at >= 0) sell(player, from, at, env.pool, env.cfg);
 }
 
 /** Take a Discover pick, then resolve a triple the pick may have completed. */
@@ -349,6 +359,8 @@ export function prepareCombat(player: PlayerState, env: GameEnv): { units: Comba
   }
 
   const extras: CombatSideExtras = { playerEffects, rules: { ...env.cfg.combatDefaults, ...combatRulesOf(player) } };
+  const handUnits = player.hand.filter((u) => env.content.card(u.key).kind === "UNIT").map((u) => u.key);
+  if (handUnits.length > 0) extras.hand = handUnits;
   if (player.giant) extras.giant = superGattai(player, env.content.toCombat(player.giant), env);
   return { units, extras };
 }

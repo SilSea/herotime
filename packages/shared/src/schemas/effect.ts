@@ -11,6 +11,8 @@ export const KeywordKey = z.enum([
   "FINAL_BLOW",
   "KYODAIKA",
   "GATTAI",
+  /** While this is on your board, your Deploy (ON_PLAY) effects happen twice. */
+  "ECHO",
 ]);
 export type KeywordKey = z.infer<typeof KeywordKey>;
 
@@ -32,6 +34,7 @@ export const Trigger = z.enum([
   "LAST_STAND",
   "AVENGE",
   "ALLY_SUMMONED", // another friendly unit was summoned (recruit or fight); target SUMMONED is that unit
+  "ON_SELL", // the unit is sold (from the board or the hand), just before it leaves
   // player effects
   "ON_ACQUIRE", // relic picked / hero chosen: runs once, rules it sets persist
   "ON_TURN_START",
@@ -62,6 +65,8 @@ export const Selector = z.enum([
   "CHOSEN_FRIENDLY",
   /** ALLY_SUMMONED only: the unit that was just summoned. */
   "SUMMONED",
+  /** The Giant Robo in the Giant Slot (in a fight: once it has entered). */
+  "GIANT_SLOT",
   "LEFTMOST_ENEMY",
   "RANDOM_ENEMY",
   "ALL_ENEMY",
@@ -109,6 +114,22 @@ export const Action = z.discriminatedUnion("type", [
    * board, the Giant Robo gets +atk/+hp and the keywords of those Extra Rangers. Stacks if granted again.
    */
   z.object({ type: z.literal("SUPER_GATTAI"), atk: amount.default(4), hp: amount.default(4) }),
+  /**
+   * Recruit only: a random card into the hand. GEAR = one of the tavern gears up to your rank (not pooled);
+   * UNIT = a unit from the pool up to your rank. Optionally of one faction.
+   */
+  z.object({ type: z.literal("RANDOM_CARD"), cardKind: z.enum(["UNIT", "GEAR"]).default("GEAR"), faction: z.string().optional() }),
+  /** Recruit only: each target becomes its card's `ultimateInto` form (keeping its bonuses); others are unchanged. */
+  z.object({ type: z.literal("ULTIMATE_FORM") }),
+  /** Recruit only: from now on, units in your tavern have +atk/+hp (they keep it when bought). Stacks. */
+  z.object({ type: z.literal("BUFF_SHOP"), atk: amount.default(1), hp: amount.default(1) }),
+  /** Recruit only: eat a random unit from your tavern; each target gains its ATK/HP for good. */
+  z.object({ type: z.literal("DEVOUR_SHOP") }),
+  /**
+   * Summon units from your hand (no Deploy). Recruit: a random unit card leaves the hand for the board.
+   * Fight: a copy of a random unit card in your hand joins the fight (the card stays in hand).
+   */
+  z.object({ type: z.literal("SUMMON_FROM_HAND"), count: z.number().int().min(1).default(1) }),
 ]);
 export type Action = z.infer<typeof Action>;
 
@@ -122,5 +143,7 @@ export const Effect = z.object({
   actions: z.array(Action).min(1),
   /** Golden units multiply numeric action amounts by this (default 2). */
   goldenMultiplier: z.number().positive().optional(),
+  /** How many times the whole effect happens each time it fires (default 1). */
+  repeat: z.number().int().min(1).max(5).optional(),
 });
 export type Effect = z.infer<typeof Effect>;

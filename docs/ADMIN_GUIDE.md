@@ -96,7 +96,9 @@
 - อยากแก้ละเอียดกว่านี้ (เช่น หลาย action ในความสามารถเดียว, golden multiplier) ใช้ฟอร์มปกติในข้อ 4.1–4.5
 
 ### 4.1 ปรับค่าพลังการ์ด
-1. แท็บ **Cards** → พิมพ์ชื่อในช่อง Search → คลิกการ์ด
+1. แท็บ **Cards** → พิมพ์ชื่อในช่อง Search (ค้นได้ทั้งชื่อ, key และข้อความบนการ์ด) หรือใช้**ตัวกรอง**ใต้ช่องค้นหา:
+   ประเภท (ยูนิตในร้าน / Token / Gear / Giant), เผ่า, Rank, keyword หรือ trigger (เช่น ECHO, ON_SELL) · ปุ่ม **Clear** ล้างตัวกรอง
+   แล้วคลิกการ์ด
 2. แก้ `atk` / `hp` / `rank` ในฟอร์ม ดู Preview ด้านขวา
 3. **Save draft** → **Publish**
 
@@ -116,6 +118,11 @@
 ### 4.4 ลบ
 **Delete** ในฟอร์ม — ถ้าการ์ดนี้ถูกอ้างจากที่อื่น (เช่น เป็นร่าง Henshin ของการ์ดอื่น, ถูก SUMMON) จะขึ้นปัญหาในกล่องแดงตอน Save ให้แก้ที่อ้างถึงก่อน
 
+### 4.4.1 ช่องที่ต้องเลือกการ์ด (ค้นหาได้)
+ช่องที่อ้างถึงการ์ดอื่น เช่น "ได้การ์ดใบไหน" (ADD_TO_HAND), "เรียกใคร" (SUMMON), "แปลงร่างเป็นอะไร" (henshin / ultimate form / gattai form):
+พิมพ์ส่วนหนึ่งของ**ชื่อ**หรือ key แล้วเลือกจากรายการที่ขึ้นมา (บอกชื่อ, ATK/HP หรือ Gear, token, rank) ใต้ช่องจะแสดงชื่อการ์ดที่เลือก ถ้าพิมพ์ผิดจะขึ้นกรอบแดง / "not found"
+ใน Card wizard ช่องเหล่านี้ก็ค้นหาแบบเดียวกัน
+
 ### 4.5 โหมด JSON
 ปุ่ม **JSON** แก้ข้อมูลดิบทั้งก้อนได้ (เร็วสำหรับคนคุ้น) กด **Form** กลับมาฟอร์มปกติ
 ถ้า JSON ผิดรูปแบบจะแก้ไม่ติด ให้ดูข้อความ error
@@ -133,6 +140,7 @@
 | `costType` | `ENERGY` = จ่ายทอง, `HEALTH` = จ่ายเลือด Hero (ซื้อจนเหลือ 0 ไม่ได้, เกราะไม่ช่วย) |
 | `GIANT` | Giant Robo อยู่ในช่อง Giant ได้จาก Kyodai Gattai! (ใส่ `series` เพื่อให้ขบวนการที่มีบนบอร์ดเยอะได้หุ่นของตัวเองแน่นอน) |
 | `henshin` | `afterTurns` = อยู่บนบอร์ดครบกี่เทิร์นแล้วแปลงร่าง, `into` = การ์ดร่างใหม่ (ปกติเป็น token) |
+| `ultimateInto` (ultimate form) | ร่างที่ action `ULTIMATE_FORM` เปลี่ยนให้ ใช้ได้**ทุกเผ่า**: ร่างสุดท้ายของ Rider แต่ละซีรีส์, หุ่น Sentai ร่างอัปเกรด, หรือ gimmick ของซีรีส์ไหนก็ได้ (ค่าบัฟที่สะสมไว้ติดไปด้วย) |
 | `gattaiInto` | ทำให้การ์ดนี้เป็น **Gattai core**: เมื่ออยู่ซ้ายสุดของกลุ่มยูนิต Gattai ที่ติดกันครบ แล้วผู้เล่นกด Combine กลุ่มจะรวมเป็นการ์ดนี้ (ต้องมี keyword `GATTAI` ด้วย) |
 | `colors` | สี Sentai: RED BLUE YELLOW GREEN PINK, `EXTRA` = นับเป็นสีอะไรก็ได้ (และใช้กับ Super Gattai) |
 | `text` / `text (Thai)` | คำอธิบายบนการ์ด เว้นว่าง = สร้างจาก effect อัตโนมัติ ถ้าเขียน `text` เอง ภาษาไทยจะแสดงอังกฤษจนกว่าจะเขียน `text (Thai)` ด้วย |
@@ -152,6 +160,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `target.selector` | กับใคร (ตารางด้านล่าง) + กรอง `faction` / `series` ได้ |
 | `actions` | ทำอะไร (ตารางด้านล่าง) |
 | `golden multiplier` | ตัวคูณตอนการ์ดเป็น Final Form (ค่าปกติ ×2) |
+| `happens N times` (`repeat`) | ความสามารถนี้ทำงานกี่ครั้งต่อการเกิด 1 ครั้ง (1–5) เช่น "ถูกขาย: ได้ Gear สุ่ม (2 ครั้ง)" |
 
 ### Trigger
 | trigger | ทำงานเมื่อ | ช่วง |
@@ -165,6 +174,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `LAST_STAND` | การ์ดนี้ตาย | ต่อสู้ |
 | `AVENGE` | ฝ่ายเราตายครบ `every` ตัว | ต่อสู้ |
 | `ALLY_SUMMONED` | มียูนิต**ตัวอื่น**ถูกเรียกเข้าฝั่งเรา (ใช้คู่กับเป้าหมาย `SUMMONED`) | ทั้งคู่ |
+| `ON_SELL` | การ์ดนี้ถูกขาย/ทิ้ง (จากบอร์ดหรือมือ) ทำงานก่อนการ์ดหายไป | ซื้อของ |
 | `ON_ACQUIRE` | ได้ Relic / เลือก Hero (passive) | ซื้อของ |
 | `ON_TURN_START` | ต้นทุกเทิร์น (Relic, Hero) | ซื้อของ |
 | `ON_USE` | กดใช้ Hero Power | ซื้อของ |
@@ -179,6 +189,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `RANDOM_FRIENDLY` | พวกเราตัวอื่น 1 ตัวแบบสุ่ม |
 | `ALL_FRIENDLY` | พวกเราทุกตัว |
 | `SUMMONED` | ตัวที่เพิ่งถูกเรียก (ใช้ได้กับ trigger `ALLY_SUMMONED` เท่านั้น) |
+| `GIANT_SLOT` | หุ่นใน Giant Slot (ช่วงซื้อของ: หุ่นในช่อง, ตอนต่อสู้: หุ่นที่ลงสนามแล้ว) — Gear ที่ใช้กับหุ่นจะใช้ไม่ได้ถ้ายังไม่มีหุ่น |
 | `CHOSEN_FRIENDLY` | **ผู้เล่นเลือกเอง** (ใช้กับ Gear: ลาก Gear ไปวางบนยูนิต/กด Use แล้วคลิก) ที่อื่นจะเป็นซ้ายสุด |
 | `LEFTMOST_ENEMY` / `RANDOM_ENEMY` / `ALL_ENEMY` | ศัตรู (ใช้ได้เฉพาะช่วงต่อสู้) |
 
@@ -197,6 +208,11 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `DISCOVER_GIANT` | เลือก Giant Robo | ซื้อของเท่านั้น |
 | `GAUGE_ADD` | เติม Gauge | ซื้อของเท่านั้น |
 | `MODIFY_RULE` | เปลี่ยนกฎให้ผู้เล่นคนนั้น (`SET`/`ADD`/`MUL`, ชื่อกฎดูข้อ 9) | ซื้อของเท่านั้น |
+| `RANDOM_CARD` | ได้การ์ด**สุ่ม**เข้ามือ: `GEAR` = Gear ในร้านที่ rank ≤ ร้านเรา, `UNIT` = ยูนิตจากกองกลาง (กรองเผ่าได้) — ถ้าอยากได้**ใบที่กำหนด**ใช้ `ADD_TO_HAND` (ใส่ได้ทั้ง Gear และยูนิต) | ซื้อของเท่านั้น |
+| `ULTIMATE_FORM` | เปลี่ยน/อัปเกรดร่างเป้าหมายเป็น `ultimateInto` ของการ์ดนั้น (ใช้กับยูนิตบนบอร์ดหรือหุ่น `GIANT_SLOT`) | ซื้อของเท่านั้น |
+| `BUFF_SHOP` | ยูนิตในร้านค้าได้ +atk/+hp จนจบเกม (ซื้อไปแล้วติดตัว) | ซื้อของเท่านั้น |
+| `DEVOUR_SHOP` | กลืนกินยูนิตในร้านแบบสุ่ม 1 ตัว เป้าหมายได้ ATK/HP ของมันถาวร | ซื้อของเท่านั้น |
+| `SUMMON_FROM_HAND` | เรียกยูนิตจากบนมือ: ช่วงซื้อของ = การ์ดออกจากมือลงบอร์ด (ไม่ทำ Deploy), ตอนต่อสู้ = สำเนาของยูนิตบนมือลงสนาม (การ์ดยังอยู่ในมือ) | ทั้งคู่ |
 | `SUPER_GATTAI` | ปลด Super Gattai (หุ่น +atk/+hp และได้ keyword ของ Extra Ranger เมื่อมี Extra บนบอร์ด) | ซื้อของเท่านั้น |
 
 > `ALLY_SUMMONED` เกิดได้ทั้งตอนซื้อของ (เช่น Hero เรียก Cub ต้นเทิร์น → บัฟติดถาวร) และตอนต่อสู้ จึงใช้ได้แค่ action ที่ทำงานทั้ง 2 ช่วง (บัฟ, ให้ keyword, เรียก, ทำลาย)
@@ -208,6 +224,16 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | ลงจากมือแล้วบัฟพวกซ้ายสุด +2/+2 | scope UNIT · trigger `ON_PLAY` · target `LEFTMOST_FRIENDLY` · action `BUFF` 2/2 |
 | ตายแล้วเรียกลูกน้อง 2 ตัว | trigger `LAST_STAND` · action `SUMMON` cardKey=grunt_token count=2 |
 | ทุกตัวที่ถูกเรียกเข้ามาได้ +1/+1 (แบบเผ่า Beast) | trigger `ALLY_SUMMONED` · target `SUMMONED` · `BUFF` 1/1 |
+| Gear ได้ Gear สุ่ม 2 ใบ | kind GEAR · `ON_PLAY` · `RANDOM_CARD` cardKind=GEAR · happens 2 times |
+| ยูนิตลงแล้วได้ Gear ที่กำหนด | `ON_PLAY` · `ADD_TO_HAND` cardKey=g_armor |
+| จบเทิร์นให้ keyword | `END_OF_TURN` · target `RIGHTMOST_FRIENDLY` · `GIVE_KEYWORD` GUARD |
+| จบเทิร์นเพิ่มพลังยูนิตในร้าน | `END_OF_TURN` · `BUFF_SHOP` 1/1 |
+| ลงแล้วกลืนกินยูนิตในร้าน | `ON_PLAY` · target `SELF` · `DEVOUR_SHOP` |
+| เริ่มสู้เรียกยูนิตจากมือ | `START_OF_COMBAT` · `SUMMON_FROM_HAND` count=1 |
+| ขาย/ทิ้งการ์ดนี้แล้วมีผล 2 ครั้ง | `ON_SELL` · action อะไรก็ได้ช่วงซื้อของ · happens 2 times |
+| Deploy ของทุกใบทำงาน 2 ครั้ง | ใส่ keyword `ECHO` (ระหว่างมันอยู่บนบอร์ด) |
+| Gear เปลี่ยนร่าง Rider เป็นร่างของซีรีส์ | Gear · target `CHOSEN_FRIENDLY` faction=rider · `ULTIMATE_FORM` (+ BUFF) และตั้ง `ultimate form` ให้การ์ด Rider แต่ละใบ |
+| Gear อัปเกรดหุ่น Sentai | Gear · target `GIANT_SLOT` · `ULTIMATE_FORM` และตั้ง `ultimate form` ให้การ์ดหุ่น (kind GIANT) |
 | ตีแล้วเรียก Cub | trigger `ON_ATTACK` · action `SUMMON` cardKey=beast_cub |
 | ตีแล้วโตถาวร +1/+0 | trigger `ON_ATTACK` · target `SELF` · action `BUFF` 1/0 ✔permanent |
 | เริ่มสู้ ถ้ามี Sentai ≥ 3 สี ให้ Sentai ทุกตัว +1/+1 | trigger `START_OF_COMBAT` · condition `TEAM_UP_COLORS_GTE` 3 · target `ALL_FRIENDLY` faction=sentai · `BUFF` 1/1 |
@@ -309,6 +335,7 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 | `X only works in the recruit phase, not on LAST_STAND` | action ช่วงซื้อของถูกใส่ใน trigger ช่วงต่อสู้ (ดูตาราง action ข้อ 6) |
 | `DAMAGE only works in a fight` / `enemies can only be targeted in a fight` | ดาเมจ/เป้าหมายศัตรูใช้ได้เฉพาะ trigger ช่วงต่อสู้ |
 | `target SUMMONED only works with ALLY_SUMMONED` | เป้าหมาย "ตัวที่ถูกเรียก" ต้องใช้กับ trigger ALLY_SUMMONED |
+| `references unknown card` ใน ultimateInto | ร่าง ultimate ที่ตั้งไว้ไม่มีอยู่ |
 | `X cannot be used on ALLY_SUMMONED` | ALLY_SUMMONED ใช้ได้แค่ action ที่ทำงานทั้งช่วงซื้อของและต่อสู้ |
 | `duplicate card key` | key ซ้ำ เปลี่ยน key ของอันใหม่ |
 
@@ -318,3 +345,18 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 - [ ] ถ้าเขียน text อังกฤษเอง เขียน text (Thai) ด้วย
 - [ ] ลอง Simulate กับ draft อย่างน้อย 40 เกม ไม่มีอะไรเขียว/แดงจัดผิดปกติ
 - [ ] ใส่โน้ตตอน Publish ว่าเปลี่ยนอะไร (ย้อนดูใน Versions ได้)
+
+---
+
+## 15. Keyword Echo
+`ECHO` (Echo): ระหว่างการ์ดที่มี Echo อยู่บนบอร์ด เอฟเฟค **Deploy** ของการ์ดที่ลงทีหลังทำงาน 2 ครั้ง (มี Echo หลายใบก็ยัง 2 ครั้ง)
+
+## 16. เริ่มสร้าง content ใหม่จากชุดเปล่า (blank)
+มีชุด `blank` ไว้เริ่มทำการ์ด production เองทั้งหมด: ไม่มีเผ่า ซีรีส์ Gauge หรือ Relic
+มีแค่สิ่งที่เกมขาดไม่ได้: Hero 2 ตัว (Placeholder Hero A/B) และยูนิตในร้าน 1 ใบ (Placeholder Unit) — สร้างของจริงแล้วค่อยลบทิ้ง
+
+วิธีใช้กับ Docker (ทำครั้งเดียว):
+1. ในไฟล์ `.env` ตั้ง `CONTENT_SET=blank` และ `CONTENT_RESEED=1`
+2. `docker compose up -d --build server` → ระบบ publish ชุดเปล่าเป็นเวอร์ชันใหม่ (เวอร์ชันเก่ายังอยู่ ย้อนได้ในหน้า Versions)
+3. ตั้ง `CONTENT_RESEED=0` แล้ว `docker compose up -d server` (ไม่งั้นทุก restart จะ publish ชุดเปล่าทับงานที่ทำใน Admin)
+4. เข้า Admin สร้างเผ่า (Factions) → ซีรีส์ (Series) → การ์ด (Card wizard) → Hero → Relic → Gauge แล้ว Publish

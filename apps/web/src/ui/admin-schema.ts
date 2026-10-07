@@ -29,7 +29,7 @@ export type Field =
   | { kind: "object"; rows: Row[]; make?: () => unknown }
   | { kind: "union"; tag: string; variants: Record<string, Row[]>; make: (tag: string) => Record<string, unknown> };
 
-export const KEYWORDS = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI"] as const;
+export const KEYWORDS = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI", "ECHO"] as const;
 export const COLORS = ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "EXTRA"] as const;
 export const SCOPES = ["UNIT", "PLAYER"] as const;
 export const TRIGGERS = [
@@ -42,15 +42,16 @@ export const TRIGGERS = [
   "LAST_STAND",
   "AVENGE",
   "ALLY_SUMMONED",
+  "ON_SELL",
   "ON_ACQUIRE",
   "ON_TURN_START",
   "ON_USE",
   "ON_ROLL_CALL",
   "ON_ROLL_CALL_WIN",
 ] as const;
-export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
+export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "GIANT_SLOT", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
 export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE"] as const;
-export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI"] as const;
+export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "SUMMON_FROM_HAND"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
 export const POWER_MODES = ["ACTIVE", "ONCE", "PASSIVE"] as const;
@@ -95,6 +96,17 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
     { key: "atk", field: int(), hint: "Giant bonus in fights with an Extra Ranger on the board" },
     { key: "hp", field: int() },
   ],
+  RANDOM_CARD: [
+    { key: "cardKind", label: "card kind", field: { kind: "enum", options: ["GEAR", "UNIT"] }, hint: "GEAR: a tavern gear up to your rank. UNIT: a pool unit up to your rank" },
+    { key: "faction", field: { kind: "ref", to: "factions" }, optional: true, hint: "Empty = any faction" },
+  ],
+  ULTIMATE_FORM: [],
+  BUFF_SHOP: [
+    { key: "atk", field: int(), hint: "Units in your tavern get this for the rest of the game" },
+    { key: "hp", field: int() },
+  ],
+  DEVOUR_SHOP: [],
+  SUMMON_FROM_HAND: [{ key: "count", field: int(1), hint: "Tavern: unit cards leave the hand for the board. Fight: copies of hand units join" }],
 };
 
 const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unknown>> = {
@@ -111,6 +123,11 @@ const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unkn
   DISCOVER_GIANT: {},
   DISCOVER_UNIT: {},
   SUPER_GATTAI: { atk: 4, hp: 4 },
+  RANDOM_CARD: { cardKind: "GEAR" },
+  ULTIMATE_FORM: {},
+  BUFF_SHOP: { atk: 1, hp: 1 },
+  DEVOUR_SHOP: {},
+  SUMMON_FROM_HAND: { count: 1 },
 };
 
 export const ACTION: Field = {
@@ -161,6 +178,7 @@ export const EFFECT: Field = {
     { key: "target", field: TARGET, optional: true, hint: "who the actions apply to (default: the unit itself)" },
     { key: "actions", field: { kind: "list", of: ACTION, make: () => ACTION_MAKE("BUFF"), min: 1, title: (a: any) => String(a?.type ?? "") } },
     { key: "goldenMultiplier", label: "golden multiplier", field: { kind: "num" }, optional: true, hint: "default 2" },
+    { key: "repeat", label: "happens N times", field: int(1, 5), optional: true, hint: "the whole effect runs this many times each time it fires (default 1)" },
   ],
 };
 
@@ -186,6 +204,7 @@ const CARD_ROWS: Row[] = [
   { key: "token", field: { kind: "bool" }, hint: "Tokens are never sold in the shop" },
   { key: "cost", label: "gear price", field: int(0), optional: true, hint: "GEAR that is not a token is sold in the tavern at this price (from its rank up)" },
   { key: "costType", label: "paid with", field: { kind: "enum", options: ["ENERGY", "HEALTH"] }, hint: "HEALTH: the price comes off the hero's Health (never down to 0)" },
+  { key: "ultimateInto", label: "ultimate form", field: { kind: "ref", to: "cards" }, optional: true, hint: "What ULTIMATE_FORM turns this unit into (e.g. its series' final Rider form)" },
   { key: "gattaiInto", label: "gattai form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Gattai core: when this is the leftmost of a Gattai group, the group becomes this card (needs the GATTAI keyword)" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },

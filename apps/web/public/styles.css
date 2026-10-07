@@ -834,3 +834,13 @@ body.dragging .drop-marker.show { display: block; }
 .wz-lines p { margin: 3px 0; }
 .wz-ok { color: #69f0ae; font-weight: 700; }
 @media (max-width: 1100px) { .wz { grid-template-columns: 1fr; } .wz-preview { position: static; } }
+
+.card.kw-echo { box-shadow: 0 0 0 2px #b388ff88, 0 0 16px #7c4dff66; }
+.aura-echo { position: absolute; inset: -4px; border-radius: inherit; border: 2px dashed #b388ffaa; pointer-events: none; animation: aim-pulse 2s ease-in-out infinite; }
+.wz-picker { display: flex; flex-direction: column; gap: 2px; }
+.wz-picker input.bad { border-color: var(--magenta); }
+.wz-picked { color: var(--cyan); }
+.admin-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+.admin-filters select { flex: 1 1 45%; min-width: 0; font-size: 12px; }
+.ref-field { display: flex; flex-direction: column; gap: 2px; }
+.ref-name { color: var(--cyan); }

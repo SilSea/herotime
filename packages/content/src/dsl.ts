@@ -32,10 +32,16 @@ export const rule = (name: string, op: "SET" | "ADD" | "MUL", value: number): Ac
 export const toHand = (cardKey: string): Action => ({ type: "ADD_TO_HAND", cardKey });
 export const discoverGiant = (): Action => ({ type: "DISCOVER_GIANT" });
 export const superGattai = (atk = 4, hp = 4): Action => ({ type: "SUPER_GATTAI", atk, hp });
+export const ultimateForm = (): Action => ({ type: "ULTIMATE_FORM" });
+export const randomCard = (cardKind: "GEAR" | "UNIT" = "GEAR", faction?: string): Action => ({ type: "RANDOM_CARD", cardKind, ...(faction ? { faction } : {}) });
+export const buffShop = (atk: number, hp: number): Action => ({ type: "BUFF_SHOP", atk, hp });
+export const devourShop = (): Action => ({ type: "DEVOUR_SHOP" });
+export const summonFromHand = (count = 1): Action => ({ type: "SUMMON_FROM_HAND", count });
 export const discoverUnit = (faction?: string): Action => (faction ? { type: "DISCOVER_UNIT", faction } : { type: "DISCOVER_UNIT" });
 
 // ------------------------------------------------------------------ targets
 export const self: Target = { selector: "SELF" };
+export const giantSlot: Target = { selector: "GIANT_SLOT" };
 export const summoned: Target = { selector: "SUMMONED" };
 export const adjacent: Target = { selector: "ADJACENT" };
 export const leftmost = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "LEFTMOST_FRIENDLY", ...filter });
@@ -62,6 +68,8 @@ interface EffectOptions {
   every?: number;
   /** Golden units multiply numbers by this instead of 2. */
   golden?: number;
+  /** The whole effect happens this many times. */
+  repeat?: number;
 }
 
 /** An effect owned by a unit. */
@@ -74,6 +82,7 @@ export function on(trigger: Trigger, actions: Action | Action[], o: EffectOption
     ...(o.condition ? { condition: o.condition } : {}),
     ...(o.every ? { every: o.every } : {}),
     ...(o.golden ? { goldenMultiplier: o.golden } : {}),
+    ...(o.repeat && o.repeat > 1 ? { repeat: o.repeat } : {}),
   });
 }
 
@@ -90,6 +99,8 @@ export const onAttack = (a: Action | Action[], o?: EffectOptions) => on("ON_ATTA
 export const afterDamaged = (a: Action | Action[], o?: EffectOptions) => on("AFTER_DAMAGED", a, o);
 /** When another friendly unit is summoned (in either phase); target `summoned` is the newcomer. */
 export const onSummon = (a: Action | Action[], o?: EffectOptions) => on("ALLY_SUMMONED", a, o);
+/** When this unit is sold (from the board or the hand). */
+export const onSell = (a: Action | Action[], o?: EffectOptions) => on("ON_SELL", a, o);
 export const avenge = (every: number, a: Action | Action[], o: EffectOptions = {}) => on("AVENGE", a, { ...o, every });
 export const onHenshin = (a: Action | Action[], o?: EffectOptions) => on("HENSHIN", a, o);
 
@@ -107,6 +118,8 @@ export interface UnitOptions {
   henshin?: { after: number; into: string };
   /** Gattai core: leading a Gattai group, the group becomes this card. */
   gattaiInto?: string;
+  /** What ULTIMATE_FORM turns this unit into (a Rider's final form, an upgraded robo...). */
+  ultimateInto?: string;
   /** Overrides the generated rules text. */
   text?: string;
   art?: string;
@@ -128,6 +141,7 @@ export function unit(key: string, name: string, o: UnitOptions) {
     ...(o.series ? { series: o.series } : {}),
     ...(o.henshin ? { henshin: { afterTurns: o.henshin.after, into: o.henshin.into } } : {}),
     ...(o.gattaiInto ? { gattaiInto: o.gattaiInto } : {}),
+    ...(o.ultimateInto ? { ultimateInto: o.ultimateInto } : {}),
     ...(o.text !== undefined ? { text: o.text } : {}),
     ...(o.art ? { art: o.art } : {}),
   });

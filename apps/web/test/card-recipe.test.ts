@@ -59,6 +59,21 @@ describe("card wizard", () => {
     expect(token).toMatchObject({ kind: "UNIT", token: true });
   });
 
+  it("builds the newer mechanics: random gear, tavern buff, devour, summon from hand, sell twice, upgrade form", () => {
+    const supply = buildCard(recipe({ key: "sup", abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", do: "RANDOM_CARD", cardKind: "GEAR" }] }));
+    expect(supply.effects).toEqual([{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "RANDOM_CARD", cardKind: "GEAR" }] }]);
+    const trader = buildCard(recipe({ key: "trd", abilities: [{ ...newAbility("UNIT"), when: "ON_SELL", do: "GAIN_ENERGY", amount: 1, repeat: 2 }] }));
+    expect(trader.effects).toEqual([{ scope: "UNIT", trigger: "ON_SELL", actions: [{ type: "GAIN_ENERGY", amount: 1 }], repeat: 2 }]);
+    const scout = buildCard(recipe({ key: "sct", abilities: [{ ...newAbility("UNIT"), when: "END_OF_TURN", do: "BUFF_SHOP", atk: 1, hp: 1 }] }));
+    const eater = buildCard(recipe({ key: "eat", abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", do: "DEVOUR_SHOP", target: "SELF" }] }));
+    const caller = buildCard(recipe({ key: "cal", abilities: [{ ...newAbility("UNIT"), when: "START_OF_COMBAT", do: "SUMMON_FROM_HAND", count: 2 }] }));
+    const rider = buildCard(recipe({ key: "rid", ultimateInto: "cub" }));
+    const upgrade = buildCard(recipe({ key: "upg", type: "GEAR", abilities: [{ ...newAbility("GEAR"), do: "ULTIMATE_FORM", target: "GIANT_SLOT" }] }));
+    for (const c of [supply, trader, scout, eater, caller, rider, upgrade]) expect(playable(c), String(c.key)).toEqual([]);
+    expect(choicesFor({ ...newAbility("UNIT"), when: "LAST_STAND" }, "UNIT").do.map((d) => d.key)).toContain("SUMMON_FROM_HAND");
+    expect(choicesFor({ ...newAbility("UNIT"), when: "LAST_STAND" }, "UNIT").do.map((d) => d.key)).not.toContain("BUFF_SHOP");
+  });
+
   it("says what is missing in words", () => {
     expect(checkRecipe(recipe({ name: "", key: "Bad Key" }), new Set())).toHaveLength(2);
     expect(checkRecipe(recipe({ key: "cub" }), new Set(["cub"])).join()).toMatch(/already|อยู่แล้ว/);

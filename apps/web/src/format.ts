@@ -1,7 +1,7 @@
 import { tr } from "./i18n.js";
 import type { CardDef, CombatRecord } from "./protocol.js";
 
-const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY"]);
+const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "ULTIMATE_FORM", "DEVOUR_SHOP"]);
 
 /**
  * Board slots a gear can be used on, or null when it goes on nobody in particular. Same rule as the
@@ -25,6 +25,7 @@ export const KEYWORDS: Record<string, { name: string; text: string; textTh: stri
   RIDER_KICK: { name: "Rider Kick", text: "Its first attack of the fight deals double damage.", textTh: "การโจมตีครั้งแรกของการต่อสู้ทำดาเมจ ×2" },
   FINAL_BLOW: { name: "Final Blow", text: "First attack deals double damage, and double again against giants.", textTh: "การโจมตีครั้งแรกทำดาเมจ ×2 และ ×2 อีกเท่าเมื่อตีใส่ยูนิตยักษ์" },
   KYODAIKA: { name: "Kyodaika", text: "The first time it dies it returns as a giant with doubled stats and no keywords.", textTh: "ตายครั้งแรกจะฟื้นเป็นร่างยักษ์ stat ×2 แต่ไม่มี keyword อื่น" },
+  ECHO: { name: "Echo", text: "While this is on your board, your Deploy effects happen twice.", textTh: "ระหว่างอยู่บนบอร์ด เอฟเฟค Deploy ของเราทำงาน 2 ครั้ง" },
   GATTAI: { name: "Gattai", text: "Can be combined: with a Gattai core leftmost of 3 adjacent Gattai units, press Combine in the recruit phase and the group becomes the core's form for good.", textTh: "เป็นชิ้นส่วนรวมร่างได้: วาง core ไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันครบ 3 ตัว แล้วกด Combine ช่วงซื้อของ ทั้งกลุ่มจะรวมเป็นร่างของ core ถาวร" },
 };
 

@@ -16,6 +16,7 @@ const KEYWORD: Record<KeywordKey, string> = {
   FINAL_BLOW: "Final Blow",
   KYODAIKA: "Kyodaika",
   GATTAI: "Gattai",
+  ECHO: "Echo",
 };
 
 const TRIGGER: Record<Trigger, string> = {
@@ -28,6 +29,7 @@ const TRIGGER: Record<Trigger, string> = {
   LAST_STAND: "Last Stand",
   AVENGE: "Avenge",
   ALLY_SUMMONED: "เมื่อเรียกยูนิตเข้าสนาม",
+  ON_SELL: "เมื่อถูกขาย",
   ON_ACQUIRE: "เมื่อได้รับ",
   ON_TURN_START: "ต้นทุกเทิร์น",
   ON_USE: "เมื่อใช้",
@@ -49,6 +51,7 @@ function who(t: Target | undefined, names: Names): string {
     case "RANDOM_FRIENDLY": return `${one}อื่นแบบสุ่ม 1 ตัว`;
     case "ALL_FRIENDLY": return many;
     case "SUMMONED": return "ตัวที่ถูกเรียก";
+    case "GIANT_SLOT": return "Giant Robo ของเรา";
     case "CHOSEN_FRIENDLY": return filter ? `ยูนิต ${filter} ที่เลือก` : "พันธมิตรที่เลือก";
     case "LEFTMOST_ENEMY": return "ศัตรูซ้ายสุด";
     case "RANDOM_ENEMY": return "ศัตรูแบบสุ่ม 1 ตัว";
@@ -81,6 +84,11 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "ADD_TO_HAND": return `ได้ ${names(a.cardKey)} เข้ามือ`;
     case "DISCOVER_GIANT": return "เลือกรับ Giant Robo";
     case "SUPER_GATTAI": return `Super Gattai: การต่อสู้ที่มี Extra Ranger บนบอร์ด Giant Robo ได้ +${a.atk}/+${a.hp} และ keyword ของ Extra Ranger`;
+    case "RANDOM_CARD": return `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${names(a.faction)}` : ""}แบบสุ่มเข้ามือ`;
+    case "ULTIMATE_FORM": return `เปลี่ยน${t}เป็นร่าง Ultimate`;
+    case "BUFF_SHOP": return `ยูนิตในร้านได้ ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
+    case "DEVOUR_SHOP": return `กลืนกินยูนิตในร้านแบบสุ่ม แล้วให้ค่าพลังของมันกับ${t}`;
+    case "SUMMON_FROM_HAND": return `เรียกยูนิตจากมือ${a.count > 1 ? ` ${a.count} ตัว` : ""}`;
     case "DISCOVER_UNIT": return a.faction ? `เลือกรับยูนิต ${names(a.faction)} 1 จาก 3` : "เลือกรับยูนิต 1 จาก 3";
   }
 }
@@ -123,7 +131,7 @@ export function ruleTextTh(rule: string, op: "SET" | "ADD" | "MUL", value: numbe
 export function effectTextTh(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   const body = e.actions.map((a) => action(a, e.target, names)).join(" แล้ว");
-  const text = `${trigger}: ${condition(e.condition, names)}${body}`;
+  const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} ครั้ง)` : ""}`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;
 }
 
@@ -131,6 +139,8 @@ export function cardTextTh(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): แปลงร่างเป็น ${names(c.henshin.into)}`);
   if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
+  if (c.ultimateInto) lines.push(`ร่าง Ultimate: ${names(c.ultimateInto)}`);
+  if (c.keywords.includes("ECHO")) lines.push("Echo: Deploy ของเราทำงาน 2 ครั้ง");
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names));
   return lines.join(" · ");
 }

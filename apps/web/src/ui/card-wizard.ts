@@ -81,6 +81,31 @@ function check(label: string, on: boolean, set: (v: boolean) => void, title = ""
 
 const toggle = (list: string[], v: string, on: boolean): string[] => (on ? [...new Set([...list, v])] : list.filter((x) => x !== v));
 
+let pickerId = 0;
+/**
+ * A card picker you can type in: matches names and keys as you type (a datalist), shows the picked card's
+ * name, and only accepts real cards.
+ */
+function cardPick(value: string, cards: readonly CardDef[], set: (key: string) => void): HTMLElement {
+  const id = `wz-cards-${pickerId++}`;
+  const name = (k: string): string => cards.find((c) => c.key === k)?.name ?? "";
+  const list = h("datalist", { id }, ...cards.map((c) => h("option", { value: c.key, text: `${c.name} · ${c.kind === "GEAR" ? "Gear" : `${c.atk}/${c.hp}`}${c.token ? " · token" : ""} · rank ${c.rank}` })));
+  const input = h("input", { type: "search", value, placeholder: tr("type to search a card…", "พิมพ์ค้นหาการ์ด…"), attrs: { list: id } }) as HTMLInputElement;
+  const shown = h("span", { class: "muted small wz-picked", text: name(value) });
+  input.addEventListener("input", () => {
+    const typed = input.value.trim();
+    // Accept a key, or a name typed in full.
+    const hit = cards.find((c) => c.key === typed) ?? cards.find((c) => c.name.toLowerCase() === typed.toLowerCase());
+    input.classList.toggle("bad", typed !== "" && !hit);
+    if (hit || typed === "") {
+      set(hit?.key ?? "");
+      shown.textContent = hit ? hit.name : "";
+      refreshPreview();
+    }
+  });
+  return h("span", { class: "wz-picker" }, input, list, shown);
+}
+
 // ------------------------------------------------------------------ the screen
 
 export function wizardPanel(d: WizardDeps): HTMLElement {
@@ -178,8 +203,9 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
     "div",
     { class: "wz-grid" },
     field(tr("Henshin after N turns (0 = never)", "Henshin หลัง N เทิร์น (0 = ไม่แปลง)"), num(wz.henshinTurns, (n) => (wz.henshinTurns = n), 0, 9)),
-    field(tr("…into", "…แปลงเป็น"), pick(wz.henshinInto, cardOptions(units), (v) => (wz.henshinInto = v))),
-    field(tr("Gattai core: the group becomes", "Gattai core: กลุ่มรวมเป็น"), pick(wz.gattaiInto, [{ value: "", label: tr("not a core", "ไม่ใช่ core") }, ...units.map((c) => ({ value: c.key, label: c.name }))], (v) => (wz.gattaiInto = v))),
+    field(tr("…into", "…แปลงเป็น"), cardPick(wz.henshinInto, units, (v) => (wz.henshinInto = v))),
+    field(tr("Gattai core: the group becomes (empty = not a core)", "Gattai core: กลุ่มรวมเป็น (ว่าง = ไม่ใช่ core)"), cardPick(wz.gattaiInto, units, (v) => (wz.gattaiInto = v))),
+    field(tr("Ultimate Form (what Ultimate Form gear turns it into)", "ร่าง Ultimate (ที่ Gear Ultimate Form เปลี่ยนให้)"), cardPick(wz.ultimateInto, units, (v) => (wz.ultimateInto = v))),
   );
 
   previewHost = h("div", { class: "wz-preview" });
@@ -240,11 +266,15 @@ function abilityBox(
       a.do === "BUFF" && field("+HP", num(a.hp, (n) => (a.hp = n), -20, 50)),
       a.do === "BUFF" && c.when.length > 0 && ["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE", "ALLY_SUMMONED"].includes(a.when) && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
       a.do === "GIVE_KEYWORD" && field("Keyword", pick(a.keyword, Object.keys(KEYWORDS).map((k) => ({ value: k, label: keywordName(k) })), (v) => (a.keyword = v))),
-      a.do === "SUMMON" && field(tr("Card", "การ์ด"), pick(a.cardKey, o.cardOptions(o.units), (v) => (a.cardKey = v))),
-      a.do === "SUMMON" && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
-      a.do === "ADD_TO_HAND" && field(tr("Card", "การ์ด"), pick(a.cardKey, o.cardOptions(o.cards), (v) => (a.cardKey = v))),
+      a.do === "SUMMON" && field(tr("Card", "การ์ด"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
+      (a.do === "SUMMON" || a.do === "SUMMON_FROM_HAND") && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
+      a.do === "ADD_TO_HAND" && field(tr("Card (a Gear or a unit)", "การ์ด (Gear หรือยูนิต)"), cardPick(a.cardKey, o.cards, (v) => (a.cardKey = v))),
+      a.do === "RANDOM_CARD" && field(tr("Random", "สุ่ม"), pick(a.cardKind, [{ value: "GEAR", label: "Gear" }, { value: "UNIT", label: tr("Unit", "ยูนิต") }], (v) => (a.cardKind = v as Ability["cardKind"]))),
+      (a.do === "DISCOVER_UNIT" || a.do === "RANDOM_CARD") && field(tr("Faction", "เผ่า"), pick(a.faction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.faction = v))),
+      a.do === "BUFF_SHOP" && field("+ATK", num(a.atk, (n) => (a.atk = n), -20, 50)),
+      a.do === "BUFF_SHOP" && field("+HP", num(a.hp, (n) => (a.hp = n), -20, 50)),
       (a.do === "DAMAGE" || a.do === "GAIN_ENERGY") && field(tr("Amount", "จำนวน"), num(a.amount, (n) => (a.amount = n), 1, 20)),
-      a.do === "DISCOVER_UNIT" && field(tr("Faction", "เผ่า"), pick(a.faction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.faction = v))),
+      field(tr("Happens N times", "ทำงานกี่ครั้ง"), num(a.repeat, (n) => (a.repeat = n), 1, 5)),
       dd?.targeted && field(tr("Who", "กับใคร"), pick(a.target, c.target.map((t) => ({ value: t.key, label: t.label() })), (v) => (a.target = v), true)),
       dd?.targeted && !["SELF", "SUMMONED", "ADJACENT"].includes(a.target) && !a.target.endsWith("_ENEMY") && field(tr("…only faction", "…เฉพาะเผ่า"), pick(a.targetFaction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.targetFaction = v))),
     ),

@@ -48,6 +48,8 @@ export interface PlayerState {
   giant?: Unit;
   /** Super Gattai (Mecha Gauge reward): what the Giant gains in fights with an Extra Ranger on the board. */
   superGattai?: { atk: number; hp: number };
+  /** BUFF_SHOP: what every unit in this player's tavern gets (kept when bought). */
+  shopBonus?: { atk: number; hp: number };
   hero?: string;
   heroPowerUsed: boolean;
   heroPowerSpent: boolean;
@@ -192,7 +194,14 @@ export function buy(player: PlayerState, shopIndex: number, cfg: GameConfig = DE
   if (player.hand.length >= c.handSize) throw new RuleError("hand is full");
   spend(player, c.buyCost);
   player.shop.splice(shopIndex, 1);
-  player.hand.push({ key, golden: false });
+  const unit: Unit = { key, golden: false };
+  const bonus = player.shopBonus;
+  if (bonus && (bonus.atk !== 0 || bonus.hp !== 0)) {
+    unit.bonusAtk = bonus.atk;
+    unit.bonusHp = bonus.hp;
+    unit.buffs = [{ kind: "card", key: null, atk: bonus.atk, hp: bonus.hp }];
+  }
+  player.hand.push(unit);
   return key;
 }
 

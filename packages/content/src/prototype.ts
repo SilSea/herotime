@@ -38,6 +38,13 @@ import {
   superGattai,
   onSummon,
   summoned,
+  ultimateForm,
+  giantSlot,
+  randomCard,
+  buffShop,
+  devourShop,
+  summonFromHand,
+  onSell,
 } from "./dsl.js";
 import type { ContentSetData } from "./types.js";
 
@@ -81,10 +88,14 @@ const cards = [
   token("rider_form", "Rider Form", { atk: 4, hp: 4, factions: ["rider"], series: R, keywords: ["RIDER_KICK"] }),
   token("super_form", "Super Form", { atk: 9, hp: 9, factions: ["rider"], series: R, keywords: ["RIDER_KICK", "RAPID"] }),
   gear("kyodai_gattai", "Kyodai Gattai!", [player("ON_PLAY", discoverGiant())]),
-  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [buff(4, 4, true), give("RIDER_KICK")], { target: chosen({ faction: "rider" }) })]),
-  giant("proto_megazord", "Proto Megazord", { atk: 8, hp: 8, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW"] }),
-  giant("proto_titan", "Proto Titan", { atk: 6, hp: 12, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"] }),
-  giant("proto_beast", "Proto Beast", { atk: 10, hp: 7, keywords: ["FINAL_BLOW", "RAPID"] }),
+  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [ultimateForm(), buff(2, 2, true)], { target: chosen({ faction: "rider" }) })]),
+  token("ultimate_rider", "Ultimate Rider", { rank: 6, atk: 12, hp: 12, factions: ["rider"], series: R, keywords: ["RIDER_KICK", "RAPID"] }),
+  giant("proto_megazord_mk2", "Proto Megazord Mk-II", { atk: 12, hp: 12, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW", "RAPID"] }),
+  giant("proto_titan_mk2", "Proto Titan Mk-II", { atk: 9, hp: 16, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"] }),
+  giant("proto_beast_mk2", "Proto Beast Mk-II", { atk: 14, hp: 10, keywords: ["FINAL_BLOW", "RAPID"] }),
+  giant("proto_megazord", "Proto Megazord", { atk: 8, hp: 8, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW"], ultimateInto: "proto_megazord_mk2" }),
+  giant("proto_titan", "Proto Titan", { atk: 6, hp: 12, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"], ultimateInto: "proto_titan_mk2" }),
+  giant("proto_beast", "Proto Beast", { atk: 10, hp: 7, keywords: ["FINAL_BLOW", "RAPID"], ultimateInto: "proto_beast_mk2" }),
 
   // ---- neutral: no faction, always in the shop
   unit("n1", "Wandering Fighter", { rank: 1, atk: 2, hp: 2 }),
@@ -95,12 +106,12 @@ const cards = [
   unit("n6", "Legendary Hero", { rank: 6, atk: 10, hp: 12, keywords: ["GUARD", "BARRIER"] }),
 
   // ---- rider
-  unit("rd1", "Rookie Rider", { rank: 1, atk: 2, hp: 2, factions: ["rider"], series: R, henshin: { after: 2, into: "rider_form" } }),
-  unit("rd2", "Bike Rider", { rank: 2, atk: 3, hp: 3, factions: ["rider"], series: R, keywords: ["RIDER_KICK"] }),
-  unit("rd3", "Hopper Rider", { rank: 3, atk: 3, hp: 4, factions: ["rider"], series: R, effects: [deploy(buff(1, 1), { target: adjacent })] }),
-  unit("rd4", "Armored Rider", { rank: 4, atk: 5, hp: 5, factions: ["rider"], series: R, henshin: { after: 2, into: "super_form" } }),
-  unit("rd5", "Time Rider", { rank: 5, atk: 7, hp: 8, factions: ["rider"], series: R, effects: [startOfCombat(buff(2, 0), { target: allAllies({ faction: "rider" }) })] }),
-  unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], series: R, keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
+  unit("rd1", "Rookie Rider", { rank: 1, atk: 2, hp: 2, factions: ["rider"], series: R, henshin: { after: 2, into: "rider_form" }, ultimateInto: "ultimate_rider" }),
+  unit("rd2", "Bike Rider", { rank: 2, atk: 3, hp: 3, factions: ["rider"], series: R, ultimateInto: "ultimate_rider", keywords: ["RIDER_KICK"] }),
+  unit("rd3", "Hopper Rider", { rank: 3, atk: 3, hp: 4, factions: ["rider"], series: R, ultimateInto: "ultimate_rider", effects: [deploy(buff(1, 1), { target: adjacent })] }),
+  unit("rd4", "Armored Rider", { rank: 4, atk: 5, hp: 5, factions: ["rider"], series: R, ultimateInto: "ultimate_rider", henshin: { after: 2, into: "super_form" } }),
+  unit("rd5", "Time Rider", { rank: 5, atk: 7, hp: 8, factions: ["rider"], series: R, ultimateInto: "ultimate_rider", effects: [startOfCombat(buff(2, 0), { target: allAllies({ faction: "rider" }) })] }),
+  unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], series: R, ultimateInto: "ultimate_rider", keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
 
   // ---- sentai (colours drive Team-Up and Roll Call)
   unit("sn1", "Red Cadet", { rank: 1, atk: 1, hp: 3, factions: ["sentai"], series: S, colors: ["RED"], effects: [startOfCombat(buff(2, 2), { condition: teamUp(2) })] }),
@@ -133,6 +144,15 @@ const cards = [
   unit("kj4", "Venom Wyrm", { rank: 4, atk: 4, hp: 5, factions: ["kaijin"], keywords: ["KYODAIKA"] }),
   unit("kj5", "Monster Duke", { rank: 5, atk: 5, hp: 7, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [avenge(2, buff(2, 2))] }),
   unit("kj6", "Monster General", { rank: 6, atk: 7, hp: 9, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [startOfCombat(buff(0, 2), { target: allAllies({ faction: "kaijin" }) })] }),
+
+  // ---- samples of the newer mechanics
+  unit("x_supply", "Supply Officer", { rank: 2, atk: 2, hp: 3, effects: [deploy(randomCard("GEAR"))] }),
+  unit("x_trader", "Lucky Trader", { rank: 1, atk: 1, hp: 2, effects: [onSell(randomCard("GEAR"), { repeat: 2 })] }),
+  unit("x_scavenger", "Market Scout", { rank: 2, atk: 2, hp: 2, factions: ["ally"], effects: [endOfTurn(buffShop(1, 1))] }),
+  unit("x_drill", "Drill Sergeant", { rank: 3, atk: 3, hp: 4, effects: [endOfTurn(give("GUARD"), { target: { selector: "RIGHTMOST_FRIENDLY" } })] }),
+  unit("x_devourer", "Tavern Devourer", { rank: 3, atk: 2, hp: 3, factions: ["kaijin"], effects: [deploy(devourShop(), { target: self })] }),
+  unit("x_caller", "Den Caller", { rank: 4, atk: 3, hp: 5, factions: ["beast"], effects: [startOfCombat(summonFromHand(1))] }),
+  unit("x_echo", "Echo Bard", { rank: 4, atk: 3, hp: 4, keywords: ["ECHO"] }),
 
   // ---- Beast (summon on attack and on death; pack leaders power up every newcomer)
   unit("bs1", "Den Mother", { rank: 1, atk: 2, hp: 2, factions: ["beast"], effects: [lastStand(summon("beast_cub"))] }),
@@ -178,6 +198,9 @@ const tavernGear = [
   shopGear("g_blood", "Blood Oath", 2, 3, [player("ON_PLAY", buff(3, 3), { target: chosen() })], { costType: "HEALTH" }),
   shopGear("g_revive", "Revive Chip", 5, 4, [player("ON_PLAY", give("REVIVE"), { target: chosen() })]),
   // a unit of one faction (only offered when that faction is in the match)
+  shopGear("g_robo_upgrade", "Robo Upgrade", 4, 3, [player("ON_PLAY", [ultimateForm(), buff(2, 2)], { target: giantSlot })], { factions: ["sentai", "mecha"] }),
+  // gets gear: a random one, twice
+  shopGear("g_supply_crate", "Supply Crate", 2, 2, [player("ON_PLAY", randomCard("GEAR"), { repeat: 2 })]),
   shopGear("g_call_rider", "Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("rider"))], { factions: ["rider"] }),
   shopGear("g_call_sentai", "Sentai Call", 2, 3, [player("ON_PLAY", discoverUnit("sentai"))], { factions: ["sentai"] }),
   shopGear("g_call_mecha", "Mecha Call", 2, 3, [player("ON_PLAY", discoverUnit("mecha"))], { factions: ["mecha"] }),

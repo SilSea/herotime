@@ -120,7 +120,7 @@ export class Content {
     };
     // Some actions and targets only make sense in one phase; the engine refuses them in the other at run time.
     const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
-    const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI"]);
+    const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP"]);
     const checkPhase = (e: Effect, from: string): void => {
       if (e.target?.selector === "SUMMONED" && e.trigger !== "ALLY_SUMMONED") problems.push(`${from}: target SUMMONED only works with ALLY_SUMMONED`);
       // A summon can happen in either phase, so its reactions must work in both.
@@ -141,7 +141,7 @@ export class Content {
     const checkActions = (actions: Iterable<Action>, from: string): void => {
       for (const a of actions) {
         if (a.type === "SUMMON" || a.type === "ADD_TO_HAND") needCard(a.cardKey, from);
-        else if (a.type === "DISCOVER_UNIT") needFaction(a.faction, from);
+        else if (a.type === "DISCOVER_UNIT" || a.type === "RANDOM_CARD") needFaction(a.faction, from);
         else if (a.type === "TRANSFORM") needCard(a.into, from);
         else if (a.type === "GAUGE_ADD" && !this.gauges.has(a.gauge)) {
           problems.push(`${from} references unknown gauge "${a.gauge}"`);
@@ -157,6 +157,7 @@ export class Content {
       for (const f of c.factions) needFaction(f, from);
       checkFilters(c.effects, from);
       if (c.henshin) needCard(c.henshin.into, `${from} henshin`);
+      if (c.ultimateInto) needCard(c.ultimateInto, `${from} ultimateInto`);
       if (c.gattaiInto) {
         needCard(c.gattaiInto, `${from} gattaiInto`);
         const form = this.cards.get(c.gattaiInto);
@@ -185,7 +186,7 @@ export class Content {
       }
     }
     // Rewards run with no source unit, so actions that need a target would silently do nothing.
-    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "SUMMON"]);
+    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "SUMMON", "RANDOM_CARD", "BUFF_SHOP", "SUMMON_FROM_HAND"]);
     for (const g of this.gauges.values()) {
       for (const t of g.thresholds) {
         const from = `gauge "${g.key}"`;

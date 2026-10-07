@@ -13,6 +13,7 @@ const KEYWORD: Record<KeywordKey, string> = {
   FINAL_BLOW: "Final Blow",
   KYODAIKA: "Kyodaika",
   GATTAI: "Gattai",
+  ECHO: "Echo",
 };
 
 const TRIGGER: Record<Trigger, string> = {
@@ -25,6 +26,7 @@ const TRIGGER: Record<Trigger, string> = {
   LAST_STAND: "Last Stand",
   AVENGE: "Avenge",
   ALLY_SUMMONED: "When you summon a unit",
+  ON_SELL: "When sold",
   ON_ACQUIRE: "When acquired",
   ON_TURN_START: "At the start of each turn",
   ON_USE: "When used",
@@ -49,6 +51,7 @@ function who(t: Target | undefined, names: Names): string {
     case "ALL_FRIENDLY": return `all ${many}`;
     case "CHOSEN_FRIENDLY": return `a chosen ${one}`;
     case "SUMMONED": return "it";
+    case "GIANT_SLOT": return "your Giant Robo";
     case "LEFTMOST_ENEMY": return "the leftmost enemy";
     case "RANDOM_ENEMY": return "a random enemy";
     case "ALL_ENEMY": return "all enemies";
@@ -83,6 +86,11 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "ADD_TO_HAND": return `add ${names(a.cardKey)} to your hand`;
     case "DISCOVER_GIANT": return "discover a Giant Robo";
     case "SUPER_GATTAI": return `Super Gattai: in fights with an Extra Ranger on your board, your Giant Robo gets +${a.atk}/+${a.hp} and that Ranger's keywords`;
+    case "RANDOM_CARD": return `add a random ${a.faction ? `${names(a.faction)} ` : ""}${a.cardKind === "GEAR" ? "Gear" : "unit"} to your hand`;
+    case "ULTIMATE_FORM": return `turn ${t} into its Ultimate Form`;
+    case "BUFF_SHOP": return `units in your tavern get ${signed(a.atk)}/${signed(a.hp)} for the rest of the game`;
+    case "DEVOUR_SHOP": return `devour a random unit in your tavern and give its stats to ${t}`;
+    case "SUMMON_FROM_HAND": return `summon ${a.count > 1 ? `${a.count} units` : "a unit"} from your hand`;
     case "DISCOVER_UNIT": return a.faction ? `discover a ${names(a.faction)} unit` : "discover a unit";
   }
 }
@@ -126,7 +134,7 @@ export function ruleText(rule: string, op: "SET" | "ADD" | "MUL", value: number)
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   const body = e.actions.map((a) => action(a, e.target, names)).join(", then ");
-  const text = `${trigger}: ${condition(e.condition, names)}${body}.`;
+  const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}.`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;
 }
 
@@ -135,6 +143,8 @@ export function cardText(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): becomes ${names(c.henshin.into)}.`);
   if (c.gattaiInto) lines.push(`Gattai core: leading a Gattai group, it becomes ${names(c.gattaiInto)}.`);
+  if (c.ultimateInto) lines.push(`Ultimate Form: ${names(c.ultimateInto)}.`);
+  if (c.keywords.includes("ECHO")) lines.push("Echo: your Deploy effects happen twice.");
   // Gear is used from the hand, so its ON_PLAY reads "Use:" rather than the units' "Deploy:".
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectText(e, names).replace(/^Deploy: /, "Use: ") : effectText(e, names));
   return lines.join(" ");

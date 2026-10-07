@@ -32,6 +32,8 @@ export const CardDef = z.object({
    * for good with COMBINE). The result has this card's stats plus the parts' stats, its effects, and all keywords.
    */
   gattaiInto: z.string().optional(),
+  /** The form ULTIMATE_FORM turns this unit into (e.g. a Rider's series-specific final form). */
+  ultimateInto: z.string().optional(),
   /** Tavern price of Gear sold in the shop (not a token). Units always use the standard buy cost. */
   cost: z.number().int().min(0).optional(),
   /** What the gear price is paid with: Energy, or the hero's Health (which can never take you to 0). */
