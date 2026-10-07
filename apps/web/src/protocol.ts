@@ -131,6 +131,7 @@ export interface MyMatch {
 export interface LeaderboardRow {
   rank: number;
   username: string;
+  mmr: number;
   games: number;
   wins: number;
   top4: number;

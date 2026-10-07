@@ -41,7 +41,7 @@ export class StatsController {
     const rows = await this.matches.leaderboard(50, LEADERBOARD_MIN_GAMES);
     return {
       minGames: LEADERBOARD_MIN_GAMES,
-      players: rows.map((r, i) => ({ rank: i + 1, username: r.username, games: r.games, wins: r.wins, top4: r.top4, avgPlacement: r.avgPlacement })),
+      players: rows.map((r, i) => ({ rank: i + 1, username: r.username, mmr: r.mmr, games: r.games, wins: r.wins, top4: r.top4, avgPlacement: r.avgPlacement })),
     };
   }
 }

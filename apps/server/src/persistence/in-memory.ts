@@ -17,6 +17,7 @@ import {
   type GameStats,
   type StatLine,
   type StatsFilter,
+  standingsFrom,
 } from "./repositories.js";
 
 export class InMemoryUserRepository implements UserRepository {
@@ -69,26 +70,15 @@ export class InMemoryMatchRepository implements MatchRepository {
   constructor(private readonly users?: UserRepository) {}
 
   async leaderboard(limit: number, minGames: number): Promise<Standing[]> {
-    const by = new Map<string, Standing>();
-    for (const r of this.results) {
-      if (r.mode !== "queue") continue;
-      for (const p of r.players) {
-        if (!p.userId) continue;
-        const s = by.get(p.userId) ?? { userId: p.userId, username: p.name, games: 0, wins: 0, top4: 0, avgPlacement: 0 };
-        s.avgPlacement = (s.avgPlacement * s.games + p.placement) / (s.games + 1);
-        s.games++;
-        if (p.placement === 1) s.wins++;
-        if (p.placement <= 4) s.top4++;
-        by.set(p.userId, s);
-      }
+    const ids = new Set(this.results.flatMap((r) => r.players.flatMap((p) => (p.userId ? [p.userId] : []))));
+    const names = new Map<string, string>();
+    for (const id of ids) {
+      const u = await this.users?.findById(id);
+      if (u) names.set(id, u.username);
     }
-    const rows = [...by.values()].filter((s) => s.games >= minGames);
-    for (const s of rows) {
-      s.username = (await this.users?.findById(s.userId))?.username ?? s.username;
-      s.avgPlacement = Math.round(s.avgPlacement * 100) / 100;
-    }
-    return rankStandings(rows, limit);
+    return standingsFrom(this.results, minGames, limit, (id) => names.get(id));
   }
+
 }
 
 export class InMemoryContentRepository implements ContentRepository {

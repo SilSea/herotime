@@ -67,10 +67,10 @@ function leaderboardPanel(): HTMLElement {
     "div",
     { class: "panel" },
     h("h2", { text: tr("Leaderboard", "ตารางอันดับ") }),
-    h("p", { class: "muted", text: tr(`Matchmaking games only (practice never counts). At least ${b?.minGames ?? 3} games to appear. Lower average place is better.`, `นับเฉพาะเกมจับคู่ (ฝึกซ้อมไม่นับ) ต้องเล่นอย่างน้อย ${b?.minGames ?? 3} เกมถึงจะขึ้นตาราง อันดับเฉลี่ยยิ่งน้อยยิ่งดี`) }),
+    h("p", { class: "muted", text: tr(`Matchmaking games only (practice never counts). At least ${b?.minGames ?? 3} games to appear. Ranked by MMR (everyone starts at 1000).`, `นับเฉพาะเกมจับคู่ (ฝึกซ้อมไม่นับ) ต้องเล่นอย่างน้อย ${b?.minGames ?? 3} เกมถึงจะขึ้นตาราง เรียงตาม MMR (เริ่มที่ 1000)`) }),
     !b ? h("p", { class: "muted", text: tr("Loading...", "กำลังโหลด...") }) : b.players.length === 0 ? h("p", { class: "muted", text: tr("Nobody has enough ranked games yet.", "ยังไม่มีใครเล่นเกมจัดอันดับครบ") }) :
-      h("table", { class: "admin-table" }, h("tr", null, ...["#", tr("Player", "ผู้เล่น"), tr("Games", "เกม"), tr("Wins", "ชนะ"), "Top 4", tr("Avg place", "อันดับเฉลี่ย")].map((t) => h("th", { text: t }))),
-        ...b.players.map((p) => h("tr", null, h("td", { text: String(p.rank) }), h("td", { text: p.username }), h("td", { text: String(p.games) }), h("td", { text: String(p.wins) }), h("td", { text: String(p.top4) }), h("td", { text: p.avgPlacement.toFixed(2) })))),
+      h("table", { class: "admin-table" }, h("tr", null, ...["#", tr("Player", "ผู้เล่น"), "MMR", tr("Games", "เกม"), tr("Wins", "ชนะ"), "Top 4", tr("Avg place", "อันดับเฉลี่ย")].map((t) => h("th", { text: t }))),
+        ...b.players.map((p) => h("tr", null, h("td", { text: String(p.rank) }), h("td", { text: p.username }), h("td", { text: String(p.mmr) }), h("td", { text: String(p.games) }), h("td", { text: String(p.wins) }), h("td", { text: String(p.top4) }), h("td", { text: p.avgPlacement.toFixed(2) })))),
   );
 }
 
@@ -159,7 +159,7 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
           "div",
           { class: "hero-stats" },
           h("div", { class: "pilot", text: state.user?.username ?? "" }),
-          h("div", { class: "stat-row" }, statTile(tr("Ranked games", "เกมจัดอันดับ"), String(ranked.length)), statTile(tr("Wins", "ชนะ"), String(wins)), statTile(tr("Best place", "อันดับดีสุด"), best ? ordinal(best) : "-"), statTile(tr("Rank", "อันดับ"), me ? `#${me.rank}` : "-")),
+          h("div", { class: "stat-row" }, statTile(tr("Ranked games", "เกมจัดอันดับ"), String(ranked.length)), statTile(tr("Wins", "ชนะ"), String(wins)), statTile(tr("Best place", "อันดับดีสุด"), best ? ordinal(best) : "-"), statTile(tr("Rank", "อันดับ"), me ? `#${me.rank}` : "-"), statTile("MMR", me ? String(me.mmr) : "-")),
         ),
       ),
       h(

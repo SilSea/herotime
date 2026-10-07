@@ -113,6 +113,48 @@ export interface Standing {
   wins: number;
   top4: number;
   avgPlacement: number;
+  /** Matchmaking rating, replayed from every ranked match in order (everyone starts at MMR_START). */
+  mmr: number;
+}
+
+export const MMR_START = 1000;
+/** How far one match can move a rating. */
+export const MMR_K = 64;
+
+/**
+ * Ranked standings from ranked matches. The rating is Elo for many players: in a match of n, a player's score
+ * is (n - place) / (n - 1) (1 for first, 0 for last), expected against the average of everyone else; bots
+ * count as MMR_START and never change. Matches are replayed oldest first, so the result is reproducible.
+ */
+export function standingsFrom(matches: readonly MatchResult[], minGames: number, limit: number, nameOf: (userId: string) => string | undefined): Standing[] {
+  const ratings = new Map<string, number>();
+  const by = new Map<string, Standing>();
+  for (const m of [...matches].filter((x) => x.mode === "queue").sort((a, b) => a.endedAt.getTime() - b.endedAt.getTime())) {
+    const n = m.players.length;
+    if (n < 2) continue;
+    const rating = (p: MatchResult["players"][number]): number => (p.userId ? (ratings.get(p.userId) ?? MMR_START) : MMR_START);
+    const before = m.players.map(rating);
+    m.players.forEach((p, i) => {
+      if (!p.userId) return;
+      const mine = before[i] as number;
+      const expected = before.reduce((sum, r, j) => (j === i ? sum : sum + 1 / (1 + 10 ** ((r - mine) / 400))), 0) / (n - 1);
+      const score = (n - p.placement) / (n - 1);
+      ratings.set(p.userId, mine + MMR_K * (score - expected));
+      const s = by.get(p.userId) ?? { userId: p.userId, username: p.name, games: 0, wins: 0, top4: 0, avgPlacement: 0, mmr: MMR_START };
+      s.avgPlacement = (s.avgPlacement * s.games + p.placement) / (s.games + 1);
+      s.games++;
+      if (p.placement === 1) s.wins++;
+      if (p.placement <= 4) s.top4++;
+      by.set(p.userId, s);
+    });
+  }
+  const rows = [...by.values()].filter((s) => s.games >= minGames);
+  for (const s of rows) {
+    s.username = nameOf(s.userId) ?? s.username;
+    s.avgPlacement = Math.round(s.avgPlacement * 100) / 100;
+    s.mmr = Math.round(ratings.get(s.userId) ?? MMR_START);
+  }
+  return rankStandings(rows, limit);
 }
 
 export interface MatchRepository {
@@ -124,9 +166,9 @@ export interface MatchRepository {
   stats(filter: StatsFilter): Promise<GameStats>;
 }
 
-/** Shared by both repositories so they rank the same way. */
+/** Shared by both repositories so they rank the same way: highest MMR first. */
 export function rankStandings(rows: Standing[], limit: number): Standing[] {
-  return [...rows].sort((a, b) => a.avgPlacement - b.avgPlacement || b.games - a.games || a.username.localeCompare(b.username)).slice(0, limit);
+  return [...rows].sort((a, b) => b.mmr - a.mmr || a.avgPlacement - b.avgPlacement || b.games - a.games || a.username.localeCompare(b.username)).slice(0, limit);
 }
 
 export const USER_REPOSITORY = Symbol("USER_REPOSITORY");
