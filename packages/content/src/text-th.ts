@@ -91,6 +91,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
       const own = a.fromSelf ? (a.atk || a.hp ? `ได้ ATK/HP เท่าตัวนี้ ${stats}` : "ได้ ATK/HP เท่าตัวนี้") : stats;
       return `ให้${t} ${own}${a.permanent ? " ถาวร" : ""}`;
     }
+    case "COPY": return a.to === "HAND" ? `ได้สำเนาของ${t}เข้ามือ${a.withBuffs ? " (รวมบัฟ)" : ""}` : `เรียกสำเนาของ${t}${a.withBuffs ? " (รวมบัฟ)" : ""}`;
     case "CONSUME_ALLIES": return `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${t}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`;
     case "SUMMON": return `เรียก ${names(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`;
     case "DAMAGE": return `ทำดาเมจ ${a.amount} ใส่${t}`;
@@ -159,7 +160,7 @@ const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UN
 export function effectTextTh(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
-  const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && LATER.has(a.type) ? " ในเทิร์นหน้า" : "");
+  const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && (LATER.has(a.type) || (a.type === "COPY" && a.to === "HAND")) ? " ในเทิร์นหน้า" : "");
   const body = e.actions.map((a) => action(a, e.target, names) + later(a)).join(" แล้ว");
   const limit = e.limit ? (e.limit.times === 1 ? ` (${e.limit.per === "TURN" ? "เทิร์นละครั้ง" : "ครั้งเดียวต่อเกม"})` : ` (ไม่เกิน ${e.limit.times} ครั้งต่อ${e.limit.per === "TURN" ? "เทิร์น" : "เกม"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} ครั้ง)` : ""}${limit}`;

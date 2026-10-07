@@ -1,6 +1,7 @@
 import type { Action, Effect, SentaiColor, Selector, Target } from "@herotime/shared";
 import { checkCondition, isOneOf, sentaiColorCount } from "../conditions.js";
 import {
+  capStat,
   DEFAULT_COMBAT_RULES,
   DEFAULT_CONFIG,
   SENTAI_FACTION,
@@ -115,6 +116,7 @@ const SETTLE_LIMIT = 2_000;
 const needsTargets = (a: Action): boolean =>
   a.type === "BUFF" ||
   a.type === "CONSUME_ALLIES" ||
+  a.type === "COPY" ||
   a.type === "DAMAGE" ||
   a.type === "GIVE_KEYWORD" ||
   a.type === "TRANSFORM" ||
@@ -136,6 +138,8 @@ export function simulateCombat(
   const events: CombatEvent[] = [];
   let attacks = 0;
   let spawned = 0;
+  /** Units one fight may create at most (summons and copies that keep summoning each other). */
+  const MAX_SPAWNS = 100;
 
   const mkSide = (id: Side, units: readonly CombatUnitInput[], extras: CombatSideExtras = {}): SideState => ({
     id,
@@ -266,10 +270,12 @@ export function simulateCombat(
         const hp = action.hp * mult + own.hp;
         for (const t of targets) {
           if (action.fromSelf && t === source) continue; // it passes its stats on to the others
-          t.atk += atk;
-          t.hp += hp;
-          t.maxHp += hp;
-          events.push({ type: "BUFF", unit: t.uid, atk, hp });
+          // What it really gained (stats stop at the cap), so the replay adds up to the same numbers.
+          const before = { atk: t.atk, hp: t.hp };
+          t.atk = capStat(t.atk + atk);
+          t.hp = capStat(t.hp + hp);
+          t.maxHp = capStat(t.maxHp + hp);
+          events.push({ type: "BUFF", unit: t.uid, atk: t.atk - before.atk, hp: t.hp - before.hp });
           if (action.permanent && t.sourceId !== undefined) {
             const book = sides[t.side].permanent;
             const prev = book.get(t.sourceId) ?? { atk: 0, hp: 0 };
@@ -280,7 +286,7 @@ export function simulateCombat(
       }
       case "SUMMON": {
         const count = action.count * mult;
-        for (let n = 0; n < count && friendly(s).length < boardLimit; n++) {
+        for (let n = 0; n < count && friendly(s).length < boardLimit && canSpawn(); n++) {
           const uid = `${s.id}s${spawned++}`;
           const f = fighterFromCard(action.cardKey, uid, s.id);
           const index = Math.min(at(), s.list.length);
@@ -332,6 +338,36 @@ export function simulateCombat(
         }
         return;
       }
+      case "COPY": {
+        for (const t of targets) {
+          if (t.uid.endsWith("g") && t.uid.length === 2) continue; // a Giant Robo is not copied
+          for (let n = 0; n < mult; n++) {
+            if (action.to === "HAND") {
+              if (!options.content?.cards.has(t.cardKey)) continue; // nothing real to put in a hand
+              // Arrives next turn, as the base card (or its Final Form with withBuffs).
+              s.rewards.push({ action, mult: 1, from: source?.cardKey ?? null, copy: { key: t.cardKey, golden: action.withBuffs && t.golden, unpooled: action.withBuffs && t.golden ? 3 : 1 } });
+              events.push({ type: "REWARD", side: s.id, unit: source?.uid ?? null, action: action.type });
+              continue;
+            }
+            if (friendly(s).length >= boardLimit || !canSpawn()) break;
+            const uid = `${s.id}s${spawned++}`;
+            // The base card when there is one to read; otherwise (or with bonuses) the unit as it stands now.
+            const known = options.content?.cards.has(t.cardKey) ?? false;
+            let f: Fighter;
+            if (known && !action.withBuffs) f = fighterFromCard(t.cardKey, uid, s.id);
+            else {
+              const input: CombatUnitInput = { cardKey: t.cardKey, rank: t.rank, atk: t.atk, hp: t.hp > 0 ? t.hp : t.maxHp, keywords: [...t.keywords], effects: t.effects, factions: t.factions, colors: t.colors, golden: t.golden };
+              if (t.series !== undefined) input.series = t.series;
+              f = toFighter(input, uid, s.id);
+            }
+            const index = Math.min(t.side === s.id && s.list.includes(t) ? s.list.indexOf(t) + 1 : at(), s.list.length);
+            insertAt(s, index, f);
+            events.push({ type: "SUMMON", unit: uid, cardKey: t.cardKey, side: s.id, index, atk: f.atk, hp: f.hp, keywords: [...f.keywords] });
+            for (const mate of friendly(s)) if (mate !== f) fire("ALLY_SUMMONED", mate, s, rightOf(s, mate), undefined, f);
+          }
+        }
+        return;
+      }
       case "CONSUME_ALLIES": {
         const eaten = friendly(s).filter((f) => f !== source && f.uid !== `${s.id}g`); // the Giant stays
         let atk = 0;
@@ -344,10 +380,12 @@ export function simulateCombat(
         }
         for (const t of targets) {
           if (!alive(t) || eaten.includes(t)) continue;
-          t.atk += atk;
-          t.hp += hp;
-          t.maxHp += hp;
-          events.push({ type: "BUFF", unit: t.uid, atk, hp });
+          // What it really gained (stats stop at the cap), so the replay adds up to the same numbers.
+          const before = { atk: t.atk, hp: t.hp };
+          t.atk = capStat(t.atk + atk);
+          t.hp = capStat(t.hp + hp);
+          t.maxHp = capStat(t.maxHp + hp);
+          events.push({ type: "BUFF", unit: t.uid, atk: t.atk - before.atk, hp: t.hp - before.hp });
           if (action.permanent && t.sourceId !== undefined) {
             const book = sides[t.side].permanent;
             const prev = book.get(t.sourceId) ?? { atk: 0, hp: 0 };
@@ -358,7 +396,7 @@ export function simulateCombat(
       }
       case "SUMMON_FROM_HAND": {
         const hand = s.extras.hand ?? [];
-        for (let n = 0; n < action.count * mult && hand.length > 0 && friendly(s).length < boardLimit; n++) {
+        for (let n = 0; n < action.count * mult && hand.length > 0 && friendly(s).length < boardLimit && canSpawn(); n++) {
           const key = rng.pick([...hand]);
           const uid = `${s.id}s${spawned++}`;
           const f = fighterFromCard(key, uid, s.id);
@@ -493,6 +531,12 @@ export function simulateCombat(
    * match down, so after too many steps the fight is abandoned and ends as a draw.
    */
   let aborted = false;
+  /** Room for one more summoned unit; past MAX_SPAWNS the content is looping, so the fight is abandoned (a draw). */
+  const canSpawn = (): boolean => {
+    if (spawned < MAX_SPAWNS) return true;
+    aborted = true;
+    return false;
+  };
   const settle = (order: Side[]): void => {
     if (aborted) return;
     for (let guard = 0; guard < SETTLE_LIMIT; guard++) {

@@ -1,8 +1,10 @@
 import type { Action, Effect, Selector, Target } from "@herotime/shared";
 import { checkCondition, isOneOf, type UnitView } from "../conditions.js";
 import { recordBuff, type BuffRecord, type Unit } from "../content.js";
+import { capStat } from "../config.js";
 import { modifyRule, withRules } from "../rules.js";
 import { copiesOf, noteMoment, type PlayerState, returnToPool } from "../shop/economy.js";
+import { resolveTriples } from "../shop/triple.js";
 import type { FightReward } from "../types.js";
 import type { GameEnv } from "./env.js";
 
@@ -14,7 +16,7 @@ export function unitView(env: GameEnv, unit: Unit): UnitView {
 }
 
 export const needsTargets = (a: Action): boolean =>
-  a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "ULTIMATE_FORM" || a.type === "DEVOUR_SHOP" || a.type === "CONSUME_ALLIES";
+  a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "ULTIMATE_FORM" || a.type === "DEVOUR_SHOP" || a.type === "CONSUME_ALLIES" || a.type === "COPY";
 
 /** Whether a unit passes a target's faction / series / card filter. */
 export function matchesTarget(env: GameEnv, u: Unit, t: Target): boolean {
@@ -71,6 +73,24 @@ function select(
  * Cards created by effects must come out of the shared pool, or selling them would inflate it.
  * Unpooled cards (tokens, gear, giants) are free. False = the pool has run dry.
  */
+/** How deep "when you summon a unit" reactions may nest in one action (a copy that copies the copy...). */
+const MAX_SUMMON_DEPTH = 8;
+let summonDepth = 0;
+
+/** Units already on the board react to a newcomer (their buffs stick: this is the recruit phase). */
+function announceSummon(player: PlayerState, env: GameEnv, newcomer: Unit): void {
+  if (summonDepth >= MAX_SUMMON_DEPTH) return;
+  summonDepth++;
+  try {
+    for (const mate of [...player.board]) {
+      if (mate === newcomer || !player.board.includes(mate)) continue;
+      runTrigger(env.content.card(mate.key).effects, "ALLY_SUMMONED", "UNIT", mate, player, env, undefined, newcomer);
+    }
+  } finally {
+    summonDepth--;
+  }
+}
+
 function reserve(env: GameEnv, key: string, copies = 1): boolean {
   return !env.pool.has(key) || env.pool.take(key, copies);
 }
@@ -161,8 +181,8 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       }
       for (const t of targets) {
         if (action.fromSelf && t === source) continue; // it passes its stats on to the others
-        t.bonusAtk = (t.bonusAtk ?? 0) + action.atk * mult + extra.atk;
-        t.bonusHp = (t.bonusHp ?? 0) + action.hp * mult + extra.hp;
+        t.bonusAtk = capStat((t.bonusAtk ?? 0) + action.atk * mult + extra.atk);
+        t.bonusHp = capStat((t.bonusHp ?? 0) + action.hp * mult + extra.hp);
         recordBuff(t, origin, action.atk * mult + extra.atk, action.hp * mult + extra.hp);
       }
       return;
@@ -185,6 +205,25 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       for (const t of targets) removeFromBoard(player, t, env);
       return;
     }
+    case "COPY": {
+      for (const t of targets) {
+        if (env.content.card(t.key).kind === "GIANT") continue; // a Giant Robo has its own slot
+        for (let n = 0; n < mult; n++) {
+          const copy = copyOf(t, action.withBuffs);
+          if (action.to === "HAND") {
+            if (player.hand.length < c.handSize) player.hand.push(copy);
+            continue;
+          }
+          if (player.board.length >= c.boardSize) break;
+          const at = player.board.includes(t) ? player.board.indexOf(t) + 1 : player.board.length;
+          player.board.splice(at, 0, copy);
+          announceSummon(player, env, copy);
+        }
+      }
+      // Copies count for triples straight away.
+      resolveTriples(player, env.pool, env.rng, env.cfg);
+      return;
+    }
     case "CONSUME_ALLIES": {
       const eaten = player.board.filter((u) => u !== source);
       let atk = 0;
@@ -197,8 +236,8 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       }
       for (const t of targets) {
         if (!player.board.includes(t) && t !== player.giant) continue; // it was eaten too
-        t.bonusAtk = (t.bonusAtk ?? 0) + atk;
-        t.bonusHp = (t.bonusHp ?? 0) + hp;
+        t.bonusAtk = capStat((t.bonusAtk ?? 0) + atk);
+        t.bonusHp = capStat((t.bonusHp ?? 0) + hp);
         recordBuff(t, origin, atk, hp);
       }
       return;
@@ -212,10 +251,7 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
         const summoned: Unit = { key: action.cardKey, golden: false };
         player.board.splice(at, 0, summoned);
         // Units already on the board react to the newcomer (their buffs stick: this is the recruit phase).
-        for (const mate of [...player.board]) {
-          if (mate === summoned || !player.board.includes(mate)) continue;
-          runTrigger(env.content.card(mate.key).effects, "ALLY_SUMMONED", "UNIT", mate, player, env, undefined, summoned);
-        }
+        announceSummon(player, env, summoned);
       }
       return;
     }
@@ -292,8 +328,8 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
         const hp = eaten.hp + (player.shopBonus?.hp ?? 0);
         if (env.pool.has(key)) env.pool.give(key);
         for (const t of targets) {
-          t.bonusAtk = (t.bonusAtk ?? 0) + atk;
-          t.bonusHp = (t.bonusHp ?? 0) + hp;
+          t.bonusAtk = capStat((t.bonusAtk ?? 0) + atk);
+          t.bonusHp = capStat((t.bonusHp ?? 0) + hp);
           recordBuff(t, origin, atk, hp);
         }
       }
@@ -326,10 +362,7 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
         player.hand.splice(player.hand.indexOf(unit), 1);
         const at = source && player.board.includes(source) ? player.board.indexOf(source) + 1 : player.board.length;
         player.board.splice(at, 0, unit);
-        for (const mate of [...player.board]) {
-          if (mate === unit || !player.board.includes(mate)) continue;
-          runTrigger(env.content.card(mate.key).effects, "ALLY_SUMMONED", "UNIT", mate, player, env, undefined, unit);
-        }
+        announceSummon(player, env, unit);
       }
       return;
     }
@@ -344,9 +377,27 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
 }
 
 /** Run one effect in the recruit phase. `source` is the owning unit (null for player-scope effects). */
-/** Give a reward a fight effect earned (Energy, a card, Gauge...). */
+/** Give a reward a fight effect earned (Energy, a card, Gauge, a copy...). */
 export function runReward(r: FightReward, player: PlayerState, env: GameEnv): void {
+  if (r.copy) {
+    if (player.hand.length < withRules(player, env.cfg).handSize) player.hand.push({ ...r.copy });
+    resolveTriples(player, env.pool, env.rng, env.cfg);
+    return;
+  }
   runAction(r.action, r.mult, null, [], player, env, { kind: "card", key: r.from });
+}
+
+/** A new card like `u` (COPY): the base card, or with its Final Form, bonuses and keywords. Never from the pool. */
+export function copyOf(u: Unit, withBuffs: boolean): Unit {
+  const copy: Unit = { key: u.key, golden: withBuffs && u.golden };
+  if (withBuffs) {
+    if (u.bonusAtk) copy.bonusAtk = u.bonusAtk;
+    if (u.bonusHp) copy.bonusHp = u.bonusHp;
+    if (u.keywords?.length) copy.keywords = [...u.keywords];
+    if (u.buffs?.length) copy.buffs = u.buffs.map((b) => ({ ...b, ...(b.keywords ? { keywords: [...b.keywords] } : {}) }));
+  }
+  copy.unpooled = copy.golden ? 3 : 1;
+  return copy;
 }
 
 export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin, chosen?: Unit): void {

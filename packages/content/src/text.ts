@@ -90,6 +90,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
       const own = a.fromSelf ? (a.atk || a.hp ? `this unit's ATK/HP ${stats}` : "this unit's ATK/HP") : stats;
       return `give ${t} ${own}${a.permanent ? " permanently" : ""}`;
     }
+    case "COPY": return a.to === "HAND" ? `add a copy of ${t} to your hand${a.withBuffs ? " (bonuses included)" : ""}` : `summon a copy of ${t}${a.withBuffs ? " (bonuses included)" : ""}`;
     case "CONSUME_ALLIES": return `destroy all your other units and give ${t} their total ATK/HP${a.permanent ? " permanently" : ""}`;
     case "SUMMON": return `summon ${a.count > 1 ? `${a.count} ` : ""}${names(a.cardKey)}${a.count > 1 ? "s" : ""}`;
     case "DAMAGE": return `deal ${a.amount} damage to ${t}`;
@@ -159,7 +160,7 @@ const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UN
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
-  const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && LATER.has(a.type) ? " next turn" : "");
+  const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && (LATER.has(a.type) || (a.type === "COPY" && a.to === "HAND")) ? " next turn" : "");
   const body = e.actions.map((a) => action(a, e.target, names) + later(a)).join(", then ");
   const limit = e.limit ? (e.limit.times === 1 ? ` (once per ${e.limit.per === "TURN" ? "turn" : "game"})` : ` (up to ${e.limit.times} times per ${e.limit.per === "TURN" ? "turn" : "game"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}${limit}.`;

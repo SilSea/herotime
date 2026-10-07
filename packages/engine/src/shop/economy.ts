@@ -91,8 +91,9 @@ export function newPlayer(): PlayerState {
 }
 
 /** Pool copies a unit is worth: a Final Form consumed 3 copies. */
+/** Pool copies a unit stands for: 3 for a Final Form, 1 otherwise, less any that were made by COPY. */
 export function copiesOf(unit: Unit): number {
-  return unit.golden ? 3 : 1;
+  return Math.max(0, (unit.golden ? 3 : 1) - (unit.unpooled ?? 0));
 }
 
 /** Put a unit's pooled copies back, including the parts a combined Gattai form was made of. */

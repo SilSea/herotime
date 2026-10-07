@@ -285,6 +285,8 @@ function abilityBox(
       (a.do === "BUFF" || a.do === "CONSUME_ALLIES") && c.when.length > 0 && ["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE", "ALLY_SUMMONED"].includes(a.when) && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
       a.do === "GIVE_KEYWORD" && field("Keyword", pick(a.keyword, Object.keys(KEYWORDS).map((k) => ({ value: k, label: keywordName(k) })), (v) => (a.keyword = v))),
       a.do === "SUMMON" && field(tr("Card", "การ์ด"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
+      a.do === "COPY" && field(tr("Copy to", "ก๊อปปี้ไปที่"), pick(a.copyTo, [{ value: "BOARD", label: tr("the board (right of it)", "บอร์ด (ข้างตัวต้นฉบับ)") }, { value: "HAND", label: tr("your hand", "มือ") }], (v) => (a.copyTo = v as Ability["copyTo"]))),
+      a.do === "COPY" && check(tr("keep its bonuses, keywords and Final Form", "เอาบัฟ keyword และร่าง Final Form ไปด้วย"), a.copyBuffs, (v) => (a.copyBuffs = v), tr("Off: a fresh base card. Copies count for triples.", "ไม่ติ๊ก = การ์ดพื้นฐาน · สำเนานับรวม triple")),
       a.do === "TRANSFORM" && field(tr("…into", "…แปลงเป็น"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
       (a.do === "SUMMON" || a.do === "SUMMON_FROM_HAND") && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
       a.do === "ADD_TO_HAND" && field(tr("Card (a Gear or a unit)", "การ์ด (Gear หรือยูนิต)"), cardPick(a.cardKey, o.cards, (v) => (a.cardKey = v))),

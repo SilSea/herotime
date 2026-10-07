@@ -68,6 +68,20 @@ describe("rules text for fight rewards", () => {
     expect(g.cards[1]?.textTh).toBe("เริ่มการต่อสู้: ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้ตัวนี้ได้ ATK/HP รวมของพวกมัน ถาวร");
   });
 
+  it("names copies", () => {
+    const g = withGeneratedText({
+      ...blank,
+      cards: [
+        { key: "m", name: "Mirror", rank: 1, atk: 0, hp: 1, kind: "GEAR", cost: 1, factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "COPY", to: "HAND", withBuffs: false }] }] },
+        { key: "s", name: "Spy", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "START_OF_COMBAT", target: { selector: "LEFTMOST_ENEMY" }, actions: [{ type: "COPY", to: "BOARD", withBuffs: true }] }] },
+      ] as never,
+    });
+    expect(g.cards[0]?.text).toBe("Use: add a copy of a chosen ally to your hand.");
+    expect(g.cards[0]?.textTh).toBe("ใช้: ได้สำเนาของพันธมิตรที่เลือกเข้ามือ");
+    expect(g.cards[1]?.text).toBe("Start of combat: summon a copy of the leftmost enemy (bonuses included).");
+    expect(g.cards[1]?.textTh).toBe("เริ่มการต่อสู้: เรียกสำเนาของศัตรูซ้ายสุด (รวมบัฟ)");
+  });
+
   it("names a Gear power-up", () => {
     const g = withGeneratedText({ ...blank, cards: [{ key: "smith", name: "Smith", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "BUFF_GEAR", atk: 1, hp: 1 }] }] }] as never });
     expect(g.cards[0]?.text).toBe("Deploy: your Gear give +1/+1 more for the rest of the game.");

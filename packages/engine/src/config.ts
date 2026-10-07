@@ -84,3 +84,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   damageCapUntilTurn: 8,
   maxAttacksPerCombat: 500,
 };
+
+/** No stat grows past this (chains of copies and own-stat buffs could otherwise run away). */
+export const STAT_CAP = 999_999;
+export const capStat = (n: number): number => Math.min(n, STAT_CAP);

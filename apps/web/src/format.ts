@@ -1,7 +1,7 @@
 import { tr } from "./i18n.js";
 import type { CardDef, CombatRecord } from "./protocol.js";
 
-const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "ULTIMATE_FORM", "DEVOUR_SHOP"]);
+const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "ULTIMATE_FORM", "DEVOUR_SHOP", "CONSUME_ALLIES", "COPY"]);
 
 /**
  * Board slots a gear can be used on, or null when it goes on nobody in particular. Same rule as the

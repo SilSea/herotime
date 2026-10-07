@@ -103,6 +103,12 @@ export const Action = z.discriminatedUnion("type", [
    * their total ATK/HP. Recruit: for good. Combat: for the fight, or for good with `permanent`.
    */
   z.object({ type: z.literal("CONSUME_ALLIES"), permanent: z.boolean().default(false) }),
+  /**
+   * A copy of each target: onto the board right of it, or into the hand. Base card by default; `withBuffs`
+   * keeps its Final Form, bonuses and keywords. Copies are new cards (never from the pool) and count for triples.
+   * Fight: BOARD summons the copy for that fight (enemies can be copied too); HAND arrives next turn as the base card.
+   */
+  z.object({ type: z.literal("COPY"), to: z.enum(["BOARD", "HAND"]).default("BOARD"), withBuffs: z.boolean().default(false) }),
   z.object({ type: z.literal("SUMMON"), cardKey: z.string(), count: z.number().int().min(1).default(1) }),
   z.object({ type: z.literal("DAMAGE"), amount: z.number().int().min(1) }),
   z.object({ type: z.literal("GIVE_KEYWORD"), keyword: KeywordKey }),

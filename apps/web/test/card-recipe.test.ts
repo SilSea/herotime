@@ -71,6 +71,15 @@ describe("card wizard", () => {
     expect(choicesFor({ ...newAbility("UNIT"), when: "ON_PLAY" }, "UNIT").do.map((d) => d.key)).toContain("CONSUME_ALLIES");
   });
 
+  it("builds copies", () => {
+    const mirror = recipe({ key: "mirror", type: "GEAR", abilities: [{ ...newAbility("GEAR"), do: "COPY", copyTo: "HAND" }] });
+    expect(buildCard(mirror).effects).toEqual([expect.objectContaining({ target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "COPY", to: "HAND", withBuffs: false }] })]);
+    const spy = recipe({ key: "spy", abilities: [{ ...newAbility("UNIT"), when: "START_OF_COMBAT", do: "COPY", target: "LEFTMOST_ENEMY", copyBuffs: true }] });
+    expect(buildCard(spy).effects).toEqual([expect.objectContaining({ actions: [{ type: "COPY", to: "BOARD", withBuffs: true }] })]);
+    for (const c of [mirror, spy]) expect(playable(buildCard(c))).toEqual([]);
+    expect(describeRecipe({ ...spy, abilities: [{ ...spy.abilities[0]!, copyTo: "HAND" }] }, (k) => k, (k) => k)[0]).toMatch(/next turn$/);
+  });
+
   it("builds a Gear power-up", () => {
     const smith = recipe({ key: "smith", abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", do: "BUFF_GEAR", atk: 1, hp: 2 }] });
     expect(buildCard(smith).effects).toEqual([expect.objectContaining({ trigger: "ON_PLAY", actions: [{ type: "BUFF_GEAR", atk: 1, hp: 2 }] })]);

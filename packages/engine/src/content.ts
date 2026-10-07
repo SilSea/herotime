@@ -28,6 +28,8 @@ export interface Unit {
   turns?: number;
   /** Who gave the permanent bonuses above, one entry per source (for showing on the card). */
   buffs?: BuffRecord[];
+  /** Copies inside it that never came from the pool (COPY): they do not go back to it either. */
+  unpooled?: number;
   /** A combined Gattai form keeps the units it was made of, so they go back to the pool when it leaves. */
   components?: Unit[];
   /** Limited effects: times used this game / this turn, by effect. */
@@ -166,7 +168,7 @@ export class Content {
         if (fight && RECRUIT_ONLY.has(a.type)) problems.push(`${from}: ${a.type} only works in the recruit phase, not on ${e.trigger}`);
         if (!fight && a.type === "DAMAGE") problems.push(`${from}: DAMAGE only works in a fight, not on ${e.trigger}`);
       }
-      if (!fight && e.target?.selector.endsWith("_ENEMY") && e.actions.some((a) => a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY")) {
+      if (!fight && e.target?.selector.endsWith("_ENEMY") && e.actions.some((a) => a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "COPY")) {
         problems.push(`${from}: enemies can only be targeted in a fight, not on ${e.trigger}`);
       }
     };

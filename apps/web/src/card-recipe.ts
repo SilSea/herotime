@@ -44,6 +44,7 @@ export const DO: DoOption[] = [
   { key: "GIVE_KEYWORD", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Give a keyword", "ให้ keyword") },
   { key: "SUMMON", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Summon a unit", "เรียกยูนิตเข้าสนาม") },
   { key: "DESTROY", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Destroy", "ทำลาย") },
+  { key: "COPY", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Copy a unit (to the board or the hand)", "ก๊อปปี้ยูนิต (ลงบอร์ดหรือเข้ามือ)") },
   { key: "CONSUME_ALLIES", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Destroy all your other units, give their total stats", "ทำลายยูนิตอื่นของเราทั้งหมด แล้วมอบค่าพลังรวม") },
   { key: "TRANSFORM", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Transform into another card", "แปลงร่างเป็นการ์ดอื่น") },
   { key: "DAMAGE", phases: ["fight"], targeted: true, label: () => tr("Deal damage", "ทำดาเมจ") },
@@ -98,6 +99,9 @@ export interface Ability {
   permanent: boolean;
   /** BUFF: also give this card's own ATK/HP. */
   fromSelf: boolean;
+  /** COPY: where the copy goes, and whether it keeps the target's bonuses. */
+  copyTo: "BOARD" | "HAND";
+  copyBuffs: boolean;
   keyword: string;
   cardKey: string;
   count: number;
@@ -159,6 +163,8 @@ export const newAbility = (type: CardType): Ability => ({
   hp: 1,
   permanent: false,
   fromSelf: false,
+  copyTo: "BOARD",
+  copyBuffs: false,
   keyword: "GUARD",
   cardKey: "",
   count: 1,
@@ -277,6 +283,7 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   const action: Record<string, unknown> = { type: a.do };
   if (a.do === "BUFF") Object.assign(action, { atk: a.atk, hp: a.hp, permanent: a.permanent, ...(a.fromSelf && !gear ? { fromSelf: true } : {}) });
   if (a.do === "CONSUME_ALLIES") action.permanent = a.permanent;
+  if (a.do === "COPY") Object.assign(action, { to: a.copyTo, withBuffs: a.copyBuffs });
   if (a.do === "GIVE_KEYWORD") action.keyword = a.keyword;
   if (a.do === "SUMMON") Object.assign(action, { cardKey: a.cardKey, count: Math.max(1, a.count) });
   if (a.do === "ADD_TO_HAND") action.cardKey = a.cardKey;
@@ -322,6 +329,9 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       a.do === "BUFF" && a.fromSelf && r.type !== "GEAR"
         ? tr(`give ${who} this card's ATK/HP${a.atk || a.hp ? ` ${sign(a.atk)}/${sign(a.hp)}` : ""}${a.permanent ? " permanently" : ""}`, `ให้${who} ได้ ATK/HP เท่าการ์ดนี้${a.atk || a.hp ? ` ${sign(a.atk)}/${sign(a.hp)}` : ""}${a.permanent ? " ถาวร" : ""}`)
       : a.do === "BUFF" ? tr(`give ${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " permanently" : ""}`, `ให้${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " ถาวร" : ""}`)
+      : a.do === "COPY" ? (a.copyTo === "HAND"
+          ? tr(`add a copy of ${who} to your hand${a.copyBuffs ? " (bonuses included)" : ""}`, `ได้สำเนาของ${who}เข้ามือ${a.copyBuffs ? " (รวมบัฟ)" : ""}`)
+          : tr(`summon a copy of ${who}${a.copyBuffs ? " (bonuses included)" : ""}`, `เรียกสำเนาของ${who}${a.copyBuffs ? " (รวมบัฟ)" : ""}`))
       : a.do === "CONSUME_ALLIES" ? tr(`destroy all your other units and give ${who} their total ATK/HP${a.permanent ? " permanently" : ""}`, `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${who}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`)
       : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${a.keyword}`, `ให้${who}ได้ ${a.keyword}`)
       : a.do === "SUMMON" ? tr(`summon ${a.count > 1 ? `${a.count} × ` : ""}${cardName(a.cardKey)}`, `เรียก ${cardName(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
@@ -341,7 +351,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.do;
     const limit = a.limitTimes > 0 ? tr(` (at most ${a.limitTimes} per ${a.limitPer === "TURN" ? "turn" : "game"})`, ` (ไม่เกิน ${a.limitTimes} ครั้งต่อ${a.limitPer === "TURN" ? "เทิร์น" : "เกม"})`) : "";
     // In a fight, Energy / cards / Gauge arrive at the start of the next turn.
-    const later = r.type !== "GEAR" && phaseOf(a.when, r.type) === "fight" && LATER.has(a.do) ? tr(" next turn", " ในเทิร์นหน้า") : "";
+    const later = r.type !== "GEAR" && phaseOf(a.when, r.type) === "fight" && (LATER.has(a.do) || (a.do === "COPY" && a.copyTo === "HAND")) ? tr(" next turn", " ในเทิร์นหน้า") : "";
     return `${when}: ${cond}${what}${later}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}${limit}`;
   });
 }

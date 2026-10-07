@@ -1,5 +1,6 @@
 import type { Action, Effect, KeywordKey, SentaiColor } from "@herotime/shared";
 import type { CombatRules } from "./config.js";
+import type { Unit } from "./content.js";
 
 export type Keyword = KeywordKey;
 export type Side = "A" | "B";
@@ -85,4 +86,6 @@ export interface FightReward {
   mult: number;
   /** The card that earned it. */
   from: string | null;
+  /** COPY to the hand: the card to add. */
+  copy?: Unit;
 }

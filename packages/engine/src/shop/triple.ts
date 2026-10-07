@@ -37,6 +37,8 @@ function mergeCopies(key: string, copies: readonly Unit[]): Unit {
   if (hp) golden.bonusHp = hp;
   const keywords = [...new Set(copies.flatMap((u) => u.keywords ?? []))];
   if (keywords.length > 0) golden.keywords = keywords;
+  const unpooled = copies.reduce((n, u) => n + (u.unpooled ?? 0), 0);
+  if (unpooled) golden.unpooled = unpooled;
   const turns = Math.max(0, ...copies.map((u) => u.turns ?? 0));
   if (turns) golden.turns = turns;
   for (const u of copies) {
