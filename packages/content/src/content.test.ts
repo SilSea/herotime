@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { CONTENT_SETS, getContentSet, type ContentSetData } from "./index.js";
 
 const build = (s: ContentSetData): Content => new Content(s);
-// The blank set is a deliberately empty start for building content in the editor: it has its own test below.
-const entries = Object.entries(CONTENT_SETS).filter(([name]) => name !== "blank");
+// production (and blank) start deliberately empty, for building the real content in the editor: they have their own test below.
+const entries = Object.entries(CONTENT_SETS).filter(([name]) => name !== "blank" && name !== "production");
 
 describe("content registry", () => {
   it("knows its sets and refuses an unknown one with the available names", () => {
@@ -151,8 +151,8 @@ describe.each(entries)("playing %s with bots", (_name, set) => {
   }, 120_000);
 });
 
-describe("production set", () => {
-  const set = getContentSet("production");
+describe("prototype set (the test bed)", () => {
+  const set = getContentSet("prototype");
   const content = build(set);
   const shop = [...content.cards.values()].filter((c) => c.kind === "UNIT" && !c.token);
 
@@ -184,8 +184,14 @@ describe("production set", () => {
     for (const c of ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "EXTRA"]) expect(colours.has(c as never), c).toBe(true);
   });
 
-  it("is a larger set than the prototype", () => {
-    expect(shop.length).toBeGreaterThan(getContentSet("prototype").cards.filter((c) => c.kind === "UNIT" && !c.token).length);
+  it("has a sample card for each newer mechanic", () => {
+    for (const key of ["x_supply", "x_trader", "x_scavenger", "x_drill", "x_devourer", "x_grave", "x_restless", "x_caller", "x_echo", "g_supply_crate"]) expect(content.cards.has(key), key).toBe(true);
+  });
+});
+
+describe("content set: production", () => {
+  it("starts blank, for the real content to be made in the editor", () => {
+    expect(getContentSet("production")).toEqual(getContentSet("blank"));
   });
 });
 

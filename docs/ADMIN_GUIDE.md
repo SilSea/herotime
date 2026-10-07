@@ -260,7 +260,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 - `tier` LESSER/GREATER · `cost` จ่ายตอนเลือก (มีตัวเลือกราคา 0 เสมอถ้ามี) · `weight` ยิ่งมากยิ่งสุ่มเจอบ่อย (ค่าปกติ 100)
 - `factions` / `series` = ผูกกับเผ่า/ซีรีส์ (ระบบชอบเสนอตัวที่ตรงกับบอร์ดผู้เล่น และไม่เสนอถ้าเผ่า/ซีรีส์นั้นไม่อยู่ในเกม)
 
-**Factions** — ตอนนี้ (production v2) มี 8 เผ่า: Rider, Sentai, Mecha, Kaijin, **Beast** (เรียกพวกตอนโจมตี/ตาย + จ่าฝูงบัฟตัวที่ถูกเรียก), Ally, Dark Rider, Shonen
+**Factions** — ชุด prototype (ที่ใช้ทดสอบอยู่) มี 8 เผ่า: Rider, Sentai, Mecha, Kaijin, **Beast** (เรียกพวกตอนโจมตี/ตาย + จ่าฝูงบัฟตัวที่ถูกเรียก), Ally, Dark Rider, Shonen
 `color` สีป้าย, `text`/`text (Thai)` คำอธิบายเผ่า (โชว์ตอนชี้ชื่อเผ่า) แต่ละเกมสุ่มใช้ 5 เผ่า
 
 **Series** — `universe` (tokusatsu/anime), `franchise` (เช่น super-sentai, kamen-rider) และ `bonds` = โบนัสเมื่อมีซีรีส์เดียวกันบนบอร์ดครบ `count` ตัว (effect ต้องเป็น scope PLAYER + `START_OF_COMBAT`)
@@ -358,12 +358,13 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 ## 15. Keyword Echo
 `ECHO` (Echo): ระหว่างการ์ดที่มี Echo อยู่บนบอร์ด เอฟเฟค **Deploy** ของการ์ดที่ลงทีหลังทำงาน 2 ครั้ง (มี Echo หลายใบก็ยัง 2 ครั้ง)
 
-## 16. เริ่มสร้าง content ใหม่จากชุดเปล่า (blank)
-มีชุด `blank` ไว้เริ่มทำการ์ด production เองทั้งหมด: ไม่มีเผ่า ซีรีส์ Gauge หรือ Relic
+## 16. ชุดการ์ด: prototype (ทดสอบ) และ production (เปล่า)
+- `prototype` = **ชุดทดสอบ**: 8 เผ่า (Rider, Sentai, Mecha, Kaijin, Beast, Ally, Dark Rider, Shonen) การ์ดครบ + การ์ดตัวอย่างของกลไกใหม่ทุกแบบ (Echo Bard, Tavern Devourer, Grave Caller, Restless Spirit ฯลฯ)
+- `production` = **ชุดเปล่า** (เหมือน `blank`) ไว้เริ่มทำการ์ดจริงเองทั้งหมด: ไม่มีเผ่า ซีรีส์ Gauge หรือ Relic
 มีแค่สิ่งที่เกมขาดไม่ได้: Hero 2 ตัว (Placeholder Hero A/B) และยูนิตในร้าน 1 ใบ (Placeholder Unit) — สร้างของจริงแล้วค่อยลบทิ้ง
 
 วิธีใช้กับ Docker (ทำครั้งเดียว):
-1. ในไฟล์ `.env` ตั้ง `CONTENT_SET=blank` และ `CONTENT_RESEED=1`
+1. ในไฟล์ `.env` ตั้ง `CONTENT_SET=production` (หรือ `blank`) และ `CONTENT_RESEED=1`
 2. `docker compose up -d --build server` → ระบบ publish ชุดเปล่าเป็นเวอร์ชันใหม่ (เวอร์ชันเก่ายังอยู่ ย้อนได้ในหน้า Versions)
 3. ตั้ง `CONTENT_RESEED=0` แล้ว `docker compose up -d server` (ไม่งั้นทุก restart จะ publish ชุดเปล่าทับงานที่ทำใน Admin)
 4. เข้า Admin สร้างเผ่า (Factions) → ซีรีส์ (Series) → การ์ด (Card wizard) → Hero → Relic → Gauge แล้ว Publish

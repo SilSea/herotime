@@ -11,9 +11,9 @@ describe("Thai rules text", () => {
   });
 
   it("reads like the English text, in Thai", () => {
-    const card = set.cards.find((c) => c.key === "sn1");
-    expect(card?.textTh).toBe("เริ่มการต่อสู้: ถ้ามี Sentai 2 สีขึ้นไป ให้ตัวนี้ +2/+2");
-    const hero = set.heroes.find((h) => h.key === "red_leader");
+    const card = set.cards.find((c) => c.key === "bs1");
+    expect(card?.textTh).toBe("Last Stand: เรียก Cub");
+    const hero = set.heroes.find((h) => h.key === "captain_marvelous");
     expect(hero?.textTh).toMatch(/^Hero Power \(2 Energy, เทิร์นละครั้ง\): /);
   });
 
@@ -23,7 +23,7 @@ describe("Thai rules text", () => {
 });
 
 describe("shipped rules", () => {
-  it("Roll Call needs 3 different colours in both sets", () => {
-    for (const name of ["prototype", "production"] as const) expect(getContentSet(name).rules?.rollCallColors).toBe(3);
+  it("Roll Call needs 3 different colours in every set", () => {
+    for (const name of ["prototype", "production", "blank"] as const) expect(getContentSet(name).rules?.rollCallColors).toBe(3);
   });
 });

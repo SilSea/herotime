@@ -32,10 +32,10 @@ describe("GET /content", () => {
     expect(res.headers.get("cache-control")).toBe("no-cache");
     const body: any = await res.json();
     expect(body).toMatchObject({ set: "prototype", version: 1 });
-    expect(body.factions).toHaveLength(7);
+    expect(body.factions).toHaveLength(8);
     expect(body.cards.length).toBeGreaterThan(50);
     expect(body.heroes.length).toBeGreaterThanOrEqual(6);
-    expect(body.relics.length).toBe(21);
+    expect(body.relics.length).toBe(25);
     expect(body.series.length).toBeGreaterThan(0);
     expect(body.gauges.length).toBe(2);
   });
@@ -45,7 +45,7 @@ describe("GET /content", () => {
     const owner = body.cards.find((c: { key: string }) => c.key === "al1");
     expect(owner.name).toBe("Cafe Owner");
     expect(owner.text).toMatch(/End of turn/);
-    const hero = body.heroes.find((h: { key: string }) => h.key === "red_leader");
+    const hero = body.heroes.find((h: { key: string }) => h.key === "captain_marvelous");
     expect(hero.text).toMatch(/Hero Power/);
   });
 
@@ -99,7 +99,7 @@ describe("practice mode over sockets", () => {
     await c.call("queue:practice", {});
     const first = await c.waitFor("match:view");
     expect(first.view.players).toHaveLength(8);
-    expect(first.view.factions).toHaveLength(5); // 5 of the 7 factions
+    expect(first.view.factions).toHaveLength(5); // 5 of the 8 factions
   });
 
   it("accepts no payload at all", async () => {

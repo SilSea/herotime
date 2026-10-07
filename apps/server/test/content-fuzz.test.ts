@@ -79,7 +79,7 @@ function play(content: Content, seed: number): string[] {
   return problems;
 }
 
-describe.each(["prototype", "production"])("fuzz with the %s set", (name) => {
+describe.each(["prototype"])("fuzz with the %s set", (name) => {
   const content = new Content(getContentSet(name) as never);
   it("plays 60 messy matches without a crash, a wrong place or a lost card", () => {
     const problems: string[] = [];

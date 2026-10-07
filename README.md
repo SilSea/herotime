@@ -35,7 +35,7 @@ docker compose down              # ข้อมูลอยู่ใน volume p
 ```
 Image เดียว (`Dockerfile`) รันเซิร์ฟเวอร์ที่เสิร์ฟเว็บด้วย, `docker/entrypoint.sh` รัน `prisma migrate deploy` ก่อนเริ่ม,
 postgres มี healthcheck และ server รอจน healthy. ตัวแปรตั้งผ่าน `.env` (ดู `.env.example`): `JWT_SECRET`, `CORS_ORIGIN`,
-`CONTENT_SET` (`prototype`/`production`/`blank` = ชุดเปล่าสำหรับเริ่มทำการ์ดเอง), `PRACTICE`, `HEROTIME_FAST`. ค่าเริ่มต้นของ `JWT_SECRET` ใน compose ใช้ลองบนเครื่องตัวเองเท่านั้น
+`CONTENT_SET` (`prototype` = ชุดทดสอบ: 8 เผ่า การ์ดครบ + การ์ดตัวอย่างกลไกใหม่ / `production` = ชุดเปล่า เริ่มทำการ์ดจริงเองใน Admin / `blank` = เหมือน production), `PRACTICE`, `HEROTIME_FAST`. ค่าเริ่มต้นของ `JWT_SECRET` ใน compose ใช้ลองบนเครื่องตัวเองเท่านั้น
 Redis ยังไม่ถูกใช้: `docker compose --profile scale up -d`
 
 ตัวแปรสภาพแวดล้อม: `PORT`, `HOST` (ค่าเริ่มต้น 0.0.0.0 เพื่อให้เพื่อนใน LAN ต่อได้), `JWT_SECRET`, `CORS_ORIGIN`,
