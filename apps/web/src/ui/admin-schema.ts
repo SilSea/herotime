@@ -240,6 +240,7 @@ const FACTION_ROWS: Row[] = [
 const SERIES_ROWS: Row[] = [
   { key: "key", field: text },
   { key: "name", field: text },
+  { key: "universe", field: text, optional: true, hint: "e.g. tokusatsu, anime" },
   { key: "franchise", field: text, optional: true, hint: "e.g. super-sentai, kamen-rider, original" },
   { key: "text", field: { kind: "text", area: true } },
   {

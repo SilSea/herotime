@@ -37,11 +37,13 @@ import {
   chosen,
   discoverUnit,
   superGattai,
+  damage,
+  randomFoe,
 } from "./dsl.js";
 import type { ContentSetData } from "./types.js";
 
 /**
- * PRODUCTION set: the launch line-up. Seven factions, seven series (Gokaiger, Kyoryuger, Shinkenger,
+ * PRODUCTION set: the launch line-up. Eight factions (Shonen is the first of the Anime universe), eight series (Gokaiger, Kyoryuger, Shinkenger,
  * W, Den-O, OOO and the original Himmapan Sentai). Series signatures are approximated with the
  * effect DSL that exists today; the ones that need new engine actions (Den-O possession, W pairing,
  * OOO medals) are noted where they are approximated.
@@ -58,6 +60,8 @@ const factions = [
   faction("grunt", "Grunt", "#6d4c41", "Swarms of cheap bodies that leave more bodies behind.", "ลูกน้องจำนวนมาก ตายแล้วเรียกลูกน้องเพิ่ม"),
   faction("ally", "Ally", "#43a047", "Economy and support: Energy, buffs and cards in hand.", "เศรษฐกิจและสนับสนุน: Energy, บัฟ, การ์ดเข้ามือ"),
   faction("dark_rider", "Dark Rider", "#37474f", "Sacrifice allies to grow monstrous.", "สังเวยพวกเดียวกันเพื่อแข็งแกร่งขึ้น"),
+  // The first faction of the Anime universe (original characters).
+  faction("shonen", "Shonen", "#ff7043", "Power-Up: grow stronger with every attack, and take revenge when friends fall.", "Power-Up: แข็งแกร่งขึ้นทุกครั้งที่โจมตี และแก้แค้นเมื่อเพื่อนล้ม"),
 ];
 
 // Bond: with 2 of a series on the board a small bonus, with 4 a bigger one.
@@ -67,13 +71,14 @@ const bond = (key: string, a: [number, number], b: [number, number]) => [
 ];
 
 const allSeries = [
-  series("gokaiger", "Kaizoku Sentai Gokaiger", { franchise: "super-sentai", bonds: bond("gokaiger", [1, 0], [0, 2]) }),
-  series("kyoryuger", "Zyuden Sentai Kyoryuger", { franchise: "super-sentai", bonds: bond("kyoryuger", [1, 0], [2, 0]) }),
-  series("shinkenger", "Samurai Sentai Shinkenger", { franchise: "super-sentai", bonds: bond("shinkenger", [0, 1], [0, 3]) }),
-  series("himmapan", "Himmapan Sentai", { franchise: "original", bonds: bond("himmapan", [1, 1], [2, 2]) }),
-  series("w", "Kamen Rider W", { franchise: "kamen-rider", bonds: bond("w", [1, 1], [2, 2]) }),
-  series("den_o", "Kamen Rider Den-O", { franchise: "kamen-rider", bonds: bond("den_o", [1, 0], [2, 1]) }),
-  series("ooo", "Kamen Rider OOO", { franchise: "kamen-rider", bonds: bond("ooo", [1, 0], [2, 0]) }),
+  series("gokaiger", "Kaizoku Sentai Gokaiger", { universe: "tokusatsu", franchise: "super-sentai", bonds: bond("gokaiger", [1, 0], [0, 2]) }),
+  series("kyoryuger", "Zyuden Sentai Kyoryuger", { universe: "tokusatsu", franchise: "super-sentai", bonds: bond("kyoryuger", [1, 0], [2, 0]) }),
+  series("shinkenger", "Samurai Sentai Shinkenger", { universe: "tokusatsu", franchise: "super-sentai", bonds: bond("shinkenger", [0, 1], [0, 3]) }),
+  series("himmapan", "Himmapan Sentai", { universe: "tokusatsu", franchise: "original", bonds: bond("himmapan", [1, 1], [2, 2]) }),
+  series("w", "Kamen Rider W", { universe: "tokusatsu", franchise: "kamen-rider", bonds: bond("w", [1, 1], [2, 2]) }),
+  series("den_o", "Kamen Rider Den-O", { universe: "tokusatsu", franchise: "kamen-rider", bonds: bond("den_o", [1, 0], [2, 1]) }),
+  series("ooo", "Kamen Rider OOO", { universe: "tokusatsu", franchise: "kamen-rider", bonds: bond("ooo", [1, 0], [2, 0]) }),
+  series("star_blade", "Star Blade Academy", { universe: "anime", franchise: "anime-original", text: "An original shonen series: rivals, training arcs and a final awakening.", bonds: bond("star_blade", [1, 0], [2, 1]) }),
 ];
 
 type Color = "RED" | "BLUE" | "YELLOW" | "GREEN" | "PINK" | "EXTRA";
@@ -195,6 +200,16 @@ const cards = [
   unit("dr4", "Dark Kabuto", { rank: 4, atk: 7, hp: 6, factions: ["dark_rider"], keywords: ["RIDER_KICK"], effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(2, 2), { target: self })] }),
   unit("dr5", "Dark Emperor", { rank: 5, atk: 9, hp: 9, factions: ["dark_rider"], keywords: ["RIDER_KICK"] }),
   unit("dr6", "Dark Lord", { rank: 6, atk: 14, hp: 12, factions: ["dark_rider"], keywords: ["RIDER_KICK", "REVIVE"] }),
+
+  // ---- Shonen (Anime universe; Power-Up: permanent growth on attack, Avenge)
+  unit("sh1", "Rookie Swordsman", { rank: 1, atk: 2, hp: 1, factions: ["shonen"], series: "star_blade", effects: [onAttack(buff(1, 0, true), { target: self })] }),
+  unit("sh2", "Hot-Headed Rival", { rank: 2, atk: 3, hp: 2, factions: ["shonen"], series: "star_blade", effects: [avenge(2, buff(1, 1, true), { target: self })] }),
+  unit("sh3", "Training Partner", { rank: 2, atk: 2, hp: 4, factions: ["shonen"], series: "star_blade", effects: [endOfTurn(buff(1, 1), { target: leftmost({ faction: "shonen" }) })] }),
+  unit("sh4", "Spirit Archer", { rank: 3, atk: 4, hp: 3, factions: ["shonen"], series: "star_blade", effects: [startOfCombat(damage(2), { target: randomFoe })] }),
+  unit("sh5", "Late Bloomer", { rank: 4, atk: 4, hp: 5, factions: ["shonen"], series: "star_blade", henshin: { after: 2, into: "sh5_awake" } }),
+  token("sh5_awake", "Awakened Bloomer", { rank: 4, atk: 9, hp: 9, factions: ["shonen"], series: "star_blade", keywords: ["RAPID"] }),
+  unit("sh6", "Old Master", { rank: 5, atk: 6, hp: 7, factions: ["shonen"], series: "star_blade", effects: [startOfCombat(buff(2, 2), { target: allAllies({ faction: "shonen" }) })] }),
+  unit("sh7", "The Chosen One", { rank: 6, atk: 9, hp: 9, factions: ["shonen"], series: "star_blade", keywords: ["BARRIER"], effects: [onAttack(buff(2, 2, true), { target: self })] }),
 ];
 
 // ---- tavern gear: one slot in the shop, bought for its own price, used from the hand
@@ -221,6 +236,7 @@ const tavernGear = [
   shopGear("g_call_grunt", "Grunt Call", 2, 3, [player("ON_PLAY", discoverUnit("grunt"))], { factions: ["grunt"] }),
   shopGear("g_call_ally", "Ally Call", 2, 3, [player("ON_PLAY", discoverUnit("ally"))], { factions: ["ally"] }),
   shopGear("g_call_dark_rider", "Dark Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("dark_rider"))], { factions: ["dark_rider"] }),
+  shopGear("g_call_shonen", "Shonen Call", 2, 3, [player("ON_PLAY", discoverUnit("shonen"))], { factions: ["shonen"] }),
 ];
 
 const gauges = [
@@ -267,6 +283,8 @@ const relics = [
   relic("kaiju_egg", "Kaiju Egg", "LESSER", 2, [player("START_OF_COMBAT", give("KYODAIKA"), { target: leftmost({ faction: "kaijin" }) })], { factions: ["kaijin"] }),
   relic("hero_medal", "Hero Medal", "GREATER", 5, [player("ON_TURN_START", buff(1, 1), { target: randomAlly() })]),
   relic("mecha_blueprint", "Mecha Blueprint", "GREATER", 3, [player("ON_ACQUIRE", rule("gattaiSize", "SET", 2))], { factions: ["mecha"] }),
+  relic("friendship_band", "Friendship Band", "LESSER", 2, [player("START_OF_COMBAT", buff(1, 1), { target: allAllies({ faction: "shonen" }) })], { factions: ["shonen"] }),
+  relic("final_awakening", "Final Awakening", "GREATER", 4, [player("START_OF_COMBAT", give("RAPID"), { target: leftmost({ faction: "shonen" }) })], { factions: ["shonen"] }),
 ];
 
 const heroes = [
@@ -279,6 +297,7 @@ const heroes = [
   hero("himmapan_guardian", "Himmapan Guardian", { armor: 3, power: { mode: "ACTIVE", cost: 2, effects: [player("ON_USE", buff(0, 3), { target: leftmost({ series: "himmapan" }) })] } }),
   hero("shocker_boss", "Shocker Boss", { power: { mode: "PASSIVE", effects: [player("ON_TURN_START", summon("grunt_token"))] } }),
   hero("iron_guard", "Iron Guard", { armor: 6 }),
+  hero("hot_blooded_captain", "Hot-Blooded Captain", { power: { mode: "ACTIVE", cost: 1, effects: [player("ON_USE", buff(1, 1, true), { target: leftmost({ faction: "shonen" }) })] } }),
 ];
 
 /** As authored: no generated rules text yet (that is filled in when a set is loaded). */

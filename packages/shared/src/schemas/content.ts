@@ -53,6 +53,8 @@ export type FactionDef = z.infer<typeof FactionDef>;
 export const SeriesDef = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
+  /** Universe the franchise belongs to, e.g. "tokusatsu", "anime" (the top of Universe -> Franchise -> Series). */
+  universe: z.string().optional(),
   /** Franchise this series belongs to, e.g. "super-sentai", "kamen-rider", "original". */
   franchise: z.string().optional(),
   text: z.string().default(""),

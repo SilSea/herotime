@@ -155,8 +155,18 @@ describe("production set", () => {
   const content = build(set);
   const shop = [...content.cards.values()].filter((c) => c.kind === "UNIT" && !c.token);
 
-  it("ships the seven launch series", () => {
-    expect(set.series.map((s) => s.key).sort()).toEqual(["den_o", "gokaiger", "himmapan", "kyoryuger", "ooo", "shinkenger", "w"]);
+  it("ships the seven launch series and the first Anime series", () => {
+    expect(set.series.map((s) => s.key).sort()).toEqual(["den_o", "gokaiger", "himmapan", "kyoryuger", "ooo", "shinkenger", "star_blade", "w"]);
+  });
+
+  it("every series names its universe and franchise; Shonen is an Anime faction with a full rank 1-6 curve", () => {
+    for (const s of set.series) {
+      expect(s.universe, s.key).toMatch(/^(tokusatsu|anime)$/);
+      expect(s.franchise, s.key).toBeTruthy();
+    }
+    expect(set.series.find((s) => s.key === "star_blade")?.universe).toBe("anime");
+    const ranks = new Set(shop.filter((c) => c.factions.includes("shonen")).map((c) => c.rank));
+    expect([...ranks].sort()).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
   it("every series has enough units for its 4-unit bond to be reachable", () => {

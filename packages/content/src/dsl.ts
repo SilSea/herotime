@@ -156,7 +156,7 @@ export const faction = (key: string, name: string, color: string, text = "", tex
 export const series = (
   key: string,
   name: string,
-  o: { franchise?: string; text?: string; bonds?: { count: number; effects: ReturnType<typeof player>[] }[] } = {},
+  o: { universe?: string; franchise?: string; text?: string; bonds?: { count: number; effects: ReturnType<typeof player>[] }[] } = {},
 ) => SeriesDef.parse({ key, name, ...o });
 
 export const gaugeDef = (
