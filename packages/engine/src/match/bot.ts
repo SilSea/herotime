@@ -12,6 +12,7 @@ import {
   playUnit,
   sellUnit,
   gearTargets,
+  gearUsable,
   useGear,
   useHeroPower,
 } from "../game/session.js";
@@ -27,16 +28,8 @@ function attempt(fn: () => void): boolean {
   }
 }
 
-/** Whether a gear would do something right now (gear cannot be sold, so a useless one would clog the hand). */
-function usableNow(p: PlayerState, key: string, env: GameEnv): boolean {
-  try {
-    const valid = gearTargets(p, key, env);
-    return valid === null || valid.length > 0;
-  } catch (e) {
-    if (e instanceof RuleError) return false;
-    throw e;
-  }
-}
+/** Whether a gear would do something right now (buying one that cannot is wasted Energy). */
+const usableNow = (p: PlayerState, key: string, env: GameEnv): boolean => gearUsable(p, key, env);
 
 /** Use a gear on the strongest unit it can go on (by current attack + health). */
 function useGearWell(p: PlayerState, handIndex: number, env: GameEnv): void {

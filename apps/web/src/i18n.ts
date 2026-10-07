@@ -43,7 +43,7 @@ const SERVER_TH: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^not enough health: need more than (\d+), have (\d+)$/, (m) => `เลือดไม่พอ: ต้องมีมากกว่า ${m[1]} มี ${m[2]}`],
   [/^board is full$/, () => "บอร์ดเต็มแล้ว"],
   [/^already at max rank$/, () => "ร้านอยู่ rank สูงสุดแล้ว"],
-  [/^gear cannot be sold$/, () => "ขาย Gear ไม่ได้"],
+  [/^gear cannot be sold while it can be used$/, () => "ขาย Gear ได้เฉพาะตอนที่ยังใช้ไม่ได้"],
   [/^there is no gear in the tavern$/, () => "ร้านไม่มี Gear"],
   [/^(.+) has no unit to go on$/, (m) => `${m[1]} ไม่มียูนิตที่ใช้ได้`],
   [/^choose a unit for (.+)$/, (m) => `เลือกยูนิตที่จะใช้ ${m[1]}`],

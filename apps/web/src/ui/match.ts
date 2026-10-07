@@ -688,6 +688,14 @@ function readDrag(e: DragEvent): { zone: string; index: number } | undefined {
 
 const isGear = (ctx: Ctx, view: View, handIndex: number): boolean => ctx.ix.card(view.me.state.hand[handIndex]?.key ?? "")?.kind === "GEAR";
 
+/** Whether the hand gear at `handIndex` has something to act on (same rule as the server's: no unit / no Giant = no). */
+function gearUsableHere(ctx: Ctx, view: View, handIndex: number): boolean {
+  const def = ctx.ix.card(view.me.state.hand[handIndex]?.key ?? "");
+  if (def?.effects.some((e) => e.target?.selector === "GIANT_SLOT") && !view.me.state.giant) return false;
+  const slots = gearSlots(ctx, view, handIndex);
+  return slots === null || slots.length > 0;
+}
+
 /** Slots the hand gear at `handIndex` can go on (null: it needs no unit). */
 const gearSlots = (ctx: Ctx, view: View, handIndex: number): number[] | null =>
   gearTargetSlots(ctx.ix.card(view.me.state.hand[handIndex]?.key ?? ""), view.me.state.board.map((u) => ctx.ix.card(u.key)));
@@ -777,7 +785,7 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
     cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [] }),
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini primary", text: gear ? (aimedGear(ctx, view) === i ? tr("Cancel", "ยกเลิก") : tr("Use", "ใช้")) : tr("Play", "ลงบอร์ด"), disabled: !gear && full, on: { click: () => (gear ? (aimedGear(ctx, view) === i ? ctx.store.set({ selected: undefined }) : useGearFromHand(ctx, view, i)) : void ctx.act({ type: "PLAY", handIndex: i, position: view.me.state.board.length })) } }),
-      !gear && h("button", { class: "mini", text: `${tr("Sell", "ขาย")} +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),
+      (!gear || !gearUsableHere(ctx, view, i)) && h("button", { class: "mini", text: `${tr("Sell", "ขาย")} +${view.me.limits.sellValue}`, title: gear ? tr("This gear has nothing to act on right now, so it can be sold", "Gear นี้ยังใช้ไม่ได้ตอนนี้ จึงขายได้") : "", on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),
   );
 }
 

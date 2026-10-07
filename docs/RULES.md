@@ -215,7 +215,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 
 ### 12.4 Gauge / Gear / Giant
 - Gauge: `sources` (trigger+amount) + `thresholds` (`at`, `reward` = actions ที่ไม่ต้องมีเป้าหมาย). `once: true` จ่ายครั้งเดียวตอนข้าม; `once: false` จ่ายซ้ำและหัก `at` ทุกครั้ง
-- **Gear** = การ์ด `kind: "GEAR"` ในมือ ใช้ด้วย `useGear` (รัน player-scope `ON_PLAY`) ขายไม่ได้ ไม่อยู่ใน pool. Gear ที่ใช้กับหุ่น (`GIANT_SLOT`) ใช้ไม่ได้จนกว่าจะมีหุ่น (bot ไม่ซื้อ Gear ที่ยังใช้ไม่ได้)
+- **Gear** = การ์ด `kind: "GEAR"` ในมือ ใช้ด้วย `useGear` (รัน player-scope `ON_PLAY`) ไม่อยู่ใน pool. **ขายได้เฉพาะตอนที่ยังใช้ไม่ได้** (เช่น Gear ที่ใช้กับหุ่นตอนยังไม่มีหุ่น หรือ Gear ที่ไม่มียูนิตให้ใส่) ได้ Energy เท่าการขายปกติ; Gear ที่ใช้ได้ขายไม่ได้ (bot ไม่ซื้อ Gear ที่ยังใช้ไม่ได้)
 - **Giant** = การ์ด `kind: "GIANT"` ไม่อยู่ใน pool; เลือกผ่าน `DISCOVER_GIANT` (3 ตัว, ตัวของซีรีส์ที่มียูนิตบนบอร์ดมากสุดออกแน่นอน) เข้า Giant Slot. ลงสนามเมื่อยูนิตเหลือ ≤ `giantEntryThreshold` หรือศัตรู Kyodaika; ลงได้ครั้งเดียวต่อการสู้
 
 ---

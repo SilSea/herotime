@@ -145,9 +145,20 @@ export function useGear(player: PlayerState, handIndex: number, env: GameEnv, ta
   runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env, { kind: "gear", key: card.key }, chosen);
 }
 
+/** Whether a gear in hand has something to act on right now (one that has not can be sold instead). */
+export function gearUsable(player: PlayerState, gearKey: string, env: GameEnv): boolean {
+  try {
+    const valid = gearTargets(player, gearKey, env);
+    return valid === null || valid.length > 0;
+  } catch (e) {
+    if (e instanceof RuleError) return false;
+    throw e;
+  }
+}
+
 export function sellUnit(player: PlayerState, from: "board" | "hand", index: number, env: GameEnv): void {
   const unit = (from === "board" ? player.board : player.hand)[index];
-  if (unit !== undefined && env.content.card(unit.key).kind === "GEAR") throw new RuleError("gear cannot be sold");
+  if (unit !== undefined && env.content.card(unit.key).kind === "GEAR" && gearUsable(player, unit.key, env)) throw new RuleError("gear cannot be sold while it can be used");
   // "When sold" effects run while the unit is still there, so it can still act on (or from) the board.
   if (unit !== undefined) runTrigger(env.content.card(unit.key).effects, "ON_SELL", "UNIT", unit, player, env);
   const at = (from === "board" ? player.board : player.hand).indexOf(unit as Unit);

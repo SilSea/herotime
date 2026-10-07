@@ -144,9 +144,9 @@ describe("useGear", () => {
 });
 
 describe("sellUnit", () => {
-  it("refuses to sell gear", () => {
+  it("refuses to sell gear that can be used", () => {
     p.hand = [u("kyodai_gattai")];
-    expect(() => sellUnit(p, "hand", 0, env)).toThrow(/gear cannot be sold/);
+    expect(() => sellUnit(p, "hand", 0, env)).toThrow(/gear cannot be sold while it can be used/);
     expect(p.hand).toHaveLength(1);
   });
 

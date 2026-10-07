@@ -136,6 +136,20 @@ describe("new mechanics", () => {
   });
 });
 
+describe("gear that cannot be used", () => {
+  it("can be sold back for the usual sell value; once it can be used it cannot", () => {
+    const e = env();
+    const p = newPlayer();
+    p.energy = 0;
+    p.hand = [{ key: "upgrade_kit", golden: false }, { key: "upgrade_kit", golden: false }];
+    sellUnit(p, "hand", 0, e); // no Giant: nothing to upgrade
+    expect(p.hand).toHaveLength(1);
+    expect(p.energy).toBe(1);
+    p.giant = { key: "robo", golden: false };
+    expect(() => sellUnit(p, "hand", 0, e)).toThrow(/while it can be used/);
+  });
+});
+
 describe("bots and gear they cannot use", () => {
   it("a bot does not buy a Giant gear without a Giant (gear cannot be sold, it would clog the hand)", async () => {
     const { runBot } = await import("../match/bot.js");
