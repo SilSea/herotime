@@ -8,8 +8,8 @@ Auto-battler (แนว Hearthstone Battlegrounds) ธีม Kamen Rider × Supe
 |---|---|
 | `packages/engine` — กฎเกม, combat, effect, match state machine, bot | เสร็จ (เฟส 1–2) |
 | `apps/server` — NestJS + Socket.IO, auth, lobby, reconnect | เสร็จ (เฟส 2) |
-| `apps/web` — หน้าเว็บ | ยังไม่เริ่ม (เฟส 3) |
-| admin editor, เนื้อหาจริง | ยังไม่เริ่ม (เฟส 4–5) |
+| `apps/web` — หน้าเว็บ (TH/EN, มือถือ, เสียง) | เสร็จ (เฟส 3, 6) |
+| admin editor, เนื้อหาจริง | เสร็จ (เฟส 4–5) — คู่มือ: [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) |
 
 ## รันบนเครื่อง
 ต้องมี Node 22 หรือ 24 (LTS) และ pnpm. Node 25 ใช้ได้ในการทดสอบแต่ Prisma ยังไม่รองรับอย่างเป็นทางการ

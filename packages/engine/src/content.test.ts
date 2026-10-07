@@ -19,6 +19,21 @@ describe("Content", () => {
     expect(buildWorld().validate()).toEqual([]);
   });
 
+  it("flags actions and targets used in the wrong phase", () => {
+    const problems = invalid({
+      cards: [
+        card("a", { effects: [effect({ trigger: "LAST_STAND", actions: [{ type: "GAIN_ENERGY", amount: 1 }] })] }),
+        card("b", { effects: [effect({ trigger: "ON_PLAY", actions: [{ type: "DAMAGE", amount: 1 }] })] }),
+        card("c", { effects: [effect({ trigger: "END_OF_TURN", target: { selector: "RANDOM_ENEMY" }, actions: [{ type: "BUFF", atk: 1, hp: 0 }] })] }),
+        card("ok", { effects: [effect({ trigger: "START_OF_COMBAT", target: { selector: "RANDOM_ENEMY" }, actions: [{ type: "DAMAGE", amount: 1 }] })] }),
+      ],
+    });
+    expect(problems).toMatch(/card "a": GAIN_ENERGY only works in the recruit phase, not on LAST_STAND/);
+    expect(problems).toMatch(/card "b": DAMAGE only works in a fight/);
+    expect(problems).toMatch(/card "c": enemies can only be targeted in a fight/);
+    expect(problems).not.toMatch(/card "ok"/);
+  });
+
   it("rejects duplicate keys", () => {
     expect(() => new Content({ cards: [card("a"), card("a")] })).toThrow(/duplicate card key: a/);
     expect(() => new Content({ relics: [RelicDef.parse({ key: "r", name: "R", tier: "LESSER", cost: 0 }), RelicDef.parse({ key: "r", name: "R", tier: "LESSER", cost: 0 })] })).toThrow(/duplicate relic/);

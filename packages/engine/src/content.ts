@@ -115,6 +115,20 @@ export class Content {
       for (const e of effects) {
         needFaction(e.target?.faction, from);
         if (e.condition?.type === "FACTION_COUNT_GTE") needFaction(e.condition.faction, from);
+        checkPhase(e, from);
+      }
+    };
+    // Some actions and targets only make sense in one phase; the engine refuses them in the other at run time.
+    const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
+    const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI"]);
+    const checkPhase = (e: Effect, from: string): void => {
+      const fight = FIGHT.has(e.trigger);
+      for (const a of e.actions) {
+        if (fight && RECRUIT_ONLY.has(a.type)) problems.push(`${from}: ${a.type} only works in the recruit phase, not on ${e.trigger}`);
+        if (!fight && a.type === "DAMAGE") problems.push(`${from}: DAMAGE only works in a fight, not on ${e.trigger}`);
+      }
+      if (!fight && e.target?.selector.endsWith("_ENEMY") && e.actions.some((a) => a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY")) {
+        problems.push(`${from}: enemies can only be targeted in a fight, not on ${e.trigger}`);
       }
     };
     const checkActions = (actions: Iterable<Action>, from: string): void => {
