@@ -719,7 +719,10 @@ function sellZone(ctx: Ctx, view: View): HTMLElement {
 
 function giantSlot(ctx: Ctx, view: View): HTMLElement {
   const g = view.me.state.giant;
-  return h("div", { class: "giant-slot" }, h("div", { class: "muted small", text: "Giant Robo" }), g ? cardEl(ctx.ix, { key: g.key, small: true, minion: true }) : h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
+  const sg = view.me.state.superGattai;
+  const extraOnBoard = view.me.state.board.some((u) => ctx.ix.card(u.key)?.colors.includes("EXTRA"));
+  return h("div", { class: `giant-slot ${sg && extraOnBoard ? "super" : ""}` }, h("div", { class: "muted small", text: "Giant Robo" }),
+    sg && h("div", { class: `super-tag ${extraOnBoard ? "on" : ""}`, title: tr(`Super Gattai: +${sg.atk}/+${sg.hp} and the Extra Ranger's keywords in fights with an Extra Ranger on your board`, `Super Gattai: +${sg.atk}/+${sg.hp} และ keyword ของ Extra Ranger ในการต่อสู้ที่มี Extra Ranger บนบอร์ด`), text: extraOnBoard ? "SUPER GATTAI" : tr("Super Gattai: needs an Extra Ranger", "Super Gattai: ต้องมี Extra Ranger") }), g ? cardEl(ctx.ix, { key: g.key, small: true, minion: true }) : h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
 }
 
 function gaugeBars(ctx: Ctx, view: View): HTMLElement {

@@ -311,6 +311,7 @@ export function simulateCombat(
       case "ADD_TO_HAND":
       case "DISCOVER_GIANT":
       case "DISCOVER_UNIT":
+      case "SUPER_GATTAI":
         throw new Error(`action ${action.type} is not valid during combat`);
     }
   };

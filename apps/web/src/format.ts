@@ -105,7 +105,7 @@ const gaugeSource = (trigger: string): string =>
 export function gaugeText(g: GaugeLike, cardName: (key: string) => string, rollCallColors = 5): { fills: string[]; rewards: string[]; short: string } {
   const fills = g.sources.map((s) => `+${s.amount} ${gaugeSource(s.trigger).replace("{colors}", String(rollCallColors))}`);
   const reward = (r: { type: string; cardKey?: string }): string =>
-    r.type === "ADD_TO_HAND" && r.cardKey ? `${tr("get", "ได้")} ${cardName(r.cardKey)}` : r.type === "DISCOVER_GIANT" ? tr("discover a Giant Robo", "เลือกรับ Giant Robo") : r.type === "DISCOVER_UNIT" ? tr("discover a unit", "เลือกรับยูนิต") : r.type.toLowerCase().replace(/_/g, " ");
+    r.type === "ADD_TO_HAND" && r.cardKey ? `${tr("get", "ได้")} ${cardName(r.cardKey)}` : r.type === "DISCOVER_GIANT" ? tr("discover a Giant Robo", "เลือกรับ Giant Robo") : r.type === "DISCOVER_UNIT" ? tr("discover a unit", "เลือกรับยูนิต") : r.type === "SUPER_GATTAI" ? tr("Super Gattai (Giant + Extra Ranger)", "Super Gattai (Giant + Extra Ranger)") : r.type.toLowerCase().replace(/_/g, " ");
   const rewards = [...g.thresholds].sort((a, b) => a.at - b.at).map((t) => `${t.once ? tr(`At ${t.at}`, `ถึง ${t.at}`) : tr(`Every ${t.at}`, `ทุก ${t.at}`)}: ${t.reward.map(reward).join(tr(", then ", " แล้ว"))}${t.once ? tr(" (once per game)", " (ครั้งเดียวต่อเกม)") : ""}`);
   const first = [...g.thresholds].sort((a, b) => a.at - b.at)[0];
   const short = first ? `${first.once ? tr("at", "ถึง") : tr("every", "ทุก")} ${first.at} → ${first.reward.map(reward).join(", ").replace(/^(get|ได้) /, "")}` : "";

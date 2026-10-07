@@ -49,7 +49,7 @@ export const TRIGGERS = [
 ] as const;
 export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
 export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE"] as const;
-export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT"] as const;
+export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
 export const POWER_MODES = ["ACTIVE", "ONCE", "PASSIVE"] as const;
@@ -90,6 +90,10 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
   ADD_TO_HAND: [{ key: "cardKey", label: "card", field: { kind: "ref", to: "cards" } }],
   DISCOVER_GIANT: [],
   DISCOVER_UNIT: [{ key: "faction", field: { kind: "ref", to: "factions" }, optional: true, hint: "Empty = any faction" }],
+  SUPER_GATTAI: [
+    { key: "atk", field: int(), hint: "Giant bonus in fights with an Extra Ranger on the board" },
+    { key: "hp", field: int() },
+  ],
 };
 
 const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unknown>> = {
@@ -105,6 +109,7 @@ const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unkn
   ADD_TO_HAND: { cardKey: "" },
   DISCOVER_GIANT: {},
   DISCOVER_UNIT: {},
+  SUPER_GATTAI: { atk: 4, hp: 4 },
 };
 
 export const ACTION: Field = {

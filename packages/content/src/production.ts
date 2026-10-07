@@ -36,6 +36,7 @@ import {
   allAllies,
   chosen,
   discoverUnit,
+  superGattai,
 } from "./dsl.js";
 import type { ContentSetData } from "./types.js";
 
@@ -231,7 +232,10 @@ const gauges = [
       { trigger: "ON_ROLL_CALL", amount: 1 },
       { trigger: "ON_ROLL_CALL_WIN", amount: 1 },
     ],
-    [{ at: 3, reward: [toHand("kyodai_gattai")] }],
+    [
+      { at: 3, reward: [toHand("kyodai_gattai")] },
+      { at: 6, reward: [superGattai(4, 4)] },
+    ],
   ),
   gaugeDef("rider", "Rider Gauge", 6, [{ trigger: "HENSHIN", amount: 1 }], [{ at: 2, once: false, reward: [toHand("ultimate_form")] }]),
 ];

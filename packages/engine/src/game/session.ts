@@ -306,6 +306,20 @@ export function autoChooseRelic(player: PlayerState, env: GameEnv): string | und
 
 // ----------------------------------------------------------------- combat
 
+/**
+ * Super Gattai: with the reward earned and an Extra Ranger on the board, the Giant gains the bonus stats and
+ * every keyword those Extra Rangers have. Otherwise the Giant is unchanged.
+ */
+export function superGattai(player: PlayerState, giant: CombatUnitInput, env: GameEnv): CombatUnitInput {
+  const bonus = player.superGattai;
+  if (!bonus) return giant;
+  const extras = player.board.filter((u) => env.content.card(u.key).colors.includes("EXTRA"));
+  if (extras.length === 0) return giant;
+  const keywords = new Set<Keyword>(giant.keywords ?? []);
+  for (const u of extras) for (const k of [...env.content.card(u.key).keywords, ...(u.keywords ?? [])]) keywords.add(k);
+  return { ...giant, atk: giant.atk + bonus.atk, hp: giant.hp + bonus.hp, keywords: [...keywords] };
+}
+
 /** Everything simulateCombat needs for this player's side, snapshotted from their board. */
 export function prepareCombat(player: PlayerState, env: GameEnv): { units: CombatUnitInput[]; extras: CombatSideExtras } {
   const units = player.board.map((u, i) => env.content.toCombat(u, `board:${i}`));
@@ -327,7 +341,7 @@ export function prepareCombat(player: PlayerState, env: GameEnv): { units: Comba
   }
 
   const extras: CombatSideExtras = { playerEffects, rules: { ...env.cfg.combatDefaults, ...combatRulesOf(player) } };
-  if (player.giant) extras.giant = env.content.toCombat(player.giant);
+  if (player.giant) extras.giant = superGattai(player, env.content.toCombat(player.giant), env);
   return { units, extras };
 }
 

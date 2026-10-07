@@ -78,6 +78,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "MODIFY_RULE": return ruleTextTh(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `ได้ ${names(a.cardKey)} เข้ามือ`;
     case "DISCOVER_GIANT": return "เลือกรับ Giant Robo";
+    case "SUPER_GATTAI": return `Super Gattai: การต่อสู้ที่มี Extra Ranger บนบอร์ด Giant Robo ได้ +${a.atk}/+${a.hp} และ keyword ของ Extra Ranger`;
     case "DISCOVER_UNIT": return a.faction ? `เลือกรับยูนิต ${names(a.faction)} 1 จาก 3` : "เลือกรับยูนิต 1 จาก 3";
   }
 }

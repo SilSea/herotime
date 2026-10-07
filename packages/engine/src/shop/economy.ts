@@ -46,6 +46,8 @@ export interface PlayerState {
   gauges: Record<string, number>;
   /** The Giant Robo in the Giant Slot (outside the 7 board slots). */
   giant?: Unit;
+  /** Super Gattai (Mecha Gauge reward): what the Giant gains in fights with an Extra Ranger on the board. */
+  superGattai?: { atk: number; hp: number };
   hero?: string;
   heroPowerUsed: boolean;
   heroPowerSpent: boolean;

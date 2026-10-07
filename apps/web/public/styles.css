@@ -731,3 +731,8 @@ body.dragging .drop-marker.show { display: block; }
 /* ---- gear priced in Health */
 .card .cost.health { background: linear-gradient(180deg, #ff8a9a, #d81b45); color: #fff; filter: drop-shadow(0 0 6px #ff3b5c); }
 .card .cost.health::after { content: "♥"; font-size: 9px; position: absolute; bottom: 2px; }
+
+/* ---- Super Gattai */
+.super-tag { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: #8296bb; text-align: center; margin: 2px 0; }
+.super-tag.on { color: #ffd54f; text-shadow: 0 0 8px #ffb300; }
+.giant-slot.super { box-shadow: 0 0 18px #ffb30066 inset; }

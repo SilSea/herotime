@@ -80,6 +80,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "MODIFY_RULE": return ruleText(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `add ${names(a.cardKey)} to your hand`;
     case "DISCOVER_GIANT": return "discover a Giant Robo";
+    case "SUPER_GATTAI": return `Super Gattai: in fights with an Extra Ranger on your board, your Giant Robo gets +${a.atk}/+${a.hp} and that Ranger's keywords`;
     case "DISCOVER_UNIT": return a.faction ? `discover a ${names(a.faction)} unit` : "discover a unit";
   }
 }

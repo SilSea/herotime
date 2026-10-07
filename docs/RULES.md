@@ -90,7 +90,7 @@
 5. **ตอนสู้** หุ่นลงสนามเมื่อเกิดเหตุการณ์แรก: (ก) ยูนิตเราเหลือ ≤2 ตัว หรือ (ข) ศัตรูเกิด Kyodaika
    - Stat = base หุ่น + ครึ่งหนึ่งของ ATK/HP รวมของ Sentai บนบอร์ดตอนเริ่มสู้
    - **Final Blow**: ตีครั้งแรกดาเมจ ×2 และดาเมจ ×2 ใส่ยูนิตยักษ์/Kyodaika
-6. **Super Gattai**: Gauge ถึง 6 + บอร์ดมี Extra Ranger → หุ่นได้ร่างรวมขั้นสูง (stat ↑ + keyword ของหุ่น Extra)
+6. **Super Gattai**: Mecha Gauge ถึง 6 → ปลด Super Gattai ถาวร: ทุกการต่อสู้ที่บอร์ดมี Extra Ranger หุ่นใน Giant Slot ได้ +4/+4 และ keyword ทั้งหมดของ Extra Ranger บนบอร์ด (ได้ซ้ำ = บวกเพิ่ม)
 
 ### 6.1 Gauge system กลาง
 Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amount), thresholds[] (value → reward action)}`

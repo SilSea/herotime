@@ -164,7 +164,7 @@ export class Content {
       }
     }
     // Rewards run with no source unit, so actions that need a target would silently do nothing.
-    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUMMON"]);
+    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "SUMMON"]);
     for (const g of this.gauges.values()) {
       for (const t of g.thresholds) {
         const from = `gauge "${g.key}"`;

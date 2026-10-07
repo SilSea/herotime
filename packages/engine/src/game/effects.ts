@@ -193,6 +193,11 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       for (let n = 0; n < mult; n++) discoverUnits(player, env, action.faction);
       return;
     }
+    case "SUPER_GATTAI": {
+      const now = player.superGattai ?? { atk: 0, hp: 0 };
+      player.superGattai = { atk: now.atk + action.atk * mult, hp: now.hp + action.hp * mult };
+      return;
+    }
     case "DAMAGE":
       throw new Error("action DAMAGE is only valid during combat");
   }

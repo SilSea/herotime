@@ -101,6 +101,11 @@ export const Action = z.discriminatedUnion("type", [
   z.object({ type: z.literal("DISCOVER_GIANT") }),
   /** Recruit only: Discover a unit from the pool (up to your tavern rank), of one faction when given. */
   z.object({ type: z.literal("DISCOVER_UNIT"), faction: z.string().optional() }),
+  /**
+   * Recruit only (a gauge reward): Super Gattai. From now on, in every fight where an Extra Ranger is on the
+   * board, the Giant Robo gets +atk/+hp and the keywords of those Extra Rangers. Stacks if granted again.
+   */
+  z.object({ type: z.literal("SUPER_GATTAI"), atk: amount.default(4), hp: amount.default(4) }),
 ]);
 export type Action = z.infer<typeof Action>;
 

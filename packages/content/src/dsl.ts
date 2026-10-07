@@ -31,6 +31,7 @@ export const gauge = (key: string, amount: number): Action => ({ type: "GAUGE_AD
 export const rule = (name: string, op: "SET" | "ADD" | "MUL", value: number): Action => ({ type: "MODIFY_RULE", rule: name, op, value });
 export const toHand = (cardKey: string): Action => ({ type: "ADD_TO_HAND", cardKey });
 export const discoverGiant = (): Action => ({ type: "DISCOVER_GIANT" });
+export const superGattai = (atk = 4, hp = 4): Action => ({ type: "SUPER_GATTAI", atk, hp });
 export const discoverUnit = (faction?: string): Action => (faction ? { type: "DISCOVER_UNIT", faction } : { type: "DISCOVER_UNIT" });
 
 // ------------------------------------------------------------------ targets

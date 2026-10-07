@@ -33,7 +33,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F3.5** (P0) Gauge system กลาง (sources / thresholds เก็บใน DB)
 - [x] **F3.6** (P0) Roll Call 5 สี → Mecha Gauge → การ์ด "Kyodai Gattai!" → Giant Slot
 - [x] **F3.7** (P0) Giant Robo ลงสนามเมื่อเหลือ ≤2 ตัว หรือศัตรูเกิด Kyodaika
-- [ ] **F3.8** (P1) Super Gattai (Gauge 6 + Extra Ranger)
+- [x] **F3.8** (P1) Super Gattai (Gauge 6 + Extra Ranger): Mecha Gauge ถึง 6 ได้ action `SUPER_GATTAI` — การต่อสู้ที่มี Extra Ranger บนบอร์ด Giant Robo +4/+4 และได้ keyword ของ Extra Ranger; ช่อง Giant มีป้าย SUPER GATTAI
 - [x] **F3.12** (P1) Gattai เป็นการ์ดใหม่: core (ซ้ายสุด, มี `gattaiInto`) + ชิ้นส่วน Gattai ติดกันครบ → กด Combine ตอนซื้อของ รวมถาวร (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด, effect ของร่าง) แล้วบัฟต่อได้; ไม่รวมระหว่างสู้; รวมได้ชั้นเดียว; ขายแล้วชิ้นส่วนคืน pool
 - [x] **F3.9** (P1) Rider Gauge → Ultimate Form
 - [ ] **F3.10** (P2) Universe Anime + faction ใหม่
