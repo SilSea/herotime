@@ -35,7 +35,8 @@ export const superGattai = (atk = 4, hp = 4): Action => ({ type: "SUPER_GATTAI",
 export const ultimateForm = (): Action => ({ type: "ULTIMATE_FORM" });
 export const randomCard = (cardKind: "GEAR" | "UNIT" = "GEAR", faction?: string): Action => ({ type: "RANDOM_CARD", cardKind, ...(faction ? { faction } : {}) });
 export const buffShop = (atk: number, hp: number): Action => ({ type: "BUFF_SHOP", atk, hp });
-export const devourShop = (): Action => ({ type: "DEVOUR_SHOP" });
+export const devourShop = (maxRank?: number, faction?: string, choose: "RANDOM" | "STRONGEST" | "WEAKEST" = "RANDOM"): Action => ({ type: "DEVOUR_SHOP", choose, ...(maxRank ? { maxRank } : {}), ...(faction ? { faction } : {}) });
+export const discard = (count = 1, pick: "RANDOM" | "LEFTMOST" | "RIGHTMOST" = "RANDOM", cardKind: "ANY" | "UNIT" | "GEAR" = "ANY"): Action => ({ type: "DISCARD", count, pick, cardKind });
 export const summonFromHand = (count = 1): Action => ({ type: "SUMMON_FROM_HAND", count });
 export const discoverUnit = (faction?: string): Action => (faction ? { type: "DISCOVER_UNIT", faction } : { type: "DISCOVER_UNIT" });
 
@@ -70,6 +71,8 @@ interface EffectOptions {
   golden?: number;
   /** The whole effect happens this many times. */
   repeat?: number;
+  /** At most this many times per turn / game. */
+  limit?: { times: number; per: "TURN" | "GAME" };
 }
 
 /** An effect owned by a unit. */
@@ -83,6 +86,7 @@ export function on(trigger: Trigger, actions: Action | Action[], o: EffectOption
     ...(o.every ? { every: o.every } : {}),
     ...(o.golden ? { goldenMultiplier: o.golden } : {}),
     ...(o.repeat && o.repeat > 1 ? { repeat: o.repeat } : {}),
+    ...(o.limit ? { limit: o.limit } : {}),
   });
 }
 
@@ -101,6 +105,8 @@ export const afterDamaged = (a: Action | Action[], o?: EffectOptions) => on("AFT
 export const onSummon = (a: Action | Action[], o?: EffectOptions) => on("ALLY_SUMMONED", a, o);
 /** When this unit is sold (from the board or the hand). */
 export const onSell = (a: Action | Action[], o?: EffectOptions) => on("ON_SELL", a, o);
+/** When another card discards this one from the hand. */
+export const onDiscard = (a: Action | Action[], o?: EffectOptions) => on("ON_DISCARD", a, o);
 export const avenge = (every: number, a: Action | Action[], o: EffectOptions = {}) => on("AVENGE", a, { ...o, every });
 export const onHenshin = (a: Action | Action[], o?: EffectOptions) => on("HENSHIN", a, o);
 

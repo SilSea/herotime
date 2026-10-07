@@ -75,6 +75,7 @@ const TRIGGERS: Record<string, { icon: string; name: [string, string]; text: [st
   ON_ATTACK: { icon: "➹", name: ["When it attacks", "เมื่อโจมตี"], text: ["Does something each time this unit attacks.", "ทำงานทุกครั้งที่ยูนิตนี้โจมตี"] },
   AFTER_DAMAGED: { icon: "❤", name: ["After it takes damage", "เมื่อโดนดาเมจแล้วยังรอด"], text: ["Does something when this unit is hit and survives.", "ทำงานเมื่อยูนิตนี้โดนโจมตีแล้วยังไม่ตาย"] },
   HENSHIN: { icon: "✧", name: ["On Henshin", "เมื่อแปลงร่าง"], text: ["Does something when this unit transforms.", "ทำงานเมื่อยูนิตนี้แปลงร่าง (Henshin)"] },
+  ON_DISCARD: { icon: "🗑", name: ["When discarded", "เมื่อถูกทิ้ง"], text: ["Does something when another card discards it from your hand.", "ทำงานเมื่อการ์ดใบอื่นทิ้งการ์ดนี้ออกจากมือ"] },
   ON_SELL: { icon: "$", name: ["When sold", "เมื่อถูกขาย"], text: ["Does something when you sell this unit.", "ทำงานเมื่อขายยูนิตนี้"] },
   ALLY_SUMMONED: { icon: "✚", name: ["When you summon", "เมื่อเรียกยูนิต"], text: ["Does something each time another unit is summoned onto your side (in the tavern or in a fight).", "ทำงานทุกครั้งที่มียูนิตตัวอื่นถูกเรียกเข้าฝั่งเรา (ทั้งช่วงซื้อของและตอนต่อสู้)"] },
   ON_PLAY: { icon: "▶", name: ["Deploy", "Deploy (ลงสนาม)"], text: ["Does something when you play this unit from your hand onto the board.", "ทำงานเมื่อคุณลงยูนิตนี้จากมือ"] },

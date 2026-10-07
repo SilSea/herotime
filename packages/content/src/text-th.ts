@@ -30,6 +30,7 @@ const TRIGGER: Record<Trigger, string> = {
   AVENGE: "Avenge",
   ALLY_SUMMONED: "เมื่อเรียกยูนิตเข้าสนาม",
   ON_SELL: "เมื่อถูกขาย",
+  ON_DISCARD: "เมื่อถูกทิ้ง",
   ON_ACQUIRE: "เมื่อได้รับ",
   ON_TURN_START: "ต้นทุกเทิร์น",
   ON_USE: "เมื่อใช้",
@@ -87,7 +88,12 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "RANDOM_CARD": return `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${names(a.faction)}` : ""}แบบสุ่มเข้ามือ`;
     case "ULTIMATE_FORM": return `เปลี่ยน${t}เป็นร่าง Ultimate`;
     case "BUFF_SHOP": return `ยูนิตในร้านได้ ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
-    case "DEVOUR_SHOP": return `กลืนกินยูนิตในร้านแบบสุ่ม แล้วให้ค่าพลังของมันกับ${t}`;
+    case "DEVOUR_SHOP": return `กลืนกินยูนิต${a.faction ? ` ${names(a.faction)}` : ""}ในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"}${a.maxRank ? ` (rank ไม่เกิน ${a.maxRank})` : ""} แล้วให้ค่าพลังของมันกับ${t}`;
+    case "DISCARD": {
+      const what = a.cardKind === "GEAR" ? "Gear" : a.cardKind === "UNIT" ? "ยูนิต" : "การ์ด";
+      const which = a.pick === "LEFTMOST" ? "ซ้ายสุด" : a.pick === "RIGHTMOST" ? "ขวาสุด" : "แบบสุ่ม";
+      return `ทิ้ง${what}${which}ในมือ${a.count > 1 ? ` ${a.count} ใบ` : ""}`;
+    }
     case "SUMMON_FROM_HAND": return `เรียกยูนิตจากมือ${a.count > 1 ? ` ${a.count} ตัว` : ""}`;
     case "DISCOVER_UNIT": return a.faction ? `เลือกรับยูนิต ${names(a.faction)} 1 จาก 3` : "เลือกรับยูนิต 1 จาก 3";
   }
@@ -131,7 +137,8 @@ export function ruleTextTh(rule: string, op: "SET" | "ADD" | "MUL", value: numbe
 export function effectTextTh(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   const body = e.actions.map((a) => action(a, e.target, names)).join(" แล้ว");
-  const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} ครั้ง)` : ""}`;
+  const limit = e.limit ? (e.limit.times === 1 ? ` (${e.limit.per === "TURN" ? "เทิร์นละครั้ง" : "ครั้งเดียวต่อเกม"})` : ` (ไม่เกิน ${e.limit.times} ครั้งต่อ${e.limit.per === "TURN" ? "เทิร์น" : "เกม"})`) : "";
+  const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} ครั้ง)` : ""}${limit}`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;
 }
 

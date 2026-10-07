@@ -50,6 +50,9 @@ export interface PlayerState {
   superGattai?: { atk: number; hp: number };
   /** BUFF_SHOP: what every unit in this player's tavern gets (kept when bought). */
   shopBonus?: { atk: number; hp: number };
+  /** Limited player-scope effects (relics, hero, gear): times used this game / this turn, by source and effect. */
+  uses?: Record<string, number>;
+  usesTurn?: Record<string, number>;
   hero?: string;
   heroPowerUsed: boolean;
   heroPowerSpent: boolean;

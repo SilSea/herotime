@@ -335,6 +335,7 @@ export function simulateCombat(
       case "ULTIMATE_FORM":
       case "BUFF_SHOP":
       case "DEVOUR_SHOP":
+      case "DISCARD":
         throw new Error(`action ${action.type} is not valid during combat`);
     }
   };
@@ -353,12 +354,22 @@ export function simulateCombat(
   };
 
   function fire(trigger: Effect["trigger"], f: Fighter, s: SideState, at: () => number, deaths?: number, subject?: Fighter): void {
-    for (const e of f.effects) {
-      if (e.scope !== "UNIT" || e.trigger !== trigger) continue;
-      if (deaths !== undefined && deaths % (e.every ?? 1) !== 0) continue;
+    f.effects.forEach((e, i) => {
+      if (e.scope !== "UNIT" || e.trigger !== trigger) return;
+      if (deaths !== undefined && deaths % (e.every ?? 1) !== 0) return;
+      if (e.limit) {
+        // In a fight a limit counts per fight, whatever its period.
+        if (!checkCondition(e.condition, friendly(s))) return;
+        const key = `${trigger}#${i}`;
+        const used = fightUses.get(f)?.[key] ?? 0;
+        if (used >= e.limit.times) return;
+        fightUses.set(f, { ...(fightUses.get(f) ?? {}), [key]: used + 1 });
+      }
       runEffect(e, f, s, at, subject);
-    }
+    });
   }
+  /** Uses of limited effects, per fighter, in this fight. */
+  const fightUses = new Map<Fighter, Record<string, number>>();
 
   /** Summons from a living unit land right of it, in order. */
   const rightOf = (s: SideState, f: Fighter): (() => number) => {

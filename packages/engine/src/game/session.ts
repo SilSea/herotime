@@ -14,13 +14,14 @@ import {
 } from "../shop/economy.js";
 import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Keyword, Side } from "../types.js";
-import { fireGaugeTrigger, matchesTarget, needsTargets, runTrigger, swapKey, type Origin } from "./effects.js";
+import { fireGaugeTrigger, matchesTarget, needsTargets, resetTurnUses, runTrigger, swapKey, type Origin } from "./effects.js";
 import type { GameEnv } from "./env.js";
 
 // ------------------------------------------------------------ recruit intents
 
 /** Start a recruit phase: refill energy, roll the shop, then run ON_TURN_START (relics, hero). */
 export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void {
+  resetTurnUses(player);
   startTurn(player, turn, env.pool, env.rng, env.cfg, env.gear);
   for (const { effects, origin } of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env, origin);
 }

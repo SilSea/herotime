@@ -28,6 +28,9 @@ export interface Unit {
   buffs?: BuffRecord[];
   /** A combined Gattai form keeps the units it was made of, so they go back to the pool when it leaves. */
   components?: Unit[];
+  /** Limited effects: times used this game / this turn, by effect. */
+  uses?: Record<string, number>;
+  usesTurn?: Record<string, number>;
 }
 
 /** Where a permanent bonus came from. `key` is a card, gear, relic or hero key; null for combat. */
@@ -120,7 +123,7 @@ export class Content {
     };
     // Some actions and targets only make sense in one phase; the engine refuses them in the other at run time.
     const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
-    const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP"]);
+    const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "DISCARD"]);
     const checkPhase = (e: Effect, from: string): void => {
       if (e.target?.selector === "SUMMONED" && e.trigger !== "ALLY_SUMMONED") problems.push(`${from}: target SUMMONED only works with ALLY_SUMMONED`);
       // A summon can happen in either phase, so its reactions must work in both.
@@ -141,7 +144,7 @@ export class Content {
     const checkActions = (actions: Iterable<Action>, from: string): void => {
       for (const a of actions) {
         if (a.type === "SUMMON" || a.type === "ADD_TO_HAND") needCard(a.cardKey, from);
-        else if (a.type === "DISCOVER_UNIT" || a.type === "RANDOM_CARD") needFaction(a.faction, from);
+        else if (a.type === "DISCOVER_UNIT" || a.type === "RANDOM_CARD" || a.type === "DEVOUR_SHOP") needFaction(a.faction, from);
         else if (a.type === "TRANSFORM") needCard(a.into, from);
         else if (a.type === "GAUGE_ADD" && !this.gauges.has(a.gauge)) {
           problems.push(`${from} references unknown gauge "${a.gauge}"`);
@@ -166,8 +169,8 @@ export class Content {
       }
       checkActions(actionsOf(c.effects), from);
       for (const e of c.effects) {
-        if (c.kind === "GEAR" && !(e.scope === "PLAYER" && e.trigger === "ON_PLAY")) {
-          problems.push(`${from} is gear: its effects must be player-scope ON_PLAY`);
+        if (c.kind === "GEAR" && !(e.scope === "PLAYER" && (e.trigger === "ON_PLAY" || e.trigger === "ON_DISCARD"))) {
+          problems.push(`${from} is gear: its effects must be player-scope ON_PLAY (or ON_DISCARD)`);
         } else if (c.kind !== "GEAR" && e.scope !== "UNIT") {
           problems.push(`${from} has a player-scope effect, which only gear may have`);
         }

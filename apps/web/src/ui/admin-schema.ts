@@ -43,6 +43,7 @@ export const TRIGGERS = [
   "AVENGE",
   "ALLY_SUMMONED",
   "ON_SELL",
+  "ON_DISCARD",
   "ON_ACQUIRE",
   "ON_TURN_START",
   "ON_USE",
@@ -51,7 +52,7 @@ export const TRIGGERS = [
 ] as const;
 export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "GIANT_SLOT", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
 export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE"] as const;
-export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "SUMMON_FROM_HAND"] as const;
+export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
 export const POWER_MODES = ["ACTIVE", "ONCE", "PASSIVE"] as const;
@@ -105,7 +106,16 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
     { key: "atk", field: int(), hint: "Units in your tavern get this for the rest of the game" },
     { key: "hp", field: int() },
   ],
-  DEVOUR_SHOP: [],
+  DEVOUR_SHOP: [
+    { key: "choose", field: { kind: "enum", options: ["RANDOM", "STRONGEST", "WEAKEST"] }, hint: "STRONGEST / WEAKEST: by ATK+HP" },
+    { key: "maxRank", label: "only rank at most", field: int(1, 6), optional: true, hint: "Leave unticked to eat any rank" },
+    { key: "faction", label: "only faction", field: { kind: "ref", to: "factions" }, optional: true },
+  ],
+  DISCARD: [
+    { key: "count", field: int(1), hint: "How many cards to throw away from the hand" },
+    { key: "pick", field: { kind: "enum", options: ["RANDOM", "LEFTMOST", "RIGHTMOST"] } },
+    { key: "cardKind", label: "card kind", field: { kind: "enum", options: ["ANY", "UNIT", "GEAR"] } },
+  ],
   SUMMON_FROM_HAND: [{ key: "count", field: int(1), hint: "Tavern: unit cards leave the hand for the board. Fight: copies of hand units join" }],
 };
 
@@ -126,7 +136,8 @@ const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unkn
   RANDOM_CARD: { cardKind: "GEAR" },
   ULTIMATE_FORM: {},
   BUFF_SHOP: { atk: 1, hp: 1 },
-  DEVOUR_SHOP: {},
+  DEVOUR_SHOP: { choose: "RANDOM" },
+  DISCARD: { count: 1, pick: "RANDOM", cardKind: "ANY" },
   SUMMON_FROM_HAND: { count: 1 },
 };
 
@@ -178,6 +189,13 @@ export const EFFECT: Field = {
     { key: "target", field: TARGET, optional: true, hint: "who the actions apply to (default: the unit itself)" },
     { key: "actions", field: { kind: "list", of: ACTION, make: () => ACTION_MAKE("BUFF"), min: 1, title: (a: any) => String(a?.type ?? "") } },
     { key: "goldenMultiplier", label: "golden multiplier", field: { kind: "num" }, optional: true, hint: "default 2" },
+    {
+      key: "limit",
+      label: "limit",
+      field: { kind: "object", rows: [{ key: "times", label: "at most", field: int(1) }, { key: "per", field: { kind: "enum", options: ["TURN", "GAME"] } }], make: () => ({ times: 1, per: "TURN" }) },
+      optional: true,
+      hint: "fires at most this many times per turn / game (per unit, or per relic/hero/gear); in a fight: per fight",
+    },
     { key: "repeat", label: "happens N times", field: int(1, 5), optional: true, hint: "the whole effect runs this many times each time it fires (default 1)" },
   ],
 };

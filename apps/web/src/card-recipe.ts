@@ -27,6 +27,7 @@ export const WHEN: WhenOption[] = [
   { key: "AVENGE", phase: "fight", label: () => tr("After N of your units die (Avenge)", "เมื่อพวกเราตายครบ N ตัว (Avenge)") },
   { key: "ALLY_SUMMONED", phase: "both", label: () => tr("When you summon another unit", "เมื่อเรียกยูนิตอื่นเข้าสนาม") },
   { key: "ON_SELL", phase: "recruit", label: () => tr("When sold", "เมื่อถูกขาย") },
+  { key: "ON_DISCARD", phase: "recruit", label: () => tr("When discarded (by another card)", "เมื่อถูกการ์ดอื่นทิ้ง") },
 ];
 
 export interface DoOption {
@@ -51,6 +52,7 @@ export const DO: DoOption[] = [
   { key: "SUMMON_FROM_HAND", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Summon units from your hand", "เรียกยูนิตจากบนมือ") },
   { key: "BUFF_SHOP", phases: ["recruit"], targeted: false, label: () => tr("Buff the units in your tavern", "เพิ่มพลังยูนิตในร้านค้า") },
   { key: "DEVOUR_SHOP", phases: ["recruit"], targeted: true, label: () => tr("Devour a tavern unit (gain its stats)", "กลืนกินยูนิตในร้าน (ได้ค่าพลังของมัน)") },
+  { key: "DISCARD", phases: ["recruit"], targeted: false, label: () => tr("Discard cards from your hand", "ทิ้งการ์ดในมือ") },
   { key: "ULTIMATE_FORM", phases: ["recruit"], targeted: true, label: () => tr("Change into its upgraded form (Rider final form, upgraded robo…)", "เปลี่ยน/อัปเกรดร่าง (ร่างสุดท้าย Rider, หุ่นร่างอัปเกรด…)") },
 ];
 
@@ -102,6 +104,15 @@ export interface Ability {
   cardKind: "GEAR" | "UNIT";
   /** How many times the whole ability happens (1 = once). */
   repeat: number;
+  /** DISCARD: which card and what kind. */
+  pick: "RANDOM" | "LEFTMOST" | "RIGHTMOST";
+  discardKind: "ANY" | "UNIT" | "GEAR";
+  /** DEVOUR_SHOP: only units of at most this rank (0 = any), and which one. */
+  maxRank: number;
+  choose: "RANDOM" | "STRONGEST" | "WEAKEST";
+  /** At most this many times per turn / game (0 = no limit). */
+  limitTimes: number;
+  limitPer: "TURN" | "GAME";
 }
 
 export interface Recipe {
@@ -147,6 +158,12 @@ export const newAbility = (type: CardType): Ability => ({
   targetFaction: "",
   cardKind: "GEAR",
   repeat: 1,
+  pick: "RANDOM",
+  discardKind: "ANY",
+  maxRank: 0,
+  choose: "RANDOM",
+  limitTimes: 0,
+  limitPer: "TURN",
 });
 
 export const newRecipe = (): Recipe => ({
@@ -255,9 +272,12 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   if (a.do === "RANDOM_CARD") Object.assign(action, { cardKind: a.cardKind, ...(a.faction ? { faction: a.faction } : {}) });
   if (a.do === "BUFF_SHOP") Object.assign(action, { atk: a.atk, hp: a.hp });
   if (a.do === "SUMMON_FROM_HAND") action.count = Math.max(1, a.count);
+  if (a.do === "DISCARD") Object.assign(action, { count: Math.max(1, a.count), pick: a.pick, cardKind: a.discardKind });
+  if (a.do === "DEVOUR_SHOP") Object.assign(action, { choose: a.choose, ...(a.maxRank > 0 ? { maxRank: a.maxRank } : {}), ...(a.faction ? { faction: a.faction } : {}) });
   const effect: Record<string, unknown> = { scope: gear ? "PLAYER" : "UNIT", trigger: gear ? "ON_PLAY" : a.when, actions: [action] };
   if (!gear && a.when === "AVENGE") effect.every = Math.max(1, a.every);
   if (a.repeat > 1) effect.repeat = Math.min(5, a.repeat);
+  if (a.limitTimes > 0) effect.limit = { times: a.limitTimes, per: a.limitPer };
   if (d?.targeted) effect.target = { selector: a.target, ...(a.targetFaction ? { faction: a.targetFaction } : {}) };
   if (a.condition === "TEAM_UP_COLORS_GTE" || a.condition === "ENERGY_GTE") effect.condition = { type: a.condition, value: a.conditionValue };
   if (a.condition === "FACTION_COUNT_GTE" && a.conditionFaction) effect.condition = { type: a.condition, faction: a.conditionFaction, value: a.conditionValue };
@@ -286,10 +306,12 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.do === "RANDOM_CARD" ? tr(`add a random ${a.faction ? `${factionName(a.faction)} ` : ""}${a.cardKind === "GEAR" ? "Gear" : "unit"} to your hand`, `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${factionName(a.faction)}` : ""}แบบสุ่มเข้ามือ`)
       : a.do === "SUMMON_FROM_HAND" ? tr(`summon ${a.count > 1 ? `${a.count} units` : "a unit"} from your hand`, `เรียกยูนิตจากมือ${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
       : a.do === "BUFF_SHOP" ? tr(`units in your tavern get ${sign(a.atk)}/${sign(a.hp)} for the rest of the game`, `ยูนิตในร้านได้ ${sign(a.atk)}/${sign(a.hp)} จนจบเกม`)
-      : a.do === "DEVOUR_SHOP" ? tr(`devour a random tavern unit; ${who} gains its stats`, `กลืนกินยูนิตในร้านแบบสุ่ม ${who}ได้ค่าพลังของมัน`)
+      : a.do === "DEVOUR_SHOP" ? tr(`devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} tavern unit${a.maxRank ? ` (rank ${a.maxRank} or lower)` : ""}; ${who} gains its stats`, `กลืนกินยูนิตในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"}${a.maxRank ? ` (rank ไม่เกิน ${a.maxRank})` : ""} ${who}ได้ค่าพลังของมัน`)
+      : a.do === "DISCARD" ? tr(`discard ${a.count} ${a.pick === "RANDOM" ? "random" : a.pick.toLowerCase()} ${a.discardKind === "ANY" ? "card" : a.discardKind === "GEAR" ? "Gear" : "unit"}${a.count > 1 ? "s" : ""} from your hand`, `ทิ้ง${a.discardKind === "ANY" ? "การ์ด" : a.discardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.pick === "RANDOM" ? "แบบสุ่ม" : a.pick === "LEFTMOST" ? "ซ้ายสุด" : "ขวาสุด"}ในมือ ${a.count} ใบ`)
       : a.do === "ULTIMATE_FORM" ? tr(`turn ${who} into its Ultimate Form`, `เปลี่ยน${who}เป็นร่าง Ultimate`)
       : a.do === "DISCOVER_UNIT" ? tr(`discover a ${a.faction ? `${factionName(a.faction)} ` : ""}unit`, `เลือกรับยูนิต${a.faction ? ` ${factionName(a.faction)}` : ""} 1 จาก 3`)
       : a.do;
-    return `${when}: ${cond}${what}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}`;
+    const limit = a.limitTimes > 0 ? tr(` (at most ${a.limitTimes} per ${a.limitPer === "TURN" ? "turn" : "game"})`, ` (ไม่เกิน ${a.limitTimes} ครั้งต่อ${a.limitPer === "TURN" ? "เทิร์น" : "เกม"})`) : "";
+    return `${when}: ${cond}${what}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}${limit}`;
   });
 }

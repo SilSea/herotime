@@ -35,6 +35,7 @@ export const Trigger = z.enum([
   "AVENGE",
   "ALLY_SUMMONED", // another friendly unit was summoned (recruit or fight); target SUMMONED is that unit
   "ON_SELL", // the unit is sold (from the board or the hand), just before it leaves
+  "ON_DISCARD", // the card was discarded from the hand by another card's DISCARD
   // player effects
   "ON_ACQUIRE", // relic picked / hero chosen: runs once, rules it sets persist
   "ON_TURN_START",
@@ -123,8 +124,27 @@ export const Action = z.discriminatedUnion("type", [
   z.object({ type: z.literal("ULTIMATE_FORM") }),
   /** Recruit only: from now on, units in your tavern have +atk/+hp (they keep it when bought). Stacks. */
   z.object({ type: z.literal("BUFF_SHOP"), atk: amount.default(1), hp: amount.default(1) }),
-  /** Recruit only: eat a random unit from your tavern; each target gains its ATK/HP for good. */
-  z.object({ type: z.literal("DEVOUR_SHOP") }),
+  /**
+   * Recruit only: eat a random unit from your tavern; each target gains its ATK/HP for good. Only units of
+   * at most `maxRank` / of `faction` can be eaten when those are set.
+   */
+  z.object({
+    type: z.literal("DEVOUR_SHOP"),
+    /** Which tavern unit: a random one, the one with the most ATK+HP, or the one with the least. */
+    choose: z.enum(["RANDOM", "STRONGEST", "WEAKEST"]).default("RANDOM"),
+    maxRank: z.number().int().min(1).max(6).optional(),
+    faction: z.string().optional(),
+  }),
+  /**
+   * Recruit only: discard `count` cards from your hand (random, or the leftmost / rightmost), optionally only units
+   * or only gear. Each discarded card runs its ON_DISCARD effects; pooled units go back to the pool.
+   */
+  z.object({
+    type: z.literal("DISCARD"),
+    count: z.number().int().min(1).default(1),
+    pick: z.enum(["RANDOM", "LEFTMOST", "RIGHTMOST"]).default("RANDOM"),
+    cardKind: z.enum(["ANY", "UNIT", "GEAR"]).default("ANY"),
+  }),
   /**
    * Summon units from your hand (no Deploy). Recruit: a random unit card leaves the hand for the board.
    * Fight: a copy of a random unit card in your hand joins the fight (the card stays in hand).
@@ -145,5 +165,10 @@ export const Effect = z.object({
   goldenMultiplier: z.number().positive().optional(),
   /** How many times the whole effect happens each time it fires (default 1). */
   repeat: z.number().int().min(1).max(5).optional(),
+  /**
+   * Fire at most `times` times per turn or per game (per unit for a unit's effect, per source for a relic,
+   * hero or gear). In a fight, both count per fight. A firing whose condition fails does not use one up.
+   */
+  limit: z.object({ times: z.number().int().min(1), per: z.enum(["TURN", "GAME"]) }).optional(),
 });
 export type Effect = z.infer<typeof Effect>;

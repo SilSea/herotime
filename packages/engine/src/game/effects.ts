@@ -234,8 +234,21 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       return;
     }
     case "DEVOUR_SHOP": {
-      for (let n = 0; n < mult && player.shop.length > 0; n++) {
-        const i = env.rng.int(player.shop.length);
+      for (let n = 0; n < mult; n++) {
+        const edible = player.shop.flatMap((k, i) => {
+          const d = env.content.card(k);
+          return (action.maxRank === undefined || d.rank <= action.maxRank) && (action.faction === undefined || d.factions.includes(action.faction)) ? [i] : [];
+        });
+        if (edible.length === 0) break;
+        const power = (i: number): number => {
+          const d = env.content.card(player.shop[i] as string);
+          return d.atk + d.hp;
+        };
+        // Strongest / weakest by ATK+HP; ties go to the leftmost.
+        const i =
+          action.choose === "STRONGEST" ? edible.reduce((best, x) => (power(x) > power(best) ? x : best))
+          : action.choose === "WEAKEST" ? edible.reduce((best, x) => (power(x) < power(best) ? x : best))
+          : env.rng.pick(edible);
         const key = player.shop.splice(i, 1)[0] as string;
         const eaten = env.content.card(key);
         const atk = eaten.atk + (player.shopBonus?.atk ?? 0);
@@ -246,6 +259,24 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
           t.bonusHp = (t.bonusHp ?? 0) + hp;
           recordBuff(t, origin, atk, hp);
         }
+      }
+      return;
+    }
+    case "DISCARD": {
+      for (let n = 0; n < action.count * mult; n++) {
+        const fits = player.hand.filter((u) => {
+          const kind = env.content.card(u.key).kind;
+          return action.cardKind === "ANY" || (action.cardKind === "GEAR" ? kind === "GEAR" : kind !== "GEAR");
+        });
+        if (fits.length === 0) break;
+        const card = action.pick === "LEFTMOST" ? fits[0] : action.pick === "RIGHTMOST" ? fits[fits.length - 1] : env.rng.pick(fits);
+        if (!card) break;
+        player.hand.splice(player.hand.indexOf(card), 1);
+        returnToPool(card, env.pool);
+        // The discarded card has its say: "When discarded: ..." (unit cards own it; gear holds player effects).
+        const def = env.content.card(card.key);
+        runTrigger(def.effects, "ON_DISCARD", "UNIT", card, player, env);
+        runTrigger(def.effects, "ON_DISCARD", "PLAYER", null, player, env, { kind: def.kind === "GEAR" ? "gear" : "card", key: card.key });
       }
       return;
     }
@@ -300,9 +331,34 @@ export function runTrigger(
   origin?: Origin,
   chosen?: Unit,
 ): void {
-  for (const e of effects) {
-    if (e.trigger === trigger && e.scope === scope) runEffect(e, source, player, env, origin, chosen);
-  }
+  effects.forEach((e, i) => {
+    if (e.trigger !== trigger || e.scope !== scope) return;
+    if (e.limit && !useUp(e, `${trigger}#${i}`, source, player, env, origin)) return;
+    runEffect(e, source, player, env, origin, chosen);
+  });
+}
+
+/**
+ * A limited effect takes one use, or says no when it has none left this turn / game. The count lives on the
+ * unit (its own effects) or on the player (relic, hero, gear). A firing whose condition fails costs nothing.
+ */
+function useUp(e: Effect, id: string, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin): boolean {
+  const limit = e.limit;
+  if (!limit) return true;
+  if (!checkCondition(e.condition, player.board.map((u) => unitView(env, u)), player.energy)) return true; // it will not do anything anyway
+  const holder: { uses?: Record<string, number>; usesTurn?: Record<string, number> } = source ?? player;
+  const key = source ? id : `${origin?.kind ?? "card"}:${origin?.key ?? ""}:${id}`;
+  const counts = limit.per === "TURN" ? (holder.usesTurn ??= {}) : (holder.uses ??= {});
+  const used = counts[key] ?? 0;
+  if (used >= limit.times) return false;
+  counts[key] = used + 1;
+  return true;
+}
+
+/** A new turn: "per turn" limits start over. */
+export function resetTurnUses(player: PlayerState): void {
+  delete player.usesTurn;
+  for (const u of [...player.board, ...player.hand]) delete u.usesTurn;
 }
 
 // ---------------------------------------------------------------- gauges

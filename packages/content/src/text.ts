@@ -27,6 +27,7 @@ const TRIGGER: Record<Trigger, string> = {
   AVENGE: "Avenge",
   ALLY_SUMMONED: "When you summon a unit",
   ON_SELL: "When sold",
+  ON_DISCARD: "When discarded",
   ON_ACQUIRE: "When acquired",
   ON_TURN_START: "At the start of each turn",
   ON_USE: "When used",
@@ -89,7 +90,12 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "RANDOM_CARD": return `add a random ${a.faction ? `${names(a.faction)} ` : ""}${a.cardKind === "GEAR" ? "Gear" : "unit"} to your hand`;
     case "ULTIMATE_FORM": return `turn ${t} into its Ultimate Form`;
     case "BUFF_SHOP": return `units in your tavern get ${signed(a.atk)}/${signed(a.hp)} for the rest of the game`;
-    case "DEVOUR_SHOP": return `devour a random unit in your tavern and give its stats to ${t}`;
+    case "DEVOUR_SHOP": return `devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} ${a.faction ? `${names(a.faction)} ` : ""}unit${a.maxRank ? ` of rank ${a.maxRank} or lower` : ""} in your tavern and give its stats to ${t}`;
+    case "DISCARD": {
+      const what = a.cardKind === "GEAR" ? "Gear" : a.cardKind === "UNIT" ? "unit" : "card";
+      const which = a.pick === "LEFTMOST" ? "your leftmost" : a.pick === "RIGHTMOST" ? "your rightmost" : "a random";
+      return a.count > 1 ? `discard ${a.count} ${which === "a random" ? "random" : which} ${what}s from your hand` : `discard ${which} ${what} from your hand`;
+    }
     case "SUMMON_FROM_HAND": return `summon ${a.count > 1 ? `${a.count} units` : "a unit"} from your hand`;
     case "DISCOVER_UNIT": return a.faction ? `discover a ${names(a.faction)} unit` : "discover a unit";
   }
@@ -134,7 +140,8 @@ export function ruleText(rule: string, op: "SET" | "ADD" | "MUL", value: number)
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   const body = e.actions.map((a) => action(a, e.target, names)).join(", then ");
-  const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}.`;
+  const limit = e.limit ? (e.limit.times === 1 ? ` (once per ${e.limit.per === "TURN" ? "turn" : "game"})` : ` (up to ${e.limit.times} times per ${e.limit.per === "TURN" ? "turn" : "game"})`) : "";
+  const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}${limit}.`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;
 }
 
