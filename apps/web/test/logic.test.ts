@@ -186,3 +186,18 @@ describe("gaugeText", async () => {
     expect(t.short).toBe("every 2 → Ultimate Form");
   });
 });
+
+describe("gearTargetSlots", async () => {
+  const { gearTargetSlots } = await import("../src/format.js");
+  const def = (o: Record<string, unknown>) => ({ key: "x", name: "x", kind: "UNIT", rank: 1, atk: 1, hp: 1, factions: [], colors: [], keywords: [], effects: [], ...o }) as never;
+  const onChosen = (target: Record<string, unknown>) => def({ kind: "GEAR", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY", ...target }, actions: [{ type: "BUFF", atk: 1, hp: 1 }] }] });
+  const board = [def({ factions: ["rider"] }), def({ factions: ["grunt"] }), def({ factions: ["rider"], series: "w" })];
+  it("lists the units a chosen-target gear can go on", () => {
+    expect(gearTargetSlots(onChosen({}), board)).toEqual([0, 1, 2]);
+    expect(gearTargetSlots(onChosen({ faction: "rider" }), board)).toEqual([0, 2]);
+    expect(gearTargetSlots(onChosen({ series: "w" }), board)).toEqual([2]);
+  });
+  it("is null for gear that needs no unit", () => {
+    expect(gearTargetSlots(def({ kind: "GEAR", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", actions: [{ type: "DISCOVER_UNIT", faction: "rider" }] }] }), board)).toBeNull();
+  });
+});

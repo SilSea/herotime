@@ -12,8 +12,14 @@ export function unitView(env: GameEnv, unit: Unit): UnitView {
   return view;
 }
 
-const needsTargets = (a: Action): boolean =>
+export const needsTargets = (a: Action): boolean =>
   a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY";
+
+/** Whether a unit passes a target's faction / series filter. */
+export function matchesTarget(env: GameEnv, u: Unit, t: Target): boolean {
+  const v = unitView(env, u);
+  return (t.faction === undefined || (v.factions?.includes(t.faction) ?? false)) && (t.series === undefined || v.series === t.series);
+}
 
 function select(
   selector: Selector,
@@ -21,12 +27,10 @@ function select(
   source: Unit | null,
   player: PlayerState,
   env: GameEnv,
+  chosen?: Unit,
 ): Unit[] {
   const board = player.board;
-  const mine = board.filter((u) => {
-    const v = unitView(env, u);
-    return (t.faction === undefined || v.factions?.includes(t.faction)) && (t.series === undefined || v.series === t.series);
-  });
+  const mine = board.filter((u) => matchesTarget(env, u, t));
   switch (selector) {
     case "SELF":
       return source && board.includes(source) ? [source] : [];
@@ -45,6 +49,8 @@ function select(
     }
     case "ALL_FRIENDLY":
       return mine;
+    case "CHOSEN_FRIENDLY":
+      return chosen && mine.includes(chosen) ? [chosen] : mine.slice(0, 1);
     case "LEFTMOST_ENEMY":
     case "RANDOM_ENEMY":
     case "ALL_ENEMY":
@@ -103,6 +109,19 @@ function offerGiants(player: PlayerState, env: GameEnv): void {
   const rest = env.rng.shuffle(giants.filter((g) => !picks.includes(g)));
   const options = [...picks, ...rest].slice(0, 3).map((g) => g.key);
   player.discovers.push({ options, destination: "GIANT" });
+}
+
+/** Up to 3 distinct pool units of at most the player's tavern rank (of one faction when given), as a Discover. */
+function discoverUnits(player: PlayerState, env: GameEnv, faction: string | undefined): void {
+  const accept = (key: string): boolean => faction === undefined || env.content.card(key).factions.includes(faction);
+  const options: string[] = [];
+  for (let attempts = 0; options.length < 3 && attempts < 20; attempts++) {
+    const key = env.pool.draw(env.rng, player.rank, 1, accept);
+    if (key === undefined) break;
+    if (options.includes(key)) env.pool.give(key);
+    else options.push(key);
+  }
+  if (options.length > 0) player.discovers.push({ options, destination: "HAND" });
 }
 
 /** What caused an effect, so a buff can be credited to it on the card. */
@@ -170,18 +189,22 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       offerGiants(player, env);
       return;
     }
+    case "DISCOVER_UNIT": {
+      for (let n = 0; n < mult; n++) discoverUnits(player, env, action.faction);
+      return;
+    }
     case "DAMAGE":
       throw new Error("action DAMAGE is only valid during combat");
   }
 }
 
 /** Run one effect in the recruit phase. `source` is the owning unit (null for player-scope effects). */
-export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin): void {
+export function runEffect(effect: Effect, source: Unit | null, player: PlayerState, env: GameEnv, origin?: Origin, chosen?: Unit): void {
   const board = player.board.map((u) => unitView(env, u));
   if (!checkCondition(effect.condition, board, player.energy)) return;
   const mult = source?.golden ? (effect.goldenMultiplier ?? 2) : 1;
   const target: Target = effect.target ?? { selector: "SELF" };
-  const targets = effect.actions.some(needsTargets) ? select(target.selector, target, source, player, env) : [];
+  const targets = effect.actions.some(needsTargets) ? select(target.selector, target, source, player, env, chosen) : [];
   const from: Origin = origin ?? (source ? { kind: "card", key: source.key } : { kind: "card", key: null });
   for (const action of effect.actions) runAction(action, mult, source, targets, player, env, from);
 }
@@ -195,9 +218,10 @@ export function runTrigger(
   player: PlayerState,
   env: GameEnv,
   origin?: Origin,
+  chosen?: Unit,
 ): void {
   for (const e of effects) {
-    if (e.trigger === trigger && e.scope === scope) runEffect(e, source, player, env, origin);
+    if (e.trigger === trigger && e.scope === scope) runEffect(e, source, player, env, origin, chosen);
   }
 }
 

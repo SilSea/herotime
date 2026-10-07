@@ -14,7 +14,7 @@ import {
 } from "../shop/economy.js";
 import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Keyword, Side } from "../types.js";
-import { fireGaugeTrigger, runTrigger, swapKey, type Origin } from "./effects.js";
+import { fireGaugeTrigger, matchesTarget, needsTargets, runTrigger, swapKey, type Origin } from "./effects.js";
 import type { GameEnv } from "./env.js";
 
 // ------------------------------------------------------------ recruit intents
@@ -93,14 +93,36 @@ export function buyGear(player: PlayerState, env: GameEnv): void {
   player.shopGear = null;
 }
 
-/** Use a Gear card from hand: its player-scope ON_PLAY effects run, then it is spent. */
-export function useGear(player: PlayerState, handIndex: number, env: GameEnv): void {
+/**
+ * Board slots a gear can be used on, or null when it targets nobody in particular (no CHOSEN_FRIENDLY effect).
+ * A unit qualifies when it passes the filter of every chosen-target effect.
+ */
+export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv): number[] | null {
+  const chosen = env.content.card(gearKey).effects.filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some(needsTargets));
+  if (chosen.length === 0) return null;
+  return player.board.flatMap((u, i) => (chosen.every((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) ? [i] : []));
+}
+
+/**
+ * Use a Gear card from hand: its player-scope ON_PLAY effects run, then it is spent. A gear that goes on a
+ * chosen unit needs `target` (a board slot) unless only one unit qualifies; with none it cannot be used.
+ */
+export function useGear(player: PlayerState, handIndex: number, env: GameEnv, target?: number): void {
   const card = player.hand[handIndex];
   if (card === undefined) throw new RuleError(`no hand slot ${handIndex}`);
   const def = env.content.card(card.key);
   if (def.kind !== "GEAR") throw new RuleError(`${def.name} is not gear`);
+  const valid = gearTargets(player, card.key, env);
+  let chosen: Unit | undefined;
+  if (valid) {
+    if (valid.length === 0) throw new RuleError(`${def.name} has no unit to go on`);
+    const slot = target ?? (valid.length === 1 ? valid[0] : undefined);
+    if (slot === undefined) throw new RuleError(`choose a unit for ${def.name}`);
+    if (!valid.includes(slot)) throw new RuleError(`${def.name} cannot go on that unit`);
+    chosen = player.board[slot];
+  }
   player.hand.splice(handIndex, 1);
-  runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env, { kind: "gear", key: card.key });
+  runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env, { kind: "gear", key: card.key }, chosen);
 }
 
 export function sellUnit(player: PlayerState, from: "board" | "hand", index: number, env: GameEnv): void {

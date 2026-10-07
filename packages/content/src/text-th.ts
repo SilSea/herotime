@@ -47,6 +47,7 @@ function who(t: Target | undefined, names: Names): string {
     case "RIGHTMOST_FRIENDLY": return `${one}ขวาสุด`;
     case "RANDOM_FRIENDLY": return `${one}อื่นแบบสุ่ม 1 ตัว`;
     case "ALL_FRIENDLY": return many;
+    case "CHOSEN_FRIENDLY": return filter ? `ยูนิต ${filter} ที่เลือก` : "พันธมิตรที่เลือก";
     case "LEFTMOST_ENEMY": return "ศัตรูซ้ายสุด";
     case "RANDOM_ENEMY": return "ศัตรูแบบสุ่ม 1 ตัว";
     case "ALL_ENEMY": return "ศัตรูทุกตัว";
@@ -77,6 +78,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "MODIFY_RULE": return ruleTextTh(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `ได้ ${names(a.cardKey)} เข้ามือ`;
     case "DISCOVER_GIANT": return "เลือกรับ Giant Robo";
+    case "DISCOVER_UNIT": return a.faction ? `เลือกรับยูนิต ${names(a.faction)} 1 จาก 3` : "เลือกรับยูนิต 1 จาก 3";
   }
 }
 

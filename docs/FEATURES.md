@@ -15,7 +15,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F1.9** (P0) จับคู่ไม่ซ้ำ 3 รอบล่าสุด + Ghost
 - [x] **F1.10** (P0) Timer: Hero 30s, Recruit 40s→75s (+10s เทิร์น relic), Battle 20s, ไม่มีปุ่ม Ready (server ปฏิเสธ READY ด้วย) (ทุกเทิร์นใช้เวลาเต็ม) → replay + นับถอยหลังเริ่มเทิร์นใหม่พร้อมกัน
 - [x] **F1.11** (P0) Hero Power (active / passive / ครั้งเดียวต่อเกม)
-- [x] **F1.12** (P1) Gear ในร้าน: ช่อง Gear 1 ช่อง ราคาตามการ์ด สุ่มจาก Gear ที่ rank ≤ ร้าน, Refresh สุ่มใหม่, Freeze เก็บไว้, ซื้อแล้วเข้ามือกด Use; ไม่อยู่ใน pool (หลายคนได้ชิ้นเดียวกันได้); bot ซื้อใช้ด้วย; 8 ชิ้นทั้ง prototype และ production
+- [x] **F1.12** (P1) Gear ในร้าน: ช่อง Gear 1 ช่อง ราคาตามการ์ด สุ่มจาก Gear ที่ rank ≤ ร้าน, Refresh สุ่มใหม่, Freeze เก็บไว้, ซื้อแล้วเข้ามือกด Use; ไม่อยู่ใน pool (หลายคนได้ชิ้นเดียวกันได้); bot ซื้อใช้ด้วย; 18 ชิ้นทั้ง prototype และ production. Gear เลือกเป้าหมายได้ (`CHOSEN_FRIENDLY`, ลากวางบนยูนิตหรือ Use → คลิก), Gear ให้ keyword, Gear `X Call` Discover ยูนิตตามเผ่า (`DISCOVER_UNIT`), ร้านมี Gear 1 ใบเสมอ, Book แท็บ Special แสดงการ์ดจาก Gauge + Giant Robo
 - [ ] **F1.13** (P2) Quick Mode (Recruit 35s, HP 20)
 - [x] **F1.14** (P0) ปุ่มยอมแพ้ (Surrender): ออกทันที ได้อันดับล่างสุดของคนที่ยังอยู่ ใช้ได้ทุก phase
 

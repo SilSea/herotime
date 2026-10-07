@@ -33,6 +33,8 @@ import {
   toHand,
   token,
   unit,
+  chosen,
+  discoverUnit,
 } from "./dsl.js";
 import type { ContentSetData } from "./types.js";
 
@@ -76,7 +78,7 @@ const cards = [
   token("rider_form", "Rider Form", { atk: 4, hp: 4, factions: ["rider"], series: R, keywords: ["RIDER_KICK"] }),
   token("super_form", "Super Form", { atk: 9, hp: 9, factions: ["rider"], series: R, keywords: ["RIDER_KICK", "RAPID"] }),
   gear("kyodai_gattai", "Kyodai Gattai!", [player("ON_PLAY", discoverGiant())]),
-  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [buff(4, 4, true), give("RIDER_KICK")], { target: leftmost({ faction: "rider" }) })]),
+  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [buff(4, 4, true), give("RIDER_KICK")], { target: chosen({ faction: "rider" }) })]),
   giant("proto_megazord", "Proto Megazord", { atk: 8, hp: 8, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW"] }),
   giant("proto_titan", "Proto Titan", { atk: 6, hp: 12, series: S, factions: ["mecha"], keywords: ["FINAL_BLOW", "GUARD"] }),
   giant("proto_beast", "Proto Beast", { atk: 10, hp: 7, keywords: ["FINAL_BLOW", "RAPID"] }),
@@ -156,14 +158,26 @@ const cards = [
 
 // ---- tavern gear: one slot in the shop, bought for its own price, used from the hand
 const tavernGear = [
-  shopGear("g_armor", "Armor Plate", 1, 1, [player("ON_PLAY", buff(0, 3), { target: leftmost() })]),
+  shopGear("g_armor", "Armor Plate", 1, 1, [player("ON_PLAY", buff(0, 3), { target: chosen() })]),
   shopGear("g_cell", "Energy Cell", 2, 1, [player("ON_PLAY", energy(2))]),
-  shopGear("g_blade", "Plasma Blade", 2, 2, [player("ON_PLAY", buff(3, 0), { target: leftmost() })]),
-  shopGear("g_emitter", "Barrier Emitter", 3, 3, [player("ON_PLAY", give("BARRIER"), { target: leftmost() })]),
-  shopGear("g_driver", "Henshin Driver", 3, 2, [player("ON_PLAY", [buff(2, 2), give("RIDER_KICK")], { target: leftmost({ faction: "rider" }) })], { factions: ["rider"] }),
+  shopGear("g_blade", "Plasma Blade", 2, 2, [player("ON_PLAY", buff(3, 0), { target: chosen() })]),
+  shopGear("g_emitter", "Barrier Emitter", 3, 3, [player("ON_PLAY", give("BARRIER"), { target: chosen() })]),
+  shopGear("g_driver", "Henshin Driver", 3, 2, [player("ON_PLAY", [buff(2, 2), give("RIDER_KICK")], { target: chosen({ faction: "rider" }) })], { factions: ["rider"] }),
   shopGear("g_boost", "Squad Boost", 4, 3, [player("ON_PLAY", buff(1, 1), { target: allAllies() })]),
-  shopGear("g_overclock", "Overclock Chip", 5, 4, [player("ON_PLAY", give("RAPID"), { target: leftmost() })]),
+  shopGear("g_overclock", "Overclock Chip", 5, 4, [player("ON_PLAY", give("RAPID"), { target: chosen() })]),
   shopGear("g_serum", "Titan Serum", 6, 5, [player("ON_PLAY", buff(2, 2), { target: allAllies() })]),
+  // keywords on a unit of your choice
+  shopGear("g_shield", "Guard Shield", 1, 1, [player("ON_PLAY", give("GUARD"), { target: chosen() })]),
+  shopGear("g_venom", "Venom Edge", 4, 3, [player("ON_PLAY", give("LETHAL"), { target: chosen() })]),
+  shopGear("g_revive", "Revive Chip", 5, 4, [player("ON_PLAY", give("REVIVE"), { target: chosen() })]),
+  // a unit of one faction (only offered when that faction is in the match)
+  shopGear("g_call_rider", "Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("rider"))], { factions: ["rider"] }),
+  shopGear("g_call_sentai", "Sentai Call", 2, 3, [player("ON_PLAY", discoverUnit("sentai"))], { factions: ["sentai"] }),
+  shopGear("g_call_mecha", "Mecha Call", 2, 3, [player("ON_PLAY", discoverUnit("mecha"))], { factions: ["mecha"] }),
+  shopGear("g_call_kaijin", "Kaijin Call", 2, 3, [player("ON_PLAY", discoverUnit("kaijin"))], { factions: ["kaijin"] }),
+  shopGear("g_call_grunt", "Grunt Call", 2, 3, [player("ON_PLAY", discoverUnit("grunt"))], { factions: ["grunt"] }),
+  shopGear("g_call_ally", "Ally Call", 2, 3, [player("ON_PLAY", discoverUnit("ally"))], { factions: ["ally"] }),
+  shopGear("g_call_dark_rider", "Dark Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("dark_rider"))], { factions: ["dark_rider"] }),
 ];
 
 const gauges = [

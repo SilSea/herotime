@@ -18,7 +18,8 @@ export const IntentSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("REFRESH") }).strict(),
   z.object({ type: z.literal("FREEZE") }).strict(),
   z.object({ type: z.literal("UPGRADE") }).strict(),
-  z.object({ type: z.literal("USE_GEAR"), handIndex: slot }).strict(),
+  /** target: the board slot of the unit a CHOSEN_FRIENDLY gear goes on. */
+  z.object({ type: z.literal("USE_GEAR"), handIndex: slot, target: slot.optional() }).strict(),
   z.object({ type: z.literal("HERO_POWER") }).strict(),
   z.object({ type: z.literal("PICK_DISCOVER"), index: slot }).strict(),
   z.object({ type: z.literal("CHOOSE_RELIC"), index: slot }).strict(),

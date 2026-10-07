@@ -46,6 +46,7 @@ function who(t: Target | undefined, names: Names): string {
     case "RIGHTMOST_FRIENDLY": return `the rightmost ${one}`;
     case "RANDOM_FRIENDLY": return `another random ${one}`;
     case "ALL_FRIENDLY": return `all ${many}`;
+    case "CHOSEN_FRIENDLY": return `a chosen ${one}`;
     case "LEFTMOST_ENEMY": return "the leftmost enemy";
     case "RANDOM_ENEMY": return "a random enemy";
     case "ALL_ENEMY": return "all enemies";
@@ -79,6 +80,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "MODIFY_RULE": return ruleText(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `add ${names(a.cardKey)} to your hand`;
     case "DISCOVER_GIANT": return "discover a Giant Robo";
+    case "DISCOVER_UNIT": return a.faction ? `discover a ${names(a.faction)} unit` : "discover a unit";
   }
 }
 

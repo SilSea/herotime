@@ -31,6 +31,7 @@ export const gauge = (key: string, amount: number): Action => ({ type: "GAUGE_AD
 export const rule = (name: string, op: "SET" | "ADD" | "MUL", value: number): Action => ({ type: "MODIFY_RULE", rule: name, op, value });
 export const toHand = (cardKey: string): Action => ({ type: "ADD_TO_HAND", cardKey });
 export const discoverGiant = (): Action => ({ type: "DISCOVER_GIANT" });
+export const discoverUnit = (faction?: string): Action => (faction ? { type: "DISCOVER_UNIT", faction } : { type: "DISCOVER_UNIT" });
 
 // ------------------------------------------------------------------ targets
 export const self: Target = { selector: "SELF" };
@@ -38,6 +39,8 @@ export const adjacent: Target = { selector: "ADJACENT" };
 export const leftmost = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "LEFTMOST_FRIENDLY", ...filter });
 export const rightmost = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "RIGHTMOST_FRIENDLY", ...filter });
 export const randomAlly = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "RANDOM_FRIENDLY", ...filter });
+/** The unit the player drops a gear on. */
+export const chosen = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "CHOSEN_FRIENDLY", ...filter });
 export const allAllies = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "ALL_FRIENDLY", ...filter });
 export const leftmostFoe: Target = { selector: "LEFTMOST_ENEMY" };
 export const randomFoe: Target = { selector: "RANDOM_ENEMY" };

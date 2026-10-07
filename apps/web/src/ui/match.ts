@@ -1,5 +1,5 @@
 import { formatClock } from "../clock.js";
-import { boardLabel, gaugeText, KEYWORDS, keywordName, ordinal, PHASE_LABEL, stars } from "../format.js";
+import { boardLabel, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, PHASE_LABEL, stars } from "../format.js";
 import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
@@ -219,6 +219,26 @@ let lastShopSig = "";
 
 /** Book tab for tavern gear (ranks are 1-6, so 7 cannot clash). */
 const GEAR_TAB = 7;
+/** Book tab for cards that never come from the tavern: gauge rewards and the Giant Robos. */
+const SPECIAL_TAB = 8;
+
+/** Gauge rewards and Giants of this match, each with a line saying how you get it. */
+function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
+  const out: { key: string; how: string }[] = [];
+  for (const g of ctx.ix.snapshot.gauges) {
+    for (const t of [...g.thresholds].sort((a, b) => a.at - b.at)) {
+      for (const r of t.reward) {
+        if (r.type === "ADD_TO_HAND" && ctx.ix.card(r.cardKey) && !out.some((o) => o.key === r.cardKey)) {
+          out.push({ key: r.cardKey, how: `${g.name} ${t.once ? "at" : "every"} ${t.at}${t.once ? " (once per game)" : ""}` });
+        }
+      }
+    }
+  }
+  const series = new Set([...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && (c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f)))).flatMap((c) => (c.series ? [c.series] : [])));
+  const giants = [...ctx.ix.cards.values()].filter((c) => c.kind === "GIANT" && (c.series === undefined || series.has(c.series))).sort((a, b) => a.name.localeCompare(b.name));
+  for (const c of giants) out.push({ key: c.key, how: "Giant Robo: chosen with Kyodai Gattai!, waits in the Giant Slot" });
+  return out;
+}
 
 /** Every shop card this match can offer, by rank: only this match's factions, plus neutrals. */
 function bookModal(ctx: Ctx, view: View): HTMLElement {
@@ -232,7 +252,8 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
   const pass = (c: { factions: string[]; keywords: string[]; effects: { actions: { type: string; keyword?: string }[] }[] }): boolean =>
     (fac === "" || (fac === "_neutral" ? c.factions.length === 0 : c.factions.includes(fac))) &&
     (kw === "" || c.keywords.includes(kw) || c.effects.some((e) => e.actions.some((a) => a.type === "GIVE_KEYWORD" && a.keyword === kw)));
-  const ofRank = (rank === GEAR_TAB ? gear : pool.filter((c) => c.rank === rank)).filter(pass).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
+  const special = specialCards(ctx, view);
+  const ofRank = (rank === GEAR_TAB ? gear : rank === SPECIAL_TAB ? [] : pool.filter((c) => c.rank === rank)).filter(pass).sort((a, b) => (a.factions[0] ?? "~").localeCompare(b.factions[0] ?? "~") || a.name.localeCompare(b.name));
   const close = (): void => ctx.store.set({ showBook: false });
   return h(
     "div",
@@ -242,7 +263,8 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
       { class: "modal-box book-box" },
       h("div", { class: "row" }, h("h2", { text: "Card book" }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `Factions this match: ${view.factions.map(ctx.ix.factionName).join(", ") || "all"} · your tavern is rank ${view.me.state.rank}` }), h("button", { class: "btn", text: "Close", on: { click: close } })),
       h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? "Upgrade your tavern to be offered these" : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
-        gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: "Gear the tavern can offer (from the rank shown on each card)", on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) }))),
+        gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: "Gear the tavern can offer (from the rank shown on each card)", on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) })),
+        special.length > 0 && h("button", { class: `tab ${rank === SPECIAL_TAB ? "active" : ""}`, title: "Cards from the gauges, and the Giant Robos", on: { click: () => ctx.store.set({ bookRank: SPECIAL_TAB }) } }, "Special", h("span", { class: "book-count", text: String(special.length) }))),
       h(
         "div",
         { class: "book-filters" },
@@ -255,7 +277,9 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
           return sel;
         })(),
       ),
-      h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? "No cards match these filters at this rank." : "No cards of this rank in this match." })),
+      rank === SPECIAL_TAB
+        ? h("div", { class: "book-cards" }, ...special.map((s) => h("div", { class: "book-special" }, cardEl(ctx.ix, { key: s.key }), h("div", { class: "book-how", text: s.how }))))
+        : h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? "No cards match these filters at this rank." : "No cards of this rank in this match." })),
     ),
   );
 }
@@ -369,9 +393,14 @@ function table(ctx: Ctx, view: View): HTMLElement {
   );
 
   const boardSlots: Child[] = s.board.map((_u, i) => boardCard(ctx, view, i));
+  const aim = aimedGear(ctx, view);
+  const aimBanner =
+    aim !== undefined &&
+    h("div", { class: "aim-banner" }, h("span", { text: `Choose a unit for ${ctx.ix.cardName(s.hand[aim]?.key ?? "")}` }), h("button", { class: "mini", text: "Cancel (Esc)", on: { click: () => ctx.store.set({ selected: undefined }) } }));
   const board = h(
     "div",
     { class: "warband" },
+    aimBanner,
     h("div", { class: "band-head" }, gaugeBars(ctx, view), h("span", { class: "spacer" }), h("span", { class: "band-count", title: "Units on your board", text: `${s.board.length}/${me.limits.boardSize}` }), sellZone(ctx, view)),
     // The Giant Slot sits at the far right; the whole row is the drop target (no dashed box), with a marker where a card will land.
     h("div", { class: "board-row" }, h("div", { class: "cards board-cards" }, ...boardSlots, h("div", { class: "drop-marker" })), giantSlot(ctx, view)),
@@ -510,19 +539,23 @@ function warbandDrop(ctx: Ctx, view: View, board: HTMLElement) {
     const at = boardIndexAt(board, e.clientX);
     const s = view.me.state;
     if (d.zone === "hand") {
-      void ctx.act(isGear(ctx, view, d.index) ? { type: "USE_GEAR", handIndex: d.index } : { type: "PLAY", handIndex: d.index, position: Math.min(at, s.board.length) });
+      if (isGear(ctx, view, d.index)) useGearFromHand(ctx, view, d.index, gearSlots(ctx, view, d.index) ? slotUnder(e) : undefined);
+      else void ctx.act({ type: "PLAY", handIndex: d.index, position: Math.min(at, s.board.length) });
     } else if (d.zone === "board") {
       const to = Math.min(at > d.index ? at - 1 : at, s.board.length - 1);
       if (to !== d.index) void ctx.act({ type: "REORDER", from: d.index, to });
     } else if (d.zone === "shop" || d.zone === "gear") {
       const key = d.zone === "shop" ? s.shop[d.index] : s.shopGear;
+      const onUnit = slotUnder(e);
       if (!key) return;
       const bought = await ctx.act(d.zone === "shop" ? { type: "BUY", index: d.index } : { type: "BUY_GEAR" });
       // Then play (or use) it: it is the last copy of that card in the hand, unless a triple swallowed it.
       const hand = ctx.store.state.view?.me.state.hand ?? [];
       const i = hand.map((u) => u.key).lastIndexOf(key);
       if (!bought || i < 0) return;
-      void ctx.act(d.zone === "gear" ? { type: "USE_GEAR", handIndex: i } : { type: "PLAY", handIndex: i, position: Math.min(at, ctx.store.state.view?.me.state.board.length ?? at) });
+      const now = ctx.store.state.view ?? view;
+      if (d.zone === "gear") useGearFromHand(ctx, now, i, gearSlots(ctx, now, i) ? onUnit : undefined);
+      else void ctx.act({ type: "PLAY", handIndex: i, position: Math.min(at, now.me.state.board.length) });
     }
   };
 }
@@ -559,6 +592,39 @@ function readDrag(e: DragEvent): { zone: string; index: number } | undefined {
 }
 
 const isGear = (ctx: Ctx, view: View, handIndex: number): boolean => ctx.ix.card(view.me.state.hand[handIndex]?.key ?? "")?.kind === "GEAR";
+
+/** Slots the hand gear at `handIndex` can go on (null: it needs no unit). */
+const gearSlots = (ctx: Ctx, view: View, handIndex: number): number[] | null =>
+  gearTargetSlots(ctx.ix.card(view.me.state.hand[handIndex]?.key ?? ""), view.me.state.board.map((u) => ctx.ix.card(u.key)));
+
+/** The hand gear being aimed at a unit, if any (it must still be a gear in that slot). */
+function aimedGear(ctx: Ctx, view: View): number | undefined {
+  const sel = ctx.store.state.selected;
+  return sel?.zone === "hand" && view.phase === "RECRUIT" && isGear(ctx, view, sel.index) ? sel.index : undefined;
+}
+
+/** Use a hand gear: straight away if it needs no unit or only one fits, otherwise wait for a click on a unit. */
+function useGearFromHand(ctx: Ctx, view: View, handIndex: number, target?: number): void {
+  const slots = gearSlots(ctx, view, handIndex);
+  if (target === undefined && slots && slots.length > 1) {
+    ctx.store.set({ selected: { zone: "hand", index: handIndex } });
+    return;
+  }
+  if (slots && slots.length === 0) {
+    ctx.toast(`${ctx.ix.cardName(view.me.state.hand[handIndex]?.key ?? "")} has no unit to go on`, "error");
+    return;
+  }
+  ctx.store.set({ selected: undefined });
+  void ctx.act(target === undefined ? { type: "USE_GEAR", handIndex } : { type: "USE_GEAR", handIndex, target });
+}
+
+/** The board slot under a drop, if the pointer is over a unit. */
+function slotUnder(e: DragEvent): number | undefined {
+  const slot = (e.target as HTMLElement | null)?.closest<HTMLElement>(".board-cards > .slot");
+  if (!slot?.parentElement) return undefined;
+  const i = [...slot.parentElement.querySelectorAll(":scope > .slot")].indexOf(slot);
+  return i >= 0 ? i : undefined;
+}
 const allowDrop = (e: DragEvent): void => e.preventDefault();
 
 function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
@@ -569,9 +635,23 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const canCombine = recruiting && (view.me.combinable ?? []).includes(i);
   const form = ctx.ix.card(u.key)?.gattaiInto;
   const el = cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, minion: true, buffs: u.buffs ?? [], classes: canCombine ? ["core-ready"] : [] });
+  const aim = aimedGear(ctx, view);
+  const aimable = aim !== undefined && (gearSlots(ctx, view, aim) ?? []).includes(i);
   return h(
     "div",
-    { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "board", i), dragend: endDrag } },
+    {
+      class: `slot ${aim === undefined ? "" : aimable ? "aim-ok" : "aim-no"}`,
+      draggable: recruiting && aim === undefined,
+      on: {
+        dragstart: (e) => dragData(e, "board", i),
+        dragend: endDrag,
+        click: (e) => {
+          if (!aimable || aim === undefined) return;
+          e.stopPropagation();
+          useGearFromHand(ctx, view, aim, i);
+        },
+      },
+    },
     el,
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini", text: "<", disabled: i === 0, title: "Move left", on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i - 1 }) } }),
@@ -601,7 +681,7 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: endDrag } },
     cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [] }),
     recruiting && h("div", { class: "slot-actions" },
-      h("button", { class: "mini primary", text: gear ? "Use" : "Play", disabled: !gear && full, on: { click: () => void ctx.act(gear ? { type: "USE_GEAR", handIndex: i } : { type: "PLAY", handIndex: i, position: view.me.state.board.length }) } }),
+      h("button", { class: "mini primary", text: gear ? (aimedGear(ctx, view) === i ? "Cancel" : "Use") : "Play", disabled: !gear && full, on: { click: () => (gear ? (aimedGear(ctx, view) === i ? ctx.store.set({ selected: undefined }) : useGearFromHand(ctx, view, i)) : void ctx.act({ type: "PLAY", handIndex: i, position: view.me.state.board.length })) } }),
       !gear && h("button", { class: "mini", text: `Sell +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),
   );
 }
@@ -667,7 +747,7 @@ function showGaugeCard(ctx: Ctx, view: View, anchor: HTMLElement, g: (typeof ctx
     { class: "player-card gauge-card" },
     h("div", { class: "pc-name", text: `${g.name} · ${value}/${g.max}` }),
     h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "How it fills" }), ...t.fills.map((f) => h("div", { class: "pc-text", text: f }))),
-    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "What it gives" }), ...t.rewards.map((r) => h("div", { class: "pc-text", text: r })), rewardKeys.length > 0 && h("div", { class: "gauge-examples" }, ...rewardKeys.map((k) => cardEl(ctx.ix, { key: k, small: true })))),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "What it gives" }), ...t.rewards.map((r) => h("div", { class: "pc-text", text: r })), ...rewardKeys.map((k) => h("div", { class: "pc-text gauge-reward-text" }, h("strong", { text: `${ctx.ix.cardName(k)}: ` }), ctx.ix.card(k)?.text ?? "")), rewardKeys.length > 0 && h("div", { class: "gauge-examples" }, ...rewardKeys.map((k) => cardEl(ctx.ix, { key: k, small: true }))), rewardKeys.length > 0 && h("div", { class: "pc-text muted", text: "All of them are in the Book, Special tab." })),
     examples.length > 0 && h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "Cards in this match that fill it" }), h("div", { class: "gauge-examples" }, ...examples.map((c) => cardEl(ctx.ix, { key: c.key, small: true })))),
     examples.length === 0 && h("div", { class: "pc-section muted", text: "No card in this match's factions fills it." }),
   );

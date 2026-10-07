@@ -1,4 +1,18 @@
-import type { CombatRecord } from "./protocol.js";
+import type { CardDef, CombatRecord } from "./protocol.js";
+
+const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY"]);
+
+/**
+ * Board slots a gear can be used on, or null when it goes on nobody in particular. Same rule as the
+ * engine: a unit qualifies when it passes the faction / series filter of every chosen-target effect.
+ */
+export function gearTargetSlots(gear: CardDef | undefined, board: readonly (CardDef | undefined)[]): number[] | null {
+  const chosen = (gear?.effects ?? []).filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some((a) => TARGETED_ACTIONS.has(a.type)));
+  if (chosen.length === 0) return null;
+  const fits = (d: CardDef | undefined): boolean =>
+    d !== undefined && chosen.every((e) => (e.target?.faction === undefined || d.factions.includes(e.target.faction)) && (e.target?.series === undefined || d.series === e.target.series));
+  return board.flatMap((d, i) => (fits(d) ? [i] : []));
+}
 
 /** Plain-language explanations shown when hovering a keyword. */
 export const KEYWORDS: Record<string, { name: string; text: string }> = {
@@ -86,7 +100,7 @@ const GAUGE_SOURCE: Record<string, string> = {
 export function gaugeText(g: GaugeLike, cardName: (key: string) => string, rollCallColors = 5): { fills: string[]; rewards: string[]; short: string } {
   const fills = g.sources.map((s) => `+${s.amount} ${(GAUGE_SOURCE[s.trigger] ?? s.trigger).replace("{colors}", String(rollCallColors))}`);
   const reward = (r: { type: string; cardKey?: string }): string =>
-    r.type === "ADD_TO_HAND" && r.cardKey ? `get ${cardName(r.cardKey)}` : r.type === "DISCOVER_GIANT" ? "discover a Giant Robo" : r.type.toLowerCase().replace(/_/g, " ");
+    r.type === "ADD_TO_HAND" && r.cardKey ? `get ${cardName(r.cardKey)}` : r.type === "DISCOVER_GIANT" ? "discover a Giant Robo" : r.type === "DISCOVER_UNIT" ? "discover a unit" : r.type.toLowerCase().replace(/_/g, " ");
   const rewards = [...g.thresholds].sort((a, b) => a.at - b.at).map((t) => `${t.once ? `At ${t.at}` : `Every ${t.at}`}: ${t.reward.map(reward).join(", then ")}${t.once ? " (once per game)" : ""}`);
   const first = [...g.thresholds].sort((a, b) => a.at - b.at)[0];
   const short = first ? `${first.once ? "at" : "every"} ${first.at} → ${first.reward.map(reward).join(", ").replace(/^get /, "")}` : "";

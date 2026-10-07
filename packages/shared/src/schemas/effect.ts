@@ -57,6 +57,8 @@ export const Selector = z.enum([
   "RIGHTMOST_FRIENDLY",
   "RANDOM_FRIENDLY",
   "ALL_FRIENDLY",
+  /** The friendly unit the player picks when using gear; anywhere else (or with no pick) the leftmost match. */
+  "CHOSEN_FRIENDLY",
   "LEFTMOST_ENEMY",
   "RANDOM_ENEMY",
   "ALL_ENEMY",
@@ -97,6 +99,8 @@ export const Action = z.discriminatedUnion("type", [
   z.object({ type: z.literal("ADD_TO_HAND"), cardKey: z.string() }),
   /** Offer 3 Giant Robos; the one whose series has most units on the board is guaranteed. */
   z.object({ type: z.literal("DISCOVER_GIANT") }),
+  /** Recruit only: Discover a unit from the pool (up to your tavern rank), of one faction when given. */
+  z.object({ type: z.literal("DISCOVER_UNIT"), faction: z.string().optional() }),
 ]);
 export type Action = z.infer<typeof Action>;
 

@@ -123,6 +123,11 @@ function rollShop(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig, ge
     player.shop.push(key);
   }
   // Rolled after the units so content without gear keeps exactly the random sequence it had before.
+  rollGear(player, rng, gear);
+}
+
+/** The tavern always offers one Gear (of at most the player rank) when the content has any. */
+function rollGear(player: PlayerState, rng: Rng, gear: readonly GearChoice[]): void {
   const eligible = gear.filter((g) => g.rank <= player.rank);
   player.shopGear = eligible.length > 0 ? rng.pick(eligible).key : null;
 }
@@ -143,6 +148,8 @@ export function startTurn(
   if (turn > 1) player.upgradeDiscount += 1;
   if (player.frozen) {
     player.frozen = false;
+    // Freezing keeps the units; a Gear bought from the frozen tavern is restocked.
+    if (player.shopGear === null) rollGear(player, rng, gear);
   } else {
     rollShop(player, pool, rng, cfg, gear);
   }

@@ -44,10 +44,10 @@ export class Pool {
    * Draw one copy at random (weighted by copies left) from cards with
    * minRank <= rank <= maxRank. Shops use the default minRank; Discover pins both.
    */
-  draw(rng: Rng, maxRank: number, minRank = 1): string | undefined {
+  draw(rng: Rng, maxRank: number, minRank = 1, accept?: (key: string) => boolean): string | undefined {
     const eligible = (key: string): boolean => {
       const r = this.rankOf(key);
-      return r >= minRank && r <= maxRank;
+      return r >= minRank && r <= maxRank && (accept === undefined || accept(key));
     };
     let total = 0;
     for (const key of this.order) {

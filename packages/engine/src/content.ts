@@ -120,6 +120,7 @@ export class Content {
     const checkActions = (actions: Iterable<Action>, from: string): void => {
       for (const a of actions) {
         if (a.type === "SUMMON" || a.type === "ADD_TO_HAND") needCard(a.cardKey, from);
+        else if (a.type === "DISCOVER_UNIT") needFaction(a.faction, from);
         else if (a.type === "TRANSFORM") needCard(a.into, from);
         else if (a.type === "GAUGE_ADD" && !this.gauges.has(a.gauge)) {
           problems.push(`${from} references unknown gauge "${a.gauge}"`);
@@ -163,7 +164,7 @@ export class Content {
       }
     }
     // Rewards run with no source unit, so actions that need a target would silently do nothing.
-    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "SUMMON"]);
+    const targetless = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUMMON"]);
     for (const g of this.gauges.values()) {
       for (const t of g.thresholds) {
         const from = `gauge "${g.key}"`;

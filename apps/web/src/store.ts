@@ -41,6 +41,7 @@ export interface AppState {
   spectating?: string;
   defeatAck?: string;
   hideOffers: boolean;
+  /** A hand gear waiting for the player to click the unit it goes on. */
   selected: Selection;
 }
 

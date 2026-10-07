@@ -311,7 +311,7 @@ export class Match {
         upgrade(s, env.cfg);
         break;
       case "USE_GEAR":
-        useGear(s, intent.handIndex, env);
+        useGear(s, intent.handIndex, env, intent.target);
         break;
       case "HERO_POWER":
         useHeroPower(s, env);

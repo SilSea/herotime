@@ -708,3 +708,15 @@ body.dragging .drop-marker.show { display: block; }
 .warband { position: relative; padding-top: 34px; }
 .warband > .band-head { position: absolute; top: 2px; left: 0; right: 0; padding: 0; align-items: flex-start; }
 .band-head .gauge { width: 230px; }
+
+/* ---- aiming a gear at a unit */
+.aim-banner { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; gap: 10px; align-items: center; padding: 6px 14px; background: linear-gradient(180deg, #0d1834f5, #08102af5); border: 1px solid var(--cyan); box-shadow: 0 0 18px #2fe4ff55; font-weight: 700; white-space: nowrap; }
+.slot.aim-ok { cursor: crosshair; }
+.slot.aim-ok > :first-child { filter: drop-shadow(0 0 10px #2fe4ff); animation: aim-pulse 1s ease-in-out infinite; }
+.slot.aim-no > :first-child { opacity: .4; filter: grayscale(.6); }
+@keyframes aim-pulse { 50% { filter: drop-shadow(0 0 3px #2fe4ff); } }
+
+/* ---- book: gauge rewards and Giants */
+.book-special { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 190px; }
+.book-how { font-size: 12px; color: var(--cyan); text-align: center; line-height: 1.25; }
+.gauge-reward-text strong { color: #fff; }

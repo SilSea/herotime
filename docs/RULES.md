@@ -132,7 +132,11 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 - ราคาเป็นของแต่ละชิ้น (ไม่ใช่ 3 เสมอ): ซื้อแล้วเข้ามือ กด **Use** เพื่อใช้ผล (ส่วนใหญ่บัฟยูนิตซ้ายสุด/ทุกตัว แบบถาวรเพราะใช้ช่วง recruit)
 - Refresh สุ่ม Gear ใหม่, Freeze เก็บไว้, ซื้อแล้วช่องว่างจน Refresh/เทิร์นหน้า
 - Gear ไม่อยู่ใน shared pool: หลายคนได้ชิ้นเดียวกันได้. ขาย Gear ไม่ได้
-- Gear ที่ได้จาก Gauge (Kyodai Gattai!, Ultimate Form) ไม่ขายในร้าน
+- Gear ที่ได้จาก Gauge (Kyodai Gattai!, Ultimate Form) ไม่ขายในร้าน — ดูได้ใน Book แท็บ **Special** (พร้อม Giant Robo)
+- ร้านมี Gear 1 ใบเสมอ: ทุก Refresh สุ่มใหม่; Freeze แล้วซื้อ Gear ไป เทิร์นหน้าเติมใหม่ให้
+- **เลือกเป้าหมาย**: Gear ที่ใช้ selector `CHOSEN_FRIENDLY` ต้องเลือกยูนิต — ลาก Gear ไปวางบนยูนิต หรือกด Use แล้วคลิกยูนิต (Esc ยกเลิก). มียูนิตเข้าเงื่อนไขตัวเดียว = เลือกให้เอง; ไม่มีเลย = ใช้ไม่ได้ (การ์ดยังอยู่ในมือ). นอกจาก Gear (เช่นในการต่อสู้) `CHOSEN_FRIENDLY` = ซ้ายสุดที่เข้าเงื่อนไข
+- **ให้ keyword**: Guard Shield (Guard), Barrier Emitter (Barrier), Venom Edge (Lethal), Overclock Chip (Rapid), Revive Chip (Revive)
+- **ได้การ์ดตามเผ่า**: `X Call` (action `DISCOVER_UNIT {faction}`) Discover ยูนิตเผ่านั้น 1 จาก 3 จาก pool ที่ rank ≤ ร้าน (มีเฉพาะเผ่าที่อยู่ในแมตช์)
 
 ## 10. ตัวอย่างยูนิต Rank 1 (prototype set หลัง balance pass ล่าสุด)
 | ชื่อ | Faction | ATK/HP | Effect |

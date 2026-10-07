@@ -11,6 +11,7 @@ import {
   pickDiscover,
   playUnit,
   sellUnit,
+  gearTargets,
   useGear,
   useHeroPower,
 } from "../game/session.js";
@@ -24,6 +25,21 @@ function attempt(fn: () => void): boolean {
     if (e instanceof RuleError) return false;
     throw e;
   }
+}
+
+/** Use a gear on the strongest unit it can go on (by current attack + health). */
+function useGearWell(p: PlayerState, handIndex: number, env: GameEnv): void {
+  const key = p.hand[handIndex]?.key;
+  const valid = key === undefined ? null : gearTargets(p, key, env);
+  if (!valid || valid.length === 0) return useGear(p, handIndex, env);
+  const power = (i: number): number => {
+    const u = p.board[i];
+    if (!u) return 0;
+    const d = env.content.card(u.key);
+    return (d.atk + (u.bonusAtk ?? 0) + d.hp + (u.bonusHp ?? 0)) * (u.golden ? 2 : 1);
+  };
+  const best = [...valid].sort((a, b) => power(b) - power(a))[0];
+  useGear(p, handIndex, env, best);
 }
 
 /** Faction most common among the units a player owns (ties broken alphabetically). */
@@ -106,7 +122,7 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv): void {
   }
   for (let guard = 0; guard < 6; guard++) {
     const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
-    if (i < 0 || !attempt(() => useGear(p, i, env))) break;
+    if (i < 0 || !attempt(() => useGearWell(p, i, env))) break;
   }
 
   // climb ranks on a schedule: about one rank every two turns
@@ -134,7 +150,7 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv): void {
   // Spare Energy goes on the tavern's Gear, used at once. Gear helps the units on the board, so only with some there.
   if (p.shopGear && p.board.length > 0 && attempt(() => buyGear(p, env))) {
     const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
-    if (i >= 0) attempt(() => useGear(p, i, env));
+    if (i >= 0) attempt(() => useGearWell(p, i, env));
   }
   for (let guard = 0; guard < 6 && p.discovers.length > 0; guard++) {
     if (!attempt(() => pickDiscover(p, 0, env))) break;

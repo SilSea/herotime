@@ -15,7 +15,7 @@ export type Intent =
   | { type: "REFRESH" }
   | { type: "FREEZE" }
   | { type: "UPGRADE" }
-  | { type: "USE_GEAR"; handIndex: number }
+  | { type: "USE_GEAR"; handIndex: number; target?: number }
   | { type: "HERO_POWER" }
   | { type: "PICK_DISCOVER"; index: number }
   | { type: "CHOOSE_RELIC"; index: number }

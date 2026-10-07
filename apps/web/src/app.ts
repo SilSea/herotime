@@ -327,7 +327,7 @@ export function startApp(root: HTMLElement): void {
     if (e.key.toLowerCase() === "d") store.set({ showDebug: !s.showDebug });
     else if (e.key.toLowerCase() === "l") store.set({ showLog: !s.showLog });
     else if (e.key.toLowerCase() === "b") store.set({ showBook: !s.showBook, bookRank: s.bookRank || s.view.me.state.rank });
-    else if (e.key === "Escape") store.set({ showBook: false, showLog: false });
+    else if (e.key === "Escape") store.set({ showBook: false, showLog: false, selected: undefined });
     else if (intent) void ctx().act(intent);
   });
 

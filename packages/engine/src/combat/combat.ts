@@ -179,6 +179,7 @@ export function simulateCombat(
         return [s.list[i - 1], s.list[i + 1]].filter((f): f is Fighter => f !== undefined && alive(f));
       }
       case "LEFTMOST_FRIENDLY":
+      case "CHOSEN_FRIENDLY": // nobody picks during a fight
         return mine.slice(0, 1);
       case "RIGHTMOST_FRIENDLY":
         return mine.slice(-1);
@@ -309,6 +310,7 @@ export function simulateCombat(
       case "MODIFY_RULE":
       case "ADD_TO_HAND":
       case "DISCOVER_GIANT":
+      case "DISCOVER_UNIT":
         throw new Error(`action ${action.type} is not valid during combat`);
     }
   };
