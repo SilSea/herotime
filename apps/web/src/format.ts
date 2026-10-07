@@ -21,6 +21,32 @@ export function gearTargetSlots(gear: CardDef | undefined, board: readonly (Card
   return board.flatMap((d, i) => (fits(d) ? [i] : []));
 }
 
+/**
+ * Cards a card brings into play or points at, for the hover preview: its Henshin / Ultimate / Gattai forms,
+ * what it summons, adds to the hand or transforms into, and the named cards its targets or conditions need.
+ * At most `max`, each once, never the card itself.
+ */
+export function relatedCards(def: CardDef | undefined, max = 4): { key: string; label: string }[] {
+  if (!def) return [];
+  const out: { key: string; label: string }[] = [];
+  const add = (key: string | undefined, label: string): void => {
+    if (key && key !== def.key && !out.some((o) => o.key === key)) out.push({ key, label });
+  };
+  add(def.henshin?.into, tr("Henshin into", "Henshin เป็น"));
+  add(def.ultimateInto, tr("Ultimate Form", "ร่าง Ultimate"));
+  add(def.gattaiInto, tr("Gattai into", "Gattai รวมเป็น"));
+  for (const e of def.effects) {
+    for (const a of e.actions) {
+      if (a.type === "SUMMON") add(a.cardKey, tr("Summons", "เรียก"));
+      if (a.type === "ADD_TO_HAND") add(a.cardKey, tr("Adds to your hand", "ได้เข้ามือ"));
+      if (a.type === "TRANSFORM") add(a.into, tr("Transforms into", "แปลงเป็น"));
+    }
+    for (const k of e.target?.cards ?? []) add(k, tr("Only for", "เฉพาะ"));
+    if (e.condition?.type === "HAS_CARD") for (const k of e.condition.cards) add(k, tr("Needs", "ต้องมี"));
+  }
+  return out.slice(0, max);
+}
+
 /** Alphabetical by name (then key), ignoring case, numbers in order ("Unit 2" before "Unit 10"). */
 export const byName = (a: { name?: unknown; key?: unknown }, b: { name?: unknown; key?: unknown }): number =>
   String(a.name ?? a.key ?? "").localeCompare(String(b.name ?? b.key ?? ""), undefined, { sensitivity: "base", numeric: true }) ||

@@ -187,6 +187,31 @@ describe("gaugeText", async () => {
   });
 });
 
+describe("relatedCards", async () => {
+  const { relatedCards } = await import("../src/format.js");
+  const fx = (o: Record<string, unknown>) => ({ scope: "UNIT", trigger: "ON_PLAY", actions: [], ...o });
+  const def = (o: Record<string, unknown>) => ({ key: "me", name: "Me", kind: "UNIT", rank: 1, atk: 1, hp: 1, factions: [], colors: [], keywords: [], effects: [], ...o }) as never;
+  it("lists forms first, then what it summons / adds / becomes, then named cards; each once, never itself", () => {
+    const d = def({
+      henshin: { afterTurns: 2, into: "me_form" },
+      ultimateInto: "me_ult",
+      effects: [
+        fx({ trigger: "LAST_STAND", actions: [{ type: "SUMMON", cardKey: "cub", count: 2 }, { type: "SUMMON", cardKey: "cub" }] }),
+        fx({ actions: [{ type: "ADD_TO_HAND", cardKey: "me" }] }),
+      ],
+    });
+    expect(relatedCards(d).map((r) => r.key)).toEqual(["me_form", "me_ult", "cub"]);
+    expect(relatedCards(d)[2]?.label).toMatch(/Summons|เรียก/);
+  });
+  it("includes transform targets, card filters and HAS_CARD, up to the limit", () => {
+    const d = def({ effects: [fx({ target: { selector: "ALL_FRIENDLY", cards: ["a", "b"] }, condition: { type: "HAS_CARD", cards: ["c"] }, actions: [{ type: "TRANSFORM", into: "t" }] })] });
+    expect(relatedCards(d).map((r) => r.key)).toEqual(["t", "a", "b", "c"]);
+    expect(relatedCards(d, 2)).toHaveLength(2);
+    expect(relatedCards(undefined)).toEqual([]);
+    expect(relatedCards(def({}))).toEqual([]);
+  });
+});
+
 describe("byName", async () => {
   const { byName } = await import("../src/format.js");
   it("sorts A to Z by name, ignoring case, numbers in order, key when names tie", () => {

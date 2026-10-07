@@ -4,8 +4,8 @@ import { Api, Net } from "./net.js";
 import type { AuthResult, Intent, MatchView, PracticeOptions } from "./protocol.js";
 import { addToast, applyEvent, applyStatus, applyView, removeToast, Store } from "./store.js";
 import { adminHasFocus, renderAdmin, resetAdmin } from "./ui/admin.js";
-import { KEYWORD_ICON_OF, triggerInfo } from "./ui/card.js";
-import { keywordName, keywordText } from "./format.js";
+import { cardEl, KEYWORD_ICON_OF, triggerInfo } from "./ui/card.js";
+import { keywordName, keywordText, relatedCards } from "./format.js";
 import { serverText, tr } from "./i18n.js";
 import { cardSound, hasUploaded, play, playMusic, setContentSounds, slotForIntent } from "./sound.js";
 import { langToggle, muteToggle } from "./ui/lang.js";
@@ -323,7 +323,14 @@ export function startApp(root: HTMLElement): void {
       ...(card.dataset.core ? [box("◈", "Gattai core", tr(`Put it leftmost of enough adjacent Gattai units and press Combine: the group becomes ${card.dataset.core} for good.`, `วางไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันให้ครบจำนวน แล้วกด Combine ทั้งกลุ่มจะรวมเป็น ${card.dataset.core} ถาวร`))] : []),
       ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k), keywordText(k))),
     ];
-    const info = h("div", { class: "kw-boxes" }, ...boxes);
+    // The cards it brings in (summons, adds to hand, its forms...) or points at, so a player sees them before choosing.
+    const ix = content;
+    const related = ix ? relatedCards(ix.card(card.dataset.key)).filter((r) => ix.card(r.key)) : [];
+    const relatedEl =
+      ix && related.length > 0
+        ? h("div", { class: "related-cards" }, ...related.map((r) => h("div", { class: "related-card" }, h("div", { class: "related-label", text: r.label }), cardEl(ix, { key: r.key, small: true }))))
+        : null;
+    const info = h("div", { class: "kw-boxes" }, ...boxes, relatedEl);
     preview.replaceChildren(big, info);
     preview.classList.toggle("left", card.getBoundingClientRect().left + card.offsetWidth / 2 > window.innerWidth / 2);
     preview.classList.add("show");
