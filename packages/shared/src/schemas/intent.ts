@@ -69,3 +69,7 @@ export type PracticeInput = z.infer<typeof PracticeSchema>;
 export const QueueKind = z.enum(["standard", "quick"]);
 export type QueueKind = z.infer<typeof QueueKind>;
 export const QueueJoinSchema = z.object({ kind: QueueKind.optional() }).strict();
+
+/** Friend rooms: join one by its code; the host starts it with this many bots on top of the players. */
+export const RoomJoinSchema = z.object({ code: z.string().trim().min(4).max(8) }).strict();
+export const RoomStartSchema = z.object({ bots: z.number().int().min(0).max(7).optional() }).strict();

@@ -20,6 +20,10 @@ export interface Ctx {
   startPractice(options: PracticeOptions): Promise<void>;
   joinQueue(kind?: "standard" | "quick"): Promise<void>;
   leaveQueue(): Promise<void>;
+  /** Friend rooms: open one, join one by its code, or (host) start it with some bots. Leaving uses leaveQueue. */
+  createRoom(): Promise<void>;
+  joinRoom(code: string): Promise<void>;
+  startRoom(bots: number): Promise<void>;
   /** After a match: go back to the lobby. */
   leaveMatch(): Promise<void>;
   go(screen: "lobby" | "library" | "admin"): void;

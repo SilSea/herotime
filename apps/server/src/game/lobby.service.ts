@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { Inject, Injectable } from "@nestjs/common";
 import { QUICK_MODE, RuleError, type MatchConfig } from "@herotime/engine";
 import type { PracticeInput, QueueKind } from "@herotime/shared";
@@ -10,7 +11,20 @@ import type { Publisher, Timers } from "./ports.js";
 export type LobbyStatus =
   | { state: "idle" }
   | { state: "queued"; kind: QueueKind; waiting: number; matchSize: number; fillAt: number | null }
-  | { state: "playing"; matchId: string; ended: boolean };
+  | { state: "playing"; matchId: string; ended: boolean }
+  | { state: "room"; code: string; host: boolean; members: string[]; max: number };
+
+/** A private room: friends gather with its code, then the host starts a match (bots fill the seats asked for). */
+interface FriendRoom {
+  code: string;
+  hostId: string;
+  /** In arrival order; the first one is the host. */
+  members: Map<string, QueuedUser>;
+}
+
+/** Room codes avoid letters that read alike (0/O, 1/I/L). */
+const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const CODE_LENGTH = 5;
 
 /** One waiting room: players in arrival order and the timer that fills the rest with bots. */
 interface Room {
@@ -28,6 +42,7 @@ const KINDS: readonly QueueKind[] = ["standard", "quick"];
 @Injectable()
 export class LobbyService {
   private readonly rooms = new Map<QueueKind, Room>(KINDS.map((k) => [k, { users: new Map(), cancelFill: undefined, fillAt: null }]));
+  private readonly friendRooms = new Map<string, FriendRoom>();
 
   constructor(
     @Inject(MatchRegistry) private readonly registry: MatchRegistry,
@@ -69,6 +84,7 @@ export class LobbyService {
     if (this.registry.activeFor(user.id)) throw new RuleError("you are already in a match");
     this.registry.release(user.id); // a finished match no longer blocks queueing
     for (const k of KINDS) if (k !== kind) this.leaveRoom(k, user.id); // one queue at a time
+    this.leaveFriendRoom(user.id);
     const room = this.room(kind);
     if (!room.users.has(user.id)) room.users.set(user.id, user);
 
@@ -83,6 +99,65 @@ export class LobbyService {
 
   leave(userId: string): void {
     for (const k of KINDS) this.leaveRoom(k, userId);
+    this.leaveFriendRoom(userId);
+  }
+
+  // ------------------------------------------------------------ friend rooms
+
+  /** Open a private room; the caller is its host. */
+  createRoom(user: QueuedUser): LobbyStatus {
+    if (this.registry.activeFor(user.id)) throw new RuleError("you are already in a match");
+    this.registry.release(user.id);
+    this.leave(user.id);
+    let code = "";
+    do code = Array.from({ length: CODE_LENGTH }, () => CODE_CHARS[randomInt(CODE_CHARS.length)]).join("");
+    while (this.friendRooms.has(code));
+    this.friendRooms.set(code, { code, hostId: user.id, members: new Map([[user.id, user]]) });
+    return this.statusFor(user.id);
+  }
+
+  /** Join a friend's room by its code (any case). */
+  joinRoom(user: QueuedUser, code: string): LobbyStatus {
+    if (this.registry.activeFor(user.id)) throw new RuleError("you are already in a match");
+    const room = this.friendRooms.get(code.trim().toUpperCase());
+    if (!room) throw new RuleError("no room with that code");
+    if (!room.members.has(user.id)) {
+      if (room.members.size >= this.config.lobby.matchSize) throw new RuleError("that room is full");
+      this.registry.release(user.id);
+      this.leave(user.id);
+      room.members.set(user.id, user);
+    }
+    this.broadcastRoom(room);
+    return this.statusFor(user.id);
+  }
+
+  /** The host starts the match: everyone in the room plus `bots` bots (at least one opponent, at most 8 seats). */
+  startRoom(userId: string, bots = 0): LobbyStatus {
+    const room = [...this.friendRooms.values()].find((r) => r.members.has(userId));
+    if (!room) throw new RuleError("you are not in a room");
+    if (room.hostId !== userId) throw new RuleError("only the host can start the match");
+    const users = [...room.members.values()];
+    const size = Math.min(this.config.lobby.matchSize, Math.max(2, users.length + bots));
+    this.friendRooms.delete(room.code);
+    this.registry.startMatch(users, { size, mode: "friends" });
+    for (const u of users) this.publisher.toUser(u.id, "queue:status", this.statusFor(u.id));
+    return this.statusFor(userId);
+  }
+
+  private leaveFriendRoom(userId: string): void {
+    const room = [...this.friendRooms.values()].find((r) => r.members.has(userId));
+    if (!room) return;
+    room.members.delete(userId);
+    if (room.members.size === 0) {
+      this.friendRooms.delete(room.code);
+      return;
+    }
+    if (room.hostId === userId) room.hostId = [...room.members.keys()][0] as string; // the next to arrive takes over
+    this.broadcastRoom(room);
+  }
+
+  private broadcastRoom(room: FriendRoom): void {
+    for (const id of room.members.keys()) this.publisher.toUser(id, "queue:status", this.statusFor(id));
   }
 
   statusFor(userId: string): LobbyStatus {
@@ -92,6 +167,8 @@ export class LobbyService {
       const room = this.room(kind);
       if (room.users.has(userId)) return { state: "queued", kind, waiting: room.users.size, matchSize: this.config.lobby.matchSize, fillAt: room.fillAt };
     }
+    const friends = [...this.friendRooms.values()].find((r) => r.members.has(userId));
+    if (friends) return { state: "room", code: friends.code, host: friends.hostId === userId, members: [...friends.members.values()].map((u) => u.name), max: this.config.lobby.matchSize };
     return { state: "idle" };
   }
 
@@ -105,6 +182,7 @@ export class LobbyService {
       this.disarmFill(k);
       this.room(k).users.clear();
     }
+    this.friendRooms.clear();
   }
 
   private room(kind: QueueKind): Room {

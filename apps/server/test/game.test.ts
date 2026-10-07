@@ -344,6 +344,59 @@ describe("LobbyService", () => {
   });
 });
 
+describe("friend rooms", () => {
+  it("the host opens a room with a code; friends join with it in any case and everyone sees the member list", () => {
+    const { lobby, publisher } = setup();
+    const created = lobby.createRoom(user(1)) as { state: string; code: string; host: boolean };
+    expect(created).toMatchObject({ state: "room", host: true });
+    expect(created.code).toMatch(/^[A-Z2-9]{5}$/);
+    const joined = lobby.joinRoom(user(2), created.code.toLowerCase());
+    expect(joined).toMatchObject({ state: "room", host: false, members: ["User 1", "User 2"] });
+    expect(publisher.of("u1", "queue:status").at(-1)?.payload).toMatchObject({ members: ["User 1", "User 2"] });
+  });
+
+  it("only the host starts; the match has the friends plus the bots asked for and is a friends match", () => {
+    const { lobby, registry } = setup();
+    const { code } = lobby.createRoom(user(1)) as { code: string };
+    lobby.joinRoom(user(2), code);
+    expect(() => lobby.startRoom("u2", 2)).toThrow(/only the host/);
+    lobby.startRoom("u1", 2);
+    const runner = registry.activeFor("u1");
+    expect(runner).toBe(registry.activeFor("u2"));
+    expect(runner?.meta.mode).toBe("friends");
+    expect(runner?.match.players).toHaveLength(4);
+    expect(() => lobby.joinRoom(user(3), code)).toThrow(/no room/); // a started room is gone
+  });
+
+  it("alone in a room, the host still gets at least one opponent", () => {
+    const { lobby, registry } = setup();
+    lobby.createRoom(user(1));
+    lobby.startRoom("u1", 0);
+    expect(registry.activeFor("u1")?.match.players).toHaveLength(2);
+  });
+
+  it("when the host leaves the next member takes over; the last one out closes the room", () => {
+    const { lobby } = setup();
+    const { code } = lobby.createRoom(user(1)) as { code: string };
+    lobby.joinRoom(user(2), code);
+    lobby.leave("u1");
+    expect(lobby.statusFor("u2")).toMatchObject({ state: "room", host: true, members: ["User 2"] });
+    lobby.leave("u2");
+    expect(() => lobby.joinRoom(user(3), code)).toThrow(/no room/);
+  });
+
+  it("refuses an unknown code, a full room, and joining a queue leaves the room", () => {
+    const { lobby } = setup();
+    expect(() => lobby.joinRoom(user(1), "ZZZZZ")).toThrow(/no room/);
+    const { code } = lobby.createRoom(user(1)) as { code: string };
+    for (let i = 2; i <= 8; i++) lobby.joinRoom(user(i), code);
+    expect(() => lobby.joinRoom(user(9), code)).toThrow(/full/);
+    lobby.join(user(8));
+    expect(lobby.statusFor("u8").state).toBe("queued");
+    expect((lobby.statusFor("u1") as { members: string[] }).members).toHaveLength(7);
+  });
+});
+
 describe("Quick Mode", () => {
   it("has its own queue: quick players wait apart from standard ones and start a 20 HP match", () => {
     const { lobby, registry, timers } = setup();

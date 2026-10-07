@@ -23,8 +23,11 @@ export interface UserRepository {
   create(user: Omit<UserRecord, "id" | "createdAt">): Promise<UserRecord>;
 }
 
-/** queue = standard matchmaking (the leaderboard counts only these), quick = Quick Mode queue, practice = vs bots. */
-export type MatchMode = "queue" | "quick" | "practice";
+/**
+ * queue = standard matchmaking (the leaderboard counts only these), quick = Quick Mode queue, practice = vs bots,
+ * friends = a private room started by its host.
+ */
+export type MatchMode = "queue" | "quick" | "practice" | "friends";
 
 export interface MatchResult {
   matchId: string;

@@ -74,6 +74,9 @@ export class Net {
   }
   joinQueue = (kind: "standard" | "quick" = "standard"): Promise<Ack> => this.call("queue:join", { kind });
   leaveQueue = (): Promise<Ack> => this.call("queue:leave");
+  createRoom = (): Promise<Ack> => this.call("room:create");
+  joinRoom = (code: string): Promise<Ack> => this.call("room:join", { code });
+  startRoom = (bots: number): Promise<Ack> => this.call("room:start", { bots });
   practice = (o: PracticeOptions): Promise<Ack> => this.call("queue:practice", o);
   sync = (): Promise<Ack> => this.call("match:sync");
   leaveMatch = (): Promise<Ack> => this.call("match:leave");

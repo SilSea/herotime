@@ -126,6 +126,21 @@ export function startApp(root: HTMLElement): void {
     async leaveQueue() {
       const ack = await net.leaveQueue();
       if (!ack.ok) toast(serverText(ack.error), "error");
+      else if (ack.status) store.update((s) => applyStatus(s, ack.status as never));
+    },
+    async createRoom() {
+      const ack = await net.createRoom();
+      if (!ack.ok) toast(serverText(ack.error), "error");
+      else if (ack.status) store.update((s) => applyStatus(s, ack.status as never));
+    },
+    async joinRoom(code: string) {
+      const ack = await net.joinRoom(code);
+      if (!ack.ok) toast(serverText(ack.error), "error");
+      else if (ack.status) store.update((s) => applyStatus(s, ack.status as never));
+    },
+    async startRoom(bots: number) {
+      const ack = await net.startRoom(bots);
+      if (!ack.ok) toast(serverText(ack.error), "error");
     },
     async leaveMatch() {
       await net.leaveMatch();

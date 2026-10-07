@@ -808,3 +808,10 @@ body.dragging .drop-marker.show { display: block; }
   .logo { font-size: 34px; }
   .player-card { max-width: 92vw; }
 }
+
+/* ---- friend rooms */
+.room-section { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.room-section h3 { margin: 0 0 4px; }
+.room-section input[type=text] { width: 110px; text-transform: uppercase; letter-spacing: .12em; }
+.room-code { font-size: 22px; letter-spacing: .2em; color: var(--cyan); text-shadow: 0 0 10px #2fe4ff88; user-select: all; }
+.room-box { border-color: var(--cyan-dim); }

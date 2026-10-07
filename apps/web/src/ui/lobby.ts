@@ -56,7 +56,7 @@ function historyPanel(ctx: Ctx): HTMLElement {
         ...rows.map((m) => h("tr", { title: m.players.map((p) => `${ordinal(p.placement)} ${p.name}${p.isBot ? " (bot)" : ""}`).join("\n") },
           h("td", { class: m.placement === 1 ? "place-win" : "", text: m.placement ? ordinal(m.placement) : "-" }),
           h("td", { text: m.heroKey ? ctx.ix.heroName(m.heroKey) : "-" }),
-          h("td", { text: m.mode === "practice" ? tr("practice", "ฝึกซ้อม") : m.mode === "quick" ? "quick" : tr("ranked", "จัดอันดับ") }),
+          h("td", { text: m.mode === "practice" ? tr("practice", "ฝึกซ้อม") : m.mode === "quick" ? "quick" : m.mode === "friends" ? tr("friends", "เพื่อน") : tr("ranked", "จัดอันดับ") }),
           h("td", { class: "muted", text: new Date(m.endedAt).toLocaleString() })))),
   );
 }
@@ -137,6 +137,29 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
           h("button", { class: "btn", text: tr("Quick Mode queue", "คิว Quick Mode"), title: tr("35s turns, heroes start on 20 HP. Does not count for the leaderboard.", "เทิร์นละ 35 วิ Hero เริ่ม HP 20 ไม่นับในตารางอันดับ"), on: { click: () => void ctx.joinQueue("quick") } }),
         );
 
+  // Friend room: a code to share; the host picks how many bots join and starts.
+  const roomBots = h("select", null, ...[0, 1, 2, 3, 4, 5, 6, 7].map((n) => h("option", { value: String(n), text: tr(`+${n} bot${n === 1 ? "" : "s"}`, `bot +${n}`), selected: n === 2 })));
+  const codeInput = h("input", { type: "text", placeholder: tr("room code", "รหัสห้อง"), attrs: { maxlength: "8", autocomplete: "off" } });
+  const friendsBox =
+    status.state === "room"
+      ? h(
+          "div",
+          { class: "queue-box room-box" },
+          h("p", null, tr("Room code", "รหัสห้อง"), " ", h("strong", { class: "room-code", text: status.code })),
+          h("p", { class: "muted", text: tr(`Players (${status.members.length}/${status.max}): ${status.members.join(", ")}`, `ผู้เล่น (${status.members.length}/${status.max}): ${status.members.join(", ")}`) }),
+          status.host
+            ? h("div", { class: "row" }, roomBots, h("button", { class: "btn primary", text: tr("Start", "เริ่มเกม"), on: { click: () => void ctx.startRoom(Number(roomBots.value)) } }))
+            : h("p", { class: "muted", text: tr("Waiting for the host to start...", "รอเจ้าของห้องเริ่มเกม...") }),
+          h("button", { class: "btn", text: tr("Leave room", "ออกจากห้อง"), on: { click: () => void ctx.leaveQueue() } }),
+        )
+      : h(
+          "div",
+          { class: "row" },
+          h("button", { class: "btn", text: tr("Create a room", "สร้างห้อง"), disabled: status.state === "queued", on: { click: () => void ctx.createRoom() } }),
+          codeInput,
+          h("button", { class: "btn", text: tr("Join", "เข้าห้อง"), disabled: status.state === "queued", on: { click: () => codeInput.value.trim() && void ctx.joinRoom(codeInput.value.trim()) } }),
+        );
+
   // Your numbers, from the history the server keeps (ranked games only for the record line).
   const mine = stats.mine ?? [];
   const ranked = mine.filter((m) => m.mode === "queue" && m.placement !== null);
@@ -182,6 +205,7 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
           h("h2", { text: tr("Matchmaking", "จับคู่") }),
           h("p", { class: "muted", text: tr("Eight players. Empty seats are filled with bots after a short wait. Your place counts for the leaderboard.", "ผู้เล่น 8 คน ที่ว่างจะเติม bot หลังรอสักครู่ อันดับนับในตารางอันดับ") }),
           queueBox,
+          h("div", { class: "room-section" }, h("h3", { text: tr("Play with friends", "เล่นกับเพื่อน") }), h("p", { class: "muted small", text: tr("Open a room and share its code. The host starts when everyone is in; bots fill the seats you ask for. Not ranked.", "สร้างห้องแล้วส่งรหัสให้เพื่อน เจ้าของห้องกดเริ่มเมื่อครบ เติม bot ตามที่เลือก ไม่นับอันดับ") }), friendsBox),
           h("div", { class: "build-info muted small", text: tr(`Content: ${ix.snapshot.set} v${ix.snapshot.version} · ${ix.cards.size} cards · ${ix.heroes.size} heroes · ${ix.relics.size} relics · ${ix.factions.size} factions`, `Content: ${ix.snapshot.set} v${ix.snapshot.version} · การ์ด ${ix.cards.size} · Hero ${ix.heroes.size} · Relic ${ix.relics.size} · เผ่า ${ix.factions.size}`) }),
         ),
       ),

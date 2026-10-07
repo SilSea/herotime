@@ -10,7 +10,7 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { RuleError } from "@herotime/engine";
-import { IntentSchema, PracticeSchema, QueueJoinSchema } from "@herotime/shared";
+import { IntentSchema, PracticeSchema, QueueJoinSchema, RoomJoinSchema, RoomStartSchema } from "@herotime/shared";
 import type { Server, Socket } from "socket.io";
 import { AuthService, type PublicUser } from "../auth/auth.service.js";
 import { RateLimiter } from "../rate-limiter.js";
@@ -102,6 +102,29 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const parsed = PracticeSchema.safeParse(body ?? {});
       if (!parsed.success) return { ok: false, error: "malformed practice options" };
       return { ok: true, status: this.lobby.practice({ id: user.id, name: user.username }, parsed.data) };
+    });
+  }
+
+  @SubscribeMessage("room:create")
+  onRoomCreate(@ConnectedSocket() socket: GameSocket): Ack {
+    return this.guarded(socket, (user) => ({ ok: true, status: this.lobby.createRoom({ id: user.id, name: user.username }) }));
+  }
+
+  @SubscribeMessage("room:join")
+  onRoomJoin(@ConnectedSocket() socket: GameSocket, @MessageBody() body: unknown): Ack {
+    return this.guarded(socket, (user) => {
+      const parsed = RoomJoinSchema.safeParse(body ?? {});
+      if (!parsed.success) return { ok: false, error: "enter the room code" };
+      return { ok: true, status: this.lobby.joinRoom({ id: user.id, name: user.username }, parsed.data.code) };
+    });
+  }
+
+  @SubscribeMessage("room:start")
+  onRoomStart(@ConnectedSocket() socket: GameSocket, @MessageBody() body: unknown): Ack {
+    return this.guarded(socket, (user) => {
+      const parsed = RoomStartSchema.safeParse(body ?? {});
+      if (!parsed.success) return { ok: false, error: "malformed room options" };
+      return { ok: true, status: this.lobby.startRoom(user.id, parsed.data.bots ?? 0) };
     });
   }
 

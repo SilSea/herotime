@@ -106,7 +106,7 @@ export class PrismaMatchRepository implements MatchRepository {
     });
     return rows.map((m) => ({
       matchId: m.id,
-      mode: m.mode === "practice" || m.mode === "quick" ? m.mode : ("queue" as const),
+      mode: m.mode === "practice" || m.mode === "quick" || m.mode === "friends" ? m.mode : ("queue" as const),
       seed: m.seed,
       contentVersion: m.contentVersion,
       startedAt: m.startedAt,
@@ -128,7 +128,7 @@ export class PrismaMatchRepository implements MatchRepository {
     ]);
     const lines: StatLine[] = players.map((p) => ({
       isBot: p.isBot,
-      mode: p.match.mode === "practice" || p.match.mode === "quick" ? p.match.mode : "queue",
+      mode: p.match.mode === "practice" || p.match.mode === "quick" || p.match.mode === "friends" ? p.match.mode : "queue",
       heroKey: p.heroKey,
       placement: p.placement,
       board: p.board,

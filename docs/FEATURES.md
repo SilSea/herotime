@@ -47,7 +47,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F4.5** (P0) Reconnect กลางเกม
 - [x] **F4.6** (P0) Bot AI พื้นฐาน
 - [x] **F4.7** (P1) ประวัติแมตช์ (20 นัดล่าสุดของตัวเอง รวม practice) + leaderboard (เฉพาะ matchmaking, ≥3 นัด, เรียงตามอันดับเฉลี่ย) ใน lobby
-- [ ] **F4.8** (P2) MMR/Ranked, friend lobby
+- [x] **F4.8** (P2) MMR/Ranked, friend lobby: MMR แบบ Elo หลายผู้เล่น (เริ่ม 1000, คำนวณจากแมตช์จัดอันดับทั้งหมดตามลำดับเวลา) ตารางอันดับเรียงตาม MMR; ห้องเล่นกับเพื่อน: สร้างห้องได้รหัส 5 ตัว เพื่อนกรอกรหัสเข้า เจ้าของห้องเลือกจำนวน bot แล้วกดเริ่ม (ไม่นับอันดับ, mode `friends`)
 - [ ] **F4.9** (P2) Redis scale หลาย instance
 - [x] **F4.10** (P0) รัน local: `pnpm dev` หรือ `docker compose up -d --build` (server + เว็บ + Postgres, migrate อัตโนมัติ), เล่นใน LAN ได้
 - [x] **F4.12** (P0) Practice mode: เล่นคนเดียวกับ bot 1–7 ตัว, เลือก faction/ความเร็วได้ (`queue:practice`)

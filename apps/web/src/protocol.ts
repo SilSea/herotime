@@ -20,7 +20,8 @@ export interface EventMessage {
 export type QueueStatus =
   | { state: "idle" }
   | { state: "queued"; kind?: "standard" | "quick"; waiting: number; matchSize: number; fillAt: number | null }
-  | { state: "playing"; matchId: string; ended: boolean };
+  | { state: "playing"; matchId: string; ended: boolean }
+  | { state: "room"; code: string; host: boolean; members: string[]; max: number };
 
 export type Ack = { ok: true; status?: QueueStatus } | { ok: false; error: string };
 
@@ -120,7 +121,7 @@ export interface GameStats {
 
 export interface MyMatch {
   matchId: string;
-  mode: "queue" | "quick" | "practice";
+  mode: "queue" | "quick" | "practice" | "friends";
   endedAt: string;
   contentVersion: number;
   placement: number | null;
