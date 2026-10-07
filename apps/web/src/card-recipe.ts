@@ -1,3 +1,4 @@
+import { spaceThai } from "./format.js";
 import { tr } from "./i18n.js";
 
 /**
@@ -353,6 +354,6 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
     const limit = a.limitTimes > 0 ? tr(` (at most ${a.limitTimes} per ${a.limitPer === "TURN" ? "turn" : "game"})`, ` (ไม่เกิน ${a.limitTimes} ครั้งต่อ${a.limitPer === "TURN" ? "เทิร์น" : "เกม"})`) : "";
     // In a fight, Energy / cards / Gauge arrive at the start of the next turn.
     const later = r.type !== "GEAR" && phaseOf(a.when, r.type) === "fight" && (LATER.has(a.do) || (a.do === "COPY" && a.copyTo === "HAND")) ? tr(" next turn", " ในเทิร์นหน้า") : "";
-    return `${when}: ${cond}${what}${later}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}${limit}`;
+    return spaceThai(`${when}: ${cond}${what}${later}${a.repeat > 1 ? tr(` (${a.repeat} times)`, ` (${a.repeat} ครั้ง)`) : ""}${limit}`);
   });
 }

@@ -175,6 +175,7 @@ describe("matches keep the content they started with", () => {
     await call("POST", "/admin/publish", admin.token, { force: true });
     expect(server.content.latest.version).toBe(before + 1);
     expect(runner.meta.contentVersion).toBe(before);
+    runner.stop(); // nobody plays it: left running, it would end (and be saved) during a later test
     registry.release("h1");
   });
 });

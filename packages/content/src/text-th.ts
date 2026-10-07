@@ -138,6 +138,14 @@ const RULE_LABEL: Record<string, string> = {
   kyodaikaMultiplier: "ตัวคูณ stat ของ Kyodaika",
 };
 
+/**
+ * A space wherever Latin letters / digits meet Thai script: names (written in English) dropped into a Thai
+ * sentence would otherwise run into the words around them ("Gear Kamen Riderแบบสุ่ม").
+ */
+export function spaceThai(s: string): string {
+  return s.replace(/([A-Za-z0-9)\]])(?=[฀-๿])/g, "$1 ").replace(/([฀-๿])(?=[A-Za-z0-9(\[])/g, "$1 ");
+}
+
 export function ruleTextTh(rule: string, op: "SET" | "ADD" | "MUL", value: number): string {
   if (op === "SET") {
     switch (rule) {

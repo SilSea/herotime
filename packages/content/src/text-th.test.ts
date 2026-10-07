@@ -74,6 +74,17 @@ describe("rules text for fight rewards", () => {
     expect(g.cards[0]?.textTh).not.toMatch(/Ultimate/);
   });
 
+  it("puts a space where English names meet Thai words", () => {
+    const g = withGeneratedText({
+      ...blank,
+      factions: [{ key: "rider", name: "Kamen Rider", color: "#888", text: "", textTh: "" }],
+      cards: [{ key: "a7", name: "Agent 7", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: ["rider"], colors: [], keywords: [], token: false, text: "", henshin: { afterTurns: 2, into: "z" }, effects: [{ scope: "UNIT", trigger: "HENSHIN", actions: [{ type: "RANDOM_CARD", cardKind: "GEAR", faction: "rider" }] }] },
+        { key: "z", name: "Zeztz", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: true, text: "", effects: [] }] as never,
+    });
+    expect(g.cards[0]?.textTh).toContain("ได้ Gear Kamen Rider แบบสุ่มเข้ามือ");
+    expect(g.cards[0]?.textTh).not.toMatch(/[A-Za-z0-9][฀-๿]|[฀-๿][A-Za-z0-9]/);
+  });
+
   it("names copies", () => {
     const g = withGeneratedText({
       ...blank,

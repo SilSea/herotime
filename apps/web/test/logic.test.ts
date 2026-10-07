@@ -212,6 +212,15 @@ describe("relatedCards", async () => {
   });
 });
 
+describe("spaceThai", async () => {
+  const { spaceThai } = await import("../src/format.js");
+  it("matches the content package (a copy: the web has no bundler)", async () => {
+    const content = await import("../../../packages/content/src/text-th.js");
+    for (const s of ["ได้ Gear Kamen Riderแบบสุ่มเข้ามือ", "ให้Agent 7ได้ +2/+2", "Deploy: ได้ 1 Energy ในเทิร์นหน้า", "plain English", "ไทยล้วน"]) expect(spaceThai(s)).toBe(content.spaceThai(s));
+    expect(spaceThai("ให้Agent 7ได้ +2/+2")).toBe("ให้ Agent 7 ได้ +2/+2");
+  });
+});
+
 describe("byName", async () => {
   const { byName } = await import("../src/format.js");
   it("sorts A to Z by name, ignoring case, numbers in order, key when names tie", () => {

@@ -47,6 +47,15 @@ export function relatedCards(def: CardDef | undefined, max = 4): { key: string; 
   return out.slice(0, max);
 }
 
+/**
+ * A space wherever Latin letters / digits meet Thai script: names (written in English) dropped into a Thai
+ * sentence would otherwise run into the words around them ("Gear Kamen Riderแบบสุ่ม").
+ */
+/* Same as @herotime/content spaceThai (a test keeps them equal). */
+export function spaceThai(s: string): string {
+  return s.replace(/([A-Za-z0-9)\]])(?=[฀-๿])/g, "$1 ").replace(/([฀-๿])(?=[A-Za-z0-9(\[])/g, "$1 ");
+}
+
 /** Alphabetical by name (then key), ignoring case, numbers in order ("Unit 2" before "Unit 10"). */
 export const byName = (a: { name?: unknown; key?: unknown }, b: { name?: unknown; key?: unknown }): number =>
   String(a.name ?? a.key ?? "").localeCompare(String(b.name ?? b.key ?? ""), undefined, { sensitivity: "base", numeric: true }) ||
