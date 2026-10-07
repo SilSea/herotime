@@ -86,7 +86,7 @@ export function renderField(field: Field, value: unknown, set: (v: unknown) => v
       const el = field.area ? h("textarea", { value: String(value ?? ""), attrs: { rows: "3" } }) : h("input", { type: "text", value: String(value ?? ""), ...(field.placeholder ? { placeholder: field.placeholder } : {}) });
       el.addEventListener("input", () => set(el.value));
       if (field.upload && env.upload) {
-        const pick = h("input", { type: "file", attrs: { accept: "image/png,image/jpeg,image/gif,image/webp" } });
+        const pick = h("input", { type: "file", attrs: { accept: field.audio ? "audio/mpeg,audio/ogg,audio/wav,.mp3,.ogg,.wav" : "image/png,image/jpeg,image/gif,image/webp" } });
         pick.addEventListener("change", () => {
           const file = pick.files?.[0];
           if (!file) return;

@@ -1,7 +1,7 @@
 import { DEFAULT_CONFIG, type GameConfig } from "../config.js";
 import type { Rng } from "../rng/rng.js";
 import { recordBuff, type Unit } from "../content.js";
-import { RuleError, type PlayerState } from "./economy.js";
+import { noteMoment, RuleError, type PlayerState } from "./economy.js";
 import { withRules } from "../rules.js";
 import type { Pool } from "./pool.js";
 
@@ -97,6 +97,7 @@ export function resolveTriples(
     const offer = drawOffer(pool, rng, Math.min(player.rank + 1, cfg.maxRank));
     if (offer.length > 0) player.discovers.push({ options: offer, destination: "HAND" });
     results.push({ key, offer });
+    noteMoment(player, "triples");
   }
 
   return results;

@@ -11,6 +11,8 @@ export interface ContentData {
   heroes?: readonly HeroDef[];
   /** Game-wide rule numbers for this content (see ContentRules). */
   rules?: Readonly<Record<string, number | undefined>>;
+  /** Uploaded sounds; the engine only carries them to the client. */
+  sounds?: unknown;
 }
 
 /** A unit the player owns. `golden` = Final Form (made by a triple). */
@@ -72,6 +74,8 @@ function* actionsOf(effects: readonly Effect[] | undefined): Generator<Action> {
 export class Content {
   /** Game-wide rule numbers from the content set (missing ones use the engine defaults). */
   readonly rules: Readonly<Record<string, number | undefined>>;
+  /** Uploaded sounds and music, passed through untouched. */
+  readonly sounds: unknown;
   readonly cards: Map<string, CardDef>;
   /** Empty = the content does not declare factions, so card faction strings are free-form. */
   readonly factions: Map<string, FactionDef>;
@@ -88,6 +92,7 @@ export class Content {
     this.relics = index("relic", data.relics);
     this.heroes = index("hero", data.heroes);
     this.rules = { ...(data.rules ?? {}) };
+    this.sounds = data.sounds ?? { slots: {}, music: {} };
 
     const problems = this.validate();
     if (problems.length > 0) throw new Error(`invalid content:\n- ${problems.join("\n- ")}`);

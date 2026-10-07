@@ -48,6 +48,11 @@ export interface PlayerState {
   giant?: Unit;
   /** Super Gattai (Mecha Gauge reward): what the Giant gains in fights with an Extra Ranger on the board. */
   superGattai?: { atk: number; hp: number };
+  /**
+   * Running counts of moments the client plays a sound for (it compares them between views): triples made,
+   * units transformed (with the last form), cards discarded.
+   */
+  moments?: { triples: number; transforms: number; lastForm?: string; discards: number };
   /** BUFF_SHOP: what every unit in this player's tavern gets (kept when bought). */
   shopBonus?: { atk: number; hp: number };
   /** Limited player-scope effects (relics, hero, gear): times used this game / this turn, by source and effect. */
@@ -250,4 +255,11 @@ export function upgrade(player: PlayerState, cfg: GameConfig = DEFAULT_CONFIG): 
   spend(player, cost);
   player.rank += 1;
   player.upgradeDiscount = 0;
+}
+
+/** Count a moment the client plays a sound for (see PlayerState.moments). */
+export function noteMoment(player: PlayerState, kind: "triples" | "transforms" | "discards", form?: string): void {
+  const m = (player.moments ??= { triples: 0, transforms: 0, discards: 0 });
+  m[kind]++;
+  if (form) m.lastForm = form;
 }

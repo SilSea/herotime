@@ -6,6 +6,7 @@ import { DEFAULT_COMBAT_RULES } from "../config.js";
 import {
   buy,
   play,
+  noteMoment,
   RuleError,
   sell,
   spend,
@@ -176,6 +177,7 @@ export function endTurn(player: PlayerState, env: GameEnv): void {
     if (!henshin || unit.turns < henshin.afterTurns) continue;
 
     if (!swapKey(unit, henshin.into, env)) continue; // pool cannot cover the new form: try again next turn
+    noteMoment(player, "transforms", henshin.into);
     runTrigger(env.content.card(unit.key).effects, "HENSHIN", "UNIT", unit, player, env);
     fireGaugeTrigger(player, env, "HENSHIN");
   }

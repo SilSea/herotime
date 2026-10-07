@@ -2,7 +2,7 @@ import { tr } from "../i18n.js";
 import type { ContentIndex } from "../content-index.js";
 import type { CombatRecord } from "../protocol.js";
 import { buildSteps, pickDelay, stepWeight, type Fighter, type ReplayState, type Step } from "../replay.js";
-import { cueForEvent, play, splashForEvent } from "../sound.js";
+import { cardSound, play, slotForEvent, splashForEvent } from "../sound.js";
 import { cardEl } from "./card.js";
 import { h, mount } from "./dom.js";
 
@@ -77,11 +77,12 @@ export class ReplayView {
     const dying = step.event.type === "DEATH" && !step.event.returns ? [step.event.unit] : [];
     this.draw(dying.length > 0 ? prev : step.state, step.focus, step, dying);
     this.log(step.text);
-    const cue = cueForEvent(step.event.type);
-    if (cue) play(cue);
+    const slot = slotForEvent(step.event.type);
+    if (slot) play(slot, this.ownSound(step, prev));
+    if (step.event.type === "ATTACK") window.setTimeout(() => play("hit"), 90);
     const splash = splashForEvent(step.event.type);
     if (splash) this.splash(splash, step.event.type);
-    if (this.done) play(this.record.result.winner === this.record.meSide ? "win" : this.record.result.winner === "DRAW" ? "hit" : "lose");
+    if (this.done) play(this.record.result.winner === this.record.meSide ? "roundWin" : "roundLose");
     this.drawControls();
     this.schedule(this.baseDelay * stepWeight(step.event));
   }
@@ -93,6 +94,20 @@ export class ReplayView {
     this.index = this.steps.length - 1;
     this.draw(last?.state ?? this.initial, [], undefined);
     this.drawControls();
+  }
+
+  /** The card's own sound for this event (attacker, the one dying, the new form, the newcomer), if it has one. */
+  private ownSound(step: Step, before: ReplayState): string | undefined {
+    const e = step.event;
+    const keyOf = (uid: string): string | undefined => [...before.A, ...before.B, ...step.state.A, ...step.state.B].find((f) => f.uid === uid)?.cardKey;
+    const own = (key: string | undefined, kind: "play" | "attack" | "death" | "transform"): string | undefined => (key ? cardSound(this.ix.card(key), (f) => this.ix.factions.get(f), kind) : undefined);
+    switch (e.type) {
+      case "ATTACK": return own(keyOf(e.attacker), "attack");
+      case "DEATH": return own(keyOf(e.unit), "death");
+      case "TRANSFORM": return own(e.into, "transform");
+      case "SUMMON": case "GIANT_ENTER": return own(e.cardKey, "play");
+      default: return undefined;
+    }
   }
 
   /** A burst of big words over the field (henshin, gattai, giant...), gone after its animation. */

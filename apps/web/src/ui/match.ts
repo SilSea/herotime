@@ -1,6 +1,7 @@
 import { formatClock } from "../clock.js";
 import { boardLabel, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars } from "../format.js";
 import { tr } from "../i18n.js";
+import { play, slotForPlace } from "../sound.js";
 import { langToggle, muteToggle } from "./lang.js";
 import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
@@ -346,6 +347,9 @@ function heroSelect(ctx: Ctx, view: View): HTMLElement {
 
 // -------------------------------------------------------------- end screen
 
+/** My place from the ENDED event, before the view has it. */
+const placeOf0 = (ctx: Ctx, view: View): number | undefined => ctx.store.state.placements?.find((p) => p.playerId === view.me.id)?.placement;
+
 /** Title, colour and words for a finishing place. */
 function placeTier(place: number | undefined): { cls: string; title: string; sub: string } {
   if (place === 1) return { cls: "gold", title: tr("VICTORY!", "ชนะเลิศ!"), sub: tr("Last hero standing", "ฮีโร่คนสุดท้ายที่ยืนอยู่") };
@@ -362,7 +366,10 @@ let endShown: { match: string; at: number } | undefined;
 /** The end of a match: your place in big, the podium, then everyone with the board they finished with. */
 function endScreen(ctx: Ctx, view: View): HTMLElement {
   const matchId = ctx.store.state.matchId ?? "";
-  if (endShown?.match !== matchId) endShown = { match: matchId, at: Date.now() };
+  if (endShown?.match !== matchId) {
+    endShown = { match: matchId, at: Date.now() };
+    play(slotForPlace(view.me.placement ?? placeOf0(ctx, view)));
+  }
   const since = Date.now() - endShown.at;
   const placements = ctx.store.state.placements ?? view.players.filter((p) => p.placement !== undefined).map((p) => ({ playerId: p.id, placement: p.placement as number }));
   const placeOf = (id: string): number | undefined => placements.find((x) => x.playerId === id)?.placement ?? view.players.find((p) => p.id === id)?.placement;
@@ -854,8 +861,13 @@ function showGaugeCard(ctx: Ctx, view: View, anchor: HTMLElement, g: (typeof ctx
 function offersModal(ctx: Ctx, view: View): HTMLElement | null {
   const s = view.me.state;
   const state = ctx.store.state;
-  if (state.hideOffers || view.phase !== "RECRUIT" || !view.me.alive) return null;
-  const hide = h("button", { class: "btn", text: tr("Decide later", "ตัดสินใจทีหลัง"), on: { click: () => ctx.store.set({ hideOffers: true }) } });
+  if (view.phase !== "RECRUIT" || !view.me.alive) return null;
+  // Hidden to look at the board and the tavern first: a button brings the choice back.
+  if (state.hideOffers) {
+    if (!s.relicOffer && s.discovers.length === 0) return null;
+    return h("button", { class: "btn primary offers-reopen", text: s.relicOffer ? tr("Choose your Relic", "เลือก Relic") : tr("Choose your card", "เลือกการ์ด"), on: { click: () => ctx.store.set({ hideOffers: false }) } });
+  }
+  const hide = h("button", { class: "btn", text: tr("Hide (look at the board)", "ซ่อน (ดูบอร์ดและร้านก่อน)"), title: tr("A button brings it back. If time runs out, the free option is taken.", "กดปุ่มเพื่อเปิดกลับได้ ถ้าหมดเวลาจะได้ตัวเลือกที่ฟรีอัตโนมัติ"), on: { click: () => ctx.store.set({ hideOffers: true }) } });
 
   if (s.relicOffer) {
     const offer = s.relicOffer;

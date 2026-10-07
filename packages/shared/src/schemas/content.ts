@@ -1,6 +1,43 @@
 import { z } from "zod";
 import { Action, Effect, KeywordKey, SentaiColor } from "./effect.js";
 
+// ------------------------------------------------------------------ sounds
+
+/** Game moments that can have their own sound (uploaded in the Admin); without one the built-in sound plays. */
+export const SOUND_SLOTS = [
+  // tavern
+  "buy", "buyGear", "sell", "refresh", "freeze", "upgrade", "denied",
+  // board
+  "play", "gear", "triple", "combine", "transform", "discover", "relic", "heroPower", "discard",
+  // fight
+  "attack", "hit", "barrier", "death", "summon", "kyodaika", "giant", "rollcall",
+  // results
+  "roundWin", "roundLose", "eliminated", "endWin", "endTop4", "endOther",
+  // general
+  "turnStart", "timeLow", "click",
+] as const;
+export type SoundSlot = (typeof SOUND_SLOTS)[number];
+
+/** Background music, by where the player is. */
+export const MUSIC_SLOTS = ["lobby", "recruit", "battle", "endWin", "endLose"] as const;
+export type MusicSlot = (typeof MUSIC_SLOTS)[number];
+
+/** An uploaded audio file (the name the upload returned) and how loud it plays (0-1). */
+export const SoundRef = z.object({ file: z.string().min(1), volume: z.number().min(0).max(1).default(1) });
+export type SoundRef = z.infer<typeof SoundRef>;
+
+export const SoundsDef = z.object({
+  slots: z.record(z.string(), SoundRef).default({}),
+  music: z.record(z.string(), SoundRef).default({}),
+});
+export type SoundsDef = z.infer<typeof SoundsDef>;
+
+/** A card's or faction's own sounds (file names); they win over the game-wide slots. */
+export const CardSounds = z
+  .object({ play: z.string().optional(), attack: z.string().optional(), death: z.string().optional(), transform: z.string().optional() })
+  .strict();
+export type CardSounds = z.infer<typeof CardSounds>;
+
 export const CardKind = z.enum(["UNIT", "GEAR", "GIANT"]);
 export type CardKind = z.infer<typeof CardKind>;
 
@@ -34,6 +71,8 @@ export const CardDef = z.object({
   gattaiInto: z.string().optional(),
   /** The form ULTIMATE_FORM turns this unit into (e.g. a Rider's series-specific final form). */
   ultimateInto: z.string().optional(),
+  /** This card's own sounds (played / attacks / dies / transforms into it). */
+  sounds: CardSounds.optional(),
   /** Tavern price of Gear sold in the shop (not a token). Units always use the standard buy cost. */
   cost: z.number().int().min(0).optional(),
   /** What the gear price is paid with: Energy, or the hero's Health (which can never take you to 0). */
@@ -49,6 +88,8 @@ export const FactionDef = z.object({
   color: z.string().default("#888888"),
   text: z.string().default(""),
   textTh: z.string().default(""),
+  /** Sounds for every card of this faction that has none of its own. */
+  sounds: CardSounds.optional(),
 });
 export type FactionDef = z.infer<typeof FactionDef>;
 

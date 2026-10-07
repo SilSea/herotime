@@ -1,13 +1,13 @@
 import { ServerClock, formatClock } from "./clock.js";
 import { ContentIndex } from "./content-index.js";
 import { Api, Net } from "./net.js";
-import type { AuthResult, Intent, PracticeOptions } from "./protocol.js";
+import type { AuthResult, Intent, MatchView, PracticeOptions } from "./protocol.js";
 import { addToast, applyEvent, applyStatus, applyView, removeToast, Store } from "./store.js";
 import { adminHasFocus, renderAdmin, resetAdmin } from "./ui/admin.js";
 import { KEYWORD_ICON_OF, triggerInfo } from "./ui/card.js";
 import { keywordName, keywordText } from "./format.js";
 import { serverText, tr } from "./i18n.js";
-import { cueForIntent, play } from "./sound.js";
+import { cardSound, hasUploaded, play, playMusic, setContentSounds, slotForIntent } from "./sound.js";
 import { langToggle, muteToggle } from "./ui/lang.js";
 import { renderAuth } from "./ui/auth.js";
 import type { Ctx } from "./ui/ctx.js";
@@ -74,14 +74,16 @@ export function startApp(root: HTMLElement): void {
       const key = JSON.stringify(intent);
       if (pendingIntents.has(key)) return false;
       pendingIntents.add(key);
+      // The card being played, read before the hand changes: it may have its own sound.
+      const played = intent.type === "PLAY" ? store.state.view?.me.state.hand[intent.handIndex]?.key : undefined;
       try {
         const ack = await net.intent(intent);
         if (!ack.ok) {
           toast(serverText(ack.error), "error");
-          play("error");
+          play("denied");
         } else {
-          const cue = cueForIntent(intent.type);
-          if (cue) play(cue);
+          const slot = slotForIntent(intent.type);
+          if (slot) play(slot, played ? unitSound(played, "play") : undefined);
           // Combining a Gattai group in the recruit phase gets the same burst as a merge in a fight.
           if (intent.type === "COMBINE") {
             const el = h("div", { class: "vfx-splash vfx-gattai vfx-screen", text: "GATTAI!" });
@@ -97,6 +99,7 @@ export function startApp(root: HTMLElement): void {
     async refreshContent(version?: number) {
       try {
         content = new ContentIndex(await api.content(version));
+        setContentSounds(content.snapshot.sounds);
         store.set({ content });
       } catch {
         // keep what we have: a stale card list is better than a blank screen
@@ -154,11 +157,28 @@ export function startApp(root: HTMLElement): void {
     },
   });
 
+  /** A card's own sound (or its faction's), if the content has one. */
+  const unitSound = (cardKey: string, kind: "play" | "attack" | "death" | "transform"): string | undefined =>
+    content ? cardSound(content.card(cardKey), (f) => content?.factions.get(f), kind) : undefined;
+
+  /** Sounds for what a new view says happened: a triple, a transformation, a discard, being knocked out. */
+  const soundChanges = (before: MatchView | undefined, after: MatchView): void => {
+    if (!before || before.me.id !== after.me.id) return;
+    const a = before.me.state.moments;
+    const b = after.me.state.moments;
+    if ((b?.triples ?? 0) > (a?.triples ?? 0)) play("triple");
+    if ((b?.transforms ?? 0) > (a?.transforms ?? 0)) play("transform", b?.lastForm ? unitSound(b.lastForm, "transform") : undefined);
+    if ((b?.discards ?? 0) > (a?.discards ?? 0)) play("discard");
+    if (before.me.alive && !after.me.alive && after.phase !== "ENDED") play("eliminated");
+  };
+
   // ----------------------------------------------------------- server messages
   net.on("connection", (connected) => store.set({ connected }));
   net.on("status", (status) => store.update((s) => applyStatus(s, status)));
   net.on("view", (m) => {
+    const before = store.state.view;
     store.update((s) => applyView(s, m, clock));
+    if (store.state.view) soundChanges(before, store.state.view);
     const shown = content?.snapshot.version;
     if (m.contentVersion !== undefined && shown !== undefined && m.contentVersion !== shown && wantedVersion !== m.contentVersion) {
       wantedVersion = m.contentVersion; // once per version, not on every view message
@@ -221,8 +241,17 @@ export function startApp(root: HTMLElement): void {
     hidePreview();
     hidePlayerCard();
     announce();
+    playMusic(musicFor(s));
     const log = document.getElementById("log");
     if (log) log.scrollTop = log.scrollHeight;
+  };
+
+  /** Which music fits where the player is. */
+  const musicFor = (s: typeof store.state): string => {
+    if (s.screen !== "match" || !s.view) return "lobby";
+    if (s.view.phase === "BATTLE") return "battle";
+    if (s.view.phase === "ENDED") return s.view.me.placement === 1 ? "endWin" : "endLose";
+    return "recruit";
   };
 
   const syncReplay = (): void => {
@@ -262,6 +291,7 @@ export function startApp(root: HTMLElement): void {
     // No banner for battles: the replay opens at that moment and would be covered by it.
     const text = s.view.phase === "RECRUIT" ? `${tr("Turn", "เทิร์น")} ${s.view.turn}` : s.view.phase === "HERO_SELECT" ? tr("Choose your hero", "เลือก Hero") : "";
     if (!text) return;
+    if (s.view.phase === "RECRUIT" && s.view.me.alive) play("turnStart");
     for (const old of document.querySelectorAll(".banner")) old.remove(); // a new phase replaces the last banner
     const el = h("div", { class: "banner", text });
     document.body.append(el);
@@ -327,6 +357,11 @@ export function startApp(root: HTMLElement): void {
 
   // ---------------------------------------------------------------- countdowns
   let fuseKey = "";
+  let timeLowKey = "";
+  // A click sound only when one was uploaded (no built-in click: it would be noise).
+  document.addEventListener("click", (e) => {
+    if ((e.target as Element | null)?.closest?.("button") && hasUploaded("click")) play("click");
+  });
   let fuseTotal = 1;
   window.setInterval(() => {
     const s = store.state;
@@ -344,6 +379,11 @@ export function startApp(root: HTMLElement): void {
       if (fuseKey !== key) ((fuseKey = key), (fuseTotal = Math.max(remaining, 1)));
       fuse.style.width = `${Math.max(0, Math.min(100, (remaining / fuseTotal) * 100))}%`;
       fuse.classList.toggle("low", remaining < 8000 && s.view.phase === "RECRUIT");
+      // One warning tick when the recruit clock is nearly out.
+      if (s.view.phase === "RECRUIT" && s.view.me.alive && remaining > 0 && remaining <= 5000 && timeLowKey !== key) {
+        timeLowKey = key;
+        play("timeLow");
+      }
     }
     const fill = document.getElementById("fill-countdown");
     if (fill && s.status.state === "queued" && s.status.fillAt) fill.textContent = `${tr("Bots join in", "bot จะเข้าใน")} ${formatClock(clock.remaining(s.status.fillAt))}`;
@@ -368,6 +408,7 @@ export function startApp(root: HTMLElement): void {
     mount(root, h("p", { class: "muted center-text", text: "Loading..." }));
     try {
       content = new ContentIndex(await api.content());
+      setContentSounds(content.snapshot.sounds);
     } catch (e) {
       mount(root, h("p", { class: "form-error center-text", text: `Cannot reach the game server (${e instanceof Error ? e.message : "unknown error"}).` }));
       return;

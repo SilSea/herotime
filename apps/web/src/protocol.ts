@@ -37,6 +37,8 @@ export interface ContentSnapshot {
   heroes: HeroDef[];
   /** Game-rule numbers the set overrides (missing = engine default). */
   rules?: Partial<Record<string, number>>;
+  /** Uploaded sounds and music. */
+  sounds?: { slots?: Record<string, { file: string; volume?: number }>; music?: Record<string, { file: string; volume?: number }> };
 }
 
 export interface AuthResult {

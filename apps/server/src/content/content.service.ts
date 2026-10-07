@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Content } from "@herotime/engine";
 import { getContentSet, getRawContentSet, withGeneratedText, type ContentSetData } from "@herotime/content";
-import { CardDef, ContentRules, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
+import { CardDef, ContentRules, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef, SoundsDef } from "@herotime/shared";
 import { z } from "zod";
 import type { ContentData, ContentRepository } from "../persistence/repositories.js";
 
@@ -13,6 +13,7 @@ export const ContentFile = z.object({
   relics: z.array(RelicDef).default([]),
   heroes: z.array(HeroDef).default([]),
   rules: ContentRules.optional(),
+  sounds: SoundsDef.optional(),
 });
 
 export interface Inspection {
@@ -62,6 +63,7 @@ export function snapshotOf(c: Content, set: string, version: number): Record<str
     relics: [...c.relics.values()],
     heroes: [...c.heroes.values()],
     rules: { ...c.rules },
+    sounds: c.sounds,
   };
 }
 

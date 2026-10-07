@@ -896,3 +896,18 @@ body.dragging .drop-marker.show { display: block; }
 .podium-hero { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .podium-num { text-shadow: 0 1px 0 #fff8; }
 .end-who { min-width: 0; }
+
+/* ---- sound controls */
+.sound-ctl { position: relative; display: inline-flex; }
+.sound-more { padding: 3px 6px; border-left: 0; }
+.sound-panel { position: absolute; top: calc(100% + 6px); right: 0; z-index: 90; min-width: 210px; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: linear-gradient(180deg, #0d1834f5, #08102af5); border: 1px solid var(--cyan-dim); box-shadow: 0 8px 20px #000a; }
+.sound-row { display: grid; grid-template-columns: 80px 1fr; gap: 8px; align-items: center; font-size: 12px; }
+/* ---- offers hidden: the way back */
+.offers-reopen { position: absolute; right: 18px; bottom: 210px; z-index: 40; animation: aim-pulse 1.4s ease-in-out infinite; box-shadow: 0 0 18px #2fe4ff88; }
+
+/* ---- admin: sounds */
+.sounds-body { grid-template-columns: 260px minmax(0, 1fr); }
+.sounds-middle { display: flex; flex-direction: column; gap: 10px; }
+.sounds-table td { vertical-align: middle; }
+.sounds-table input[type=file] { max-width: 190px; font-size: 11px; }
+.sounds-table input[type=range] { width: 100px; }

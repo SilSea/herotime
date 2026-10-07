@@ -1,4 +1,4 @@
-import type { CardDef, ContentRules, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef } from "@herotime/shared";
+import type { CardDef, ContentRules, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef, SoundsDef } from "@herotime/shared";
 import { cardText, heroText, relicText } from "./text.js";
 import { cardTextTh, heroTextTh, relicTextTh } from "./text-th.js";
 
@@ -12,6 +12,8 @@ export interface ContentSetData {
   heroes: HeroDef[];
   /** Game-wide rule numbers (prices, sizes, Roll Call, Gattai, Giant...). Missing ones use the engine defaults. */
   rules?: ContentRules;
+  /** Uploaded sounds and music (see SOUND_SLOTS / MUSIC_SLOTS); absent = built-in sounds only. */
+  sounds?: SoundsDef;
 }
 
 /** Fill in rules text for anything whose author did not write any. */

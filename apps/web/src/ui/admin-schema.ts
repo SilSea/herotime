@@ -16,7 +16,7 @@ export interface Row {
 }
 
 export type Field =
-  | { kind: "text"; area?: boolean; placeholder?: string; /** Offer a file picker that uploads an image and fills in its name. */ upload?: boolean }
+  | { kind: "text"; area?: boolean; placeholder?: string; /** Offer a file picker that uploads an image (or, with audio, a sound) and fills in its name. */ upload?: boolean; audio?: boolean }
   | { kind: "int"; min?: number; max?: number }
   | { kind: "num" }
   | { kind: "bool" }
@@ -207,6 +207,25 @@ const effects = (): Field => ({ kind: "list", of: EFFECT, make: () => (EFFECT as
 
 // ------------------------------------------------------------------------------------ entities
 
+/** A card's or faction's own sounds: uploaded files (mp3 / ogg / wav). */
+const sound = (hint: string): Row["field"] => ({ kind: "text", placeholder: "upload a sound", upload: true, audio: true });
+export const CARD_SOUNDS: Row = {
+  key: "sounds",
+  label: "sounds",
+  optional: true,
+  hint: "This card's own sounds. Empty = its faction's, then the game-wide ones (Sounds tab)",
+  field: {
+    kind: "object",
+    make: () => ({}),
+    rows: [
+      { key: "play", label: "played / summoned", field: sound(""), optional: true },
+      { key: "attack", label: "attacks", field: sound(""), optional: true },
+      { key: "death", label: "dies", field: sound(""), optional: true },
+      { key: "transform", label: "transforms into this", field: sound(""), optional: true },
+    ],
+  },
+};
+
 const CARD_ROWS: Row[] = [
   { key: "key", field: text },
   { key: "name", field: text },
@@ -221,6 +240,7 @@ const CARD_ROWS: Row[] = [
   { key: "token", field: { kind: "bool" }, hint: "Tokens are never sold in the shop" },
   { key: "cost", label: "gear price", field: int(0), optional: true, hint: "GEAR that is not a token is sold in the tavern at this price (from its rank up)" },
   { key: "costType", label: "paid with", field: { kind: "enum", options: ["ENERGY", "HEALTH"] }, hint: "HEALTH: the price comes off the hero's Health (never down to 0)" },
+  CARD_SOUNDS,
   { key: "ultimateInto", label: "ultimate form", field: { kind: "ref", to: "cards" }, optional: true, hint: "What ULTIMATE_FORM turns this unit into (e.g. its series' final Rider form)" },
   { key: "gattaiInto", label: "gattai form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Gattai core: when this is the leftmost of a Gattai group, the group becomes this card (needs the GATTAI keyword)" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
@@ -272,6 +292,7 @@ const FACTION_ROWS: Row[] = [
   { key: "color", field: { kind: "text", placeholder: "#e53935" } },
   { key: "text", field: { kind: "text", area: true } },
   { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true } },
+  { ...CARD_SOUNDS, hint: "Sounds for every card of this faction that has none of its own" },
 ];
 
 const SERIES_ROWS: Row[] = [

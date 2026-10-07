@@ -5,6 +5,7 @@ import { ENTITIES, entityInfo, KEYWORDS, RULE_DEFAULTS, RULE_ROWS, TRIGGERS, typ
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
 import { wizardPanel } from "./card-wizard.js";
+import { CUES, MUSIC_SLOTS, play, preview, SOUND_SLOTS } from "../sound.js";
 import type { Ctx } from "./ctx.js";
 import { h, mount } from "./dom.js";
 import { renderRows, type FormEnv } from "./form.js";
@@ -18,7 +19,7 @@ interface EditorState {
   loading: boolean;
   loadError?: string;
   /** Which list is open; "rules" is the game-wide numbers. */
-  kind: EntityKind | "rules";
+  kind: EntityKind | "rules" | "sounds";
   /** Position in the list of that kind (not the key, which can be edited). */
   index?: number;
   query: string;
@@ -50,7 +51,7 @@ let statusEl: HTMLElement | undefined;
 let previewEl: HTMLElement | undefined;
 
 /** The entity list being edited (the Rules tab has no list; entity code never runs there). */
-const kindNow = (): EntityKind => (ed.kind === "rules" ? "cards" : ed.kind);
+const kindNow = (): EntityKind => (ed.kind === "rules" || ed.kind === "sounds" ? "cards" : ed.kind);
 
 const data = (): Record<string, any[]> => (ed.draft as AdminDraft).data;
 const list = (kind: EntityKind): any[] => (data()[kind] ??= []);
@@ -432,12 +433,70 @@ function rulesBody(refs: (k: RefKind) => string[]): HTMLElement {
   );
 }
 
+/** What each sound slot is for (shown in the Sounds tab). */
+const SLOT_INFO: Record<string, [group: string, label: string]> = {
+  buy: ["Tavern", "Buy a unit"], buyGear: ["Tavern", "Buy a Gear"], sell: ["Tavern", "Sell"], refresh: ["Tavern", "Refresh"], freeze: ["Tavern", "Freeze"], upgrade: ["Tavern", "Upgrade the tavern"], denied: ["Tavern", "Not allowed / not enough Energy"],
+  play: ["Board", "Play a unit (Deploy)"], gear: ["Board", "Use a Gear"], triple: ["Board", "Triple (Final Form)"], combine: ["Board", "Gattai / Combine"], transform: ["Board", "Transform (Henshin, Ultimate Form)"], discover: ["Board", "Pick a Discover card"], relic: ["Board", "Pick a Relic"], heroPower: ["Board", "Hero Power"], discard: ["Board", "A card is discarded"],
+  attack: ["Fight", "Attack"], hit: ["Fight", "Hit"], barrier: ["Fight", "Barrier breaks"], death: ["Fight", "A unit dies"], summon: ["Fight", "Summon"], kyodaika: ["Fight", "Kyodaika"], giant: ["Fight", "Giant Robo enters"], rollcall: ["Fight", "Roll Call"],
+  roundWin: ["Results", "Fight won"], roundLose: ["Results", "Fight lost"], eliminated: ["Results", "Knocked out"], endWin: ["Results", "Match won (1st)"], endTop4: ["Results", "Match: top 4"], endOther: ["Results", "Match: 5th-8th"],
+  turnStart: ["General", "A turn starts"], timeLow: ["General", "5 seconds left"], click: ["General", "Button click (only with a file)"],
+};
+const MUSIC_INFO: Record<string, string> = { lobby: "Lobby", recruit: "Recruit phase (and hero select)", battle: "Battle phase", endWin: "End of match: won", endLose: "End of match: not won" };
+
+/** The Sounds tab: a file, a volume and a preview for every game moment and every music slot. */
+function soundsBody(ctx: Ctx): HTMLElement {
+  const d = data() as unknown as Record<string, any>;
+  const sounds = (d.sounds ??= { slots: {}, music: {} }) as { slots: Record<string, { file: string; volume: number }>; music: Record<string, { file: string; volume: number }> };
+  sounds.slots ??= {};
+  sounds.music ??= {};
+  const row = (map: Record<string, { file: string; volume: number }>, key: string, label: string, builtIn: boolean): HTMLElement => {
+    const ref = map[key];
+    const pickFile = h("input", { type: "file", attrs: { accept: "audio/mpeg,audio/ogg,audio/wav,.mp3,.ogg,.wav" } }) as HTMLInputElement;
+    pickFile.addEventListener("change", () => {
+      const file = pickFile.files?.[0];
+      if (file) void uploadImage(ctx, file).then((name) => ((map[key] = { file: name, volume: map[key]?.volume ?? 1 }), (ed.dirty = true), redraw()), () => undefined);
+    });
+    const vol = h("input", { type: "range", value: String(Math.round((ref?.volume ?? 1) * 100)), attrs: { min: "0", max: "100" }, disabled: !ref }) as HTMLInputElement;
+    vol.addEventListener("change", () => {
+      if (!map[key]) return;
+      map[key].volume = Number(vol.value) / 100;
+      setDirty();
+    });
+    return h(
+      "tr",
+      null,
+      h("td", { text: label }),
+      h("td", { class: ref ? "" : "muted", text: ref ? ref.file : builtIn ? "built-in" : "none" }),
+      h("td", null, pickFile),
+      h("td", null, vol),
+      h("td", null,
+        h("button", { class: "mini", text: "▶", title: "Listen", disabled: !ref && !builtIn, on: { click: () => (ref ? preview(ref.file, ref.volume) : play(key)) } }),
+        ref && h("button", { class: "mini danger", text: "✕", title: "Back to the built-in sound", on: { click: () => (delete map[key], (ed.dirty = true), redraw()) } })),
+    );
+  };
+  const groups = [...new Set(Object.values(SLOT_INFO).map(([g]) => g))];
+  return h(
+    "div",
+    { class: "admin-body sounds-body" },
+    h("div", { class: "admin-left" }, rulesTabs(), h("p", { class: "muted small", text: "Upload MP3, OGG or WAV (sounds up to 1.5 MB, music up to 6 MB). A slot without a file plays the built-in sound. Cards and factions can have their own sounds (\"sounds\" in their form), which win over these. Save the draft and publish to use them in matches." })),
+    h(
+      "div",
+      { class: "admin-middle sounds-middle" },
+      ...groups.map((g) =>
+        h("div", { class: "panel" }, h("h3", { text: g }), h("table", { class: "admin-table sounds-table" }, h("tr", null, ...["Moment", "File", "Upload", "Volume", ""].map((t) => h("th", { text: t }))), ...SOUND_SLOTS.filter((k) => SLOT_INFO[k]?.[0] === g).map((k) => row(sounds.slots, k, SLOT_INFO[k]?.[1] ?? k, !!CUES[k])))),
+      ),
+      h("div", { class: "panel" }, h("h3", { text: "Music (loops)" }), h("table", { class: "admin-table sounds-table" }, h("tr", null, ...["Where", "File", "Upload", "Volume", ""].map((t) => h("th", { text: t }))), ...MUSIC_SLOTS.map((k) => row(sounds.music, k, MUSIC_INFO[k] ?? k, false)))),
+    ),
+  );
+}
+
 function rulesTabs(): HTMLElement {
-  return h("div", { class: "admin-tabs" }, ...ENTITIES.map((e) => h("button", { class: `tab ${e.kind === ed.kind ? "active" : ""}`, text: `${e.label} (${list(e.kind).length})`, on: { click: () => ((ed.kind = e.kind), (ed.index = undefined), redraw()) } })), h("button", { class: `tab ${ed.kind === "rules" ? "active" : ""}`, text: "Rules", on: { click: () => ((ed.kind = "rules"), (ed.index = undefined), redraw()) } }));
+  return h("div", { class: "admin-tabs" }, ...ENTITIES.map((e) => h("button", { class: `tab ${e.kind === ed.kind ? "active" : ""}`, text: `${e.label} (${list(e.kind).length})`, on: { click: () => ((ed.kind = e.kind), (ed.index = undefined), redraw()) } })), h("button", { class: `tab ${ed.kind === "rules" ? "active" : ""}`, text: "Rules", on: { click: () => ((ed.kind = "rules"), (ed.index = undefined), redraw()) } }), h("button", { class: `tab ${ed.kind === "sounds" ? "active" : ""}`, text: "Sounds", on: { click: () => ((ed.kind = "sounds"), (ed.index = undefined), redraw()) } }));
 }
 
 function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
   if (ed.kind === "rules") return rulesBody(refs);
+  if (ed.kind === "sounds") return soundsBody(ctx);
   const kind: EntityKind = ed.kind;
   const info = entityInfo(kind);
   const items = list(kind);
@@ -505,7 +564,7 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
 }
 
 function newEntity(_ctx: Ctx): void {
-  if (ed.kind === "rules") return;
+  if (ed.kind === "rules" || ed.kind === "sounds") return;
   const info = entityInfo(kindNow());
   const key = window.prompt(`Key for the new ${info.singular} (letters, digits, _ ; cannot change meaning later)`, "")?.trim();
   if (!key) return;
@@ -544,11 +603,14 @@ function entityEditor(ctx: Ctx, entity: Record<string, any>, refs: (k: RefKind) 
 }
 
 const MAX_IMAGE_BYTES = 1_400_000;
+const MAX_AUDIO_BYTES = 5_900_000;
 
-/** Send a picked image to the server and return the stored file name. */
+/** Send a picked image or sound to the server and return the stored file name. */
 async function uploadImage(ctx: Ctx, file: File): Promise<string> {
-  if (file.size > MAX_IMAGE_BYTES) {
-    ctx.toast(`That image is ${Math.round(file.size / 1000)} KB; the limit is about ${Math.round(MAX_IMAGE_BYTES / 1000)} KB`, "error");
+  const audio = file.type.startsWith("audio/") || /\.(mp3|ogg|wav)$/i.test(file.name);
+  const limit = audio ? MAX_AUDIO_BYTES : MAX_IMAGE_BYTES;
+  if (file.size > limit) {
+    ctx.toast(`That ${audio ? "sound" : "image"} is ${Math.round(file.size / 1000)} KB; the limit is about ${Math.round(limit / 1000)} KB`, "error");
     throw new Error("too large");
   }
   const data = await new Promise<string>((resolve, reject) => {

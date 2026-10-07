@@ -2,7 +2,7 @@ import type { Action, Effect, Selector, Target } from "@herotime/shared";
 import { checkCondition, type UnitView } from "../conditions.js";
 import { recordBuff, type BuffRecord, type Unit } from "../content.js";
 import { modifyRule, withRules } from "../rules.js";
-import { copiesOf, type PlayerState, returnToPool } from "../shop/economy.js";
+import { copiesOf, noteMoment, type PlayerState, returnToPool } from "../shop/economy.js";
 import type { GameEnv } from "./env.js";
 
 export function unitView(env: GameEnv, unit: Unit): UnitView {
@@ -164,7 +164,7 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       return;
     }
     case "TRANSFORM": {
-      for (const t of targets) swapKey(t, action.into, env);
+      for (const t of targets) if (swapKey(t, action.into, env)) noteMoment(player, "transforms", action.into);
       return;
     }
     case "DESTROY": {
@@ -224,7 +224,7 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
     case "ULTIMATE_FORM": {
       for (const t of targets) {
         const into = env.content.card(t.key).ultimateInto;
-        if (into) swapKey(t, into, env);
+        if (into && swapKey(t, into, env)) noteMoment(player, "transforms", into);
       }
       return;
     }
@@ -273,6 +273,7 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
         if (!card) break;
         player.hand.splice(player.hand.indexOf(card), 1);
         returnToPool(card, env.pool);
+        noteMoment(player, "discards");
         // The discarded card has its say: "When discarded: ..." (unit cards own it; gear holds player effects).
         const def = env.content.card(card.key);
         runTrigger(def.effects, "ON_DISCARD", "UNIT", card, player, env);
