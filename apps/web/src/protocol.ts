@@ -19,7 +19,7 @@ export interface EventMessage {
 
 export type QueueStatus =
   | { state: "idle" }
-  | { state: "queued"; waiting: number; matchSize: number; fillAt: number | null }
+  | { state: "queued"; kind?: "standard" | "quick"; waiting: number; matchSize: number; fillAt: number | null }
   | { state: "playing"; matchId: string; ended: boolean };
 
 export type Ack = { ok: true; status?: QueueStatus } | { ok: false; error: string };
@@ -45,7 +45,7 @@ export interface AuthResult {
 
 export interface PracticeOptions {
   factions?: string[];
-  speed?: "normal" | "fast";
+  speed?: "normal" | "fast" | "quick";
   bots?: number;
 }
 
@@ -100,7 +100,7 @@ export interface SimulationReport {
 
 export interface MyMatch {
   matchId: string;
-  mode: "queue" | "practice";
+  mode: "queue" | "quick" | "practice";
   endedAt: string;
   contentVersion: number;
   placement: number | null;

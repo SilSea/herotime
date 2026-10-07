@@ -1,4 +1,5 @@
 import { randomInt, randomUUID } from "node:crypto";
+import type { MatchMode } from "../persistence/repositories.js";
 import { Inject, Injectable } from "@nestjs/common";
 import { Match, type Entrant, type MatchConfig } from "@herotime/engine";
 import type { ServerConfig } from "../config.js";
@@ -19,7 +20,7 @@ export interface StartOptions {
   /** Overrides for this match only. */
   match?: Partial<MatchConfig>;
   /** Practice matches are kept in history but never ranked. */
-  mode?: "queue" | "practice";
+  mode?: MatchMode;
 }
 
 /** How long a finished match stays available for reconnects and final standings. */

@@ -72,7 +72,7 @@ export class Net {
   intent(i: Intent): Promise<Ack> {
     return this.call("match:intent", i);
   }
-  joinQueue = (): Promise<Ack> => this.call("queue:join");
+  joinQueue = (kind: "standard" | "quick" = "standard"): Promise<Ack> => this.call("queue:join", { kind });
   leaveQueue = (): Promise<Ack> => this.call("queue:leave");
   practice = (o: PracticeOptions): Promise<Ack> => this.call("queue:practice", o);
   sync = (): Promise<Ack> => this.call("match:sync");

@@ -42,6 +42,14 @@ export const DEFAULT_MATCH_CONFIG: MatchConfig = {
   readyEndsRecruit: false,
 };
 
+/** Quick Mode (docs/RULES.md 1.1): every recruit turn lasts 35s and heroes start on 20 Health. */
+export const QUICK_MODE: Partial<MatchConfig> = {
+  recruitBaseMs: 35_000,
+  recruitStepMs: 0,
+  recruitMaxMs: 35_000,
+  startHp: 20,
+};
+
 /** Recruit-phase length for a turn: 40s, +5s each turn, capped at 75s. */
 export function recruitDuration(turn: number, cfg: MatchConfig): number {
   const base = Math.min(cfg.recruitBaseMs + (turn - 1) * cfg.recruitStepMs, cfg.recruitMaxMs);

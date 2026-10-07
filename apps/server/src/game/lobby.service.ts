@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { RuleError, type MatchConfig } from "@herotime/engine";
-import type { PracticeInput } from "@herotime/shared";
+import { QUICK_MODE, RuleError, type MatchConfig } from "@herotime/engine";
+import type { PracticeInput, QueueKind } from "@herotime/shared";
 import { FAST_TIMERS, type ServerConfig } from "../config.js";
 import { ContentService } from "../content/content.service.js";
 import { CONFIG, PUBLISHER, TIMERS } from "../tokens.js";
@@ -9,18 +9,25 @@ import type { Publisher, Timers } from "./ports.js";
 
 export type LobbyStatus =
   | { state: "idle" }
-  | { state: "queued"; waiting: number; matchSize: number; fillAt: number | null }
+  | { state: "queued"; kind: QueueKind; waiting: number; matchSize: number; fillAt: number | null }
   | { state: "playing"; matchId: string; ended: boolean };
 
+/** One waiting room: players in arrival order and the timer that fills the rest with bots. */
+interface Room {
+  users: Map<string, QueuedUser>;
+  cancelFill: (() => void) | undefined;
+  fillAt: number | null;
+}
+
+const KINDS: readonly QueueKind[] = ["standard", "quick"];
+
 /**
- * A single waiting room. A match starts when it is full, or `fillAfterMs` after the first player
- * arrived, with bots filling every empty seat.
+ * Waiting rooms, one per kind of match (standard, quick). A match starts when a room is full, or
+ * `fillAfterMs` after its first player arrived, with bots filling every empty seat.
  */
 @Injectable()
 export class LobbyService {
-  private readonly queue = new Map<string, QueuedUser>();
-  private cancelFill: (() => void) | undefined;
-  private fillAt: number | null = null;
+  private readonly rooms = new Map<QueueKind, Room>(KINDS.map((k) => [k, { users: new Map(), cancelFill: undefined, fillAt: null }]));
 
   constructor(
     @Inject(MatchRegistry) private readonly registry: MatchRegistry,
@@ -47,6 +54,7 @@ export class LobbyService {
     const match: Partial<MatchConfig> = {};
     if (options.factions) match.fixedFactions = options.factions;
     if (options.speed === "fast") Object.assign(match, FAST_TIMERS);
+    if (options.speed === "quick") Object.assign(match, QUICK_MODE);
     this.registry.startMatch([user], {
       size: options.bots === undefined ? this.config.lobby.matchSize : options.bots + 1,
       match,
@@ -57,76 +65,95 @@ export class LobbyService {
     return status;
   }
 
-  join(user: QueuedUser): LobbyStatus {
+  join(user: QueuedUser, kind: QueueKind = "standard"): LobbyStatus {
     if (this.registry.activeFor(user.id)) throw new RuleError("you are already in a match");
     this.registry.release(user.id); // a finished match no longer blocks queueing
-    if (!this.queue.has(user.id)) this.queue.set(user.id, user);
+    for (const k of KINDS) if (k !== kind) this.leaveRoom(k, user.id); // one queue at a time
+    const room = this.room(kind);
+    if (!room.users.has(user.id)) room.users.set(user.id, user);
 
-    if (this.queue.size >= this.config.lobby.matchSize) {
-      this.startNow();
+    if (room.users.size >= this.config.lobby.matchSize) {
+      this.startNow(kind);
     } else {
-      if (!this.cancelFill) this.armFill();
-      this.broadcast();
+      if (!room.cancelFill) this.armFill(kind);
+      this.broadcast(kind);
     }
     return this.statusFor(user.id);
   }
 
   leave(userId: string): void {
-    if (!this.queue.delete(userId)) return;
-    if (this.queue.size === 0) this.disarmFill();
-    this.broadcast();
+    for (const k of KINDS) this.leaveRoom(k, userId);
   }
 
   statusFor(userId: string): LobbyStatus {
     const runner = this.registry.runnerFor(userId);
     if (runner) return { state: "playing", matchId: runner.id, ended: runner.ended };
-    if (this.queue.has(userId)) {
-      return { state: "queued", waiting: this.queue.size, matchSize: this.config.lobby.matchSize, fillAt: this.fillAt };
+    for (const kind of KINDS) {
+      const room = this.room(kind);
+      if (room.users.has(userId)) return { state: "queued", kind, waiting: room.users.size, matchSize: this.config.lobby.matchSize, fillAt: room.fillAt };
     }
     return { state: "idle" };
   }
 
+  /** Players waiting, in every room. */
   get waiting(): number {
-    return this.queue.size;
+    return KINDS.reduce((n, k) => n + this.room(k).users.size, 0);
   }
 
   shutdown(): void {
-    this.disarmFill();
-    this.queue.clear();
-  }
-
-  private armFill(): void {
-    this.fillAt = this.timers.now() + this.config.lobby.fillAfterMs;
-    this.cancelFill = this.timers.after(this.config.lobby.fillAfterMs, () => {
-      this.cancelFill = undefined;
-      this.fillAt = null;
-      this.startNow();
-    });
-  }
-
-  private disarmFill(): void {
-    this.cancelFill?.();
-    this.cancelFill = undefined;
-    this.fillAt = null;
-  }
-
-  private startNow(): void {
-    this.disarmFill();
-    const users = [...this.queue.values()].slice(0, this.config.lobby.matchSize);
-    if (users.length === 0) return;
-    for (const u of users) this.queue.delete(u.id);
-
-    const runner = this.registry.startMatch(users);
-    for (const u of users) this.publisher.toUser(u.id, "queue:status", this.statusFor(u.id));
-    void runner; // the runner already pushed everyone's first view
-
-    if (this.queue.size > 0) {
-      this.armFill();
-      this.broadcast();
+    for (const k of KINDS) {
+      this.disarmFill(k);
+      this.room(k).users.clear();
     }
   }
 
-  private broadcast(): void {
-    for (const id of this.queue.keys()) this.publisher.toUser(id, "queue:status", this.statusFor(id));
+  private room(kind: QueueKind): Room {
+    return this.rooms.get(kind) as Room;
+  }
+
+  private leaveRoom(kind: QueueKind, userId: string): void {
+    const room = this.room(kind);
+    if (!room.users.delete(userId)) return;
+    if (room.users.size === 0) this.disarmFill(kind);
+    this.broadcast(kind);
+  }
+
+  private armFill(kind: QueueKind): void {
+    const room = this.room(kind);
+    room.fillAt = this.timers.now() + this.config.lobby.fillAfterMs;
+    room.cancelFill = this.timers.after(this.config.lobby.fillAfterMs, () => {
+      room.cancelFill = undefined;
+      room.fillAt = null;
+      this.startNow(kind);
+    });
+  }
+
+  private disarmFill(kind: QueueKind): void {
+    const room = this.room(kind);
+    room.cancelFill?.();
+    room.cancelFill = undefined;
+    room.fillAt = null;
+  }
+
+  private startNow(kind: QueueKind): void {
+    this.disarmFill(kind);
+    const room = this.room(kind);
+    const users = [...room.users.values()].slice(0, this.config.lobby.matchSize);
+    if (users.length === 0) return;
+    for (const u of users) room.users.delete(u.id);
+
+    // Quick matches are their own kind: they never count for the (standard) leaderboard.
+    const runner = kind === "quick" ? this.registry.startMatch(users, { match: { ...QUICK_MODE }, mode: "quick" }) : this.registry.startMatch(users);
+    for (const u of users) this.publisher.toUser(u.id, "queue:status", this.statusFor(u.id));
+    void runner; // the runner already pushed everyone's first view
+
+    if (room.users.size > 0) {
+      this.armFill(kind);
+      this.broadcast(kind);
+    }
+  }
+
+  private broadcast(kind: QueueKind): void {
+    for (const id of this.room(kind).users.keys()) this.publisher.toUser(id, "queue:status", this.statusFor(id));
   }
 }

@@ -9,7 +9,7 @@ import type { Ctx } from "./ctx.js";
 interface PracticeForm {
   factions: string[];
   bots: number;
-  speed: "normal" | "fast";
+  speed: "normal" | "fast" | "quick";
 }
 
 const KEY = "herotime.practice";
@@ -56,7 +56,7 @@ function historyPanel(ctx: Ctx): HTMLElement {
         ...rows.map((m) => h("tr", { title: m.players.map((p) => `${ordinal(p.placement)} ${p.name}${p.isBot ? " (bot)" : ""}`).join("\n") },
           h("td", { class: m.placement === 1 ? "place-win" : "", text: m.placement ? ordinal(m.placement) : "-" }),
           h("td", { text: m.heroKey ? ctx.ix.heroName(m.heroKey) : "-" }),
-          h("td", { text: m.mode === "practice" ? tr("practice", "ฝึกซ้อม") : tr("ranked", "จัดอันดับ") }),
+          h("td", { text: m.mode === "practice" ? tr("practice", "ฝึกซ้อม") : m.mode === "quick" ? "quick" : tr("ranked", "จัดอันดับ") }),
           h("td", { class: "muted", text: new Date(m.endedAt).toLocaleString() })))),
   );
 }
@@ -77,7 +77,7 @@ function leaderboardPanel(): HTMLElement {
 function loadForm(): PracticeForm {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? "null") as Partial<PracticeForm> | null;
-    return { factions: raw?.factions ?? [], bots: raw?.bots ?? 7, speed: raw?.speed === "normal" ? "normal" : "fast" };
+    return { factions: raw?.factions ?? [], bots: raw?.bots ?? 7, speed: raw?.speed === "normal" || raw?.speed === "quick" ? raw.speed : "fast" };
   } catch {
     return { factions: [], bots: 7, speed: "fast" };
   }
@@ -114,9 +114,10 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
   const bots = h("select", { on: { change: (e) => ((form.bots = Number((e.target as HTMLSelectElement).value)), saveForm(form)) } }, ...[1, 2, 3, 4, 5, 6, 7].map((n) => h("option", { value: String(n), text: tr(`${n} bot${n > 1 ? "s" : ""}`, `bot ${n} ตัว`), selected: n === form.bots })));
   const speed = h(
     "select",
-    { on: { change: (e) => ((form.speed = (e.target as HTMLSelectElement).value as "normal" | "fast"), saveForm(form)) } },
+    { on: { change: (e) => ((form.speed = (e.target as HTMLSelectElement).value as PracticeForm["speed"]), saveForm(form)) } },
     h("option", { value: "fast", text: tr("Fast (about 1 min per game)", "เร็ว (ประมาณ 1 นาทีต่อเกม)"), selected: form.speed === "fast" }),
     h("option", { value: "normal", text: tr("Normal (20-30 min)", "ปกติ (20-30 นาที)"), selected: form.speed === "normal" }),
+    h("option", { value: "quick", text: tr("Quick Mode (35s turns, 20 HP)", "Quick Mode (เทิร์นละ 35 วิ, HP 20)"), selected: form.speed === "quick" }),
   );
 
   const status = state.status;
@@ -125,11 +126,16 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
       ? h(
           "div",
           { class: "queue-box" },
-          h("p", { text: `${tr("Waiting for players", "รอผู้เล่น")}: ${status.waiting}/${status.matchSize}` }),
+          h("p", { text: `${status.kind === "quick" ? "Quick Mode · " : ""}${tr("Waiting for players", "รอผู้เล่น")}: ${status.waiting}/${status.matchSize}` }),
           h("p", { class: "muted", id: "fill-countdown", data: { fillAt: String(status.fillAt ?? "") }, text: status.fillAt ? `${tr("Bots join in", "bot จะเข้าใน")} ${formatClock(ctx.clock.remaining(status.fillAt))}` : "" }),
           h("button", { class: "btn", text: tr("Leave queue", "ออกจากคิว"), on: { click: () => void ctx.leaveQueue() } }),
         )
-      : h("button", { class: "btn", text: tr("Join the queue", "เข้าคิว"), on: { click: () => void ctx.joinQueue() } });
+      : h(
+          "div",
+          { class: "row" },
+          h("button", { class: "btn", text: tr("Join the queue", "เข้าคิว"), on: { click: () => void ctx.joinQueue("standard") } }),
+          h("button", { class: "btn", text: tr("Quick Mode queue", "คิว Quick Mode"), title: tr("35s turns, heroes start on 20 HP. Does not count for the leaderboard.", "เทิร์นละ 35 วิ Hero เริ่ม HP 20 ไม่นับในตารางอันดับ"), on: { click: () => void ctx.joinQueue("quick") } }),
+        );
 
   // Your numbers, from the history the server keeps (ranked games only for the record line).
   const mine = stats.mine ?? [];

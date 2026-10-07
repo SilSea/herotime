@@ -344,6 +344,38 @@ describe("LobbyService", () => {
   });
 });
 
+describe("Quick Mode", () => {
+  it("has its own queue: quick players wait apart from standard ones and start a 20 HP match", () => {
+    const { lobby, registry, timers } = setup();
+    lobby.join(user(1), "quick");
+    lobby.join(user(2));
+    expect(lobby.statusFor("u1")).toMatchObject({ state: "queued", kind: "quick", waiting: 1 });
+    expect(lobby.statusFor("u2")).toMatchObject({ state: "queued", kind: "standard", waiting: 1 });
+    timers.advance(5000);
+    expect(registry.count).toBe(2);
+    const quick = registry.activeFor("u1");
+    expect(quick?.meta.mode).toBe("quick");
+    expect(quick?.match.players.every((p) => p.hp === 20)).toBe(true);
+    expect(registry.activeFor("u2")?.meta.mode).toBe("queue");
+    expect(registry.activeFor("u2")?.match.players.every((p) => p.hp === 30)).toBe(true);
+  });
+
+  it("joining one queue leaves the other", () => {
+    const { lobby } = setup();
+    lobby.join(user(1));
+    lobby.join(user(1), "quick");
+    expect(lobby.waiting).toBe(1);
+    expect(lobby.statusFor("u1")).toMatchObject({ kind: "quick" });
+  });
+
+  it("practice can use the Quick Mode preset", () => {
+    const { lobby, registry } = setup();
+    lobby.practice(user(1), { speed: "quick", bots: 1 });
+    expect(registry.activeFor("u1")?.match.players.every((p) => p.hp === 20)).toBe(true);
+    expect(registry.activeFor("u1")?.match.config.recruitStepMs).toBe(0);
+  });
+});
+
 describe("LobbyService.practice (playtesting)", () => {
   it("starts a match for the player straight away, with a full table by default", () => {
     const { lobby, registry, publisher } = setup();

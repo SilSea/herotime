@@ -18,7 +18,7 @@ export interface Ctx {
   login(result: AuthResult): Promise<void>;
   logout(): void;
   startPractice(options: PracticeOptions): Promise<void>;
-  joinQueue(): Promise<void>;
+  joinQueue(kind?: "standard" | "quick"): Promise<void>;
   leaveQueue(): Promise<void>;
   /** After a match: go back to the lobby. */
   leaveMatch(): Promise<void>;

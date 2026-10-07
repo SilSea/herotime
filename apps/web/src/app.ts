@@ -106,8 +106,8 @@ export function startApp(root: HTMLElement): void {
       const ack = await net.practice(options);
       if (!ack.ok) toast(serverText(ack.error), "error");
     },
-    async joinQueue() {
-      const ack = await net.joinQueue();
+    async joinQueue(kind = "standard") {
+      const ack = await net.joinQueue(kind);
       if (!ack.ok) toast(serverText(ack.error), "error");
     },
     async leaveQueue() {

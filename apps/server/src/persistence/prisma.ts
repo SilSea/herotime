@@ -100,7 +100,7 @@ export class PrismaMatchRepository implements MatchRepository {
     });
     return rows.map((m) => ({
       matchId: m.id,
-      mode: m.mode === "practice" ? ("practice" as const) : ("queue" as const),
+      mode: m.mode === "practice" || m.mode === "quick" ? m.mode : ("queue" as const),
       seed: m.seed,
       contentVersion: m.contentVersion,
       startedAt: m.startedAt,

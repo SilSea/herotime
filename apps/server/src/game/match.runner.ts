@@ -1,8 +1,9 @@
 import { RuleError, type Intent, type Match, type MatchEvent, type MatchView } from "@herotime/engine";
+import type { MatchMode } from "../persistence/repositories.js";
 import type { Publisher, Timers } from "./ports.js";
 
 export interface RunnerMeta {
-  mode: "queue" | "practice";
+  mode: MatchMode;
   seed: number;
   contentVersion: number;
   startedAt: Date;

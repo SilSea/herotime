@@ -57,9 +57,15 @@ export const PracticeSchema = z
   .object({
     /** Force exactly these factions. Omit for the normal random subset. */
     factions: z.array(z.string().min(1).max(40)).min(1).max(10).optional(),
-    speed: z.enum(["normal", "fast"]).optional(),
+    /** normal = the real timers, fast = seconds (playtesting), quick = Quick Mode (35s turns, 20 Health). */
+    speed: z.enum(["normal", "fast", "quick"]).optional(),
     /** Bots to play against (1-7). Omit for a full lobby of 7. */
     bots: z.number().int().min(1).max(7).optional(),
   })
   .strict();
 export type PracticeInput = z.infer<typeof PracticeSchema>;
+
+/** Which queue to wait in: standard matches (they count for the leaderboard) or Quick Mode. */
+export const QueueKind = z.enum(["standard", "quick"]);
+export type QueueKind = z.infer<typeof QueueKind>;
+export const QueueJoinSchema = z.object({ kind: QueueKind.optional() }).strict();
