@@ -166,8 +166,11 @@ export class Match {
       for (const f of fixed) if (!content.factions.has(f)) throw new Error(`unknown faction in fixedFactions: ${f}`);
       return new Set(fixed);
     }
+    // Only factions with units in the tavern: a faction with no cards yet would leave the tavern short (or empty).
+    const stocked = all.filter((f) => [...content.cards.values()].some((c) => c.kind === "UNIT" && !c.token && c.factions.includes(f)));
+    const from = stocked.length > 0 ? stocked : all;
     const n = this.config.factionsPerMatch;
-    return new Set(n <= 0 || n >= all.length ? all : rng.shuffle(all).slice(0, n));
+    return new Set(n <= 0 || n >= from.length ? from : rng.shuffle(from).slice(0, n));
   }
 
   /**

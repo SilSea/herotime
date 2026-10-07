@@ -155,7 +155,12 @@ export class Content {
     const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
     // GAIN_ENERGY, ADD_TO_HAND, RANDOM_CARD, DISCOVER_UNIT, GAUGE_ADD, BUFF_SHOP and BUFF_GEAR work in fights too: they arrive next turn.
     const RECRUIT_ONLY = new Set(["MODIFY_RULE", "DISCOVER_GIANT", "SUPER_GATTAI", "ULTIMATE_FORM", "DEVOUR_SHOP", "DISCARD"]);
+    // Triggers only the player gets (relic picked, hero power used, Roll Call): a unit effect on them never runs.
+    const PLAYER_ONLY = new Set(["ON_ACQUIRE", "ON_USE", "ON_ROLL_CALL", "ON_ROLL_CALL_WIN"]);
     const checkPhase = (e: Effect, from: string): void => {
+      if (e.scope === "UNIT" && PLAYER_ONLY.has(e.trigger) && !from.startsWith("relic") && !from.startsWith("hero")) {
+        problems.push(`${from}: a unit effect never gets ${e.trigger} (it is for relics, heroes and Gauges)`);
+      }
       if (e.target?.selector === "SUMMONED" && e.trigger !== "ALLY_SUMMONED") problems.push(`${from}: target SUMMONED only works with ALLY_SUMMONED`);
       // A summon can happen in either phase, so its reactions must work in both.
       if (e.trigger === "ALLY_SUMMONED") {

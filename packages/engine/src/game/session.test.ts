@@ -205,7 +205,7 @@ describe("endTurn", () => {
       expect(p.board[0]?.turns).toBe(0);
     });
 
-    it("fires the new form's HENSHIN effect and keeps golden + bonuses", () => {
+    it("fires the transforming card's HENSHIN effect (on the new form) and keeps golden + bonuses", () => {
       p.board = [{ key: "rookie", golden: true, bonusAtk: 3 }];
       endTurn(p, env);
       endTurn(p, env);

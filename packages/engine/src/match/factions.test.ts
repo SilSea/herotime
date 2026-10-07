@@ -107,6 +107,15 @@ describe("which factions a match uses", () => {
     expect(combos.size).toBe(3); // all three pairs occur
   });
 
+  it("only draws factions that have units in the tavern (a faction with no cards yet never empties the tavern)", () => {
+    const w = content({
+      factions: [f("rider"), f("sentai"), f("mecha"), f("kaiju")],
+      cards: [card("r1", { rank: 1, factions: ["rider"] }), card("r2", { rank: 2, factions: ["rider"] }), card("tok", { token: true, factions: ["sentai"] })],
+      heroes: [HeroDef.parse({ key: "h1", name: "h1" }), HeroDef.parse({ key: "h2", name: "h2" })],
+    });
+    for (let seed = 1; seed <= 20; seed++) expect([...(create({ factionsPerMatch: 2 }, seed, w).env.activeFactions ?? [])]).toEqual(["rider"]);
+  });
+
   it("0, or at least as many as exist, means all of them", () => {
     for (const n of [0, 3, 7]) expect(create({ factionsPerMatch: n }).env.activeFactions?.size).toBe(3);
   });

@@ -27,7 +27,7 @@ export const Trigger = z.enum([
   // unit effects
   "ON_PLAY", // Deploy: unit placed on the board (also: a Gear card being used)
   "END_OF_TURN",
-  "HENSHIN", // the unit transformed (also a Gauge source: any friendly Henshin)
+  "HENSHIN", // the unit transformed: runs the effects of the card it was (also a Gauge source: any friendly Henshin)
   "START_OF_COMBAT",
   "ON_ATTACK",
   "AFTER_DAMAGED",
@@ -38,7 +38,7 @@ export const Trigger = z.enum([
   "ON_DISCARD", // the card was discarded from the hand by another card's DISCARD
   // player effects
   "ON_ACQUIRE", // relic picked / hero chosen: runs once, rules it sets persist
-  "ON_TURN_START",
+  "ON_TURN_START", // also units on the board
   "ON_USE", // hero power activated
   // gauge sources
   "ON_ROLL_CALL",

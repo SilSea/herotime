@@ -18,6 +18,7 @@ export interface WhenOption {
 /** When an ability fires, for units (gear always fires when used). */
 export const WHEN: WhenOption[] = [
   { key: "ON_PLAY", phase: "recruit", label: () => tr("When played from hand (Deploy)", "เมื่อลงจากมือ (Deploy)") },
+  { key: "ON_TURN_START", phase: "recruit", label: () => tr("At the start of each turn", "ตอนเริ่มเทิร์น") },
   { key: "END_OF_TURN", phase: "recruit", label: () => tr("At the end of your turn", "ตอนจบเทิร์น") },
   { key: "HENSHIN", phase: "recruit", label: () => tr("When it transforms (Henshin)", "เมื่อแปลงร่าง") },
   { key: "START_OF_COMBAT", phase: "fight", label: () => tr("At the start of combat", "ตอนเริ่มการต่อสู้") },

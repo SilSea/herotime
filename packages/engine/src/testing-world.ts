@@ -13,14 +13,14 @@ export function buildWorld(): Content {
     card("drone", { rank: 1, atk: 1, hp: 2, factions: ["mecha"], keywords: ["GATTAI"] }),
     card("scout", { rank: 2, atk: 2, hp: 2 }),
     card("elder", { rank: 3, atk: 3, hp: 3 }),
-    // Henshin(2): rookie -> rider_form, then a gauge point
+    // Henshin(2): rookie -> rider_form ("On Henshin" printed on the rookie), then a gauge point
     card("rookie", {
       rank: 1, atk: 2, hp: 2, factions: ["rider"], series: "w",
       henshin: { afterTurns: 2, into: "rider_form" },
+      effects: [effect({ trigger: "HENSHIN", actions: [{ type: "BUFF", atk: 1, hp: 1 }] })],
     }),
     card("rider_form", {
       rank: 2, atk: 4, hp: 4, factions: ["rider"], series: "w", keywords: ["RIDER_KICK"], token: true,
-      effects: [effect({ trigger: "HENSHIN", actions: [{ type: "BUFF", atk: 1, hp: 1 }] })],
     }),
     // Cafe Owner: End of Turn, if energy is left, random friendly +1/+1
     card("cafe", {

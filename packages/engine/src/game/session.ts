@@ -20,7 +20,7 @@ import type { GameEnv } from "./env.js";
 
 // ------------------------------------------------------------ recruit intents
 
-/** Start a recruit phase: refill energy, roll the shop, then run ON_TURN_START (relics, hero). */
+/** Start a recruit phase: refill energy, roll the shop, then run ON_TURN_START (units on the board, relics, hero). */
 export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void {
   resetTurnUses(player);
   startTurn(player, turn, env.pool, env.rng, env.cfg, env.gear);
@@ -28,6 +28,9 @@ export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void
   const rewards = player.fightRewards ?? [];
   delete player.fightRewards;
   for (const r of rewards) runReward(r, player, env);
+  for (const unit of [...player.board]) {
+    if (player.board.includes(unit)) runTrigger(env.content.card(unit.key).effects, "ON_TURN_START", "UNIT", unit, player, env);
+  }
   for (const { effects, origin } of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env, origin);
 }
 
@@ -188,12 +191,14 @@ export function endTurn(player: PlayerState, env: GameEnv): void {
   for (const unit of [...player.board]) {
     if (!player.board.includes(unit)) continue;
     unit.turns = (unit.turns ?? 0) + 1;
-    const henshin = env.content.card(unit.key).henshin;
+    const before = env.content.card(unit.key);
+    const henshin = before.henshin;
     if (!henshin || unit.turns < henshin.afterTurns) continue;
 
     if (!swapKey(unit, henshin.into, env)) continue; // pool cannot cover the new form: try again next turn
     noteMoment(player, "transforms", henshin.into);
-    runTrigger(env.content.card(unit.key).effects, "HENSHIN", "UNIT", unit, player, env);
+    // "On Henshin" is printed on the card that transforms, so its effects run (acting as the new form).
+    runTrigger(before.effects, "HENSHIN", "UNIT", unit, player, env);
     fireGaugeTrigger(player, env, "HENSHIN");
   }
 }
