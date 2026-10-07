@@ -346,16 +346,90 @@ function heroSelect(ctx: Ctx, view: View): HTMLElement {
 
 // -------------------------------------------------------------- end screen
 
+/** Title, colour and words for a finishing place. */
+function placeTier(place: number | undefined): { cls: string; title: string; sub: string } {
+  if (place === 1) return { cls: "gold", title: tr("VICTORY!", "ชนะเลิศ!"), sub: tr("Last hero standing", "ฮีโร่คนสุดท้ายที่ยืนอยู่") };
+  if (place === 2) return { cls: "silver", title: tr("RUNNER-UP", "รองแชมป์"), sub: tr("So close", "อีกนิดเดียว") };
+  if (place === 3) return { cls: "bronze", title: tr("TOP 3", "อันดับ 3"), sub: tr("On the podium", "ขึ้นโพเดียม") };
+  if (place === 4) return { cls: "top4", title: tr("TOP 4", "ท็อป 4"), sub: tr("A strong finish", "จบได้สวย") };
+  if (place) return { cls: "out", title: tr("DEFEATED", "ตกรอบ"), sub: tr("Regroup and go again", "รวมทีมใหม่แล้วลุยอีกครั้ง") };
+  return { cls: "out", title: tr("MATCH OVER", "จบเกม"), sub: "" };
+}
+
+/** When the end screen first appeared (per match): redraws continue its animations instead of restarting them. */
+let endShown: { match: string; at: number } | undefined;
+
+/** The end of a match: your place in big, the podium, then everyone with the board they finished with. */
 function endScreen(ctx: Ctx, view: View): HTMLElement {
+  const matchId = ctx.store.state.matchId ?? "";
+  if (endShown?.match !== matchId) endShown = { match: matchId, at: Date.now() };
+  const since = Date.now() - endShown.at;
   const placements = ctx.store.state.placements ?? view.players.filter((p) => p.placement !== undefined).map((p) => ({ playerId: p.id, placement: p.placement as number }));
-  const mine = view.me.placement;
-  const name = (id: string): string => view.players.find((p) => p.id === id)?.name ?? id;
+  const placeOf = (id: string): number | undefined => placements.find((x) => x.playerId === id)?.placement ?? view.players.find((p) => p.id === id)?.placement;
+  const ranked = [...view.players].sort((a, b) => (placeOf(a.id) ?? 99) - (placeOf(b.id) ?? 99));
+  const mine = placeOf(view.me.id);
+  const tier = placeTier(mine);
+  const me = view.players.find((p) => p.id === view.me.id);
+
+  const portrait = (p: Player, cls: string): HTMLElement => {
+    const art = ctx.ix.heroArt(p.hero);
+    const name = p.hero ? ctx.ix.heroName(p.hero) : p.name;
+    return h("div", { class: `${cls} ${art ? "has-art" : ""}`, style: bg(art) }, !art && h("span", { text: initialsOf(name) }));
+  };
+  const miniBoard = (p: Player): HTMLElement =>
+    h("div", { class: "end-board" }, ...(p.lastFightBoard ?? []).map((u) => cardEl(ctx.ix, { key: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden, extraKeywords: u.keywords, small: true, minion: true, hideText: true })));
+
+  // Podium: 2nd, 1st, 3rd
+  const podiumOrder = [2, 1, 3].map((n) => ranked.find((p) => placeOf(p.id) === n)).filter((p): p is Player => !!p);
+  const podium = h(
+    "div",
+    { class: "podium" },
+    ...podiumOrder.map((p) => {
+      const n = placeOf(p.id) as number;
+      return h(
+        "div",
+        { class: `podium-spot p${n} ${p.id === view.me.id ? "me" : ""}` },
+        portrait(p, "podium-portrait"),
+        h("div", { class: "podium-name", text: p.name }),
+        h("div", { class: "podium-hero muted small", text: p.hero ? ctx.ix.heroName(p.hero) : "" }),
+        h("div", { class: "podium-block" }, h("span", { class: "podium-num", text: String(n) })),
+      );
+    }),
+  );
+
+  const rows = h(
+    "div",
+    { class: "end-list" },
+    ...ranked.map((p) => {
+      const n = placeOf(p.id);
+      const label = p.lastBoard ? boardLabel(p.lastBoard, ctx.ix.factionName).headline : "";
+      return h(
+        "div",
+        { class: `end-row ${p.id === view.me.id ? "me" : ""} ${placeTier(n).cls}` },
+        h("div", { class: "end-place", text: n ? String(n) : "-" }),
+        portrait(p, "end-portrait"),
+        h("div", { class: "end-who" }, h("div", { class: "end-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${p.id === view.me.id ? tr(" (you)", " (คุณ)") : ""}` }), h("div", { class: "muted small", text: [p.hero ? ctx.ix.heroName(p.hero) : "", label, p.relics.length > 0 ? `Relic ${p.relics.length}` : ""].filter(Boolean).join(" · ") })),
+        miniBoard(p),
+      );
+    }),
+  );
+
   return h(
     "div",
-    { class: "center end-screen" },
-    h("h2", { text: mine === 1 ? tr("Victory!", "ชนะ!") : mine ? tr(`You finished ${ordinal(mine)}`, `คุณได้อันดับ${ordinal(mine)}`) : tr("Match over", "จบเกม") }),
-    h("ol", { class: "standings" }, ...[...placements].sort((a, b) => a.placement - b.placement).map((p) => h("li", { class: p.playerId === view.me.id ? "me" : "" }, `${ordinal(p.placement)} - ${name(p.playerId)}`))),
-    h("div", { class: "row" }, h("button", { class: "btn primary big", text: tr("Back to lobby", "กลับล็อบบี้"), on: { click: () => void ctx.leaveMatch() } })),
+    { class: `end-screen end-${tier.cls}`, style: `--since: -${since}ms` },
+    tier.cls === "gold" && h("div", { class: "confetti" }, ...Array.from({ length: 36 }, (_, i) => h("i", { style: `--x:${(i * 37) % 100}%;--d:${(i % 7) * 0.35}s;--h:${(i * 53) % 360}` }))),
+    h(
+      "div",
+      { class: "end-hero" },
+      me && portrait(me, "end-hero-portrait"),
+      h("div", { class: "end-medal" }, h("span", { text: mine ? String(mine) : "-" })),
+      h("div", { class: "end-title", text: tier.title }),
+      h("div", { class: "end-sub", text: mine ? `${tr(`You finished ${ordinal(mine)}`, `คุณได้อันดับ${ordinal(mine)}`)} · ${tier.sub}` : tier.sub }),
+      h("div", { class: "end-stats muted" }, `${tr("Turns", "เทิร์น")} ${view.turn}`, me ? ` · ${Math.max(0, me.hp)} HP` : "", me?.relics.length ? ` · Relic ${me.relics.length}` : ""),
+    ),
+    podiumOrder.length > 1 && podium,
+    rows,
+    h("div", { class: "row center-row end-actions" }, h("button", { class: "btn primary big", text: tr("Back to lobby", "กลับล็อบบี้"), on: { click: () => void ctx.leaveMatch() } })),
   );
 }
 
