@@ -44,6 +44,7 @@ export const DO: DoOption[] = [
   { key: "GIVE_KEYWORD", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Give a keyword", "ให้ keyword") },
   { key: "SUMMON", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Summon a unit", "เรียกยูนิตเข้าสนาม") },
   { key: "DESTROY", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Destroy", "ทำลาย") },
+  { key: "CONSUME_ALLIES", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Destroy all your other units, give their total stats", "ทำลายยูนิตอื่นของเราทั้งหมด แล้วมอบค่าพลังรวม") },
   { key: "TRANSFORM", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Transform into another card", "แปลงร่างเป็นการ์ดอื่น") },
   { key: "DAMAGE", phases: ["fight"], targeted: true, label: () => tr("Deal damage", "ทำดาเมจ") },
   { key: "GAIN_ENERGY", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Gain Energy", "ได้ Energy") },
@@ -95,6 +96,8 @@ export interface Ability {
   atk: number;
   hp: number;
   permanent: boolean;
+  /** BUFF: also give this card's own ATK/HP. */
+  fromSelf: boolean;
   keyword: string;
   cardKey: string;
   count: number;
@@ -155,6 +158,7 @@ export const newAbility = (type: CardType): Ability => ({
   atk: 1,
   hp: 1,
   permanent: false,
+  fromSelf: false,
   keyword: "GUARD",
   cardKey: "",
   count: 1,
@@ -234,7 +238,7 @@ export function checkRecipe(r: Recipe, takenKeys: ReadonlySet<string>): string[]
     if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Ultimate Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Ultimate (ตั้งในขั้นที่ 4)`));
     if (a.condition === "HAS_CARD" && a.conditionCards.length === 0) out.push(tr(`Ability ${n}: pick the card(s) the condition looks for.`, `ความสามารถ ${n}: เลือกการ์ดที่ต้องมีในเงื่อนไข`));
     if (a.do === "BUFF_GEAR" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the Gear power-up adds nothing.`, `ความสามารถ ${n}: เสริมพลัง Gear เป็น 0`));
-    if (a.do === "BUFF" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the buff adds nothing.`, `ความสามารถ ${n}: บัฟเป็น 0`));
+    if (a.do === "BUFF" && a.atk === 0 && a.hp === 0 && !(a.fromSelf && r.type !== "GEAR")) out.push(tr(`Ability ${n}: the buff adds nothing.`, `ความสามารถ ${n}: บัฟเป็น 0`));
   });
   return out;
 }
@@ -271,7 +275,8 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   const gear = type === "GEAR";
   const d = DO.find((x) => x.key === a.do);
   const action: Record<string, unknown> = { type: a.do };
-  if (a.do === "BUFF") Object.assign(action, { atk: a.atk, hp: a.hp, permanent: a.permanent });
+  if (a.do === "BUFF") Object.assign(action, { atk: a.atk, hp: a.hp, permanent: a.permanent, ...(a.fromSelf && !gear ? { fromSelf: true } : {}) });
+  if (a.do === "CONSUME_ALLIES") action.permanent = a.permanent;
   if (a.do === "GIVE_KEYWORD") action.keyword = a.keyword;
   if (a.do === "SUMMON") Object.assign(action, { cardKey: a.cardKey, count: Math.max(1, a.count) });
   if (a.do === "ADD_TO_HAND") action.cardKey = a.cardKey;
@@ -314,7 +319,10 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : "";
     const sign = (n: number): string => (n >= 0 ? `+${n}` : String(n));
     const what =
-      a.do === "BUFF" ? tr(`give ${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " permanently" : ""}`, `ให้${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " ถาวร" : ""}`)
+      a.do === "BUFF" && a.fromSelf && r.type !== "GEAR"
+        ? tr(`give ${who} this card's ATK/HP${a.atk || a.hp ? ` ${sign(a.atk)}/${sign(a.hp)}` : ""}${a.permanent ? " permanently" : ""}`, `ให้${who} ได้ ATK/HP เท่าการ์ดนี้${a.atk || a.hp ? ` ${sign(a.atk)}/${sign(a.hp)}` : ""}${a.permanent ? " ถาวร" : ""}`)
+      : a.do === "BUFF" ? tr(`give ${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " permanently" : ""}`, `ให้${who} ${sign(a.atk)}/${sign(a.hp)}${a.permanent ? " ถาวร" : ""}`)
+      : a.do === "CONSUME_ALLIES" ? tr(`destroy all your other units and give ${who} their total ATK/HP${a.permanent ? " permanently" : ""}`, `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${who}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`)
       : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${a.keyword}`, `ให้${who}ได้ ${a.keyword}`)
       : a.do === "SUMMON" ? tr(`summon ${a.count > 1 ? `${a.count} × ` : ""}${cardName(a.cardKey)}`, `เรียก ${cardName(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
       : a.do === "TRANSFORM" ? tr(`transform ${who} into ${cardName(a.cardKey)}`, `แปลง${who}เป็น ${cardName(a.cardKey)}`)

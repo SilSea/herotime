@@ -60,6 +60,17 @@ describe("card wizard", () => {
     expect(buildCard(recipe({ abilities: [{ ...newAbility("UNIT"), targetCards: ["cub"] }] })).effects).toEqual([expect.objectContaining({ target: { selector: "SELF" } })]);
   });
 
+  it("builds an own-stat buff and a consume-all", () => {
+    const cap = recipe({ key: "cap", abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", do: "BUFF", atk: 0, hp: 0, fromSelf: true, target: "ALL_FRIENDLY" }] });
+    expect(buildCard(cap).effects).toEqual([expect.objectContaining({ actions: [{ type: "BUFF", atk: 0, hp: 0, permanent: false, fromSelf: true }] })]);
+    expect(checkRecipe(cap, new Set())).toEqual([]);
+    expect(describeRecipe(cap, (k) => k, (k) => k)[0]).toContain("this card's ATK/HP");
+    const eat = recipe({ key: "eat", abilities: [{ ...newAbility("UNIT"), when: "START_OF_COMBAT", do: "CONSUME_ALLIES", target: "SELF", permanent: true }] });
+    expect(buildCard(eat).effects).toEqual([expect.objectContaining({ trigger: "START_OF_COMBAT", target: { selector: "SELF" }, actions: [{ type: "CONSUME_ALLIES", permanent: true }] })]);
+    for (const c of [cap, eat]) expect(playable(buildCard(c))).toEqual([]);
+    expect(choicesFor({ ...newAbility("UNIT"), when: "ON_PLAY" }, "UNIT").do.map((d) => d.key)).toContain("CONSUME_ALLIES");
+  });
+
   it("builds a Gear power-up", () => {
     const smith = recipe({ key: "smith", abilities: [{ ...newAbility("UNIT"), when: "ON_PLAY", do: "BUFF_GEAR", atk: 1, hp: 2 }] });
     expect(buildCard(smith).effects).toEqual([expect.objectContaining({ trigger: "ON_PLAY", actions: [{ type: "BUFF_GEAR", atk: 1, hp: 2 }] })]);

@@ -114,6 +114,7 @@ const SETTLE_LIMIT = 2_000;
 
 const needsTargets = (a: Action): boolean =>
   a.type === "BUFF" ||
+  a.type === "CONSUME_ALLIES" ||
   a.type === "DAMAGE" ||
   a.type === "GIVE_KEYWORD" ||
   a.type === "TRANSFORM" ||
@@ -259,9 +260,12 @@ export function simulateCombat(
     }
     switch (action.type) {
       case "BUFF": {
-        const atk = action.atk * mult;
-        const hp = action.hp * mult;
+        // fromSelf: the unit's own stats (a Last Stand uses what it had: its top HP).
+        const own = action.fromSelf && source ? { atk: source.atk, hp: source.hp > 0 ? source.hp : source.maxHp } : { atk: 0, hp: 0 };
+        const atk = action.atk * mult + own.atk;
+        const hp = action.hp * mult + own.hp;
         for (const t of targets) {
+          if (action.fromSelf && t === source) continue; // it passes its stats on to the others
           t.atk += atk;
           t.hp += hp;
           t.maxHp += hp;
@@ -325,6 +329,30 @@ export function simulateCombat(
         for (const t of targets) {
           t.hp = 0;
           events.push({ type: "DESTROY", unit: t.uid });
+        }
+        return;
+      }
+      case "CONSUME_ALLIES": {
+        const eaten = friendly(s).filter((f) => f !== source && f.uid !== `${s.id}g`); // the Giant stays
+        let atk = 0;
+        let hp = 0;
+        for (const f of eaten) {
+          atk += Math.max(0, f.atk);
+          hp += Math.max(0, f.hp);
+          f.hp = 0;
+          events.push({ type: "DESTROY", unit: f.uid });
+        }
+        for (const t of targets) {
+          if (!alive(t) || eaten.includes(t)) continue;
+          t.atk += atk;
+          t.hp += hp;
+          t.maxHp += hp;
+          events.push({ type: "BUFF", unit: t.uid, atk, hp });
+          if (action.permanent && t.sourceId !== undefined) {
+            const book = sides[t.side].permanent;
+            const prev = book.get(t.sourceId) ?? { atk: 0, hp: 0 };
+            book.set(t.sourceId, { atk: prev.atk + atk, hp: prev.hp + hp });
+          }
         }
         return;
       }

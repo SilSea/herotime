@@ -86,7 +86,12 @@ function condition(c: Condition | undefined, names: Names): string {
 function action(a: Action, target: Target | undefined, names: Names): string {
   const t = who(target, names);
   switch (a.type) {
-    case "BUFF": return `ให้${t} ${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " ถาวร" : ""}`;
+    case "BUFF": {
+      const stats = `${signed(a.atk)}/${signed(a.hp)}`;
+      const own = a.fromSelf ? (a.atk || a.hp ? `ได้ ATK/HP เท่าตัวนี้ ${stats}` : "ได้ ATK/HP เท่าตัวนี้") : stats;
+      return `ให้${t} ${own}${a.permanent ? " ถาวร" : ""}`;
+    }
+    case "CONSUME_ALLIES": return `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${t}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`;
     case "SUMMON": return `เรียก ${names(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`;
     case "DAMAGE": return `ทำดาเมจ ${a.amount} ใส่${t}`;
     case "GIVE_KEYWORD": return `ให้${t}ได้ ${KEYWORD[a.keyword]}`;

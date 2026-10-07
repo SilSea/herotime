@@ -14,7 +14,7 @@ export function unitView(env: GameEnv, unit: Unit): UnitView {
 }
 
 export const needsTargets = (a: Action): boolean =>
-  a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "ULTIMATE_FORM" || a.type === "DEVOUR_SHOP";
+  a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "ULTIMATE_FORM" || a.type === "DEVOUR_SHOP" || a.type === "CONSUME_ALLIES";
 
 /** Whether a unit passes a target's faction / series / card filter. */
 export function matchesTarget(env: GameEnv, u: Unit, t: Target): boolean {
@@ -152,8 +152,15 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
   switch (action.type) {
     case "BUFF": {
       // BUFF_GEAR: a Gear that gives stats gives more.
-      const extra = origin.kind === "gear" ? (player.gearBonus ?? { atk: 0, hp: 0 }) : { atk: 0, hp: 0 };
+      const extra = origin.kind === "gear" ? { ...(player.gearBonus ?? { atk: 0, hp: 0 }) } : { atk: 0, hp: 0 };
+      // fromSelf: the unit's own stats as they are now (taken once, before any target, itself included, grows).
+      if (action.fromSelf && source) {
+        const own = env.content.stats(source);
+        extra.atk += own.atk;
+        extra.hp += own.hp;
+      }
       for (const t of targets) {
+        if (action.fromSelf && t === source) continue; // it passes its stats on to the others
         t.bonusAtk = (t.bonusAtk ?? 0) + action.atk * mult + extra.atk;
         t.bonusHp = (t.bonusHp ?? 0) + action.hp * mult + extra.hp;
         recordBuff(t, origin, action.atk * mult + extra.atk, action.hp * mult + extra.hp);
@@ -176,6 +183,24 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
     }
     case "DESTROY": {
       for (const t of targets) removeFromBoard(player, t, env);
+      return;
+    }
+    case "CONSUME_ALLIES": {
+      const eaten = player.board.filter((u) => u !== source);
+      let atk = 0;
+      let hp = 0;
+      for (const u of eaten) {
+        const st = env.content.stats(u);
+        atk += st.atk;
+        hp += st.hp;
+        removeFromBoard(player, u, env);
+      }
+      for (const t of targets) {
+        if (!player.board.includes(t) && t !== player.giant) continue; // it was eaten too
+        t.bonusAtk = (t.bonusAtk ?? 0) + atk;
+        t.bonusHp = (t.bonusHp ?? 0) + hp;
+        recordBuff(t, origin, atk, hp);
+      }
       return;
     }
     case "SUMMON": {

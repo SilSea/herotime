@@ -87,8 +87,10 @@ function action(a: Action, target: Target | undefined, names: Names): string {
   switch (a.type) {
     case "BUFF": {
       const stats = `${signed(a.atk)}/${signed(a.hp)}`;
-      return `give ${t} ${stats}${a.permanent ? " permanently" : ""}`;
+      const own = a.fromSelf ? (a.atk || a.hp ? `this unit's ATK/HP ${stats}` : "this unit's ATK/HP") : stats;
+      return `give ${t} ${own}${a.permanent ? " permanently" : ""}`;
     }
+    case "CONSUME_ALLIES": return `destroy all your other units and give ${t} their total ATK/HP${a.permanent ? " permanently" : ""}`;
     case "SUMMON": return `summon ${a.count > 1 ? `${a.count} ` : ""}${names(a.cardKey)}${a.count > 1 ? "s" : ""}`;
     case "DAMAGE": return `deal ${a.amount} damage to ${t}`;
     case "GIVE_KEYWORD": return `give ${t} ${KEYWORD[a.keyword]}`;

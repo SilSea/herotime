@@ -52,7 +52,7 @@ export const TRIGGERS = [
 ] as const;
 export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "GIANT_SLOT", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
 export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE", "HAS_CARD"] as const;
-export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "BUFF_GEAR", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD"] as const;
+export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "BUFF_GEAR", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD", "CONSUME_ALLIES"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
 export const POWER_MODES = ["ACTIVE", "ONCE", "PASSIVE"] as const;
@@ -74,7 +74,9 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
     { key: "atk", field: int() },
     { key: "hp", field: int() },
     { key: "permanent", field: { kind: "bool" }, hint: "In combat, keep the bonus after the fight" },
+    { key: "fromSelf", label: "+ this card's ATK/HP", field: { kind: "bool" }, optional: true, hint: "Also give this card's own current ATK/HP (on top of atk/hp)" },
   ],
+  CONSUME_ALLIES: [{ key: "permanent", field: { kind: "bool" }, hint: "Destroys all your other units, the targets get their total ATK/HP. In combat, keep it after the fight" }],
   SUMMON: [
     { key: "cardKey", label: "card", field: { kind: "ref", to: "cards" } },
     { key: "count", field: int(1) },
@@ -127,6 +129,7 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
 
 const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unknown>> = {
   BUFF: { atk: 1, hp: 1, permanent: false },
+  CONSUME_ALLIES: { permanent: false },
   SUMMON: { cardKey: "", count: 1 },
   DAMAGE: { amount: 1 },
   GIVE_KEYWORD: { keyword: "GUARD" },

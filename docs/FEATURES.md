@@ -63,6 +63,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F5.6** (P0) Giant Slot + Gauge UI (ไฟ 5 สี)
 - [x] **F5.7** (P0) Tooltip keyword/การ์ด
 - [x] **F5.10** (P0) หน้าตาแบบ Battlegrounds: โต๊ะ tavern/warband/มือ/รูป hero, การ์ดกรอบ parchment + ATK/HP gem, hover ดูการ์ดขนาดใหญ่ + คำอธิบาย keyword, banner เปลี่ยน phase, fuse bar นับเวลา
+- [x] **F6.16** (P1) บัฟด้วย ATK/HP ของการ์ดใบนี้ (`BUFF.fromSelf`) และ `CONSUME_ALLIES` ทำลายยูนิตอื่นทั้งหมดแล้วมอบค่าพลังรวม ใช้ได้ทั้งช่วงซื้อและช่วงต่อสู้ (effect builder + Card wizard)
 - [x] **F5.18** (P1) ชี้การ์ดแล้ว preview ใหญ่แสดง**การ์ดที่เกี่ยวข้อง**ด้วย: ร่าง Henshin / Ultimate / Gattai, การ์ดที่เรียก, ได้เข้ามือ, แปลงเป็น, การ์ดในตัวกรอง/เงื่อนไข (สูงสุด 4 ใบ)
 - [x] **F6.15** (P1) เสริมพลัง Gear (`BUFF_GEAR`): Gear ที่ให้ค่าพลังให้เพิ่มจนจบเกม ใช้กับเงื่อนไข/trigger ไหนก็ได้ (ช่วงต่อสู้ได้เทิร์นหน้า) + ป้ายโบนัสบนการ์ด Gear
 - [x] **F6.14** (P1) รางวัลหลังการต่อสู้: Energy / การ์ด / Discover / Gauge / บัฟร้าน จาก trigger ช่วงต่อสู้ ได้ตอนเริ่มเทิร์นหน้า; Card wizard มี TRANSFORM; รายการการ์ดใน Admin และช่องค้นหาการ์ดเรียงตามชื่อ

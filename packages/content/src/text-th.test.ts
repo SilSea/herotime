@@ -53,6 +53,21 @@ describe("rules text for fight rewards", () => {
     ...blank,
     cards: [{ key: "miner", name: "Miner", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "ON_ATTACK", actions: [{ type: "GAIN_ENERGY", amount: 1 }] }] }] as never,
   });
+  it("names own-stat buffs and consuming allies", () => {
+    const unit = (key: string, effects: unknown[]) => ({ key, name: key, rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects });
+    const g = withGeneratedText({
+      ...blank,
+      cards: [
+        unit("cap", [{ scope: "UNIT", trigger: "ON_PLAY", target: { selector: "ALL_FRIENDLY" }, actions: [{ type: "BUFF", atk: 0, hp: 0, fromSelf: true }] }]),
+        unit("eat", [{ scope: "UNIT", trigger: "START_OF_COMBAT", target: { selector: "SELF" }, actions: [{ type: "CONSUME_ALLIES", permanent: true }] }]),
+      ] as never,
+    });
+    expect(g.cards[0]?.text).toBe("Deploy: give all allies this unit's ATK/HP.");
+    expect(g.cards[0]?.textTh).toBe("Deploy: ให้พันธมิตรทุกตัว ได้ ATK/HP เท่าตัวนี้");
+    expect(g.cards[1]?.text).toBe("Start of combat: destroy all your other units and give this their total ATK/HP permanently.");
+    expect(g.cards[1]?.textTh).toBe("เริ่มการต่อสู้: ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้ตัวนี้ได้ ATK/HP รวมของพวกมัน ถาวร");
+  });
+
   it("names a Gear power-up", () => {
     const g = withGeneratedText({ ...blank, cards: [{ key: "smith", name: "Smith", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "BUFF_GEAR", atk: 1, hp: 1 }] }] }] as never });
     expect(g.cards[0]?.text).toBe("Deploy: your Gear give +1/+1 more for the rest of the game.");

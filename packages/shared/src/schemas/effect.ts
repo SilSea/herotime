@@ -95,7 +95,14 @@ export const Action = z.discriminatedUnion("type", [
     hp: amount.default(0),
     /** Recruit: always sticks. Combat: only persists after the fight when true. */
     permanent: z.boolean().default(false),
+    /** Also give the unit's own current ATK/HP (on top of atk/hp) to the targets other than itself. A player effect has no unit: nothing extra. */
+    fromSelf: z.boolean().optional(),
   }),
+  /**
+   * Destroy every other friendly unit (not the one with the effect, not the Giant), then give the targets
+   * their total ATK/HP. Recruit: for good. Combat: for the fight, or for good with `permanent`.
+   */
+  z.object({ type: z.literal("CONSUME_ALLIES"), permanent: z.boolean().default(false) }),
   z.object({ type: z.literal("SUMMON"), cardKey: z.string(), count: z.number().int().min(1).default(1) }),
   z.object({ type: z.literal("DAMAGE"), amount: z.number().int().min(1) }),
   z.object({ type: z.literal("GIVE_KEYWORD"), keyword: KeywordKey }),
