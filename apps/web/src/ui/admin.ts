@@ -478,7 +478,7 @@ function soundsBody(ctx: Ctx): HTMLElement {
   return h(
     "div",
     { class: "admin-body sounds-body" },
-    h("div", { class: "admin-left" }, rulesTabs(), h("p", { class: "muted small", text: "Upload MP3, OGG or WAV (sounds up to 1.5 MB, music up to 6 MB). A slot without a file plays the built-in sound. Cards and factions can have their own sounds (\"sounds\" in their form), which win over these. Save the draft and publish to use them in matches." })),
+    h("div", { class: "admin-left" }, rulesTabs(), h("p", { class: "muted small", text: "Upload MP3, OGG or WAV (up to 6 MB each; keep effects short, about 1-2 seconds). A slot without a file plays the built-in sound. Cards and factions can have their own sounds (\"sounds\" in their form), which win over these. Save the draft and publish to use them in matches." })),
     h(
       "div",
       { class: "admin-middle sounds-middle" },

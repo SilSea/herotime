@@ -1,7 +1,7 @@
 # herotime
 
 Auto-battler (แนว Hearthstone Battlegrounds) ธีม Kamen Rider × Super Sentai เล่นผ่านเว็บ แบบ online multiplayer
-เอกสาร: [docs/FEATURES.md](docs/FEATURES.md) · [docs/PLAN.md](docs/PLAN.md) · [docs/RULES.md](docs/RULES.md)
+เอกสาร: [docs/FEATURES.md](docs/FEATURES.md) · [docs/PLAN.md](docs/PLAN.md) · [docs/RULES.md](docs/RULES.md) · [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) (คู่มือ Admin) · [docs/AUDIT_REPORT.md](docs/AUDIT_REPORT.md) (รายงานตรวจบัคล่าสุด)
 
 ## สถานะ
 | ส่วน | สถานะ |
@@ -35,7 +35,7 @@ docker compose down              # ข้อมูลอยู่ใน volume p
 ```
 Image เดียว (`Dockerfile`) รันเซิร์ฟเวอร์ที่เสิร์ฟเว็บด้วย, `docker/entrypoint.sh` รัน `prisma migrate deploy` ก่อนเริ่ม,
 postgres มี healthcheck และ server รอจน healthy. ตัวแปรตั้งผ่าน `.env` (ดู `.env.example`): `JWT_SECRET`, `CORS_ORIGIN`,
-`CONTENT_SET` (`prototype`/`production`), `PRACTICE`, `HEROTIME_FAST`. ค่าเริ่มต้นของ `JWT_SECRET` ใน compose ใช้ลองบนเครื่องตัวเองเท่านั้น
+`CONTENT_SET` (`prototype`/`production`/`blank` = ชุดเปล่าสำหรับเริ่มทำการ์ดเอง), `PRACTICE`, `HEROTIME_FAST`. ค่าเริ่มต้นของ `JWT_SECRET` ใน compose ใช้ลองบนเครื่องตัวเองเท่านั้น
 Redis ยังไม่ถูกใช้: `docker compose --profile scale up -d`
 
 ตัวแปรสภาพแวดล้อม: `PORT`, `HOST` (ค่าเริ่มต้น 0.0.0.0 เพื่อให้เพื่อนใน LAN ต่อได้), `JWT_SECRET`, `CORS_ORIGIN`,

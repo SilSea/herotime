@@ -117,7 +117,7 @@ export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv):
   const chosen = effects.filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some(needsTargets));
   if (chosen.length === 0) {
     // A gear for the Giant Robo is wasted without one.
-    if (effects.some((e) => e.target?.selector === "GIANT_SLOT") && !player.giant) return [];
+    if (effects.some((e) => e.target?.selector === "GIANT_SLOT") && !player.giant) throw new RuleError(`${env.content.card(gearKey).name} needs a Giant Robo in the Giant Slot`);
     return null;
   }
   return player.board.flatMap((u, i) => (chosen.every((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) ? [i] : []));

@@ -113,6 +113,7 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 | Team-Up(k) | — | ทำงานเมื่อมีสี Sentai ไม่ซ้ำ ≥ k |
 | Gattai | — | เป็นชิ้นส่วนรวมร่างได้: core (การ์ดที่มี `gattaiInto`) อยู่ซ้ายสุด + Gattai ติดกันครบจำนวน → กด Combine ตอน recruit = รวมถาวรเป็นการ์ดร่าง (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด, effect ของร่าง) แล้วบัฟต่อได้. ไม่มีการรวมระหว่างสู้. ตัวที่รวมแล้วไม่ถูกรวมซ้ำ |
 | Kyodaika | — | ตายครั้งแรก ฟื้นด้วย stat ×2 แต่ไม่มี keyword อื่น |
+| Echo | Brann | ระหว่างอยู่บนบอร์ด Deploy ของการ์ดที่ลงทีหลังทำงาน 2 ครั้ง (มีหลายใบก็ 2 ครั้ง) |
 | Start of Combat / End of Turn / Avenge(N) | เหมือน HS | trigger มาตรฐาน |
 
 ## 8. Hero (ตามที่อยู่ใน prototype set ตอนนี้)
@@ -189,15 +190,16 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 ### 12.1 Triggers
 | ระดับ | Trigger |
 |---|---|
-| ยูนิต | `ON_PLAY` (Deploy), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย) |
+| ยูนิต | `ON_PLAY` (Deploy), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย), `ALLY_SUMMONED` (มียูนิตตัวอื่นถูกเรียกเข้าฝั่งเรา ทั้งสองช่วง), `ON_SELL` (ถูกขาย), `ON_DISCARD` (ถูกการ์ดอื่นทิ้งจากมือ; Gear ก็มีได้) |
 | ผู้เล่น | `ON_ACQUIRE` (เลือก Relic/Hero), `ON_TURN_START`, `ON_USE` (Hero Power), `START_OF_COMBAT` (Relic/Series Bond), `ON_PLAY` (Gear) |
 | แหล่ง Gauge | `ON_ROLL_CALL`, `ON_ROLL_CALL_WIN`, `HENSHIN` |
 
 ### 12.2 Conditions / Selectors / Actions
 - **Conditions**: `TEAM_UP_COLORS_GTE`, `FACTION_COUNT_GTE`, `SERIES_COUNT_GTE`, `ENERGY_GTE` (ใน combat ไม่มี energy → ไม่ผ่าน)
-- **Selectors**: `SELF`, `ADJACENT`, `LEFTMOST_FRIENDLY`, `RIGHTMOST_FRIENDLY`, `RANDOM_FRIENDLY` (**ไม่เลือกตัวเอง**), `ALL_FRIENDLY`, `LEFTMOST_ENEMY`, `RANDOM_ENEMY`, `ALL_ENEMY` (selector ศัตรูใช้ได้เฉพาะใน combat)
-- **Actions**: `BUFF`, `SUMMON`, `DAMAGE` (combat เท่านั้น), `GIVE_KEYWORD`, `TRANSFORM`, `DESTROY`, `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`. ยังไม่มี: `STEAL_STATS`, `MERGE`, `COPY_KEYWORD`, `DISCOVER` ทั่วไป (ซีรีส์ Gokaiger/Kyoryuger/W/Den-O/OOO ใช้ตอน content pass: เพิ่ม handler ตามต้องการ)
-- action ที่ใช้ได้เฉพาะตอน recruit: `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`
+- **Selectors**: `SELF`, `ADJACENT`, `LEFTMOST_FRIENDLY`, `RIGHTMOST_FRIENDLY`, `RANDOM_FRIENDLY` (**ไม่เลือกตัวเอง**), `ALL_FRIENDLY`, `CHOSEN_FRIENDLY` (ผู้เล่นเลือก ใช้กับ Gear; ที่อื่น = ซ้ายสุด), `SUMMONED` (ตัวที่เพิ่งถูกเรียก ใช้กับ `ALLY_SUMMONED`), `GIANT_SLOT` (หุ่นในช่อง Giant), `LEFTMOST_ENEMY`, `RANDOM_ENEMY`, `ALL_ENEMY` (selector ศัตรูใช้ได้เฉพาะใน combat)
+- **Actions**: `BUFF`, `SUMMON`, `DAMAGE` (combat เท่านั้น), `GIVE_KEYWORD`, `TRANSFORM`, `DESTROY`, `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`, `DISCOVER_UNIT` (เลือกรับยูนิต 1 จาก 3 กรองเผ่าได้), `SUPER_GATTAI`, `RANDOM_CARD` (Gear หรือยูนิตแบบสุ่มเข้ามือ), `ULTIMATE_FORM` (เปลี่ยนเป็น `ultimateInto` ของการ์ด บัฟเดิมติดไปด้วย), `BUFF_SHOP` (ยูนิตในร้าน +atk/+hp จนจบเกม), `DEVOUR_SHOP` (กินยูนิตในร้าน: สุ่ม/แรงสุด/อ่อนสุด กรองเผ่าได้ เป้าหมายได้ค่าพลังถาวร), `SUMMON_FROM_HAND` (ช่วงซื้อของ: การ์ดในมือลงบอร์ด ไม่ทำ Deploy / ตอนสู้: สำเนายูนิตในมือลงสนาม), `DISCARD` (ทิ้งการ์ดในมือ สุ่ม/ซ้าย/ขวา เฉพาะยูนิตหรือ Gear ได้).
+- **ทุก effect**: `repeat` (ทำงาน N ครั้งต่อการเกิด 1 ครั้ง, 1–5) และ `limit` (ไม่เกิน N ครั้งต่อเทิร์น/ต่อเกม นับแยกต่อยูนิต หรือต่อ Relic/Hero/Gear; ตอนสู้นับต่อการสู้; ครั้งที่เงื่อนไขไม่ผ่านไม่นับ) ยังไม่มี: `STEAL_STATS`, `MERGE`, `COPY_KEYWORD`, `DISCOVER` ทั่วไป (ซีรีส์ Gokaiger/Kyoryuger/W/Den-O/OOO ใช้ตอน content pass: เพิ่ม handler ตามต้องการ)
+- action ที่ใช้ได้เฉพาะตอน recruit: `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`, `DISCOVER_UNIT`, `SUPER_GATTAI`, `RANDOM_CARD`, `ULTIMATE_FORM`, `BUFF_SHOP`, `DEVOUR_SHOP`, `DISCARD` — content validation เตือนตั้งแต่ตอน Save ถ้าใส่ผิดช่วง (`ALLY_SUMMONED` เกิดได้ทั้งสองช่วง จึงใช้ได้แค่ action ที่ทำงานทั้งคู่)
 
 ### 12.3 กฎที่ engine บังคับ (ได้จากการทำ + fuzz จริง)
 - **Golden**: ตัวเลข `BUFF`/`SUMMON count`/`DAMAGE`/`GAIN_ENERGY`/`GAUGE_ADD` คูณ `goldenMultiplier` (ค่าเริ่มต้น 2) เมื่อ *ยูนิตเจ้าของ* เป็น Final Form
@@ -213,7 +215,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 
 ### 12.4 Gauge / Gear / Giant
 - Gauge: `sources` (trigger+amount) + `thresholds` (`at`, `reward` = actions ที่ไม่ต้องมีเป้าหมาย). `once: true` จ่ายครั้งเดียวตอนข้าม; `once: false` จ่ายซ้ำและหัก `at` ทุกครั้ง
-- **Gear** = การ์ด `kind: "GEAR"` ในมือ ใช้ด้วย `useGear` (รัน player-scope `ON_PLAY`) ขายไม่ได้ ไม่อยู่ใน pool
+- **Gear** = การ์ด `kind: "GEAR"` ในมือ ใช้ด้วย `useGear` (รัน player-scope `ON_PLAY`) ขายไม่ได้ ไม่อยู่ใน pool. Gear ที่ใช้กับหุ่น (`GIANT_SLOT`) ใช้ไม่ได้จนกว่าจะมีหุ่น (bot ไม่ซื้อ Gear ที่ยังใช้ไม่ได้)
 - **Giant** = การ์ด `kind: "GIANT"` ไม่อยู่ใน pool; เลือกผ่าน `DISCOVER_GIANT` (3 ตัว, ตัวของซีรีส์ที่มียูนิตบนบอร์ดมากสุดออกแน่นอน) เข้า Giant Slot. ลงสนามเมื่อยูนิตเหลือ ≤ `giantEntryThreshold` หรือศัตรู Kyodaika; ลงได้ครั้งเดียวต่อการสู้
 
 ---

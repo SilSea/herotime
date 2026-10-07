@@ -27,6 +27,17 @@ function attempt(fn: () => void): boolean {
   }
 }
 
+/** Whether a gear would do something right now (gear cannot be sold, so a useless one would clog the hand). */
+function usableNow(p: PlayerState, key: string, env: GameEnv): boolean {
+  try {
+    const valid = gearTargets(p, key, env);
+    return valid === null || valid.length > 0;
+  } catch (e) {
+    if (e instanceof RuleError) return false;
+    throw e;
+  }
+}
+
 /** Use a gear on the strongest unit it can go on (by current attack + health). */
 function useGearWell(p: PlayerState, handIndex: number, env: GameEnv): void {
   const key = p.hand[handIndex]?.key;
@@ -149,7 +160,7 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv, payHealth?: (
   attempt(() => useHeroPower(p, env));
 
   // Spare Energy goes on the tavern's Gear, used at once. Gear helps the units on the board, so only with some there.
-  if (p.shopGear && p.board.length > 0 && attempt(() => buyGear(p, env, payHealth))) {
+  if (p.shopGear && p.board.length > 0 && usableNow(p, p.shopGear, env) && attempt(() => buyGear(p, env, payHealth))) {
     const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
     if (i >= 0) attempt(() => useGearWell(p, i, env));
   }

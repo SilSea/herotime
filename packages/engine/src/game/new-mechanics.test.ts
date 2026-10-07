@@ -18,6 +18,7 @@ const world = content({
     card("rider_ultimate", { rank: 1, atk: 9, hp: 9, token: true }),
     card("robo", { kind: "GIANT", rank: 6, atk: 8, hp: 8, token: true, ultimateInto: "robo_mk2" }),
     card("robo_mk2", { kind: "GIANT", rank: 6, atk: 12, hp: 12, token: true }),
+    card("upgrade_kit_shop", { kind: "GEAR", rank: 1, cost: 1, effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "GIANT_SLOT" }, actions: [{ type: "ULTIMATE_FORM" }] })] }),
     card("upgrade_kit", { kind: "GEAR", rank: 1, cost: 1, token: true, effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "GIANT_SLOT" }, actions: [{ type: "ULTIMATE_FORM" }] })] }),
     card("echo", { rank: 1, atk: 1, hp: 1, keywords: ["ECHO"] }),
     card("cheer", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "ON_PLAY", target: { selector: "SELF" }, actions: [{ type: "BUFF", atk: 1, hp: 0 }] })] }),
@@ -56,7 +57,7 @@ describe("new mechanics", () => {
     const e = env();
     const p = newPlayer();
     p.hand = [{ key: "upgrade_kit", golden: false }];
-    expect(() => useGear(p, 0, e)).toThrow(/no unit/);
+    expect(() => useGear(p, 0, e)).toThrow(/needs a Giant Robo/);
     p.giant = { key: "robo", golden: false };
     useGear(p, 0, e);
     expect(p.giant.key).toBe("robo_mk2");
@@ -132,5 +133,18 @@ describe("new mechanics", () => {
     q.hand = [{ key: "cheer", golden: false }];
     playUnit(q, 0, 1, e);
     expect(q.board[1]?.bonusAtk).toBe(2);
+  });
+});
+
+describe("bots and gear they cannot use", () => {
+  it("a bot does not buy a Giant gear without a Giant (gear cannot be sold, it would clog the hand)", async () => {
+    const { runBot } = await import("../match/bot.js");
+    const e = { ...env(), gear: [{ key: "upgrade_kit_shop", rank: 1 }] };
+    const p = newPlayer();
+    p.energy = 10;
+    p.board = [{ key: "bear", golden: false }];
+    p.shopGear = "upgrade_kit_shop";
+    runBot(p, 3, e);
+    expect(p.hand.some((u) => u.key === "upgrade_kit_shop")).toBe(false);
   });
 });

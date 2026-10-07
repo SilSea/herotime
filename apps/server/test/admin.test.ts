@@ -231,6 +231,16 @@ describe("statistics from saved matches", () => {
   });
 });
 
+describe("request size", () => {
+  it("only the admin upload accepts bodies over 4 MB", async () => {
+    const big = "x".repeat(5 * 1024 * 1024);
+    const signup = await fetch(`${server.url}/auth/register`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: "big", email: "big@x.dev", password: big }) });
+    expect(signup.status).toBe(413);
+    const upload = await call("POST", "/admin/upload", admin.token, { data: big });
+    expect(upload.status).toBe(400); // let through, then refused as not a picture or a sound
+  });
+});
+
 describe("card art upload", () => {
   // 1x1 transparent PNG
   const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");
