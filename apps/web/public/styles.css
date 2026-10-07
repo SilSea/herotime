@@ -720,3 +720,10 @@ body.dragging .drop-marker.show { display: block; }
 .book-special { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 190px; }
 .book-how { font-size: 12px; color: var(--cyan); text-align: center; line-height: 1.25; }
 .gauge-reward-text strong { color: #fff; }
+
+/* ---- TH / EN switch */
+.lang-toggle { display: inline-flex; border: 1px solid var(--cyan-dim); }
+.lang-btn { background: transparent; border: 0; color: #8fa8d0; font-weight: 800; font-size: 12px; letter-spacing: .08em; padding: 5px 9px; cursor: pointer; }
+.lang-btn.active { background: var(--cyan); color: #04101f; }
+.lang-btn:not(.active):hover { color: #fff; }
+.auth-screen .lang-toggle { margin: 4px auto 10px; }

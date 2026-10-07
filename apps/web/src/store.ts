@@ -41,6 +41,8 @@ export interface AppState {
   spectating?: string;
   defeatAck?: string;
   hideOffers: boolean;
+  /** Interface language (the i18n module holds it; kept here so switching redraws). */
+  lang?: "en" | "th";
   /** A hand gear waiting for the player to click the unit it goes on. */
   selected: Selection;
 }

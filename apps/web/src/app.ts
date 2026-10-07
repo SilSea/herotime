@@ -4,8 +4,10 @@ import { Api, Net } from "./net.js";
 import type { AuthResult, Intent, PracticeOptions } from "./protocol.js";
 import { addToast, applyEvent, applyStatus, applyView, removeToast, Store } from "./store.js";
 import { adminHasFocus, renderAdmin, resetAdmin } from "./ui/admin.js";
-import { KEYWORD_ICON_OF, TRIGGER_ICON } from "./ui/card.js";
-import { KEYWORDS, keywordName } from "./format.js";
+import { KEYWORD_ICON_OF, triggerInfo } from "./ui/card.js";
+import { keywordName, keywordText } from "./format.js";
+import { serverText, tr } from "./i18n.js";
+import { langToggle } from "./ui/lang.js";
 import { renderAuth } from "./ui/auth.js";
 import type { Ctx } from "./ui/ctx.js";
 import { h, mount } from "./ui/dom.js";
@@ -73,7 +75,7 @@ export function startApp(root: HTMLElement): void {
       pendingIntents.add(key);
       try {
         const ack = await net.intent(intent);
-        if (!ack.ok) toast(ack.error, "error");
+        if (!ack.ok) toast(serverText(ack.error), "error");
         return ack.ok;
       } finally {
         pendingIntents.delete(key);
@@ -102,15 +104,15 @@ export function startApp(root: HTMLElement): void {
     },
     async startPractice(options: PracticeOptions) {
       const ack = await net.practice(options);
-      if (!ack.ok) toast(ack.error, "error");
+      if (!ack.ok) toast(serverText(ack.error), "error");
     },
     async joinQueue() {
       const ack = await net.joinQueue();
-      if (!ack.ok) toast(ack.error, "error");
+      if (!ack.ok) toast(serverText(ack.error), "error");
     },
     async leaveQueue() {
       const ack = await net.leaveQueue();
-      if (!ack.ok) toast(ack.error, "error");
+      if (!ack.ok) toast(serverText(ack.error), "error");
     },
     async leaveMatch() {
       await net.leaveMatch();
@@ -136,9 +138,9 @@ export function startApp(root: HTMLElement): void {
     }
   });
   net.on("event", (m) => store.update((s) => applyEvent(s, m)));
-  net.on("matchError", (e) => toast(e, "error"));
+  net.on("matchError", (e) => toast(serverText(e), "error"));
   net.on("authError", () => {
-    toast("Your login expired. Please log in again.", "error");
+    toast(tr("Your login expired. Please log in again.", "การล็อกอินหมดอายุ กรุณาล็อกอินใหม่"), "error");
     ctx().logout();
   });
 
@@ -153,11 +155,12 @@ export function startApp(root: HTMLElement): void {
         "header",
         { class: "app-header" },
         h("span", { class: "logo small", text: "HeroTime" }),
-        h("nav", { class: "tabs" }, nav("lobby", "Play"), nav("library", "Library"), s.user?.role === "ADMIN" && nav("admin", "Admin")),
+        h("nav", { class: "tabs" }, nav("lobby", tr("Play", "เล่น")), nav("library", tr("Library", "คลังการ์ด")), s.user?.role === "ADMIN" && nav("admin", "Admin")),
         h("span", { class: "spacer" }),
-        !s.connected && h("span", { class: "conn bad", text: "reconnecting..." }),
+        !s.connected && h("span", { class: "conn bad", text: tr("reconnecting...", "กำลังเชื่อมต่อใหม่...") }),
+        langToggle(store),
         h("span", { class: "muted", text: s.user?.username ?? "" }),
-        h("button", { class: "btn", text: "Log out", on: { click: () => ctx().logout() } }),
+        h("button", { class: "btn", text: tr("Log out", "ออกจากระบบ"), on: { click: () => ctx().logout() } }),
       ),
       inner,
     );
@@ -210,7 +213,7 @@ export function startApp(root: HTMLElement): void {
       const budget = Math.max(3000, (clock.remaining(s.view?.deadline ?? null) ?? 15_000) - 2500);
       replay = new ReplayView(replayHost, pending, content as ContentIndex, {
         budgetMs: budget,
-        nextTurnText: () => `Next turn in ${formatClock(clock.remaining(store.state.view?.deadline ?? null))}`,
+        nextTurnText: () => `${tr("Next turn in", "เทิร์นถัดไปใน")} ${formatClock(clock.remaining(store.state.view?.deadline ?? null))}`,
         onClose: () => {
           replay = undefined;
           store.update((st) => (st.replayPending?.turn === pending.turn ? { ...st, replayPending: undefined } : st));
@@ -228,7 +231,7 @@ export function startApp(root: HTMLElement): void {
     if (key === bannerKey) return;
     bannerKey = key;
     // No banner for battles: the replay opens at that moment and would be covered by it.
-    const text = s.view.phase === "RECRUIT" ? `Turn ${s.view.turn}` : s.view.phase === "HERO_SELECT" ? "Choose your hero" : "";
+    const text = s.view.phase === "RECRUIT" ? `${tr("Turn", "เทิร์น")} ${s.view.turn}` : s.view.phase === "HERO_SELECT" ? tr("Choose your hero", "เลือก Hero") : "";
     if (!text) return;
     for (const old of document.querySelectorAll(".banner")) old.remove(); // a new phase replaces the last banner
     const el = h("div", { class: "banner", text });
@@ -252,14 +255,14 @@ export function startApp(root: HTMLElement): void {
     big.style.transform = "";
     // Battlegrounds-style: one box per keyword and per kind of ability, next to the big card.
     const kws = (card.dataset.kws ?? "").split(",").filter(Boolean);
-    const triggers = (card.dataset.triggers ?? "").split(",").filter((t) => t && TRIGGER_ICON[t]);
+    const triggers = (card.dataset.triggers ?? "").split(",").filter((t) => t && triggerInfo(t));
     const box = (icon: string, title: string, text: string): HTMLElement => h("div", { class: "kw-box" }, h("div", { class: "kw-box-title" }, h("span", { class: "pi-icon", text: icon }), title), h("div", { class: "kw-box-text", text }));
     const [turns, form] = (card.dataset.henshin ?? "").split("|");
     const boxes = [
-      ...triggers.map((t) => box(TRIGGER_ICON[t]?.icon ?? "•", TRIGGER_ICON[t]?.name ?? t, TRIGGER_ICON[t]?.text ?? "")),
-      ...(turns ? [box("✧", `Henshin (${turns})`, `อยู่บนบอร์ดครบ ${turns} เทิร์น จะแปลงร่างเป็น ${form}`)] : []),
-      ...(card.dataset.core ? [box("◈", "Gattai core", `วางไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันให้ครบจำนวน แล้วกด Combine ทั้งกลุ่มจะรวมเป็น ${card.dataset.core} ถาวร`)] : []),
-      ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k), KEYWORDS[k]?.text ?? "")),
+      ...triggers.map((t) => box(triggerInfo(t)?.icon ?? "•", triggerInfo(t)?.name ?? t, triggerInfo(t)?.text ?? "")),
+      ...(turns ? [box("✧", `Henshin (${turns})`, tr(`After ${turns} turn${turns === "1" ? "" : "s"} on your board, transforms into ${form}.`, `อยู่บนบอร์ดครบ ${turns} เทิร์น จะแปลงร่างเป็น ${form}`))] : []),
+      ...(card.dataset.core ? [box("◈", "Gattai core", tr(`Put it leftmost of enough adjacent Gattai units and press Combine: the group becomes ${card.dataset.core} for good.`, `วางไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันให้ครบจำนวน แล้วกด Combine ทั้งกลุ่มจะรวมเป็น ${card.dataset.core} ถาวร`))] : []),
+      ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k), keywordText(k))),
     ];
     const info = h("div", { class: "kw-boxes" }, ...boxes);
     preview.replaceChildren(big, info);
@@ -303,7 +306,7 @@ export function startApp(root: HTMLElement): void {
     const left = s.view ? formatClock(clock.remaining(s.view.deadline)) : "";
     for (const id of ["timer-big", "replay-timer"]) {
       const el = document.getElementById(id);
-      if (el) el.textContent = id === "replay-timer" ? `Next turn in ${left}` : left;
+      if (el) el.textContent = id === "replay-timer" ? `${tr("Next turn in", "เทิร์นถัดไปใน")} ${left}` : left;
     }
     const fuse = document.getElementById("fuse-fill");
     if (fuse && s.view) {
@@ -314,7 +317,7 @@ export function startApp(root: HTMLElement): void {
       fuse.classList.toggle("low", remaining < 8000 && s.view.phase === "RECRUIT");
     }
     const fill = document.getElementById("fill-countdown");
-    if (fill && s.status.state === "queued" && s.status.fillAt) fill.textContent = `Bots join in ${formatClock(clock.remaining(s.status.fillAt))}`;
+    if (fill && s.status.state === "queued" && s.status.fillAt) fill.textContent = `${tr("Bots join in", "bot จะเข้าใน")} ${formatClock(clock.remaining(s.status.fillAt))}`;
   }, 250);
 
   // ----------------------------------------------------------------- shortcuts

@@ -127,7 +127,7 @@ export function effectTextTh(e: Effect, names: Names): string {
 export function cardTextTh(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): แปลงร่างเป็น ${names(c.henshin.into)}`);
-  if (c.gattaiInto) lines.push(`Gattai core: เมื่อนำกลุ่ม Gattai จะกลายเป็น ${names(c.gattaiInto)}`);
+  if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Henshin Call: /, "ใช้: ") : effectTextTh(e, names));
   return lines.join(" · ");
 }

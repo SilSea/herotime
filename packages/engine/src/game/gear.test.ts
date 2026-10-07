@@ -13,8 +13,8 @@ const gear = (key: string, rank: number, effects: Record<string, unknown>[]) =>
 
 const world = content({
   factions: [
-    { key: "rider", name: "Rider" },
-    { key: "grunt", name: "Grunt" },
+    { key: "rider", name: "Rider", color: "#e53935", text: "", textTh: "" },
+    { key: "grunt", name: "Grunt", color: "#795548", text: "", textTh: "" },
   ],
   cards: [
     card("rider_a", { rank: 1, atk: 2, hp: 2, factions: ["rider"] }),

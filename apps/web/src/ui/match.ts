@@ -1,5 +1,7 @@
 import { formatClock } from "../clock.js";
-import { boardLabel, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, PHASE_LABEL, stars } from "../format.js";
+import { boardLabel, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars } from "../format.js";
+import { tr } from "../i18n.js";
+import { langToggle } from "./lang.js";
 import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
@@ -34,12 +36,12 @@ function defeatNotice(ctx: Ctx, view: View): HTMLElement | null {
     h(
       "div",
       { class: "modal-box defeat-box" },
-      h("div", { class: "defeat-title", text: "Defeated" }),
-      h("p", { class: "defeat-place", text: place ? `You finished ${ordinal(place)}` : "You are out of the match" }),
-      h("p", { class: "muted", text: "The match goes on without you. You can watch the other players' boards from their last fight, or leave." }),
+      h("div", { class: "defeat-title", text: tr("Defeated", "แพ้แล้ว") }),
+      h("p", { class: "defeat-place", text: place ? tr(`You finished ${ordinal(place)}`, `คุณได้อันดับ${ordinal(place)}`) : tr("You are out of the match", "คุณตกรอบแล้ว") }),
+      h("p", { class: "muted", text: tr("The match goes on without you. You can watch the other players' boards from their last fight, or leave.", "เกมยังเล่นต่อโดยไม่มีคุณ ดูบอร์ดของผู้เล่นคนอื่นจากการต่อสู้ล่าสุดได้ หรือออกจากเกม") }),
       h("div", { class: "row center-row" },
-        h("button", { class: "btn primary big", text: "Watch other players", on: { click: () => ctx.store.set({ defeatAck: state.matchId, spectating: state.spectating ?? firstAlive }) } }),
-        h("button", { class: "btn big", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
+        h("button", { class: "btn primary big", text: tr("Watch other players", "ดูผู้เล่นคนอื่น"), on: { click: () => ctx.store.set({ defeatAck: state.matchId, spectating: state.spectating ?? firstAlive }) } }),
+        h("button", { class: "btn big", text: tr("Leave match", "ออกจากเกม"), on: { click: () => void ctx.leaveMatch() } }),
       ),
     ),
   );
@@ -58,24 +60,24 @@ function spectateStage(ctx: Ctx, view: View): HTMLElement {
     { class: "stage table spectate" },
     defeatNotice(ctx, view),
     h("div", { class: "spectate-head" },
-      h("span", { class: "spectate-tag", text: "Spectating" }),
-      h("div", { class: "spectate-tabs" }, ...others.map((p) => h("button", { class: `tab ${p.id === target?.id ? "active" : ""} ${p.alive ? "" : "out"}`, text: `${p.name}${p.alive ? ` · ${Math.max(0, p.hp)} HP` : ` · ${p.placement ? ordinal(p.placement) : "out"}`}`, on: { click: () => ctx.store.set({ spectating: p.id }) } }))),
+      h("span", { class: "spectate-tag", text: tr("Spectating", "กำลังดู") }),
+      h("div", { class: "spectate-tabs" }, ...others.map((p) => h("button", { class: `tab ${p.id === target?.id ? "active" : ""} ${p.alive ? "" : "out"}`, text: `${p.name}${p.alive ? ` · ${Math.max(0, p.hp)} HP` : ` · ${p.placement ? ordinal(p.placement) : tr("out", "ตกรอบ")}`}`, on: { click: () => ctx.store.set({ spectating: p.id }) } }))),
       h("span", { class: "spacer" }),
-      h("button", { class: "btn", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
+      h("button", { class: "btn", text: tr("Leave match", "ออกจากเกม"), on: { click: () => void ctx.leaveMatch() } }),
     ),
     target
       ? h("div", { class: "spectate-body" },
           h("div", { class: "spectate-hero" },
             artBox("pc-portrait", ctx.ix.heroArt(target.hero), heroDef?.name ?? target.name),
-            h("div", null, h("div", { class: "pc-name", text: target.name }), h("div", { class: "pc-hero", text: heroDef?.name ?? "" }), h("div", { class: "pc-stats", text: `${Math.max(0, target.hp)} HP${target.armor ? ` + ${target.armor} armor` : ""} · Tavern rank ${target.rank}` }))),
-          h("div", { class: "pc-label", text: target.lastBoard ? `Board in their last fight (turn ${target.lastBoard.turn})${label ? ` · ${label.headline}` : ""}` : "No fight seen yet" }),
-          h("div", { class: "cards board-cards spectate-board" }, ...units.map((u) => cardEl(ctx.ix, { key: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden, extraKeywords: u.keywords, small: true, minion: true })), units.length === 0 && h("p", { class: "muted", text: target.lastBoard ? "They fought with an empty board." : "Boards appear after a fight." })),
+            h("div", null, h("div", { class: "pc-name", text: target.name }), h("div", { class: "pc-hero", text: heroDef?.name ?? "" }), h("div", { class: "pc-stats", text: `${Math.max(0, target.hp)} HP${target.armor ? ` + ${target.armor} ${tr("armor", "เกราะ")}` : ""} · ${tr("Tavern rank", "rank ร้าน")} ${target.rank}` }))),
+          h("div", { class: "pc-label", text: target.lastBoard ? `${tr("Board in their last fight", "บอร์ดในการต่อสู้ล่าสุด")} (${tr("turn", "เทิร์น")} ${target.lastBoard.turn})${label ? ` · ${label.headline}` : ""}` : tr("No fight seen yet", "ยังไม่เห็นการต่อสู้") }),
+          h("div", { class: "cards board-cards spectate-board" }, ...units.map((u) => cardEl(ctx.ix, { key: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden, extraKeywords: u.keywords, small: true, minion: true })), units.length === 0 && h("p", { class: "muted", text: target.lastBoard ? tr("They fought with an empty board.", "สู้ด้วยบอร์ดว่าง") : tr("Boards appear after a fight.", "บอร์ดจะแสดงหลังการต่อสู้") })),
           h("div", { class: "spectate-info" },
-            h("div", { class: "power-panel" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "power-text", text: heroDef ? powerBody(heroDef.text) || "No hero power." : "" })),
+            h("div", { class: "power-panel" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "power-text", text: heroDef ? powerBody(ctx.ix.heroText(heroDef.key)) || tr("No hero power.", "ไม่มีพลัง Hero") : "" })),
             target.relics.length > 0 && h("div", { class: "relic-panel" }, h("div", { class: "pc-label", text: "Relics" }), relicList(ctx, target.relics)),
           ),
         )
-      : h("p", { class: "muted", text: "Nobody else is left." }),
+      : h("p", { class: "muted", text: tr("Nobody else is left.", "ไม่เหลือผู้เล่นคนอื่น") }),
   );
 }
 
@@ -103,22 +105,23 @@ function topBar(ctx: Ctx, view: View): HTMLElement {
   return h(
     "div",
     { class: "topbar" },
-    h("div", { class: "phase" }, h("strong", { text: PHASE_LABEL[view.phase] ?? view.phase }), view.turn > 0 && h("span", { class: "turn", text: `Turn ${view.turn}` }), timer),
-    h("div", { class: "factions" }, ...view.factions.map((f) => h("span", { class: "chip", style: `--c:${ctx.ix.factionColor(f)}`, title: ctx.ix.factions.get(f)?.text ?? "", text: ctx.ix.factionName(f) }))),
+    h("div", { class: "phase" }, h("strong", { text: phaseLabel(view.phase) }), view.turn > 0 && h("span", { class: "turn", text: `${tr("Turn", "เทิร์น")} ${view.turn}` }), timer),
+    h("div", { class: "factions" }, ...view.factions.map((f) => h("span", { class: "chip", style: `--c:${ctx.ix.factionColor(f)}`, title: ctx.ix.factionText(f), text: ctx.ix.factionName(f) }))),
     h(
       "div",
       { class: "top-actions" },
-      h("button", { class: `btn ${state.showBook ? "on" : ""}`, text: "Book", title: "Every card in this match, by rank (B)", on: { click: () => ctx.store.set({ showBook: !state.showBook, bookRank: state.bookRank || me.state.rank }) } }),
-      h("button", { class: `btn ${state.showLog ? "on" : ""}`, text: "Log", title: "L", on: { click: () => ctx.store.set({ showLog: !state.showLog }) } }),
-      view.phase !== "ENDED" && me.alive && h("button", { class: "btn danger", text: "Surrender", title: "Give up and take your current place", on: { click: () => void surrender(ctx, view) } }),
-      out && h("button", { class: "btn", text: "Leave match", on: { click: () => void ctx.leaveMatch() } }),
+      h("button", { class: `btn ${state.showBook ? "on" : ""}`, text: tr("Book", "หนังสือ"), title: tr("Every card in this match, by rank (B)", "การ์ดทั้งหมดในเกมนี้ แยกตาม rank (B)"), on: { click: () => ctx.store.set({ showBook: !state.showBook, bookRank: state.bookRank || me.state.rank }) } }),
+      h("button", { class: `btn ${state.showLog ? "on" : ""}`, text: tr("Log", "บันทึก"), title: "L", on: { click: () => ctx.store.set({ showLog: !state.showLog }) } }),
+      view.phase !== "ENDED" && me.alive && h("button", { class: "btn danger", text: tr("Surrender", "ยอมแพ้"), title: tr("Give up and take your current place", "ยอมแพ้และรับอันดับปัจจุบัน"), on: { click: () => void surrender(ctx, view) } }),
+      out && h("button", { class: "btn", text: tr("Leave match", "ออกจากเกม"), on: { click: () => void ctx.leaveMatch() } }),
+      langToggle(ctx.store),
     ),
   );
 }
 
 async function surrender(ctx: Ctx, view: View): Promise<void> {
   const place = view.players.filter((p) => p.alive).length;
-  if (!window.confirm(`Surrender? You will finish ${ordinal(place)} and the match goes on without you.`)) return;
+  if (!window.confirm(tr(`Surrender? You will finish ${ordinal(place)} and the match goes on without you.`, `ยอมแพ้? คุณจะได้อันดับ${ordinal(place)} และเกมจะเล่นต่อโดยไม่มีคุณ`))) return;
   await ctx.act({ type: "SURRENDER" });
 }
 
@@ -136,7 +139,7 @@ function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLE
   const row = h(
     "div",
     { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}` },
-    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "tier-badge", title: `Tavern rank ${p.rank}`, text: String(p.rank) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
+    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "tier-badge", title: `${tr("Tavern rank", "rank ร้าน")} ${p.rank}`, text: String(p.rank) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
     h("div", { class: "pname" }, h("span", { class: "pname-text", text: p.name }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) })),
     h("div", { class: "pmeta", text: `${stars(p.rank)}${p.lastBoard ? ` · ${boardLabel(p.lastBoard, ctx.ix.factionName).headline}` : ""}` }),
   );
@@ -162,17 +165,17 @@ const powerBody = (text: string): string => text.replace(/^(Hero Power \([^)]*\)
 
 /** Say why the power cannot be used, rather than just greying it out. */
 function powerButtonLabel(power: { mode: string; cost: number; usable: boolean }, recruiting: boolean, energy: number): string {
-  if (power.usable) return "Use power";
-  if (!recruiting) return "Recruit phase only";
-  if (energy < power.cost) return `Need ${power.cost} Energy`;
-  return power.mode === "ONCE" ? "Already used" : "Used this turn";
+  if (power.usable) return tr("Use power", "ใช้พลัง");
+  if (!recruiting) return tr("Recruit phase only", "ใช้ได้ช่วงซื้อของเท่านั้น");
+  if (energy < power.cost) return tr(`Need ${power.cost} Energy`, `ต้องมี ${power.cost} Energy`);
+  return power.mode === "ONCE" ? tr("Already used", "ใช้ไปแล้ว") : tr("Used this turn", "ใช้แล้วเทิร์นนี้");
 }
 
 function powerHeader(mode: string | undefined, cost: number | undefined): string {
-  if (mode === "ACTIVE") return `Hero Power · ${cost ?? 0} Energy · once per turn`;
-  if (mode === "ONCE") return `Hero Power · ${cost ?? 0} Energy · once per game`;
+  if (mode === "ACTIVE") return `Hero Power · ${cost ?? 0} Energy · ${tr("once per turn", "เทิร์นละครั้ง")}`;
+  if (mode === "ONCE") return `Hero Power · ${cost ?? 0} Energy · ${tr("once per game", "ครั้งเดียวต่อเกม")}`;
   if (mode === "PASSIVE") return "Passive";
-  return "No hero power";
+  return tr("No hero power", "ไม่มีพลัง Hero");
 }
 
 /** Relics as small readable entries: picture, name and what it does. */
@@ -182,7 +185,7 @@ function relicList(ctx: Ctx, keys: readonly string[]): HTMLElement {
     { class: "relic-list" },
     ...keys.map((k) => {
       const r = ctx.ix.relics.get(k);
-      return h("div", { class: "relic-entry" }, artBox("relic-thumb", ctx.ix.relicArt(k), ctx.ix.relicName(k)), h("div", null, h("div", { class: "relic-name", text: `${ctx.ix.relicName(k)}${r ? ` · ${r.tier === "GREATER" ? "Greater" : "Lesser"}` : ""}` }), h("div", { class: "relic-text", text: r?.text ?? "" })));
+      return h("div", { class: "relic-entry" }, artBox("relic-thumb", ctx.ix.relicArt(k), ctx.ix.relicName(k)), h("div", null, h("div", { class: "relic-name", text: `${ctx.ix.relicName(k)}${r ? ` · ${r.tier === "GREATER" ? "Greater" : "Lesser"}` : ""}` }), h("div", { class: "relic-text", text: ctx.ix.relicText(k) })));
     }),
   );
 }
@@ -194,13 +197,13 @@ function showPlayerCard(ctx: Ctx, row: HTMLElement, p: Player, mine: boolean, op
   const card = h(
     "div",
     { class: "player-card" },
-    h("div", { class: "pc-head" }, artBox("pc-portrait", ctx.ix.heroArt(p.hero), heroDef?.name ?? p.name), h("div", null, h("div", { class: "pc-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${mine ? " (you)" : ""}` }), h("div", { class: "pc-hero", text: heroDef?.name ?? "Choosing a hero..." }), h("div", { class: "pc-stats", text: `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} armor` : ""} · Tavern ${stars(p.rank)}` }))),
-    !p.alive && p.placement !== undefined && h("div", { class: "pc-out", text: `Out in ${ordinal(p.placement)} place` }),
-    opponent && h("div", { class: "pc-note", text: "Your last opponent" }),
-    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: board ? `Board in their last fight (turn ${p.lastBoard?.turn}) · ${p.lastBoard?.units} unit${p.lastBoard?.units === 1 ? "" : "s"}` : "Board" }),
-      board ? h("div", null, h("div", { class: "pc-headline", text: board.headline }), board.parts.length > 0 && h("div", { class: "pc-parts" }, ...board.parts.map((t) => h("span", { class: "pc-part", text: t })))) : h("div", { class: "muted", text: "Not seen yet: boards show up after the first fight." })),
-    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "pc-text", text: heroDef ? powerBody(heroDef.text) || "No hero power." : "-" })),
-    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: `Relics (${p.relics.length})` }), p.relics.length > 0 ? relicList(ctx, p.relics) : h("div", { class: "muted", text: "None yet: relics are offered on turns 5 and 9." })),
+    h("div", { class: "pc-head" }, artBox("pc-portrait", ctx.ix.heroArt(p.hero), heroDef?.name ?? p.name), h("div", null, h("div", { class: "pc-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${mine ? tr(" (you)", " (คุณ)") : ""}` }), h("div", { class: "pc-hero", text: heroDef?.name ?? tr("Choosing a hero...", "กำลังเลือก Hero...") }), h("div", { class: "pc-stats", text: `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} ${tr("armor", "เกราะ")}` : ""} · ${tr("Tavern", "ร้าน")} ${stars(p.rank)}` }))),
+    !p.alive && p.placement !== undefined && h("div", { class: "pc-out", text: tr(`Out in ${ordinal(p.placement)} place`, `ตกรอบ อันดับ${ordinal(p.placement)}`) }),
+    opponent && h("div", { class: "pc-note", text: tr("Your last opponent", "คู่ต่อสู้ล่าสุดของคุณ") }),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: board ? `${tr("Board in their last fight", "บอร์ดในการต่อสู้ล่าสุด")} (${tr("turn", "เทิร์น")} ${p.lastBoard?.turn}) · ${p.lastBoard?.units} ${tr(`unit${p.lastBoard?.units === 1 ? "" : "s"}`, "ตัว")}` : tr("Board", "บอร์ด") }),
+      board ? h("div", null, h("div", { class: "pc-headline", text: board.headline }), board.parts.length > 0 && h("div", { class: "pc-parts" }, ...board.parts.map((t) => h("span", { class: "pc-part", text: t })))) : h("div", { class: "muted", text: tr("Not seen yet: boards show up after the first fight.", "ยังไม่เห็น: บอร์ดจะแสดงหลังการต่อสู้ครั้งแรก") })),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "pc-text", text: heroDef ? powerBody(ctx.ix.heroText(heroDef.key)) || tr("No hero power.", "ไม่มีพลัง Hero") : "-" })),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: `Relics (${p.relics.length})` }), p.relics.length > 0 ? relicList(ctx, p.relics) : h("div", { class: "muted", text: tr("None yet: relics are offered on turns 5 and 9.", "ยังไม่มี: Relic จะให้เลือกในเทิร์น 5 และ 9") })),
   );
   document.body.append(card);
   playerCard = card;
@@ -229,14 +232,14 @@ function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
     for (const t of [...g.thresholds].sort((a, b) => a.at - b.at)) {
       for (const r of t.reward) {
         if (r.type === "ADD_TO_HAND" && ctx.ix.card(r.cardKey) && !out.some((o) => o.key === r.cardKey)) {
-          out.push({ key: r.cardKey, how: `${g.name} ${t.once ? "at" : "every"} ${t.at}${t.once ? " (once per game)" : ""}` });
+          out.push({ key: r.cardKey, how: `${g.name} ${t.once ? tr("at", "ถึง") : tr("every", "ทุก")} ${t.at}${t.once ? tr(" (once per game)", " (ครั้งเดียวต่อเกม)") : ""}` });
         }
       }
     }
   }
   const series = new Set([...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && (c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f)))).flatMap((c) => (c.series ? [c.series] : [])));
   const giants = [...ctx.ix.cards.values()].filter((c) => c.kind === "GIANT" && (c.series === undefined || series.has(c.series))).sort((a, b) => a.name.localeCompare(b.name));
-  for (const c of giants) out.push({ key: c.key, how: "Giant Robo: chosen with Kyodai Gattai!, waits in the Giant Slot" });
+  for (const c of giants) out.push({ key: c.key, how: tr("Giant Robo: chosen with Kyodai Gattai!, waits in the Giant Slot", "Giant Robo: เลือกได้จาก Kyodai Gattai! แล้วรออยู่ในช่อง Giant") });
   return out;
 }
 
@@ -261,25 +264,25 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
     h(
       "div",
       { class: "modal-box book-box" },
-      h("div", { class: "row" }, h("h2", { text: "Card book" }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `Factions this match: ${view.factions.map(ctx.ix.factionName).join(", ") || "all"} · your tavern is rank ${view.me.state.rank}` }), h("button", { class: "btn", text: "Close", on: { click: close } })),
-      h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? "Upgrade your tavern to be offered these" : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
-        gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: "Gear the tavern can offer (from the rank shown on each card)", on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) })),
-        special.length > 0 && h("button", { class: `tab ${rank === SPECIAL_TAB ? "active" : ""}`, title: "Cards from the gauges, and the Giant Robos", on: { click: () => ctx.store.set({ bookRank: SPECIAL_TAB }) } }, "Special", h("span", { class: "book-count", text: String(special.length) }))),
+      h("div", { class: "row" }, h("h2", { text: tr("Card book", "หนังสือการ์ด") }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `${tr("Factions this match", "เผ่าในเกมนี้")}: ${view.factions.map(ctx.ix.factionName).join(", ") || tr("all", "ทั้งหมด")} · ${tr("your tavern is rank", "ร้านของคุณ rank")} ${view.me.state.rank}` }), h("button", { class: "btn", text: tr("Close", "ปิด"), on: { click: close } })),
+      h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? tr("Upgrade your tavern to be offered these", "อัปเกรดร้านเพื่อให้สุ่มเจอการ์ดเหล่านี้") : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
+        gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: tr("Gear the tavern can offer (from the rank shown on each card)", "Gear ที่ร้านสุ่มให้ได้ (ตั้งแต่ rank ที่เขียนบนการ์ด)"), on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) })),
+        special.length > 0 && h("button", { class: `tab ${rank === SPECIAL_TAB ? "active" : ""}`, title: tr("Cards from the gauges, and the Giant Robos", "การ์ดจาก gauge และ Giant Robo"), on: { click: () => ctx.store.set({ bookRank: SPECIAL_TAB }) } }, tr("Special", "พิเศษ"), h("span", { class: "book-count", text: String(special.length) }))),
       h(
         "div",
         { class: "book-filters" },
-        h("span", { class: "muted small", text: "Faction" }),
-        ...[["", "All"], ...view.factions.map((f) => [f, ctx.ix.factionName(f)]), ["_neutral", "Neutral"]].map(([k, label]) => h("button", { class: `chip filter-chip ${fac === k ? "active" : ""}`, style: k && k !== "_neutral" ? `--c:${ctx.ix.factionColor(k as string)}` : "--c:#8296bb", text: label as string, on: { click: () => ctx.store.set({ bookFaction: k as string }) } })),
+        h("span", { class: "muted small", text: tr("Faction", "เผ่า") }),
+        ...[["", tr("All", "ทั้งหมด")], ...view.factions.map((f) => [f, ctx.ix.factionName(f)]), ["_neutral", tr("Neutral", "ไม่มีเผ่า")]].map(([k, label]) => h("button", { class: `chip filter-chip ${fac === k ? "active" : ""}`, style: k && k !== "_neutral" ? `--c:${ctx.ix.factionColor(k as string)}` : "--c:#8296bb", text: label as string, on: { click: () => ctx.store.set({ bookFaction: k as string }) } })),
         h("span", { class: "muted small", text: "Keyword" }),
         (() => {
-          const sel = h("select", null, h("option", { value: "", text: "Any", selected: kw === "" }), ...Object.keys(KEYWORDS).map((k) => h("option", { value: k, text: keywordName(k), selected: kw === k })));
+          const sel = h("select", null, h("option", { value: "", text: tr("Any", "ทั้งหมด"), selected: kw === "" }), ...Object.keys(KEYWORDS).map((k) => h("option", { value: k, text: keywordName(k), selected: kw === k })));
           sel.addEventListener("change", () => ctx.store.set({ bookKeyword: sel.value }));
           return sel;
         })(),
       ),
       rank === SPECIAL_TAB
         ? h("div", { class: "book-cards" }, ...special.map((s) => h("div", { class: "book-special" }, cardEl(ctx.ix, { key: s.key }), h("div", { class: "book-how", text: s.how }))))
-        : h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? "No cards match these filters at this rank." : "No cards of this rank in this match." })),
+        : h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? tr("No cards match these filters at this rank.", "ไม่มีการ์ดที่ตรงกับตัวกรองใน rank นี้") : tr("No cards of this rank in this match.", "ไม่มีการ์ด rank นี้ในเกมนี้") })),
     ),
   );
 }
@@ -299,9 +302,9 @@ function logDrawer(ctx: Ctx, view: View): HTMLElement {
   return h(
     "div",
     { class: "drawer" },
-    h("div", { class: "row" }, h("h3", { text: "Match log" }), h("span", { class: "spacer" }), h("button", { class: "btn", text: "Close", on: { click: () => ctx.store.set({ showLog: false }) } })),
+    h("div", { class: "row" }, h("h3", { text: tr("Match log", "บันทึกเกม") }), h("span", { class: "spacer" }), h("button", { class: "btn", text: tr("Close", "ปิด"), on: { click: () => ctx.store.set({ showLog: false }) } })),
     h("div", { class: "log", id: "log" }, ...state.log.map((l) => h("div", { text: l }))),
-    h("p", { class: "muted small", text: "R refresh - F freeze - U upgrade - L log - D debug" }),
+    h("p", { class: "muted small", text: tr("R refresh - F freeze - U upgrade - B book - L log - D debug", "R รีเฟรช - F แช่ร้าน - U อัปเกรด - B หนังสือ - L บันทึก - D debug") }),
     debug,
   );
 }
@@ -325,12 +328,12 @@ function heroSelect(ctx: Ctx, view: View): HTMLElement {
   return h(
     "div",
     { class: "center hero-select" },
-    h("h2", { text: chosen ? "Waiting for the other players..." : "Choose your hero" }),
+    h("h2", { text: chosen ? tr("Waiting for the other players...", "รอผู้เล่นคนอื่น...") : tr("Choose your hero", "เลือก Hero") }),
     h("div", { class: "hero-options" }, ...view.me.heroOptions.map((key, i) => {
       const def = ctx.ix.heroes.get(key);
-      return h("div", { class: `hero-card ${chosen === key ? "picked" : ""} ${chosen ? "locked" : ""}`, on: { click: () => !chosen && void ctx.act({ type: "CHOOSE_HERO", index: i }) } }, artBox("hero-art", ctx.ix.heroArt(key), def?.name ?? key), h("h3", { text: def?.name ?? key }), h("p", { text: def?.text || "No hero power." }), (def?.armor ?? 0) > 0 && h("p", { class: "muted", text: `${def?.armor} armor` }));
+      return h("div", { class: `hero-card ${chosen === key ? "picked" : ""} ${chosen ? "locked" : ""}`, on: { click: () => !chosen && void ctx.act({ type: "CHOOSE_HERO", index: i }) } }, artBox("hero-art", ctx.ix.heroArt(key), def?.name ?? key), h("h3", { text: def?.name ?? key }), h("p", { text: ctx.ix.heroText(key) || tr("No hero power.", "ไม่มีพลัง Hero") }), def?.power && (def?.armor ?? 0) > 0 && h("p", { class: "muted", text: `${tr("Armor", "เกราะ")} ${def?.armor}` }));
     })),
-    view.factions.length > 0 && h("p", { class: "muted", text: `Factions this game: ${view.factions.map(ctx.ix.factionName).join(", ")}` }),
+    view.factions.length > 0 && h("p", { class: "muted", text: `${tr("Factions this game", "เผ่าในเกมนี้")}: ${view.factions.map(ctx.ix.factionName).join(", ")}` }),
   );
 }
 
@@ -343,9 +346,9 @@ function endScreen(ctx: Ctx, view: View): HTMLElement {
   return h(
     "div",
     { class: "center end-screen" },
-    h("h2", { text: mine === 1 ? "Victory!" : mine ? `You finished ${ordinal(mine)}` : "Match over" }),
+    h("h2", { text: mine === 1 ? tr("Victory!", "ชนะ!") : mine ? tr(`You finished ${ordinal(mine)}`, `คุณได้อันดับ${ordinal(mine)}`) : tr("Match over", "จบเกม") }),
     h("ol", { class: "standings" }, ...[...placements].sort((a, b) => a.placement - b.placement).map((p) => h("li", { class: p.playerId === view.me.id ? "me" : "" }, `${ordinal(p.placement)} - ${name(p.playerId)}`))),
-    h("div", { class: "row" }, h("button", { class: "btn primary big", text: "Back to lobby", on: { click: () => void ctx.leaveMatch() } })),
+    h("div", { class: "row" }, h("button", { class: "btn primary big", text: tr("Back to lobby", "กลับล็อบบี้"), on: { click: () => void ctx.leaveMatch() } })),
   );
 }
 
@@ -364,17 +367,17 @@ function table(ctx: Ctx, view: View): HTMLElement {
 
   const upgrade = h(
     "button",
-    { class: `tier-btn ${me.upgradeCost === null ? "maxed" : ""}`, disabled: !recruiting || me.upgradeCost === null || energy < (me.upgradeCost ?? 0), title: me.upgradeCost === null ? "Your tavern is at the highest rank" : "Upgrade the tavern (U)", on: { click: () => void ctx.act({ type: "UPGRADE" }) } },
+    { class: `tier-btn ${me.upgradeCost === null ? "maxed" : ""}`, disabled: !recruiting || me.upgradeCost === null || energy < (me.upgradeCost ?? 0), title: me.upgradeCost === null ? tr("Your tavern is at the highest rank", "ร้านอยู่ rank สูงสุดแล้ว") : tr("Upgrade the tavern (U)", "อัปเกรดร้าน (U)"), on: { click: () => void ctx.act({ type: "UPGRADE" }) } },
     h("span", { class: "tier-stars", text: stars(s.rank) }),
     // At the top rank there is nothing to buy: no price, just the rank.
-    me.upgradeCost === null ? h("span", { class: "tier-label", text: "Max rank" }) : h("span", { class: "tier-label", text: `Upgrade to ${s.rank + 1}` }),
+    me.upgradeCost === null ? h("span", { class: "tier-label", text: tr("Max rank", "rank สูงสุด") }) : h("span", { class: "tier-label", text: tr(`Upgrade to ${s.rank + 1}`, `อัปเป็น ${s.rank + 1}`) }),
     me.upgradeCost !== null && h("span", { class: "coin", text: String(me.upgradeCost) }),
   );
   const side = h(
     "div",
     { class: "tavern-side" },
-    h("button", { class: "round-btn", disabled: !recruiting || energy < me.limits.refreshCost, title: "Refresh the tavern (R)", on: { click: () => void ctx.act({ type: "REFRESH" }) } }, h("span", { class: "round-icon", text: "↻" }), h("span", { class: "coin", text: String(me.limits.refreshCost) })),
-    h("button", { class: `round-btn ${s.frozen ? "on" : ""}`, disabled: !recruiting, title: "Freeze the tavern (F)", on: { click: () => void ctx.act({ type: "FREEZE" }) } }, h("span", { class: "round-icon", text: "❄" })),
+    h("button", { class: "round-btn", disabled: !recruiting || energy < me.limits.refreshCost, title: tr("Refresh the tavern (R)", "รีเฟรชร้าน (R)"), on: { click: () => void ctx.act({ type: "REFRESH" }) } }, h("span", { class: "round-icon", text: "↻" }), h("span", { class: "coin", text: String(me.limits.refreshCost) })),
+    h("button", { class: `round-btn ${s.frozen ? "on" : ""}`, disabled: !recruiting, title: tr("Freeze the tavern (F)", "แช่ร้านไว้เทิร์นหน้า (F)"), on: { click: () => void ctx.act({ type: "FREEZE" }) } }, h("span", { class: "round-icon", text: "❄" })),
   );
   // Deal the cards in only when the shop actually changed, not on every redraw.
   const shopSig = `${view.turn}|${s.shop.join(",")}`;
@@ -385,9 +388,9 @@ function table(ctx: Ctx, view: View): HTMLElement {
   const tavern = h(
     "div",
     { class: `tavern ${s.frozen ? "frozen" : ""} ${justFroze ? "just-frozen" : ""}`, on: { dragover: allowDrop, drop: tavernDrop(ctx, view) } },
-    s.frozen && h("div", { class: "frozen-stamp", text: "❄ Frozen: kept for next turn" }),
+    s.frozen && h("div", { class: "frozen-stamp", text: tr("❄ Frozen: kept for next turn", "❄ แช่ไว้: เก็บร้านไว้เทิร์นหน้า") }),
     upgrade,
-    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => draggableCard(cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) }), recruiting, "shop", i)), s.shop.length === 0 && h("p", { class: "muted", text: "The tavern is empty." })),
+    h("div", { class: `cards shop-cards ${dealing ? "dealing" : ""}` }, ...s.shop.map((key, i) => draggableCard(cardEl(ctx.ix, { key, cost: me.limits.buyCost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY", index: i }) }), recruiting, "shop", i)), s.shop.length === 0 && h("p", { class: "muted", text: tr("The tavern is empty.", "ร้านว่าง") })),
     gearSlot(ctx, view),
     side,
   );
@@ -396,17 +399,17 @@ function table(ctx: Ctx, view: View): HTMLElement {
   const aim = aimedGear(ctx, view);
   const aimBanner =
     aim !== undefined &&
-    h("div", { class: "aim-banner" }, h("span", { text: `Choose a unit for ${ctx.ix.cardName(s.hand[aim]?.key ?? "")}` }), h("button", { class: "mini", text: "Cancel (Esc)", on: { click: () => ctx.store.set({ selected: undefined }) } }));
+    h("div", { class: "aim-banner" }, h("span", { text: tr(`Choose a unit for ${ctx.ix.cardName(s.hand[aim]?.key ?? "")}`, `เลือกยูนิตที่จะใช้ ${ctx.ix.cardName(s.hand[aim]?.key ?? "")}`) }), h("button", { class: "mini", text: tr("Cancel (Esc)", "ยกเลิก (Esc)"), on: { click: () => ctx.store.set({ selected: undefined }) } }));
   const board = h(
     "div",
     { class: "warband" },
     aimBanner,
-    h("div", { class: "band-head" }, gaugeBars(ctx, view), h("span", { class: "spacer" }), h("span", { class: "band-count", title: "Units on your board", text: `${s.board.length}/${me.limits.boardSize}` }), sellZone(ctx, view)),
+    h("div", { class: "band-head" }, gaugeBars(ctx, view), h("span", { class: "spacer" }), h("span", { class: "band-count", title: tr("Units on your board", "ยูนิตบนบอร์ด"), text: `${s.board.length}/${me.limits.boardSize}` }), sellZone(ctx, view)),
     // The Giant Slot sits at the far right; the whole row is the drop target (no dashed box), with a marker where a card will land.
     h("div", { class: "board-row" }, h("div", { class: "cards board-cards" }, ...boardSlots, h("div", { class: "drop-marker" })), giantSlot(ctx, view)),
   );
 
-  const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: "Buy a card from the tavern, then drag it onto your warband." }));
+  const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: tr("Buy a card from the tavern, then drag it onto your warband.", "ซื้อการ์ดจากร้าน แล้วลากลงบอร์ด") }));
 
   board.addEventListener("dragover", (e) => {
     allowDrop(e);
@@ -444,7 +447,7 @@ function gearSlot(ctx: Ctx, view: View): HTMLElement | null {
     "div",
     { class: "gear-slot" },
     h("div", { class: "gear-slot-label", text: "Gear" }),
-    key ? draggableCard(cardEl(ctx.ix, { key, cost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: "Sold out until the next refresh" }),
+    key ? draggableCard(cardEl(ctx.ix, { key, cost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: tr("Sold out until the next refresh", "หมดแล้ว รอรีเฟรชครั้งหน้า") }),
   );
 }
 
@@ -457,11 +460,12 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
   const self = view.players.find((p) => p.id === me.id);
   const heroDef = hero ? ctx.ix.heroes.get(hero) : undefined;
   const name = hero ? ctx.ix.heroName(hero) : "Hero";
+  const heroText = hero ? ctx.ix.heroText(hero) : "";
 
   const portrait = h(
     "div",
     { class: "hero-box" },
-    h("div", { class: `portrait ${ctx.ix.heroArt(hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(hero)), title: `${name}${heroDef?.text ? `\n${heroDef.text}` : ""}` }, !ctx.ix.heroArt(hero) && h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
+    h("div", { class: `portrait ${ctx.ix.heroArt(hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(hero)), title: `${name}${heroText ? `\n${heroText}` : ""}` }, !ctx.ix.heroArt(hero) && h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
     h("div", { class: "hero-name", text: name }),
   );
 
@@ -473,7 +477,7 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
       "div",
       { class: "power-panel" },
       h("div", { class: "pc-label", text: powerHeader(power?.mode, power?.cost) }),
-      h("div", { class: "power-text", text: heroDef ? powerBody(heroDef.text) || "No hero power." : "" }),
+      h("div", { class: "power-text", text: heroDef ? powerBody(ctx.ix.heroText(heroDef.key)) || tr("No hero power.", "ไม่มีพลัง Hero") : "" }),
       power && power.mode !== "PASSIVE" && h("button", { class: `hero-power ${power.usable ? "ready" : ""}`, disabled: !power.usable, on: { click: () => void ctx.act({ type: "HERO_POWER" }) } }, h("span", { text: powerButtonLabel(power, recruiting, me.state.energy) }), h("span", { class: "coin", text: String(power.cost) })),
     ),
     (self?.relics.length ?? 0) > 0 && h("div", { class: "relic-panel" }, h("div", { class: "pc-label", text: "Relics" }), relicList(ctx, self?.relics ?? [])),
@@ -485,7 +489,7 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
     h("div", { class: "gold-num" }, h("span", { class: "coin big-coin", text: String(me.state.energy) }), h("span", { class: "gold-max", text: `/${me.limits.maxEnergy}` })),
     h("div", { class: "pips" }, ...Array.from({ length: me.limits.maxEnergy }, (_, i) => h("span", { class: `pip ${i < me.state.energy ? "full" : ""}` }))),
     // No Ready button: every turn runs its full clock so everyone starts the next one together.
-    h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: view.phase === "RECRUIT" ? "Battle in" : "Next turn in" }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
+    h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: view.phase === "RECRUIT" ? tr("Battle in", "ต่อสู้ใน") : tr("Next turn in", "เทิร์นถัดไปใน") }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
   );
 
   return h("div", { class: "bottom" }, h("div", { class: "hero-zone" }, portrait, info), hand, gold);
@@ -611,7 +615,7 @@ function useGearFromHand(ctx: Ctx, view: View, handIndex: number, target?: numbe
     return;
   }
   if (slots && slots.length === 0) {
-    ctx.toast(`${ctx.ix.cardName(view.me.state.hand[handIndex]?.key ?? "")} has no unit to go on`, "error");
+    ctx.toast(tr(`${ctx.ix.cardName(view.me.state.hand[handIndex]?.key ?? "")} has no unit to go on`, `${ctx.ix.cardName(view.me.state.hand[handIndex]?.key ?? "")} ไม่มียูนิตที่ใช้ได้`), "error");
     return;
   }
   ctx.store.set({ selected: undefined });
@@ -654,12 +658,12 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
     },
     el,
     recruiting && h("div", { class: "slot-actions" },
-      h("button", { class: "mini", text: "<", disabled: i === 0, title: "Move left", on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i - 1 }) } }),
-      h("button", { class: "mini", text: `Sell +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "board", index: i }) } }),
-      h("button", { class: "mini", text: ">", disabled: i === last, title: "Move right", on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i + 1 }) } })),
+      h("button", { class: "mini", text: "<", disabled: i === 0, title: tr("Move left", "ย้ายไปซ้าย"), on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i - 1 }) } }),
+      h("button", { class: "mini", text: `${tr("Sell", "ขาย")} +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "board", index: i }) } }),
+      h("button", { class: "mini", text: ">", disabled: i === last, title: tr("Move right", "ย้ายไปขวา"), on: { click: () => void ctx.act({ type: "REORDER", from: i, to: i + 1 }) } })),
     // A Gattai core says what its group becomes; when the group is complete it offers to combine for good.
-    form && h("div", { class: `core-tag ${canCombine ? "ready" : ""}`, title: `Gattai core: lead a Gattai group (it must be the leftmost) to become ${ctx.ix.cardName(form)}` }, `Core → ${ctx.ix.cardName(form)}`),
-    canCombine && h("button", { class: "combine-btn", title: `Merge this group into ${ctx.ix.cardName(form ?? "")} for good (frees board slots)`, on: { click: () => void ctx.act({ type: "COMBINE", index: i }) } }, "⚙ Combine"),
+    form && h("div", { class: `core-tag ${canCombine ? "ready" : ""}`, title: tr(`Gattai core: lead a Gattai group (it must be the leftmost) to become ${ctx.ix.cardName(form)}`, `Gattai core: วางไว้ซ้ายสุดของกลุ่ม Gattai เพื่อรวมเป็น ${ctx.ix.cardName(form)}`) }, `Core → ${ctx.ix.cardName(form)}`),
+    canCombine && h("button", { class: "combine-btn", title: tr(`Merge this group into ${ctx.ix.cardName(form ?? "")} for good (frees board slots)`, `รวมกลุ่มนี้เป็น ${ctx.ix.cardName(form ?? "")} ถาวร (บอร์ดว่างขึ้น)`), on: { click: () => void ctx.act({ type: "COMBINE", index: i }) } }, "⚙ Combine"),
     (u.turns ?? 0) > 0 && ctx.ix.card(u.key)?.henshin && h("div", { class: "henshin", text: `henshin ${u.turns}/${ctx.ix.card(u.key)?.henshin?.afterTurns}` }),
   );
 }
@@ -667,7 +671,7 @@ function boardCard(ctx: Ctx, view: View, i: number): HTMLElement {
 function endDrop(ctx: Ctx, view: View): HTMLElement {
   void ctx;
   void view;
-  return h("div", { class: "end-drop", title: "Drop anywhere on the board" }, h("span", { text: "+" }));
+  return h("div", { class: "end-drop", title: tr("Drop anywhere on the board", "วางตรงไหนบนบอร์ดก็ได้") }, h("span", { text: "+" }));
 }
 
 function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
@@ -681,8 +685,8 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
     { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: endDrag } },
     cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [] }),
     recruiting && h("div", { class: "slot-actions" },
-      h("button", { class: "mini primary", text: gear ? (aimedGear(ctx, view) === i ? "Cancel" : "Use") : "Play", disabled: !gear && full, on: { click: () => (gear ? (aimedGear(ctx, view) === i ? ctx.store.set({ selected: undefined }) : useGearFromHand(ctx, view, i)) : void ctx.act({ type: "PLAY", handIndex: i, position: view.me.state.board.length })) } }),
-      !gear && h("button", { class: "mini", text: `Sell +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),
+      h("button", { class: "mini primary", text: gear ? (aimedGear(ctx, view) === i ? tr("Cancel", "ยกเลิก") : tr("Use", "ใช้")) : tr("Play", "ลงบอร์ด"), disabled: !gear && full, on: { click: () => (gear ? (aimedGear(ctx, view) === i ? ctx.store.set({ selected: undefined }) : useGearFromHand(ctx, view, i)) : void ctx.act({ type: "PLAY", handIndex: i, position: view.me.state.board.length })) } }),
+      !gear && h("button", { class: "mini", text: `${tr("Sell", "ขาย")} +${view.me.limits.sellValue}`, on: { click: () => void ctx.act({ type: "SELL", from: "hand", index: i }) } })),
   );
 }
 
@@ -696,9 +700,9 @@ function sellZone(ctx: Ctx, view: View): HTMLElement {
   // A recycler console: quiet until a card is dragged, then it lights up; brighter still while the card is over it.
   const zone = h(
     "div",
-    { class: "sell-zone", title: "Drag a unit here to sell it", on: { dragover: allowDrop, drop: sell, dragenter: () => zone.classList.add("over"), dragleave: (e) => !zone.contains(e.relatedTarget as Node | null) && zone.classList.remove("over") } },
+    { class: "sell-zone", title: tr("Drag a unit here to sell it", "ลากยูนิตมาที่นี่เพื่อขาย"), on: { dragover: allowDrop, drop: sell, dragenter: () => zone.classList.add("over"), dragleave: (e) => !zone.contains(e.relatedTarget as Node | null) && zone.classList.remove("over") } },
     h("span", { class: "sell-icon", text: "♻" }),
-    h("span", { class: "sell-copy" }, h("span", { class: "sell-title", text: "Sell" }), h("span", { class: "sell-hint idle-hint", text: "drag a unit here" }), h("span", { class: "sell-hint drag-hint", text: "release to sell" })),
+    h("span", { class: "sell-copy" }, h("span", { class: "sell-title", text: tr("Sell", "ขาย") }), h("span", { class: "sell-hint idle-hint", text: tr("drag a unit here", "ลากยูนิตมาที่นี่") }), h("span", { class: "sell-hint drag-hint", text: tr("release to sell", "ปล่อยเพื่อขาย") })),
     h("span", { class: "sell-value" }, h("span", { text: `+${view.me.limits.sellValue}` }), h("span", { class: "sell-unit", text: "Energy" })),
   );
   return zone;
@@ -706,7 +710,7 @@ function sellZone(ctx: Ctx, view: View): HTMLElement {
 
 function giantSlot(ctx: Ctx, view: View): HTMLElement {
   const g = view.me.state.giant;
-  return h("div", { class: "giant-slot" }, h("div", { class: "muted small", text: "Giant Robo" }), g ? cardEl(ctx.ix, { key: g.key, small: true, minion: true }) : h("div", { class: "empty-giant", text: "empty" }));
+  return h("div", { class: "giant-slot" }, h("div", { class: "muted small", text: "Giant Robo" }), g ? cardEl(ctx.ix, { key: g.key, small: true, minion: true }) : h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
 }
 
 function gaugeBars(ctx: Ctx, view: View): HTMLElement {
@@ -746,10 +750,10 @@ function showGaugeCard(ctx: Ctx, view: View, anchor: HTMLElement, g: (typeof ctx
     "div",
     { class: "player-card gauge-card" },
     h("div", { class: "pc-name", text: `${g.name} · ${value}/${g.max}` }),
-    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "How it fills" }), ...t.fills.map((f) => h("div", { class: "pc-text", text: f }))),
-    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "What it gives" }), ...t.rewards.map((r) => h("div", { class: "pc-text", text: r })), ...rewardKeys.map((k) => h("div", { class: "pc-text gauge-reward-text" }, h("strong", { text: `${ctx.ix.cardName(k)}: ` }), ctx.ix.card(k)?.text ?? "")), rewardKeys.length > 0 && h("div", { class: "gauge-examples" }, ...rewardKeys.map((k) => cardEl(ctx.ix, { key: k, small: true }))), rewardKeys.length > 0 && h("div", { class: "pc-text muted", text: "All of them are in the Book, Special tab." })),
-    examples.length > 0 && h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: "Cards in this match that fill it" }), h("div", { class: "gauge-examples" }, ...examples.map((c) => cardEl(ctx.ix, { key: c.key, small: true })))),
-    examples.length === 0 && h("div", { class: "pc-section muted", text: "No card in this match's factions fills it." }),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: tr("How it fills", "เติมยังไง") }), ...t.fills.map((f) => h("div", { class: "pc-text", text: f }))),
+    h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: tr("What it gives", "ได้อะไร") }), ...t.rewards.map((r) => h("div", { class: "pc-text", text: r })), ...rewardKeys.map((k) => h("div", { class: "pc-text gauge-reward-text" }, h("strong", { text: `${ctx.ix.cardName(k)}: ` }), ctx.ix.cardText(k))), rewardKeys.length > 0 && h("div", { class: "gauge-examples" }, ...rewardKeys.map((k) => cardEl(ctx.ix, { key: k, small: true }))), rewardKeys.length > 0 && h("div", { class: "pc-text muted", text: tr("All of them are in the Book, Special tab.", "ดูทั้งหมดได้ในหนังสือ แท็บพิเศษ") })),
+    examples.length > 0 && h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: tr("Cards in this match that fill it", "การ์ดในเกมนี้ที่เติม gauge นี้") }), h("div", { class: "gauge-examples" }, ...examples.map((c) => cardEl(ctx.ix, { key: c.key, small: true })))),
+    examples.length === 0 && h("div", { class: "pc-section muted", text: tr("No card in this match's factions fills it.", "ไม่มีการ์ดของเผ่าในเกมนี้ที่เติม gauge นี้") }),
   );
   document.body.append(card);
   playerCard = card;
@@ -764,18 +768,18 @@ function offersModal(ctx: Ctx, view: View): HTMLElement | null {
   const s = view.me.state;
   const state = ctx.store.state;
   if (state.hideOffers || view.phase !== "RECRUIT" || !view.me.alive) return null;
-  const hide = h("button", { class: "btn", text: "Decide later", on: { click: () => ctx.store.set({ hideOffers: true }) } });
+  const hide = h("button", { class: "btn", text: tr("Decide later", "ตัดสินใจทีหลัง"), on: { click: () => ctx.store.set({ hideOffers: true }) } });
 
   if (s.relicOffer) {
     const offer = s.relicOffer;
     return h(
       "div",
       { class: "modal" },
-      h("div", { class: "modal-box" }, h("h2", { text: `Choose a ${offer.tier === "LESSER" ? "Lesser" : "Greater"} Relic` }), h("p", { class: "muted", text: "It stays with you for the rest of the game. Free ones are always safe; the rest cost Energy now." }),
+      h("div", { class: "modal-box" }, h("h2", { text: tr(`Choose a ${offer.tier === "LESSER" ? "Lesser" : "Greater"} Relic`, `เลือก ${offer.tier === "LESSER" ? "Lesser" : "Greater"} Relic`) }), h("p", { class: "muted", text: tr("It stays with you for the rest of the game. Free ones are always safe; the rest cost Energy now.", "อยู่กับคุณจนจบเกม ตัวฟรีเลือกได้เสมอ ตัวอื่นจ่าย Energy ตอนนี้") }),
         h("div", { class: "cards" }, ...offer.options.map((key, i) => {
           const r = ctx.ix.relics.get(key);
           const cost = r?.cost ?? 0;
-          return h("div", { class: `relic-card ${cost > s.energy ? "unaffordable" : ""}`, title: r?.text ?? "", on: { click: () => cost <= s.energy && void ctx.act({ type: "CHOOSE_RELIC", index: i }) } }, h("div", { class: "cost", text: String(cost) }), artBox("relic-art", ctx.ix.relicArt(key), r?.name ?? key), h("h3", { text: r?.name ?? key }), h("p", { text: r?.text ?? "" }), (r?.factions.length ?? 0) > 0 && h("p", { class: "muted small", text: r?.factions.map(ctx.ix.factionName).join(", ") }));
+          return h("div", { class: `relic-card ${cost > s.energy ? "unaffordable" : ""}`, title: ctx.ix.relicText(key), on: { click: () => cost <= s.energy && void ctx.act({ type: "CHOOSE_RELIC", index: i }) } }, h("div", { class: "cost", text: String(cost) }), artBox("relic-art", ctx.ix.relicArt(key), r?.name ?? key), h("h3", { text: r?.name ?? key }), h("p", { text: ctx.ix.relicText(key) }), (r?.factions.length ?? 0) > 0 && h("p", { class: "muted small", text: r?.factions.map(ctx.ix.factionName).join(", ") }));
         })), hide),
     );
   }
@@ -786,7 +790,7 @@ function offersModal(ctx: Ctx, view: View): HTMLElement | null {
     return h(
       "div",
       { class: "modal" },
-      h("div", { class: "modal-box" }, h("h2", { text: giant ? "Choose a Giant Robo" : "Discover a card" }), giant && h("p", { class: "muted", text: "It waits in your Giant Slot and joins the fight when your team is nearly beaten." }),
+      h("div", { class: "modal-box" }, h("h2", { text: giant ? tr("Choose a Giant Robo", "เลือก Giant Robo") : tr("Discover a card", "เลือกรับการ์ด") }), giant && h("p", { class: "muted", text: tr("It waits in your Giant Slot and joins the fight when your team is nearly beaten.", "รออยู่ในช่อง Giant และลงสนามเมื่อทีมเกือบแพ้") }),
         h("div", { class: "cards" }, ...discover.options.map((key, i) => cardEl(ctx.ix, { key, onClick: () => void ctx.act({ type: "PICK_DISCOVER", index: i }) }))), hide),
     );
   }

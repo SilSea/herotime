@@ -1,3 +1,4 @@
+import { tr } from "../i18n.js";
 import type { ContentIndex } from "../content-index.js";
 import type { CombatRecord } from "../protocol.js";
 import { buildSteps, pickDelay, stepWeight, type Fighter, type ReplayState, type Step } from "../replay.js";
@@ -41,7 +42,7 @@ export class ReplayView {
     this.field = h("div", { class: "replay-field" });
     this.logEl = h("div", { class: "replay-log" });
     this.controls = h("div", { class: "replay-controls" });
-    this.root = h("div", { class: "replay-overlay" }, h("div", { class: "replay-box" }, h("h2", { text: `Turn ${record.turn}: you vs ${record.opponentName}` }), this.field, this.logEl, this.controls));
+    this.root = h("div", { class: "replay-overlay" }, h("div", { class: "replay-box" }, h("h2", { text: tr(`Turn ${record.turn}: you vs ${record.opponentName}`, `เทิร์น ${record.turn}: คุณ vs ${record.opponentName}`) }), this.field, this.logEl, this.controls));
     host.replaceChildren(this.root);
     this.draw(this.initial, [], undefined);
     this.drawControls();
@@ -99,7 +100,7 @@ export class ReplayView {
     const fresh = step && (step.event.type === "SUMMON" || step.event.type === "GIANT_ENTER" || step.event.type === "GATTAI") ? focus : [];
     const row = h("div", { class: `replay-row ${side === this.record.meSide ? "mine" : "theirs"}` });
     for (const f of state[side]) row.append(this.fighter(f, { attacker: f.uid === attacker, target: f.uid === target, focus: focus.includes(f.uid), dying: dying.includes(f.uid), fresh: fresh.includes(f.uid) }));
-    if (state[side].length === 0) row.append(h("div", { class: "muted", text: "(no units)" }));
+    if (state[side].length === 0) row.append(h("div", { class: "muted", text: tr("(no units)", "(ไม่มียูนิต)") }));
     return row;
   }
 
@@ -117,17 +118,17 @@ export class ReplayView {
   private drawControls(): void {
     const finished = this.done;
     const r = this.record.result;
-    const outcome = r.winner === "DRAW" ? "Draw" : r.winner === this.record.meSide ? "You won" : "You lost";
+    const outcome = r.winner === "DRAW" ? tr("Draw", "เสมอ") : r.winner === this.record.meSide ? tr("You won", "คุณชนะ") : tr("You lost", "คุณแพ้");
     mount(
       this.controls,
       finished
-        ? h("span", { class: `outcome ${r.winner === this.record.meSide ? "win" : r.winner === "DRAW" ? "draw" : "loss"}`, text: `${outcome}${this.record.damageTaken > 0 ? ` - you took ${this.record.damageTaken} damage` : this.record.damageDealt > 0 ? ` - dealt ${this.record.damageDealt} damage` : ""}` })
+        ? h("span", { class: `outcome ${r.winner === this.record.meSide ? "win" : r.winner === "DRAW" ? "draw" : "loss"}`, text: `${outcome}${this.record.damageTaken > 0 ? tr(` - you took ${this.record.damageTaken} damage`, ` - โดน ${this.record.damageTaken} ดาเมจ`) : this.record.damageDealt > 0 ? tr(` - dealt ${this.record.damageDealt} damage`, ` - ทำ ${this.record.damageDealt} ดาเมจ`) : ""}` })
         : h("span", { class: "muted", text: `${this.index + 1}/${this.steps.length}` }),
       h("span", { class: "next-turn", id: "replay-timer", text: this.opts.nextTurnText() }),
-      !finished && h("button", { class: "btn", text: this.paused ? "Resume" : "Pause", on: { click: () => this.togglePause() } }),
-      !finished && h("button", { class: "btn", text: `${this.speed}x`, title: "Change speed", on: { click: () => ((this.speed = this.speed === 1 ? 2 : this.speed === 2 ? 4 : 1), this.drawControls(), this.schedule(0)) } }),
-      !finished && h("button", { class: "btn", text: "Skip", on: { click: () => this.skip() } }),
-      h("button", { class: "btn primary", text: finished ? "Continue" : "Close", on: { click: () => this.close() } }),
+      !finished && h("button", { class: "btn", text: this.paused ? tr("Resume", "เล่นต่อ") : tr("Pause", "หยุด"), on: { click: () => this.togglePause() } }),
+      !finished && h("button", { class: "btn", text: `${this.speed}x`, title: tr("Change speed", "เปลี่ยนความเร็ว"), on: { click: () => ((this.speed = this.speed === 1 ? 2 : this.speed === 2 ? 4 : 1), this.drawControls(), this.schedule(0)) } }),
+      !finished && h("button", { class: "btn", text: tr("Skip", "ข้าม"), on: { click: () => this.skip() } }),
+      h("button", { class: "btn primary", text: finished ? tr("Continue", "ไปต่อ") : tr("Close", "ปิด"), on: { click: () => this.close() } }),
     );
   }
 

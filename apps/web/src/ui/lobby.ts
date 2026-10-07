@@ -1,5 +1,6 @@
 import { formatClock } from "../clock.js";
 import { ordinal } from "../format.js";
+import { tr } from "../i18n.js";
 import type { LeaderboardRow, MyMatch, PracticeOptions } from "../protocol.js";
 import { h, mount } from "./dom.js";
 import type { Ctx } from "./ctx.js";
@@ -48,14 +49,14 @@ function historyPanel(ctx: Ctx): HTMLElement {
   return h(
     "div",
     { class: "panel" },
-    h("h2", { text: "Your recent matches" }),
+    h("h2", { text: tr("Your recent matches", "เกมล่าสุดของคุณ") }),
     stats.error && h("p", { class: "form-error", text: stats.error }),
-    !rows ? h("p", { class: "muted", text: "Loading..." }) : rows.length === 0 ? h("p", { class: "muted", text: "No finished matches yet." }) :
-      h("table", { class: "admin-table" }, h("tr", null, ...["Place", "Hero", "Mode", "When"].map((t) => h("th", { text: t }))),
+    !rows ? h("p", { class: "muted", text: tr("Loading...", "กำลังโหลด...") }) : rows.length === 0 ? h("p", { class: "muted", text: tr("No finished matches yet.", "ยังไม่มีเกมที่เล่นจบ") }) :
+      h("table", { class: "admin-table" }, h("tr", null, ...[tr("Place", "อันดับ"), "Hero", tr("Mode", "โหมด"), tr("When", "เมื่อ")].map((t) => h("th", { text: t }))),
         ...rows.map((m) => h("tr", { title: m.players.map((p) => `${ordinal(p.placement)} ${p.name}${p.isBot ? " (bot)" : ""}`).join("\n") },
           h("td", { class: m.placement === 1 ? "place-win" : "", text: m.placement ? ordinal(m.placement) : "-" }),
           h("td", { text: m.heroKey ? ctx.ix.heroName(m.heroKey) : "-" }),
-          h("td", { text: m.mode === "practice" ? "practice" : "ranked" }),
+          h("td", { text: m.mode === "practice" ? tr("practice", "ฝึกซ้อม") : tr("ranked", "จัดอันดับ") }),
           h("td", { class: "muted", text: new Date(m.endedAt).toLocaleString() })))),
   );
 }
@@ -65,10 +66,10 @@ function leaderboardPanel(): HTMLElement {
   return h(
     "div",
     { class: "panel" },
-    h("h2", { text: "Leaderboard" }),
-    h("p", { class: "muted", text: `Matchmaking games only (practice never counts). At least ${b?.minGames ?? 3} games to appear. Lower average place is better.` }),
-    !b ? h("p", { class: "muted", text: "Loading..." }) : b.players.length === 0 ? h("p", { class: "muted", text: "Nobody has enough ranked games yet." }) :
-      h("table", { class: "admin-table" }, h("tr", null, ...["#", "Player", "Games", "Wins", "Top 4", "Avg place"].map((t) => h("th", { text: t }))),
+    h("h2", { text: tr("Leaderboard", "ตารางอันดับ") }),
+    h("p", { class: "muted", text: tr(`Matchmaking games only (practice never counts). At least ${b?.minGames ?? 3} games to appear. Lower average place is better.`, `นับเฉพาะเกมจับคู่ (ฝึกซ้อมไม่นับ) ต้องเล่นอย่างน้อย ${b?.minGames ?? 3} เกมถึงจะขึ้นตาราง อันดับเฉลี่ยยิ่งน้อยยิ่งดี`) }),
+    !b ? h("p", { class: "muted", text: tr("Loading...", "กำลังโหลด...") }) : b.players.length === 0 ? h("p", { class: "muted", text: tr("Nobody has enough ranked games yet.", "ยังไม่มีใครเล่นเกมจัดอันดับครบ") }) :
+      h("table", { class: "admin-table" }, h("tr", null, ...["#", tr("Player", "ผู้เล่น"), tr("Games", "เกม"), tr("Wins", "ชนะ"), "Top 4", tr("Avg place", "อันดับเฉลี่ย")].map((t) => h("th", { text: t }))),
         ...b.players.map((p) => h("tr", null, h("td", { text: String(p.rank) }), h("td", { text: p.username }), h("td", { text: String(p.games) }), h("td", { text: String(p.wins) }), h("td", { text: String(p.top4) }), h("td", { text: p.avgPlacement.toFixed(2) })))),
   );
 }
@@ -107,15 +108,15 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
       form.factions = [...root.querySelectorAll<HTMLInputElement>("input[data-faction]")].filter((b) => b.checked).map((b) => b.dataset.faction as string);
       saveForm(form);
     });
-    return h("label", { class: "faction-pick", title: f.text, style: `--c:${f.color}` }, box, h("span", { class: "swatch" }), f.name);
+    return h("label", { class: "faction-pick", title: ctx.ix.factionText(f.key), style: `--c:${f.color}` }, box, h("span", { class: "swatch" }), f.name);
   });
 
-  const bots = h("select", { on: { change: (e) => ((form.bots = Number((e.target as HTMLSelectElement).value)), saveForm(form)) } }, ...[1, 2, 3, 4, 5, 6, 7].map((n) => h("option", { value: String(n), text: `${n} bot${n > 1 ? "s" : ""}`, selected: n === form.bots })));
+  const bots = h("select", { on: { change: (e) => ((form.bots = Number((e.target as HTMLSelectElement).value)), saveForm(form)) } }, ...[1, 2, 3, 4, 5, 6, 7].map((n) => h("option", { value: String(n), text: tr(`${n} bot${n > 1 ? "s" : ""}`, `bot ${n} ตัว`), selected: n === form.bots })));
   const speed = h(
     "select",
     { on: { change: (e) => ((form.speed = (e.target as HTMLSelectElement).value as "normal" | "fast"), saveForm(form)) } },
-    h("option", { value: "fast", text: "Fast (about 1 min per game)", selected: form.speed === "fast" }),
-    h("option", { value: "normal", text: "Normal (20-30 min)", selected: form.speed === "normal" }),
+    h("option", { value: "fast", text: tr("Fast (about 1 min per game)", "เร็ว (ประมาณ 1 นาทีต่อเกม)"), selected: form.speed === "fast" }),
+    h("option", { value: "normal", text: tr("Normal (20-30 min)", "ปกติ (20-30 นาที)"), selected: form.speed === "normal" }),
   );
 
   const status = state.status;
@@ -124,11 +125,11 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
       ? h(
           "div",
           { class: "queue-box" },
-          h("p", { text: `Waiting for players: ${status.waiting}/${status.matchSize}` }),
-          h("p", { class: "muted", id: "fill-countdown", data: { fillAt: String(status.fillAt ?? "") }, text: status.fillAt ? `Bots join in ${formatClock(ctx.clock.remaining(status.fillAt))}` : "" }),
-          h("button", { class: "btn", text: "Leave queue", on: { click: () => void ctx.leaveQueue() } }),
+          h("p", { text: `${tr("Waiting for players", "รอผู้เล่น")}: ${status.waiting}/${status.matchSize}` }),
+          h("p", { class: "muted", id: "fill-countdown", data: { fillAt: String(status.fillAt ?? "") }, text: status.fillAt ? `${tr("Bots join in", "bot จะเข้าใน")} ${formatClock(ctx.clock.remaining(status.fillAt))}` : "" }),
+          h("button", { class: "btn", text: tr("Leave queue", "ออกจากคิว"), on: { click: () => void ctx.leaveQueue() } }),
         )
-      : h("button", { class: "btn", text: "Join the queue", on: { click: () => void ctx.joinQueue() } });
+      : h("button", { class: "btn", text: tr("Join the queue", "เข้าคิว"), on: { click: () => void ctx.joinQueue() } });
 
   // Your numbers, from the history the server keeps (ranked games only for the record line).
   const mine = stats.mine ?? [];
@@ -147,12 +148,12 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
       h(
         "section",
         { class: "lobby-hero" },
-        h("div", { class: "hero-copy" }, h("div", { class: "eyebrow", text: "Auto-battler · Rider × Sentai" }), h("h1", { class: "logo", text: "HeroTime" }), h("p", { class: "tagline", text: "Recruit your squad, transform, and call the giant robo. Last hero standing wins." })),
+        h("div", { class: "hero-copy" }, h("div", { class: "eyebrow", text: "Auto-battler · Rider × Sentai" }), h("h1", { class: "logo", text: "HeroTime" }), h("p", { class: "tagline", text: tr("Recruit your squad, transform, and call the giant robo. Last hero standing wins.", "รวมทีม แปลงร่าง แล้วเรียกหุ่นยักษ์ ฮีโร่คนสุดท้ายที่รอดคือผู้ชนะ") })),
         h(
           "div",
           { class: "hero-stats" },
           h("div", { class: "pilot", text: state.user?.username ?? "" }),
-          h("div", { class: "stat-row" }, statTile("Ranked games", String(ranked.length)), statTile("Wins", String(wins)), statTile("Best place", best ? ordinal(best) : "-"), statTile("Rank", me ? `#${me.rank}` : "-")),
+          h("div", { class: "stat-row" }, statTile(tr("Ranked games", "เกมจัดอันดับ"), String(ranked.length)), statTile(tr("Wins", "ชนะ"), String(wins)), statTile(tr("Best place", "อันดับดีสุด"), best ? ordinal(best) : "-"), statTile(tr("Rank", "อันดับ"), me ? `#${me.rank}` : "-")),
         ),
       ),
       h(
@@ -161,21 +162,21 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
         h(
           "div",
           { class: "mode-card practice-card" },
-          h("div", { class: "mode-tag", text: "Solo" }),
-          h("h2", { text: "Practice vs bots" }),
-          h("p", { class: "muted", text: "Starts at once. Pick factions to force a matchup, or leave them empty for the usual random 5. Never counts for the leaderboard." }),
+          h("div", { class: "mode-tag", text: tr("Solo", "เดี่ยว") }),
+          h("h2", { text: tr("Practice vs bots", "ฝึกกับ bot") }),
+          h("p", { class: "muted", text: tr("Starts at once. Pick factions to force a matchup, or leave them empty for the usual random 5. Never counts for the leaderboard.", "เริ่มทันที เลือกเผ่าเพื่อกำหนดเผ่าในเกม หรือเว้นว่างให้สุ่ม 5 เผ่าตามปกติ ไม่นับในตารางอันดับ") }),
           h("div", { class: "faction-picks" }, ...factionBoxes),
           h("div", { class: "row" }, bots, speed),
-          h("button", { class: "btn primary big", text: "Start practice", on: { click: () => void ctx.startPractice(toPracticeOptions(form)) } }),
+          h("button", { class: "btn primary big", text: tr("Start practice", "เริ่มฝึกซ้อม"), on: { click: () => void ctx.startPractice(toPracticeOptions(form)) } }),
         ),
         h(
           "div",
           { class: "mode-card ranked-card" },
-          h("div", { class: "mode-tag", text: "Ranked" }),
-          h("h2", { text: "Matchmaking" }),
-          h("p", { class: "muted", text: "Eight players. Empty seats are filled with bots after a short wait. Your place counts for the leaderboard." }),
+          h("div", { class: "mode-tag", text: tr("Ranked", "จัดอันดับ") }),
+          h("h2", { text: tr("Matchmaking", "จับคู่") }),
+          h("p", { class: "muted", text: tr("Eight players. Empty seats are filled with bots after a short wait. Your place counts for the leaderboard.", "ผู้เล่น 8 คน ที่ว่างจะเติม bot หลังรอสักครู่ อันดับนับในตารางอันดับ") }),
           queueBox,
-          h("div", { class: "build-info muted small", text: `Content: ${ix.snapshot.set} v${ix.snapshot.version} · ${ix.cards.size} cards · ${ix.heroes.size} heroes · ${ix.relics.size} relics · ${ix.factions.size} factions` }),
+          h("div", { class: "build-info muted small", text: tr(`Content: ${ix.snapshot.set} v${ix.snapshot.version} · ${ix.cards.size} cards · ${ix.heroes.size} heroes · ${ix.relics.size} relics · ${ix.factions.size} factions`, `Content: ${ix.snapshot.set} v${ix.snapshot.version} · การ์ด ${ix.cards.size} · Hero ${ix.heroes.size} · Relic ${ix.relics.size} · เผ่า ${ix.factions.size}`) }),
         ),
       ),
       h("div", { class: "lobby-side" }, historyPanel(ctx), leaderboardPanel()),

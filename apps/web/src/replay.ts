@@ -1,3 +1,4 @@
+import { tr } from "./i18n.js";
 import type { CombatEvent, CombatRecord } from "./protocol.js";
 
 /**
@@ -172,20 +173,20 @@ export function describe(e: CombatEvent, before: ReplayState, names: Names): str
   const name = (uid: string): string => names(find(before, uid)?.cardKey ?? uid);
   switch (e.type) {
     case "ATTACK":
-      return `${name(e.attacker)} hits ${name(e.target)} for ${e.damageToTarget} and takes ${e.damageToAttacker}`;
-    case "BARRIER_POP": return `${name(e.unit)}'s Barrier absorbs the hit`;
-    case "BUFF": return `${name(e.unit)} gets ${e.atk >= 0 ? "+" : ""}${e.atk}/${e.hp >= 0 ? "+" : ""}${e.hp}`;
-    case "EFFECT_DAMAGE": return e.amount > 0 ? `${name(e.unit)} takes ${e.amount} damage` : `${name(e.unit)} is not hurt`;
-    case "DESTROY": return `${name(e.unit)} is destroyed`;
-    case "KEYWORD": return `${name(e.unit)} gains ${e.keyword}`;
-    case "SUMMON": return `${names(e.cardKey)} appears (${e.atk}/${e.hp})`;
-    case "TRANSFORM": return `${name(e.unit)} becomes ${names(e.into)} (${e.atk}/${e.hp})`;
-    case "DEATH": return `${name(e.unit)} falls`;
-    case "REVIVE": return `${name(e.unit)} revives`;
-    case "KYODAIKA": return `${name(e.unit)} rises as a giant (${e.atk}/${e.hp})`;
-    case "GATTAI": return `${e.units.length} units merge into ${names(e.cardKey)} (${e.atk}/${e.hp})`;
-    case "ROLL_CALL": return `Roll Call! Side ${e.side} calls out the full team`;
-    case "GIANT_ENTER": return `${names(e.cardKey)} enters the fight (${e.atk}/${e.hp})`;
+      return tr(`${name(e.attacker)} hits ${name(e.target)} for ${e.damageToTarget} and takes ${e.damageToAttacker}`, `${name(e.attacker)} ตี ${name(e.target)} ${e.damageToTarget} ดาเมจ และโดนคืน ${e.damageToAttacker}`);
+    case "BARRIER_POP": return tr(`${name(e.unit)}'s Barrier absorbs the hit`, `Barrier ของ ${name(e.unit)} กันดาเมจไว้`);
+    case "BUFF": return `${name(e.unit)} ${tr("gets", "ได้")} ${e.atk >= 0 ? "+" : ""}${e.atk}/${e.hp >= 0 ? "+" : ""}${e.hp}`;
+    case "EFFECT_DAMAGE": return e.amount > 0 ? tr(`${name(e.unit)} takes ${e.amount} damage`, `${name(e.unit)} โดน ${e.amount} ดาเมจ`) : tr(`${name(e.unit)} is not hurt`, `${name(e.unit)} ไม่เป็นอะไร`);
+    case "DESTROY": return tr(`${name(e.unit)} is destroyed`, `${name(e.unit)} ถูกทำลาย`);
+    case "KEYWORD": return `${name(e.unit)} ${tr("gains", "ได้")} ${e.keyword}`;
+    case "SUMMON": return `${names(e.cardKey)} ${tr("appears", "ปรากฏตัว")} (${e.atk}/${e.hp})`;
+    case "TRANSFORM": return `${name(e.unit)} ${tr("becomes", "กลายเป็น")} ${names(e.into)} (${e.atk}/${e.hp})`;
+    case "DEATH": return `${name(e.unit)} ${tr("falls", "ล้ม")}`;
+    case "REVIVE": return `${name(e.unit)} ${tr("revives", "ฟื้นคืนชีพ")}`;
+    case "KYODAIKA": return tr(`${name(e.unit)} rises as a giant (${e.atk}/${e.hp})`, `${name(e.unit)} ขยายร่างเป็นยักษ์ (${e.atk}/${e.hp})`);
+    case "GATTAI": return tr(`${e.units.length} units merge into ${names(e.cardKey)} (${e.atk}/${e.hp})`, `${e.units.length} ยูนิตรวมร่างเป็น ${names(e.cardKey)} (${e.atk}/${e.hp})`);
+    case "ROLL_CALL": return tr(`Roll Call! Side ${e.side} calls out the full team`, `Roll Call! ฝั่ง ${e.side} ประกาศชื่อทีม`);
+    case "GIANT_ENTER": return `${names(e.cardKey)} ${tr("enters the fight", "ลงสนาม")} (${e.atk}/${e.hp})`;
   }
 }
 

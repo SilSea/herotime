@@ -1,3 +1,4 @@
+import { pick } from "./i18n.js";
 import type { CardDef, ContentSnapshot, FactionDef, HeroDef, RelicDef } from "./protocol.js";
 
 /** An uploaded file name becomes /art/<name>; a full URL or absolute path is used as it is. */
@@ -33,6 +34,11 @@ export class ContentIndex {
   heroName = (key: string): string => this.heroes.get(key)?.name ?? key;
   relicName = (key: string): string => this.relics.get(key)?.name ?? key;
   factionName = (key: string): string => this.factions.get(key)?.name ?? key;
+  /** Rules text in the current language (Thai falls back to English where none was written or generated). */
+  cardText = (key: string): string => pick(this.cards.get(key));
+  heroText = (key: string): string => pick(this.heroes.get(key));
+  relicText = (key: string): string => pick(this.relics.get(key));
+  factionText = (key: string): string => pick(this.factions.get(key));
   factionColor = (key: string): string => this.factions.get(key)?.color ?? "#888888";
 
   /** The faction colour a card is drawn with: its first faction, or neutral grey. */

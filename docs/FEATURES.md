@@ -63,6 +63,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F5.6** (P0) Giant Slot + Gauge UI (ไฟ 5 สี)
 - [x] **F5.7** (P0) Tooltip keyword/การ์ด
 - [x] **F5.10** (P0) หน้าตาแบบ Battlegrounds: โต๊ะ tavern/warband/มือ/รูป hero, การ์ดกรอบ parchment + ATK/HP gem, hover ดูการ์ดขนาดใหญ่ + คำอธิบาย keyword, banner เปลี่ยน phase, fuse bar นับเวลา
+- [x] **F5.14** (P1) 2 ภาษา TH/EN: ปุ่มสลับที่หัวจอ (หน้า login, lobby, ในเกม) จำไว้ในเครื่อง; ข้อความ UI, คำอธิบาย keyword/ability, gauge, replay, ข้อความ error ที่เจอบ่อยจาก server แปลไทย; การ์ด/Relic/Hero/เผ่ามี `textTh` สร้างอัตโนมัติจาก effect (แก้เองได้ใน Admin ช่อง "text (Thai)"); ชื่อการ์ดและ keyword คงเป็นอังกฤษ; หน้า Admin เป็นอังกฤษ
 - [x] **F5.13** (P1) Game rules ใน content (ราคา, ขนาดบอร์ด/มือ, Roll Call, Gattai, หุ่นยักษ์, Kyodaika) แก้ได้ในแท็บ Admin → Rules และ publish เป็นเวอร์ชัน; หุ่นยักษ์ได้ stat Sentai เต็ม (giantSentaiScale 1); ชี้การ์ดเห็นคำอธิบาย keyword/ability; gauge ชี้แล้วมีคำอธิบาย + ตัวอย่างการ์ด; Giant Slot ขวาสุด; ตัวบอกตำแหน่งวางตอนลาก
 - [x] **F5.12** (P1) ลากการ์ดในร้านไปที่ hero/มือ = ซื้อ, ไปที่บอร์ด = ซื้อแล้ววาง, ลากยูนิตกลับเข้าร้าน = ขาย (พื้นที่วางกว้างทั้งโซน); หนังสือการ์ดกรอง faction/keyword; คำอธิบาย Mecha/Rider Gauge; ป้าย rank ทุกคน; แพ้แล้วมีหน้าบอกอันดับ + ดูบอร์ดคนอื่น (บอร์ดตอนสู้ล่าสุด)
 - [x] **F5.11** (P0) แจ้งเมื่อการ์ดที่เพิ่งลง (Henshin Call) ทำลายยูนิตของตัวเอง
