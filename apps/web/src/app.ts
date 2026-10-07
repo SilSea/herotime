@@ -257,8 +257,8 @@ export function startApp(root: HTMLElement): void {
     const [turns, form] = (card.dataset.henshin ?? "").split("|");
     const boxes = [
       ...triggers.map((t) => box(TRIGGER_ICON[t]?.icon ?? "•", TRIGGER_ICON[t]?.name ?? t, TRIGGER_ICON[t]?.text ?? "")),
-      ...(turns ? [box("✧", `Henshin (${turns})`, `After ${turns} turn${turns === "1" ? "" : "s"} on your board, transforms into ${form}.`)] : []),
-      ...(card.dataset.core ? [box("◈", "Gattai core", `Put it leftmost of enough adjacent Gattai units and press Combine: they become ${card.dataset.core} for good.`)] : []),
+      ...(turns ? [box("✧", `Henshin (${turns})`, `อยู่บนบอร์ดครบ ${turns} เทิร์น จะแปลงร่างเป็น ${form}`)] : []),
+      ...(card.dataset.core ? [box("◈", "Gattai core", `วางไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันให้ครบจำนวน แล้วกด Combine ทั้งกลุ่มจะรวมเป็น ${card.dataset.core} ถาวร`)] : []),
       ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k), KEYWORDS[k]?.text ?? "")),
     ];
     const info = h("div", { class: "kw-boxes" }, ...boxes);

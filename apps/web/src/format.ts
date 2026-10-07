@@ -2,15 +2,15 @@ import type { CombatRecord } from "./protocol.js";
 
 /** Plain-language explanations shown when hovering a keyword. */
 export const KEYWORDS: Record<string, { name: string; text: string }> = {
-  GUARD: { name: "Guard", text: "Enemies must attack this unit before any other." },
-  BARRIER: { name: "Barrier", text: "Ignores the first damage it would take." },
-  RAPID: { name: "Rapid", text: "Attacks twice each turn." },
-  LETHAL: { name: "Lethal", text: "Any unit it damages is destroyed." },
-  REVIVE: { name: "Revive", text: "Comes back once with 1 HP after dying." },
-  RIDER_KICK: { name: "Rider Kick", text: "Its first attack of the fight deals double damage." },
-  FINAL_BLOW: { name: "Final Blow", text: "First attack deals double damage, and double again against giants." },
-  KYODAIKA: { name: "Kyodaika", text: "The first time it dies it returns as a giant with doubled stats and no keywords." },
-  GATTAI: { name: "Gattai", text: "Can be combined: with a Gattai core leftmost of 3 adjacent Gattai units, press Combine in the recruit phase and the group becomes the core's form for good." },
+  GUARD: { name: "Guard", text: "ศัตรูต้องโจมตียูนิตนี้ก่อนตัวอื่นเสมอ" },
+  BARRIER: { name: "Barrier", text: "ไม่รับดาเมจครั้งแรกที่โดน (โล่แตกแทน)" },
+  RAPID: { name: "Rapid", text: "โจมตี 2 ครั้งทุกครั้งที่ถึงตาของตัวเอง" },
+  LETHAL: { name: "Lethal", text: "ยูนิตใดที่โดนดาเมจจากตัวนี้ จะถูกทำลายทันที" },
+  REVIVE: { name: "Revive", text: "ตายครั้งแรกจะฟื้นกลับมาพร้อม HP 1" },
+  RIDER_KICK: { name: "Rider Kick", text: "การโจมตีครั้งแรกของการต่อสู้ทำดาเมจ ×2" },
+  FINAL_BLOW: { name: "Final Blow", text: "การโจมตีครั้งแรกทำดาเมจ ×2 และ ×2 อีกเท่าเมื่อตีใส่ยูนิตยักษ์" },
+  KYODAIKA: { name: "Kyodaika", text: "ตายครั้งแรกจะฟื้นเป็นร่างยักษ์ stat ×2 แต่ไม่มี keyword อื่น" },
+  GATTAI: { name: "Gattai", text: "เป็นชิ้นส่วนรวมร่างได้: วาง core ไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันครบ 3 ตัว แล้วกด Combine ช่วงซื้อของ ทั้งกลุ่มจะรวมเป็นร่างของ core ถาวร" },
 };
 
 export const keywordName = (k: string): string => KEYWORDS[k]?.name ?? k;

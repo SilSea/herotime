@@ -64,14 +64,14 @@ const KEYWORD_ICON: Record<string, string> = {
   GATTAI: "⚙",
 };
 export const TRIGGER_ICON: Record<string, { icon: string; name: string; text: string }> = {
-  LAST_STAND: { icon: "💀", name: "Last Stand", text: "Does something when this unit dies." },
-  START_OF_COMBAT: { icon: "⚔", name: "Start of combat", text: "Does something as the fight begins, before anyone attacks." },
-  END_OF_TURN: { icon: "⌛", name: "End of turn", text: "Does something when the recruit phase ends." },
-  AVENGE: { icon: "✊", name: "Avenge", text: "Does something after a number of your units have died in the fight." },
-  ON_ATTACK: { icon: "➹", name: "When it attacks", text: "Does something each time this unit attacks." },
-  AFTER_DAMAGED: { icon: "❤", name: "After it takes damage", text: "Does something when this unit is hit and survives." },
-  HENSHIN: { icon: "✧", name: "On Henshin", text: "Does something when this unit transforms." },
-  ON_PLAY: { icon: "▶", name: "Henshin Call", text: "Does something when you play this unit from your hand." },
+  LAST_STAND: { icon: "💀", name: "Last Stand", text: "ทำงานเมื่อยูนิตนี้ตาย" },
+  START_OF_COMBAT: { icon: "⚔", name: "Start of combat", text: "ทำงานตอนเริ่มการต่อสู้ ก่อนที่ใครจะโจมตี" },
+  END_OF_TURN: { icon: "⌛", name: "End of turn", text: "ทำงานตอนจบช่วงซื้อของ (ก่อนเข้าการต่อสู้)" },
+  AVENGE: { icon: "✊", name: "Avenge", text: "ทำงานเมื่อยูนิตฝ่ายเราตายครบตามจำนวนที่กำหนดระหว่างการต่อสู้" },
+  ON_ATTACK: { icon: "➹", name: "When it attacks", text: "ทำงานทุกครั้งที่ยูนิตนี้โจมตี" },
+  AFTER_DAMAGED: { icon: "❤", name: "After it takes damage", text: "ทำงานเมื่อยูนิตนี้โดนโจมตีแล้วยังไม่ตาย" },
+  HENSHIN: { icon: "✧", name: "On Henshin", text: "ทำงานเมื่อยูนิตนี้แปลงร่าง (Henshin)" },
+  ON_PLAY: { icon: "▶", name: "Henshin Call", text: "ทำงานเมื่อคุณลงยูนิตนี้จากมือ" },
 };
 
 export const KEYWORD_ICON_OF = (k: string): string => KEYWORD_ICON[k] ?? "•";
