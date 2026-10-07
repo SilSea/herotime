@@ -1,7 +1,7 @@
 import { formatClock } from "../clock.js";
 import { boardLabel, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars } from "../format.js";
 import { tr } from "../i18n.js";
-import { langToggle } from "./lang.js";
+import { langToggle, muteToggle } from "./lang.js";
 import type { MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
@@ -114,6 +114,7 @@ function topBar(ctx: Ctx, view: View): HTMLElement {
       h("button", { class: `btn ${state.showLog ? "on" : ""}`, text: tr("Log", "บันทึก"), title: "L", on: { click: () => ctx.store.set({ showLog: !state.showLog }) } }),
       view.phase !== "ENDED" && me.alive && h("button", { class: "btn danger", text: tr("Surrender", "ยอมแพ้"), title: tr("Give up and take your current place", "ยอมแพ้และรับอันดับปัจจุบัน"), on: { click: () => void surrender(ctx, view) } }),
       out && h("button", { class: "btn", text: tr("Leave match", "ออกจากเกม"), on: { click: () => void ctx.leaveMatch() } }),
+      muteToggle(ctx.store),
       langToggle(ctx.store),
     ),
   );

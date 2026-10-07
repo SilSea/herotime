@@ -2,6 +2,7 @@ import { tr } from "../i18n.js";
 import type { ContentIndex } from "../content-index.js";
 import type { CombatRecord } from "../protocol.js";
 import { buildSteps, pickDelay, stepWeight, type Fighter, type ReplayState, type Step } from "../replay.js";
+import { cueForEvent, play, splashForEvent } from "../sound.js";
 import { cardEl } from "./card.js";
 import { h, mount } from "./dom.js";
 
@@ -76,6 +77,11 @@ export class ReplayView {
     const dying = step.event.type === "DEATH" && !step.event.returns ? [step.event.unit] : [];
     this.draw(dying.length > 0 ? prev : step.state, step.focus, step, dying);
     this.log(step.text);
+    const cue = cueForEvent(step.event.type);
+    if (cue) play(cue);
+    const splash = splashForEvent(step.event.type);
+    if (splash) this.splash(splash, step.event.type);
+    if (this.done) play(this.record.result.winner === this.record.meSide ? "win" : this.record.result.winner === "DRAW" ? "hit" : "lose");
     this.drawControls();
     this.schedule(this.baseDelay * stepWeight(step.event));
   }
@@ -87,6 +93,13 @@ export class ReplayView {
     this.index = this.steps.length - 1;
     this.draw(last?.state ?? this.initial, [], undefined);
     this.drawControls();
+  }
+
+  /** A burst of big words over the field (henshin, gattai, giant...), gone after its animation. */
+  private splash(text: string, kind: string): void {
+    const el = h("div", { class: `vfx-splash vfx-${kind.toLowerCase().replace(/_/g, "-")}`, text });
+    (this.field.parentElement ?? this.root).append(el);
+    window.setTimeout(() => el.remove(), 1200);
   }
 
   private log(text: string): void {

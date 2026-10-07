@@ -7,7 +7,8 @@ import { adminHasFocus, renderAdmin, resetAdmin } from "./ui/admin.js";
 import { KEYWORD_ICON_OF, triggerInfo } from "./ui/card.js";
 import { keywordName, keywordText } from "./format.js";
 import { serverText, tr } from "./i18n.js";
-import { langToggle } from "./ui/lang.js";
+import { cueForIntent, play } from "./sound.js";
+import { langToggle, muteToggle } from "./ui/lang.js";
 import { renderAuth } from "./ui/auth.js";
 import type { Ctx } from "./ui/ctx.js";
 import { h, mount } from "./ui/dom.js";
@@ -75,7 +76,19 @@ export function startApp(root: HTMLElement): void {
       pendingIntents.add(key);
       try {
         const ack = await net.intent(intent);
-        if (!ack.ok) toast(serverText(ack.error), "error");
+        if (!ack.ok) {
+          toast(serverText(ack.error), "error");
+          play("error");
+        } else {
+          const cue = cueForIntent(intent.type);
+          if (cue) play(cue);
+          // Combining a Gattai group in the recruit phase gets the same burst as a merge in a fight.
+          if (intent.type === "COMBINE") {
+            const el = h("div", { class: "vfx-splash vfx-gattai vfx-screen", text: "GATTAI!" });
+            document.body.append(el);
+            window.setTimeout(() => el.remove(), 1200);
+          }
+        }
         return ack.ok;
       } finally {
         pendingIntents.delete(key);
@@ -158,6 +171,7 @@ export function startApp(root: HTMLElement): void {
         h("nav", { class: "tabs" }, nav("lobby", tr("Play", "เล่น")), nav("library", tr("Library", "คลังการ์ด")), s.user?.role === "ADMIN" && nav("admin", "Admin")),
         h("span", { class: "spacer" }),
         !s.connected && h("span", { class: "conn bad", text: tr("reconnecting...", "กำลังเชื่อมต่อใหม่...") }),
+        muteToggle(store),
         langToggle(store),
         h("span", { class: "muted", text: s.user?.username ?? "" }),
         h("button", { class: "btn", text: tr("Log out", "ออกจากระบบ"), on: { click: () => ctx().logout() } }),

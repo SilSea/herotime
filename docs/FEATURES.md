@@ -67,8 +67,8 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F5.13** (P1) Game rules ใน content (ราคา, ขนาดบอร์ด/มือ, Roll Call, Gattai, หุ่นยักษ์, Kyodaika) แก้ได้ในแท็บ Admin → Rules และ publish เป็นเวอร์ชัน; หุ่นยักษ์ได้ stat Sentai เต็ม (giantSentaiScale 1); ชี้การ์ดเห็นคำอธิบาย keyword/ability; gauge ชี้แล้วมีคำอธิบาย + ตัวอย่างการ์ด; Giant Slot ขวาสุด; ตัวบอกตำแหน่งวางตอนลาก
 - [x] **F5.12** (P1) ลากการ์ดในร้านไปที่ hero/มือ = ซื้อ, ไปที่บอร์ด = ซื้อแล้ววาง, ลากยูนิตกลับเข้าร้าน = ขาย (พื้นที่วางกว้างทั้งโซน); หนังสือการ์ดกรอง faction/keyword; คำอธิบาย Mecha/Rider Gauge; ป้าย rank ทุกคน; แพ้แล้วมีหน้าบอกอันดับ + ดูบอร์ดคนอื่น (บอร์ดตอนสู้ล่าสุด)
 - [x] **F5.11** (P0) แจ้งเมื่อการ์ดที่เพิ่งลง (Henshin Call) ทำลายยูนิตของตัวเอง
-- [ ] **F5.8** (P1) เสียง, VFX แปลงร่าง/รวมร่าง
-- [ ] **F5.9** (P2) Mobile layout
+- [x] **F5.8** (P1) เสียง, VFX แปลงร่าง/รวมร่าง: เสียงสังเคราะห์ด้วย Web Audio (ไม่มีไฟล์เสียง) ทุก action และทุก event ใน replay, ปุ่มเปิด/ปิดเสียง (จำในเครื่อง); ตัวอักษรใหญ่ HENSHIN! / GATTAI! / KYODAI GATTAI! / KYODAIKA! / ROLL CALL! ใน replay และตอนกด Combine
+- [x] **F5.9** (P2) Mobile layout: จอ ≤640px จัดเป็นคอลัมน์เดียว การ์ดเล็กลง ไม่มีสกรอลแนวนอน; จอสัมผัส (ไม่มี hover) ปุ่ม Play/Use/Sell โชว์ตลอด เพราะลากวางใช้ได้กับเมาส์เท่านั้น
 
 ## F6. Admin Editor
 - [x] **F6.1** (P0) CRUD Card / Hero / Relic / Faction / Series / Gauge (Keyword ยังเป็น enum ใน engine)
