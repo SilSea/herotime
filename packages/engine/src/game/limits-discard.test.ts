@@ -13,8 +13,8 @@ const world = content({
   cards: [
     card("small", { rank: 1, atk: 1, hp: 1 }),
     card("big", { rank: 5, atk: 9, hp: 9, factions: ["kaijin"] }),
-    // eats a tavern unit at the end of each turn, but only once per turn and only rank 2 or lower
-    card("eater", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "END_OF_TURN", target: { selector: "SELF" }, limit: { times: 1, per: "TURN" }, actions: [{ type: "DEVOUR_SHOP", maxRank: 2 }] })] }),
+    // eats the weakest tavern unit at the end of each turn, but only once per turn
+    card("eater", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "END_OF_TURN", target: { selector: "SELF" }, limit: { times: 1, per: "TURN" }, actions: [{ type: "DEVOUR_SHOP", choose: "WEAKEST" }] })] }),
     card("restless", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "ON_DISCARD", repeat: 2, actions: [{ type: "GAIN_ENERGY", amount: 1 }] })] }),
     card("thrower", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "ON_PLAY", actions: [{ type: "DISCARD", count: 1, pick: "LEFTMOST", cardKind: "UNIT" }] })] }),
     card("charm", { kind: "GEAR", rank: 1, cost: 1, token: true, effects: [effect({ scope: "PLAYER", trigger: "ON_DISCARD", actions: [{ type: "GAIN_ENERGY", amount: 3 }] })] }),
@@ -37,9 +37,9 @@ describe("limited effects", () => {
     beginTurn(p, 2, e);
     p.shop = ["small", "big"];
     fire();
-    expect(p.shop).toEqual(["big"]); // the rank 5 unit is never eaten (maxRank 2)
-    fire();
     expect(p.shop).toEqual(["big"]);
+    fire();
+    expect(p.shop).toEqual(["big"]); // once per turn: the second firing eats nothing
   });
 
   it("per game: the count never resets", () => {

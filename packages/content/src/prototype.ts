@@ -152,8 +152,8 @@ const cards = [
   unit("x_trader", "Lucky Trader", { rank: 1, atk: 1, hp: 2, effects: [onSell(randomCard("GEAR"), { repeat: 2 })] }),
   unit("x_scavenger", "Market Scout", { rank: 2, atk: 2, hp: 2, factions: ["ally"], effects: [endOfTurn(buffShop(1, 1))] }),
   unit("x_drill", "Drill Sergeant", { rank: 3, atk: 3, hp: 4, effects: [endOfTurn(give("GUARD"), { target: { selector: "RIGHTMOST_FRIENDLY" } })] }),
-  // eats at the end of each turn, at most once per turn, only small fry (rank 2 or lower)
-  unit("x_devourer", "Tavern Devourer", { rank: 3, atk: 2, hp: 3, factions: ["kaijin"], effects: [endOfTurn(devourShop(2, undefined, "STRONGEST"), { target: self, limit: { times: 1, per: "TURN" } })] }),
+  // eats the strongest unit in the tavern at the end of each turn, at most once per turn
+  unit("x_devourer", "Tavern Devourer", { rank: 3, atk: 2, hp: 3, factions: ["kaijin"], effects: [endOfTurn(devourShop("STRONGEST"), { target: self, limit: { times: 1, per: "TURN" } })] }),
   unit("x_grave", "Grave Caller", { rank: 2, atk: 3, hp: 2, effects: [deploy(discard(1, "RANDOM", "UNIT"))] }),
   unit("x_restless", "Restless Spirit", { rank: 1, atk: 1, hp: 1, effects: [onDiscard(buff(2, 2), { target: allAllies(), repeat: 2 })] }),
   unit("x_caller", "Den Caller", { rank: 4, atk: 3, hp: 5, factions: ["beast"], effects: [startOfCombat(summonFromHand(1))] }),

@@ -126,13 +126,12 @@ export const Action = z.discriminatedUnion("type", [
   z.object({ type: z.literal("BUFF_SHOP"), atk: amount.default(1), hp: amount.default(1) }),
   /**
    * Recruit only: eat a random unit from your tavern; each target gains its ATK/HP for good. Only units of
-   * at most `maxRank` / of `faction` can be eaten when those are set.
+   * of `faction` can be eaten when it is set.
    */
   z.object({
     type: z.literal("DEVOUR_SHOP"),
     /** Which tavern unit: a random one, the one with the most ATK+HP, or the one with the least. */
     choose: z.enum(["RANDOM", "STRONGEST", "WEAKEST"]).default("RANDOM"),
-    maxRank: z.number().int().min(1).max(6).optional(),
     faction: z.string().optional(),
   }),
   /**

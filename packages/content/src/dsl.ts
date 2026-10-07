@@ -35,7 +35,7 @@ export const superGattai = (atk = 4, hp = 4): Action => ({ type: "SUPER_GATTAI",
 export const ultimateForm = (): Action => ({ type: "ULTIMATE_FORM" });
 export const randomCard = (cardKind: "GEAR" | "UNIT" = "GEAR", faction?: string): Action => ({ type: "RANDOM_CARD", cardKind, ...(faction ? { faction } : {}) });
 export const buffShop = (atk: number, hp: number): Action => ({ type: "BUFF_SHOP", atk, hp });
-export const devourShop = (maxRank?: number, faction?: string, choose: "RANDOM" | "STRONGEST" | "WEAKEST" = "RANDOM"): Action => ({ type: "DEVOUR_SHOP", choose, ...(maxRank ? { maxRank } : {}), ...(faction ? { faction } : {}) });
+export const devourShop = (choose: "RANDOM" | "STRONGEST" | "WEAKEST" = "RANDOM", faction?: string): Action => ({ type: "DEVOUR_SHOP", choose, ...(faction ? { faction } : {}) });
 export const discard = (count = 1, pick: "RANDOM" | "LEFTMOST" | "RIGHTMOST" = "RANDOM", cardKind: "ANY" | "UNIT" | "GEAR" = "ANY"): Action => ({ type: "DISCARD", count, pick, cardKind });
 export const summonFromHand = (count = 1): Action => ({ type: "SUMMON_FROM_HAND", count });
 export const discoverUnit = (faction?: string): Action => (faction ? { type: "DISCOVER_UNIT", faction } : { type: "DISCOVER_UNIT" });

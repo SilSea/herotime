@@ -88,7 +88,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "RANDOM_CARD": return `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${names(a.faction)}` : ""}แบบสุ่มเข้ามือ`;
     case "ULTIMATE_FORM": return `เปลี่ยน${t}เป็นร่าง Ultimate`;
     case "BUFF_SHOP": return `ยูนิตในร้านได้ ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
-    case "DEVOUR_SHOP": return `กลืนกินยูนิต${a.faction ? ` ${names(a.faction)}` : ""}ในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"}${a.maxRank ? ` (rank ไม่เกิน ${a.maxRank})` : ""} แล้วให้ค่าพลังของมันกับ${t}`;
+    case "DEVOUR_SHOP": return `กลืนกินยูนิต${a.faction ? ` ${names(a.faction)}` : ""}ในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"} แล้วให้ค่าพลังของมันกับ${t}`;
     case "DISCARD": {
       const what = a.cardKind === "GEAR" ? "Gear" : a.cardKind === "UNIT" ? "ยูนิต" : "การ์ด";
       const which = a.pick === "LEFTMOST" ? "ซ้ายสุด" : a.pick === "RIGHTMOST" ? "ขวาสุด" : "แบบสุ่ม";

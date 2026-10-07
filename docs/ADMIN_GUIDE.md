@@ -213,7 +213,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `RANDOM_CARD` | ได้การ์ด**สุ่ม**เข้ามือ: `GEAR` = Gear ในร้านที่ rank ≤ ร้านเรา, `UNIT` = ยูนิตจากกองกลาง (กรองเผ่าได้) — ถ้าอยากได้**ใบที่กำหนด**ใช้ `ADD_TO_HAND` (ใส่ได้ทั้ง Gear และยูนิต) | ซื้อของเท่านั้น |
 | `ULTIMATE_FORM` | เปลี่ยน/อัปเกรดร่างเป้าหมายเป็น `ultimateInto` ของการ์ดนั้น (ใช้กับยูนิตบนบอร์ดหรือหุ่น `GIANT_SLOT`) | ซื้อของเท่านั้น |
 | `BUFF_SHOP` | ยูนิตในร้านค้าได้ +atk/+hp จนจบเกม (ซื้อไปแล้วติดตัว) | ซื้อของเท่านั้น |
-| `DEVOUR_SHOP` | กลืนกินยูนิตในร้าน 1 ตัว เป้าหมายได้ ATK/HP ของมันถาวร · `choose`: สุ่ม / ค่าพลังมากสุด / น้อยสุด (ATK+HP) · จำกัดได้ว่ากินเฉพาะ rank ไม่เกิน X หรือเฉพาะเผ่า · ใช้ `limit` กันกินรัวๆ | ซื้อของเท่านั้น |
+| `DEVOUR_SHOP` | กลืนกินยูนิตในร้าน 1 ตัว เป้าหมายได้ ATK/HP ของมันถาวร · `choose`: สุ่ม / ค่าพลังมากสุด / น้อยสุด (ATK+HP) · จำกัดได้ว่ากินเฉพาะเผ่า · ใช้ `limit` กันกินรัวๆ | ซื้อของเท่านั้น |
 | `DISCARD` | **ทิ้งการ์ดในมือ** `count` ใบ: สุ่ม / ซ้ายสุด / ขวาสุด · เลือกได้ว่าการ์ดอะไรก็ได้ / เฉพาะยูนิต / เฉพาะ Gear · การ์ดที่ถูกทิ้งจะทำผล `ON_DISCARD` ของมัน | ซื้อของเท่านั้น |
 | `SUMMON_FROM_HAND` | เรียกยูนิตจากบนมือ: ช่วงซื้อของ = การ์ดออกจากมือลงบอร์ด (ไม่ทำ Deploy), ตอนต่อสู้ = สำเนาของยูนิตบนมือลงสนาม (การ์ดยังอยู่ในมือ) | ทั้งคู่ |
 | `SUPER_GATTAI` | ปลด Super Gattai (หุ่น +atk/+hp และได้ keyword ของ Extra Ranger เมื่อมี Extra บนบอร์ด) | ซื้อของเท่านั้น |
@@ -236,7 +236,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | ขายการ์ดนี้แล้วมีผล 2 ครั้ง | `ON_SELL` · action อะไรก็ได้ช่วงซื้อของ · happens 2 times |
 | การ์ดที่สั่งทิ้งการ์ด | `ON_PLAY` · `DISCARD` count=1 pick=RANDOM cardKind=UNIT |
 | ถูกทิ้งแล้วมีผล 2 ครั้ง | `ON_DISCARD` · target `ALL_FRIENDLY` · `BUFF` 2/2 · happens 2 times |
-| จบเทิร์นกินตัวแรงสุดในร้าน เทิร์นละครั้ง | `END_OF_TURN` · target `SELF` · `DEVOUR_SHOP` choose=STRONGEST (maxRank=2) · limit at most 1 per TURN |
+| จบเทิร์นกินตัวแรงสุดในร้าน เทิร์นละครั้ง | `END_OF_TURN` · target `SELF` · `DEVOUR_SHOP` choose=STRONGEST · limit at most 1 per TURN |
 | Deploy ของทุกใบทำงาน 2 ครั้ง | ใส่ keyword `ECHO` (ระหว่างมันอยู่บนบอร์ด) |
 | Gear เปลี่ยนร่าง Rider เป็นร่างของซีรีส์ | Gear · target `CHOSEN_FRIENDLY` faction=rider · `ULTIMATE_FORM` (+ BUFF) และตั้ง `ultimate form` ให้การ์ด Rider แต่ละใบ |
 | Gear อัปเกรดหุ่น Sentai | Gear · target `GIANT_SLOT` · `ULTIMATE_FORM` และตั้ง `ultimate form` ให้การ์ดหุ่น (kind GIANT) |

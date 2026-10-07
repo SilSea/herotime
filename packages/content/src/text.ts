@@ -90,7 +90,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "RANDOM_CARD": return `add a random ${a.faction ? `${names(a.faction)} ` : ""}${a.cardKind === "GEAR" ? "Gear" : "unit"} to your hand`;
     case "ULTIMATE_FORM": return `turn ${t} into its Ultimate Form`;
     case "BUFF_SHOP": return `units in your tavern get ${signed(a.atk)}/${signed(a.hp)} for the rest of the game`;
-    case "DEVOUR_SHOP": return `devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} ${a.faction ? `${names(a.faction)} ` : ""}unit${a.maxRank ? ` of rank ${a.maxRank} or lower` : ""} in your tavern and give its stats to ${t}`;
+    case "DEVOUR_SHOP": return `devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} ${a.faction ? `${names(a.faction)} ` : ""}unit in your tavern and give its stats to ${t}`;
     case "DISCARD": {
       const what = a.cardKind === "GEAR" ? "Gear" : a.cardKind === "UNIT" ? "unit" : "card";
       const which = a.pick === "LEFTMOST" ? "your leftmost" : a.pick === "RIGHTMOST" ? "your rightmost" : "a random";

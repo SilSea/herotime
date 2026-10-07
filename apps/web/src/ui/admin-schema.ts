@@ -108,7 +108,6 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
   ],
   DEVOUR_SHOP: [
     { key: "choose", field: { kind: "enum", options: ["RANDOM", "STRONGEST", "WEAKEST"] }, hint: "STRONGEST / WEAKEST: by ATK+HP" },
-    { key: "maxRank", label: "only rank at most", field: int(1, 6), optional: true, hint: "Leave unticked to eat any rank" },
     { key: "faction", label: "only faction", field: { kind: "ref", to: "factions" }, optional: true },
   ],
   DISCARD: [

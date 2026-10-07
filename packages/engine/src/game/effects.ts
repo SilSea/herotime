@@ -237,7 +237,7 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       for (let n = 0; n < mult; n++) {
         const edible = player.shop.flatMap((k, i) => {
           const d = env.content.card(k);
-          return (action.maxRank === undefined || d.rank <= action.maxRank) && (action.faction === undefined || d.factions.includes(action.faction)) ? [i] : [];
+          return action.faction === undefined || d.factions.includes(action.faction) ? [i] : [];
         });
         if (edible.length === 0) break;
         const power = (i: number): number => {
