@@ -70,7 +70,7 @@ describe("buyUnit", () => {
 });
 
 describe("playUnit", () => {
-  it("runs Henshin Call (ON_PLAY) effects on the new unit", () => {
+  it("runs Deploy (ON_PLAY) effects on the new unit", () => {
     p.board = [u("grunt"), u("drone")];
     p.hand = [u("shield_bearer")];
     playUnit(p, 0, 1, env);

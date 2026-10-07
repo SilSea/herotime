@@ -106,7 +106,7 @@ export function applyView(state: AppState, msg: ViewMessage, clock: ServerClock,
 }
 
 /**
- * Units that left the board because of a card just played from hand (a Henshin Call that destroys an ally).
+ * Units that left the board because of a card just played from hand (a Deploy that destroys an ally).
  * Selling and triples do not count: selling does not shrink the hand, and a triple adds a Final Form.
  */
 export function unitsLostToPlay(state: AppState, view: ViewMessage["view"], newMatch: boolean): string[] {

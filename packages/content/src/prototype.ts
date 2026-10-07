@@ -15,7 +15,7 @@ import {
   gear,
   give,
   giant,
-  henshinCall,
+  deploy,
   hero,
   lastStand,
   onAttack,
@@ -97,7 +97,7 @@ const cards = [
   // ---- rider
   unit("rd1", "Rookie Rider", { rank: 1, atk: 2, hp: 2, factions: ["rider"], series: R, henshin: { after: 2, into: "rider_form" } }),
   unit("rd2", "Bike Rider", { rank: 2, atk: 3, hp: 3, factions: ["rider"], series: R, keywords: ["RIDER_KICK"] }),
-  unit("rd3", "Hopper Rider", { rank: 3, atk: 3, hp: 4, factions: ["rider"], series: R, effects: [henshinCall(buff(1, 1), { target: adjacent })] }),
+  unit("rd3", "Hopper Rider", { rank: 3, atk: 3, hp: 4, factions: ["rider"], series: R, effects: [deploy(buff(1, 1), { target: adjacent })] }),
   unit("rd4", "Armored Rider", { rank: 4, atk: 5, hp: 5, factions: ["rider"], series: R, henshin: { after: 2, into: "super_form" } }),
   unit("rd5", "Time Rider", { rank: 5, atk: 7, hp: 8, factions: ["rider"], series: R, effects: [startOfCombat(buff(2, 0), { target: allAllies({ faction: "rider" }) })] }),
   unit("rd6", "Final Rider", { rank: 6, atk: 10, hp: 10, factions: ["rider"], series: R, keywords: ["RIDER_KICK"], effects: [startOfCombat(give("RIDER_KICK"), { target: allAllies({ faction: "rider" }) })] }),
@@ -146,17 +146,17 @@ const cards = [
 
   // ---- ally (economy and support)
   unit("al1", "Cafe Owner", { rank: 1, atk: 1, hp: 2, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { condition: energyAtLeast(1), target: randomAlly() })] }),
-  unit("al2", "Mechanic", { rank: 2, atk: 1, hp: 3, factions: ["ally"], effects: [henshinCall(energy(2))] }),
-  unit("al3", "Informant", { rank: 3, atk: 3, hp: 4, factions: ["ally"], effects: [henshinCall(toHand("al1"))] }),
+  unit("al2", "Mechanic", { rank: 2, atk: 1, hp: 3, factions: ["ally"], effects: [deploy(energy(2))] }),
+  unit("al3", "Informant", { rank: 3, atk: 3, hp: 4, factions: ["ally"], effects: [deploy(toHand("al1"))] }),
   unit("al4", "Mentor", { rank: 4, atk: 4, hp: 6, factions: ["ally"], effects: [endOfTurn(buff(2, 2), { target: leftmost() })] }),
   unit("al5", "Veteran Coach", { rank: 5, atk: 5, hp: 8, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: randomAlly() })] }),
   unit("al6", "Base Commander", { rank: 6, atk: 6, hp: 10, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: allAllies() })] }),
 
   // ---- dark rider (sacrifice: destroys a random ally, then grows; alone it just grows)
-  unit("dr1", "Shadow Rider", { rank: 1, atk: 2, hp: 2, factions: ["dark_rider"], series: R, effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(2, 2), { target: self })] }),
-  unit("dr2", "Night Hopper", { rank: 2, atk: 4, hp: 3, factions: ["dark_rider"], series: R, effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(3, 3), { target: self })] }),
+  unit("dr1", "Shadow Rider", { rank: 1, atk: 2, hp: 2, factions: ["dark_rider"], series: R, effects: [deploy(destroy(), { target: randomAlly() }), deploy(buff(2, 2), { target: self })] }),
+  unit("dr2", "Night Hopper", { rank: 2, atk: 4, hp: 3, factions: ["dark_rider"], series: R, effects: [deploy(destroy(), { target: randomAlly() }), deploy(buff(3, 3), { target: self })] }),
   unit("dr3", "Dark Armor", { rank: 3, atk: 5, hp: 6, factions: ["dark_rider"], series: R, keywords: ["BARRIER"] }),
-  unit("dr4", "Dark Kabuto", { rank: 4, atk: 7, hp: 6, factions: ["dark_rider"], series: R, keywords: ["RIDER_KICK"], effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(2, 2), { target: self })] }),
+  unit("dr4", "Dark Kabuto", { rank: 4, atk: 7, hp: 6, factions: ["dark_rider"], series: R, keywords: ["RIDER_KICK"], effects: [deploy(destroy(), { target: randomAlly() }), deploy(buff(2, 2), { target: self })] }),
   unit("dr5", "Dark Emperor", { rank: 5, atk: 9, hp: 9, factions: ["dark_rider"], series: R, keywords: ["RIDER_KICK"] }),
   unit("dr6", "Dark Lord", { rank: 6, atk: 14, hp: 12, factions: ["dark_rider"], series: R, keywords: ["RIDER_KICK", "REVIVE"] }),
 ];

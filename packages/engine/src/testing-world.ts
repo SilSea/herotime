@@ -34,7 +34,7 @@ export function buildWorld(): Content {
         }),
       ],
     }),
-    // Henshin Call: give the unit to the right a Guard
+    // Deploy: give the unit to the right a Guard
     card("shield_bearer", {
       rank: 2, atk: 1, hp: 3,
       effects: [effect({ trigger: "ON_PLAY", target: { selector: "ADJACENT" }, actions: [{ type: "GIVE_KEYWORD", keyword: "GUARD" }] })],

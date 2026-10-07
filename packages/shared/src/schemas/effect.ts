@@ -23,7 +23,7 @@ export type OwnerScope = z.infer<typeof OwnerScope>;
 
 export const Trigger = z.enum([
   // unit effects
-  "ON_PLAY", // Henshin Call: unit placed on the board (also: a Gear card being used)
+  "ON_PLAY", // Deploy: unit placed on the board (also: a Gear card being used)
   "END_OF_TURN",
   "HENSHIN", // the unit transformed (also a Gauge source: any friendly Henshin)
   "START_OF_COMBAT",

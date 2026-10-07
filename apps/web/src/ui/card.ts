@@ -75,7 +75,7 @@ const TRIGGERS: Record<string, { icon: string; name: [string, string]; text: [st
   AFTER_DAMAGED: { icon: "❤", name: ["After it takes damage", "เมื่อโดนดาเมจแล้วยังรอด"], text: ["Does something when this unit is hit and survives.", "ทำงานเมื่อยูนิตนี้โดนโจมตีแล้วยังไม่ตาย"] },
   HENSHIN: { icon: "✧", name: ["On Henshin", "เมื่อแปลงร่าง"], text: ["Does something when this unit transforms.", "ทำงานเมื่อยูนิตนี้แปลงร่าง (Henshin)"] },
   ALLY_SUMMONED: { icon: "✚", name: ["When you summon", "เมื่อเรียกยูนิต"], text: ["Does something each time another unit is summoned onto your side (in the tavern or in a fight).", "ทำงานทุกครั้งที่มียูนิตตัวอื่นถูกเรียกเข้าฝั่งเรา (ทั้งช่วงซื้อของและตอนต่อสู้)"] },
-  ON_PLAY: { icon: "▶", name: ["Henshin Call", "Henshin Call"], text: ["Does something when you play this unit from your hand.", "ทำงานเมื่อคุณลงยูนิตนี้จากมือ"] },
+  ON_PLAY: { icon: "▶", name: ["Deploy", "Deploy (ลงสนาม)"], text: ["Does something when you play this unit from your hand onto the board.", "ทำงานเมื่อคุณลงยูนิตนี้จากมือ"] },
 };
 
 /** A kind of ability a card shows an icon for, named and explained in the current language. */

@@ -19,7 +19,7 @@ const KEYWORD: Record<KeywordKey, string> = {
 };
 
 const TRIGGER: Record<Trigger, string> = {
-  ON_PLAY: "Henshin Call",
+  ON_PLAY: "Deploy",
   END_OF_TURN: "จบเทิร์น",
   HENSHIN: "เมื่อแปลงร่าง",
   START_OF_COMBAT: "เริ่มการต่อสู้",
@@ -131,7 +131,7 @@ export function cardTextTh(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): แปลงร่างเป็น ${names(c.henshin.into)}`);
   if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
-  for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Henshin Call: /, "ใช้: ") : effectTextTh(e, names));
+  for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names));
   return lines.join(" · ");
 }
 

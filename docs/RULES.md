@@ -55,7 +55,7 @@
 | **Kaijin** | สัตว์ประหลาด/ปีศาจ | **Kyodaika**: ตายครั้งแรกฟื้นเป็นร่างยักษ์ |
 | **Beast** | ฝูงสัตว์ | **เรียกพวก**: เรียกยูนิตเข้าสนามตอนโจมตี/ตอนตาย/เริ่มสู้ + จ่าฝูง (trigger `ALLY_SUMMONED`) บัฟทุกตัวที่ถูกเรียกเข้ามาใหม่ |
 | **Ally** | พลเรือน/ทีม support | economy และ support: ได้ Energy, เพิ่มการ์ดเข้ามือ, บัฟ ally ตอนจบเทิร์น (ลดราคา/บัฟการ์ดในมือ: ยังไม่มีการ์ดที่ทำ) |
-| **Dark Rider** | ไรเดอร์ฝ่ายร้าย | sacrifice: Henshin Call ทำลาย ally สุ่ม 1 ตัว แล้วตัวเองได้ stat ตายตัว (ขโมย stat/keyword ของตัวที่ทำลาย: ยังไม่มี action นี้ใน engine) |
+| **Dark Rider** | ไรเดอร์ฝ่ายร้าย | sacrifice: Deploy ทำลาย ally สุ่ม 1 ตัว แล้วตัวเองได้ stat ตายตัว (ขโมย stat/keyword ของตัวที่ทำลาย: ยังไม่มี action นี้ใน engine) |
 
 ยูนิต 1 ตัวมีได้หลาย Faction หรือเป็น **Neutral**
 
@@ -104,7 +104,7 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 | Guard | Taunt | ศัตรูต้องตีตัวนี้ก่อน |
 | Barrier | Divine Shield | กันดาเมจได้ 1 ครั้ง |
 | Last Stand | Deathrattle | ทำงานตอนตาย |
-| Henshin Call | Battlecry | ทำงานตอนวางจาก hand |
+| Deploy | Battlecry | ทำงานตอนวางจาก hand |
 | Rapid | Windfury | ตี 2 ครั้ง |
 | Lethal | Poisonous | ทำดาเมจโดน = ตายทันที |
 | Revive | Reborn | ฟื้นครั้งเดียว HP 1 |
@@ -155,9 +155,9 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 
 | Franchise | Series | Signature | กลไก |
 |---|---|---|---|
-| Sentai | **Gokaiger** | Gokai Change | Henshin Call: copy keyword 1 อย่างจาก Sentai ตัวอื่นบนบอร์ด |
+| Sentai | **Gokaiger** | Gokai Change | Deploy: copy keyword 1 อย่างจาก Sentai ตัวอื่นบนบอร์ด |
 | Sentai | **Kyoryuger** | Brave | ตีแล้วศัตรูตาย = ได้ 1 stack, ครบ 3 ได้ +ATK ถาวร; Giant Robo เลือก keyword ตอนเรียก |
-| Sentai | **Shinkenger** | Mojikara | Henshin Call: ให้ยูนิตข้างเคียง 1 keyword (Guard / Barrier / Rapid) |
+| Sentai | **Shinkenger** | Mojikara | Deploy: ให้ยูนิตข้างเคียง 1 keyword (Guard / Barrier / Rapid) |
 | Rider | **W** | Pair | ยูนิต W 2 ตัวอยู่ติดกัน รวมเป็นตัวเดียวตอนเริ่มสู้ ได้ keyword ของทั้งสองครึ่ง |
 | Rider | **Den-O** | Imagin Possession | วาง Imagin ทับยูนิตอื่น ให้ stat + keyword (Imagin ไม่กินช่องบอร์ด) |
 | Rider | **OOO** | Medal Combo | สะสม Medal 3 สี, ครบ 3 เหรียญสีเดียวกัน → Combo Form + bonus ตามสี |
@@ -189,7 +189,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 ### 12.1 Triggers
 | ระดับ | Trigger |
 |---|---|
-| ยูนิต | `ON_PLAY` (Henshin Call), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย) |
+| ยูนิต | `ON_PLAY` (Deploy), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย) |
 | ผู้เล่น | `ON_ACQUIRE` (เลือก Relic/Hero), `ON_TURN_START`, `ON_USE` (Hero Power), `START_OF_COMBAT` (Relic/Series Bond), `ON_PLAY` (Gear) |
 | แหล่ง Gauge | `ON_ROLL_CALL`, `ON_ROLL_CALL_WIN`, `HENSHIN` |
 

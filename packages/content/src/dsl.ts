@@ -84,7 +84,7 @@ export function player(trigger: Trigger, actions: Action | Action[], o: EffectOp
 
 export const lastStand = (a: Action | Action[], o?: EffectOptions) => on("LAST_STAND", a, o);
 export const startOfCombat = (a: Action | Action[], o?: EffectOptions) => on("START_OF_COMBAT", a, o);
-export const henshinCall = (a: Action | Action[], o?: EffectOptions) => on("ON_PLAY", a, o);
+export const deploy = (a: Action | Action[], o?: EffectOptions) => on("ON_PLAY", a, o);
 export const endOfTurn = (a: Action | Action[], o?: EffectOptions) => on("END_OF_TURN", a, o);
 export const onAttack = (a: Action | Action[], o?: EffectOptions) => on("ON_ATTACK", a, o);
 export const afterDamaged = (a: Action | Action[], o?: EffectOptions) => on("AFTER_DAMAGED", a, o);

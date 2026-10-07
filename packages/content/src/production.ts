@@ -13,7 +13,7 @@ import {
   gear,
   give,
   giant,
-  henshinCall,
+  deploy,
   hero,
   lastStand,
   leftmost,
@@ -86,7 +86,7 @@ const allSeries = [
 type Color = "RED" | "BLUE" | "YELLOW" | "GREEN" | "PINK" | "EXTRA";
 
 /** A ranger: the standard Team-Up effect for its rank plus whatever its series adds. */
-function ranger(key: string, name: string, rank: number, atk: number, hp: number, seriesKey: string, color: Color, extra: ReturnType<typeof henshinCall>[] = [], keywords: Parameters<typeof unit>[2]["keywords"] = []) {
+function ranger(key: string, name: string, rank: number, atk: number, hp: number, seriesKey: string, color: Color, extra: ReturnType<typeof deploy>[] = [], keywords: Parameters<typeof unit>[2]["keywords"] = []) {
   const teamUpEffect = [
     startOfCombat(buff(1, 1), { condition: teamUp(2) }),
     startOfCombat(buff(2, 1), { condition: teamUp(3) }),
@@ -119,11 +119,11 @@ const cards = [
   unit("n6", "Legendary Hero", { rank: 6, atk: 10, hp: 12, keywords: ["GUARD", "BARRIER"] }),
 
   // ---- Sentai: Gokaiger (Gokai Change: lend a keyword to a teammate)
-  ranger("gk1", "Gokai Blue", 1, 2, 2, "gokaiger", "BLUE", [henshinCall(buff(1, 0, true), { target: adjacent })]),
+  ranger("gk1", "Gokai Blue", 1, 2, 2, "gokaiger", "BLUE", [deploy(buff(1, 0, true), { target: adjacent })]),
   ranger("gk2", "Gokai Yellow", 2, 3, 3, "gokaiger", "YELLOW"),
-  ranger("gk3", "Gokai Pink", 3, 3, 5, "gokaiger", "PINK", [henshinCall(give("GUARD"), { target: leftmost({ faction: "sentai" }) })]),
-  ranger("gk4", "Gokai Red", 4, 5, 5, "gokaiger", "RED", [henshinCall(give("RAPID"), { target: rightmost({ faction: "sentai" }) })]),
-  ranger("gk5", "Gokai Silver", 5, 6, 7, "gokaiger", "EXTRA", [henshinCall(give("BARRIER"), { target: adjacent })]),
+  ranger("gk3", "Gokai Pink", 3, 3, 5, "gokaiger", "PINK", [deploy(give("GUARD"), { target: leftmost({ faction: "sentai" }) })]),
+  ranger("gk4", "Gokai Red", 4, 5, 5, "gokaiger", "RED", [deploy(give("RAPID"), { target: rightmost({ faction: "sentai" }) })]),
+  ranger("gk5", "Gokai Silver", 5, 6, 7, "gokaiger", "EXTRA", [deploy(give("BARRIER"), { target: adjacent })]),
 
   // ---- Sentai: Kyoryuger (Brave: every attack makes it stronger for good)
   ranger("ky1", "Kyoryu Red", 1, 2, 3, "kyoryuger", "RED", [onAttack(buff(1, 0, true), { target: self })]),
@@ -133,11 +133,11 @@ const cards = [
   ranger("ky5", "Kyoryu Gold", 5, 7, 7, "kyoryuger", "EXTRA", [onAttack(buff(2, 0, true), { target: self })]),
 
   // ---- Sentai: Shinkenger (Mojikara: seals protection onto allies)
-  ranger("sk1", "Shinken Yellow", 1, 1, 3, "shinkenger", "YELLOW", [henshinCall(give("GUARD"), { target: adjacent })]),
+  ranger("sk1", "Shinken Yellow", 1, 1, 3, "shinkenger", "YELLOW", [deploy(give("GUARD"), { target: adjacent })]),
   ranger("sk2", "Shinken Green", 2, 2, 4, "shinkenger", "GREEN", [], ["GUARD"]),
-  ranger("sk3", "Shinken Blue", 3, 3, 5, "shinkenger", "BLUE", [henshinCall(give("BARRIER"), { target: randomAlly({ series: "shinkenger" }) })]),
+  ranger("sk3", "Shinken Blue", 3, 3, 5, "shinkenger", "BLUE", [deploy(give("BARRIER"), { target: randomAlly({ series: "shinkenger" }) })]),
   ranger("sk4", "Shinken Red", 4, 5, 6, "shinkenger", "RED"),
-  ranger("sk5", "Shinken Gold", 5, 6, 8, "shinkenger", "EXTRA", [henshinCall(give("LETHAL"), { target: rightmost() })]),
+  ranger("sk5", "Shinken Gold", 5, 6, 8, "shinkenger", "EXTRA", [deploy(give("LETHAL"), { target: rightmost() })]),
 
   // ---- Sentai: Himmapan (original; Mythic Bond: a fallen guardian lends strength to the rest)
   ranger("hm1", "Kinnaree Pink", 1, 1, 3, "himmapan", "PINK"),
@@ -150,7 +150,7 @@ const cards = [
   // ---- Rider
   unit("rd1", "Rookie Rider", { rank: 1, atk: 2, hp: 2, factions: ["rider"], henshin: { after: 2, into: "rider_form" } }),
   unit("rd2", "Kamen Rider Double", { rank: 2, atk: 3, hp: 3, factions: ["rider"], series: "w", effects: [startOfCombat(buff(2, 2), { condition: seriesCount("w", 2) })] }),
-  unit("rb", "Kamen Rider Birth", { rank: 2, atk: 2, hp: 4, factions: ["rider"], series: "ooo", effects: [henshinCall(buff(1, 1), { target: adjacent })] }),
+  unit("rb", "Kamen Rider Birth", { rank: 2, atk: 2, hp: 4, factions: ["rider"], series: "ooo", effects: [deploy(buff(1, 1), { target: adjacent })] }),
   unit("rd3", "Kamen Rider Accel", { rank: 3, atk: 4, hp: 4, factions: ["rider"], series: "w", keywords: ["RIDER_KICK"] }),
   unit("rd4", "Kamen Rider Den-O", { rank: 4, atk: 5, hp: 5, factions: ["rider"], series: "den_o", henshin: { after: 2, into: "super_form" } }),
   unit("rz", "Kamen Rider Zeronos", { rank: 5, atk: 6, hp: 7, factions: ["rider"], series: "den_o", keywords: ["RIDER_KICK"], effects: [startOfCombat(buff(2, 0), { target: allAllies({ series: "den_o" }) })] }),
@@ -191,17 +191,17 @@ const cards = [
 
   // ---- Ally (economy and support). Den-O's Imagin live here.
   unit("al1", "Cafe Owner", { rank: 1, atk: 1, hp: 2, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { condition: energyAtLeast(1), target: randomAlly() })] }),
-  unit("al2", "Urataros", { rank: 2, atk: 2, hp: 4, factions: ["ally"], series: "den_o", effects: [henshinCall(buff(1, 1, true), { target: adjacent })] }),
+  unit("al2", "Urataros", { rank: 2, atk: 2, hp: 4, factions: ["ally"], series: "den_o", effects: [deploy(buff(1, 1, true), { target: adjacent })] }),
   unit("al3", "Momotaros", { rank: 3, atk: 3, hp: 4, factions: ["ally"], series: "den_o", effects: [endOfTurn(buff(1, 1), { target: randomAlly({ series: "den_o" }) })] }),
   unit("al4", "Mentor", { rank: 4, atk: 4, hp: 6, factions: ["ally"], effects: [endOfTurn(buff(2, 2), { target: leftmost() })] }),
   unit("al5", "Veteran Coach", { rank: 5, atk: 5, hp: 8, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: randomAlly() })] }),
   unit("al6", "Base Commander", { rank: 6, atk: 6, hp: 10, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { target: allAllies() })] }),
 
   // ---- Dark Rider (sacrifice: destroys a random ally, then grows; alone it just grows)
-  unit("dr1", "Shadow Rider", { rank: 1, atk: 2, hp: 2, factions: ["dark_rider"], effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(2, 2), { target: self })] }),
-  unit("dr2", "Night Hopper", { rank: 2, atk: 4, hp: 3, factions: ["dark_rider"], effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(3, 3), { target: self })] }),
+  unit("dr1", "Shadow Rider", { rank: 1, atk: 2, hp: 2, factions: ["dark_rider"], effects: [deploy(destroy(), { target: randomAlly() }), deploy(buff(2, 2), { target: self })] }),
+  unit("dr2", "Night Hopper", { rank: 2, atk: 4, hp: 3, factions: ["dark_rider"], effects: [deploy(destroy(), { target: randomAlly() }), deploy(buff(3, 3), { target: self })] }),
   unit("dr3", "Kamen Rider Eternal", { rank: 3, atk: 5, hp: 6, factions: ["dark_rider"], series: "w", keywords: ["BARRIER"] }),
-  unit("dr4", "Dark Kabuto", { rank: 4, atk: 7, hp: 6, factions: ["dark_rider"], keywords: ["RIDER_KICK"], effects: [henshinCall(destroy(), { target: randomAlly() }), henshinCall(buff(2, 2), { target: self })] }),
+  unit("dr4", "Dark Kabuto", { rank: 4, atk: 7, hp: 6, factions: ["dark_rider"], keywords: ["RIDER_KICK"], effects: [deploy(destroy(), { target: randomAlly() }), deploy(buff(2, 2), { target: self })] }),
   unit("dr5", "Dark Emperor", { rank: 5, atk: 9, hp: 9, factions: ["dark_rider"], keywords: ["RIDER_KICK"] }),
   unit("dr6", "Dark Lord", { rank: 6, atk: 14, hp: 12, factions: ["dark_rider"], keywords: ["RIDER_KICK", "REVIVE"] }),
 

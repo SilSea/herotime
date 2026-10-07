@@ -31,7 +31,7 @@ export function buyUnit(player: PlayerState, shopIndex: number, env: GameEnv): T
   return resolveTriples(player, env.pool, env.rng, env.cfg);
 }
 
-/** Put a unit on the board, run its Henshin Call (ON_PLAY), then resolve any triple. */
+/** Put a unit on the board, run its Deploy (ON_PLAY), then resolve any triple. */
 export function playUnit(player: PlayerState, handIndex: number, position: number, env: GameEnv): TripleResult[] {
   const card = player.hand[handIndex];
   if (card === undefined) throw new RuleError(`no hand slot ${handIndex}`);
