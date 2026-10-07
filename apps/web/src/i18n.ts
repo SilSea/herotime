@@ -40,6 +40,7 @@ export const pick = (o: { text?: string; textTh?: string } | undefined): string 
 const SERVER_TH: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^not enough energy: need (\d+), have (\d+)$/, (m) => `Energy ไม่พอ: ต้องใช้ ${m[1]} มี ${m[2]}`],
   [/^hand is full$/, () => "มือเต็มแล้ว"],
+  [/^not enough health: need more than (\d+), have (\d+)$/, (m) => `เลือดไม่พอ: ต้องมีมากกว่า ${m[1]} มี ${m[2]}`],
   [/^board is full$/, () => "บอร์ดเต็มแล้ว"],
   [/^already at max rank$/, () => "ร้านอยู่ rank สูงสุดแล้ว"],
   [/^gear cannot be sold$/, () => "ขาย Gear ไม่ได้"],

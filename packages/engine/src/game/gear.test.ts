@@ -25,6 +25,7 @@ const world = content({
     gear("blade", 1, [{ target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "BUFF", atk: 3, hp: 0 }] }]),
     gear("venom", 1, [{ target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "GIVE_KEYWORD", keyword: "LETHAL" }] }]),
     gear("driver", 1, [{ target: { selector: "CHOSEN_FRIENDLY", faction: "rider" }, actions: [{ type: "BUFF", atk: 2, hp: 2 }] }]),
+    card("oath", { kind: "GEAR", rank: 1, cost: 3, costType: "HEALTH", effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "BUFF", atk: 3, hp: 3 }] })] }),
     gear("call", 1, [{ actions: [{ type: "DISCOVER_UNIT", faction: "rider" }] }]),
   ],
 });
@@ -127,5 +128,35 @@ describe("the tavern always has a Gear", () => {
     toggleFreeze(p);
     startTurn(p, 2, env.pool, env.rng, env.cfg, env.gear);
     expect(p.shopGear).toBe("blade");
+  });
+});
+
+describe("gear priced in Health", () => {
+  it("is paid through the Health callback, not Energy", () => {
+    p.shopGear = "oath";
+    let paid = 0;
+    buyGear(p, env, (n) => (paid += n));
+    expect(paid).toBe(3);
+    expect(p.energy).toBe(10);
+    expect(p.hand.map((x) => x.key)).toEqual(["oath"]);
+  });
+
+  it("cannot be bought without a way to pay Health", () => {
+    p.shopGear = "oath";
+    expect(() => buyGear(p, env)).toThrow(/costs Health/);
+    expect(p.hand).toEqual([]);
+  });
+});
+
+describe("a frozen tavern", () => {
+  it("keeps its cards and fills the slots that were bought", () => {
+    startTurn(p, 1, env.pool, env.rng, env.cfg, env.gear);
+    const size = p.shop.length;
+    const kept = p.shop.slice(1);
+    p.shop.splice(0, 1); // bought one
+    toggleFreeze(p);
+    startTurn(p, 2, env.pool, env.rng, env.cfg, env.gear);
+    expect(p.shop).toHaveLength(size);
+    expect(p.shop.slice(0, kept.length)).toEqual(kept);
   });
 });

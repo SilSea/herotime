@@ -90,11 +90,18 @@ export class Match {
   turn = 0;
   deadline: number | null;
 
+
   private readonly combatRng: Rng;
   private readonly events: MatchEvent[] = [];
   /** Boards of eliminated players, oldest first. */
   private readonly ghosts: GhostBoard[] = [];
   private lastGhostFor: string | undefined;
+
+  /** Pay a Health price (Health gear). Armor does not pay it, and it can never knock the hero out. */
+  private payHealth(p: MatchPlayer, amount: number): void {
+    if (p.hp <= amount) throw new RuleError(`not enough health: need more than ${amount}, have ${p.hp}`);
+    p.hp -= amount;
+  }
 
   private constructor(opts: CreateMatchOptions) {
     this.config = { ...DEFAULT_MATCH_CONFIG, ...opts.config };
@@ -287,7 +294,7 @@ export class Match {
         buyUnit(s, intent.index, env);
         break;
       case "BUY_GEAR":
-        buyGear(s, env);
+        buyGear(s, env, (amount) => this.payHealth(p, amount));
         break;
       case "COMBINE":
         combineGattai(s, intent.index, env);
@@ -407,7 +414,7 @@ export class Match {
           }
         }
       }
-      if (p.isBot) runBot(p.state, turn, this.env);
+      if (p.isBot) runBot(p.state, turn, this.env, (amount) => { if (p.hp - amount < 15) throw new RuleError("bots keep their health"); this.payHealth(p, amount); });
     }
     this.emitPhase();
   }

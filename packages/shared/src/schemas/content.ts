@@ -34,6 +34,8 @@ export const CardDef = z.object({
   gattaiInto: z.string().optional(),
   /** Tavern price of Gear sold in the shop (not a token). Units always use the standard buy cost. */
   cost: z.number().int().min(0).optional(),
+  /** What the gear price is paid with: Energy, or the hero's Health (which can never take you to 0). */
+  costType: z.enum(["ENERGY", "HEALTH"]).default("ENERGY"),
 });
 export type CardDef = z.infer<typeof CardDef>;
 

@@ -727,3 +727,7 @@ body.dragging .drop-marker.show { display: block; }
 .lang-btn.active { background: var(--cyan); color: #04101f; }
 .lang-btn:not(.active):hover { color: #fff; }
 .auth-screen .lang-toggle { margin: 4px auto 10px; }
+
+/* ---- gear priced in Health */
+.card .cost.health { background: linear-gradient(180deg, #ff8a9a, #d81b45); color: #fff; filter: drop-shadow(0 0 6px #ff3b5c); }
+.card .cost.health::after { content: "♥"; font-size: 9px; position: absolute; bottom: 2px; }

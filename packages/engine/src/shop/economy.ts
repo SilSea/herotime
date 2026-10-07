@@ -148,6 +148,13 @@ export function startTurn(
   if (turn > 1) player.upgradeDiscount += 1;
   if (player.frozen) {
     player.frozen = false;
+    // The frozen cards stay; slots emptied by buying (or added by an upgrade) are filled with new ones.
+    const size = shopSizeFor(player.rank, cfg);
+    while (player.shop.length < size) {
+      const key = pool.draw(rng, player.rank);
+      if (key === undefined) break;
+      player.shop.push(key);
+    }
     // Freezing keeps the units; a Gear bought from the frozen tavern is restocked.
     if (player.shopGear === null) rollGear(player, rng, gear);
   } else {

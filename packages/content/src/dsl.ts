@@ -141,7 +141,7 @@ export function giant(key: string, name: string, o: Omit<UnitOptions, "rank"> & 
 
 /** A Gear card: spent from hand, runs its player effects. */
 /** Gear sold in the tavern: offered from `rank` up, bought for `cost` Energy, used from the hand. */
-export function shopGear(key: string, name: string, rank: number, cost: number, effects: ReturnType<typeof player>[], o: { factions?: string[]; text?: string; art?: string } = {}) {
+export function shopGear(key: string, name: string, rank: number, cost: number, effects: ReturnType<typeof player>[], o: { factions?: string[]; text?: string; art?: string; costType?: "ENERGY" | "HEALTH" } = {}) {
   return CardDef.parse({ key, name, rank, atk: 0, hp: 1, kind: "GEAR", token: false, cost, effects, ...o });
 }
 

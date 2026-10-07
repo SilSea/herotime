@@ -82,13 +82,24 @@ export function combineGattai(player: PlayerState, index: number, env: GameEnv):
   player.board.splice(index, group.parts.length, combined);
 }
 
-/** Buy the tavern's Gear: it goes to the hand, to be used from there. Its price is the card's own cost. */
-export function buyGear(player: PlayerState, env: GameEnv): void {
+/**
+ * Buy the tavern's Gear: it goes to the hand, to be used from there. Its price is the card's own cost, in Energy
+ * or, for costType HEALTH, in hero Health paid through `payHealth` (the match owns Health; it refuses a price
+ * that would leave the hero at 0 or less).
+ */
+export function buyGear(player: PlayerState, env: GameEnv, payHealth?: (amount: number) => void): void {
   const key = player.shopGear;
   if (!key) throw new RuleError("there is no gear in the tavern");
   const c = withRules(player, env.cfg);
   if (player.hand.length >= c.handSize) throw new RuleError("hand is full");
-  spend(player, env.content.card(key).cost ?? c.buyCost);
+  const def = env.content.card(key);
+  const price = def.cost ?? c.buyCost;
+  if (def.costType === "HEALTH") {
+    if (!payHealth) throw new RuleError(`${def.name} costs Health`);
+    payHealth(price);
+  } else {
+    spend(player, price);
+  }
   player.hand.push({ key, golden: false });
   player.shopGear = null;
 }

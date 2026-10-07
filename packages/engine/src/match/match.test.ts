@@ -824,6 +824,28 @@ describe("gear in the tavern", () => {
     expect(s.board[0]?.buffs).toEqual([{ kind: "gear", key: "g_plate", atk: 0, hp: 6 }]);
   });
 
+  it("Health-priced gear comes off the hero's Health, never down to 0, and leaves Energy alone", () => {
+    const m = start();
+    const s = m.player("h0").state;
+    const p = m.players.find((x) => x.id === "h0") as { hp: number };
+    const def = m.env.content.card("g_plate") as { costType: string };
+    def.costType = "HEALTH";
+    try {
+      s.shopGear = "g_plate";
+      s.energy = 0;
+      m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 10);
+      expect(p.hp).toBe(m.config.startHp - 2);
+      expect(s.energy).toBe(0);
+      expect(s.hand.map((u) => u.key)).toEqual(["g_plate"]);
+      s.shopGear = "g_plate";
+      p.hp = 2;
+      expect(() => m.dispatch("h0", { type: "BUY_GEAR" }, T0 + 20)).toThrow(/not enough health/);
+      expect(p.hp).toBe(2);
+    } finally {
+      def.costType = "ENERGY";
+    }
+  });
+
   it("refuses when Energy is short or the hand is full, changing nothing", () => {
     const m = start();
     const s = m.player("h0").state;

@@ -164,11 +164,13 @@ const tavernGear = [
   shopGear("g_emitter", "Barrier Emitter", 3, 3, [player("ON_PLAY", give("BARRIER"), { target: chosen() })]),
   shopGear("g_driver", "Henshin Driver", 3, 2, [player("ON_PLAY", [buff(2, 2), give("RIDER_KICK")], { target: chosen({ faction: "rider" }) })], { factions: ["rider"] }),
   shopGear("g_boost", "Squad Boost", 4, 3, [player("ON_PLAY", buff(1, 1), { target: allAllies() })]),
-  shopGear("g_overclock", "Overclock Chip", 5, 4, [player("ON_PLAY", give("RAPID"), { target: chosen() })]),
+  shopGear("g_overclock", "Overclock Chip", 5, 5, [player("ON_PLAY", give("RAPID"), { target: chosen() })], { costType: "HEALTH" }),
   shopGear("g_serum", "Titan Serum", 6, 5, [player("ON_PLAY", buff(2, 2), { target: allAllies() })]),
   // keywords on a unit of your choice
   shopGear("g_shield", "Guard Shield", 1, 1, [player("ON_PLAY", give("GUARD"), { target: chosen() })]),
-  shopGear("g_venom", "Venom Edge", 4, 3, [player("ON_PLAY", give("LETHAL"), { target: chosen() })]),
+  shopGear("g_venom", "Venom Edge", 4, 4, [player("ON_PLAY", give("LETHAL"), { target: chosen() })], { costType: "HEALTH" }),
+  // paid in Health: strong for its rank
+  shopGear("g_blood", "Blood Oath", 2, 3, [player("ON_PLAY", buff(3, 3), { target: chosen() })], { costType: "HEALTH" }),
   shopGear("g_revive", "Revive Chip", 5, 4, [player("ON_PLAY", give("REVIVE"), { target: chosen() })]),
   // a unit of one faction (only offered when that faction is in the match)
   shopGear("g_call_rider", "Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("rider"))], { factions: ["rider"] }),

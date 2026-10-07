@@ -282,7 +282,7 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
       ),
       rank === SPECIAL_TAB
         ? h("div", { class: "book-cards" }, ...special.map((s) => h("div", { class: "book-special" }, cardEl(ctx.ix, { key: s.key }), h("div", { class: "book-how", text: s.how }))))
-        : h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? tr("No cards match these filters at this rank.", "ไม่มีการ์ดที่ตรงกับตัวกรองใน rank นี้") : tr("No cards of this rank in this match.", "ไม่มีการ์ด rank นี้ในเกมนี้") })),
+        : h("div", { class: "book-cards" }, ...ofRank.map((c) => cardEl(ctx.ix, { key: c.key, ...(c.kind === "GEAR" ? { cost: c.cost ?? view.me.limits.buyCost, costHealth: c.costType === "HEALTH" } : {}) })), ofRank.length === 0 && h("p", { class: "muted", text: fac || kw ? tr("No cards match these filters at this rank.", "ไม่มีการ์ดที่ตรงกับตัวกรองใน rank นี้") : tr("No cards of this rank in this match.", "ไม่มีการ์ด rank นี้ในเกมนี้") })),
     ),
   );
 }
@@ -442,12 +442,15 @@ function gearSlot(ctx: Ctx, view: View): HTMLElement | null {
   if (!key && !anyGear) return null; // content without tavern gear: no empty box either
   const recruiting = view.phase === "RECRUIT" && me.alive;
   const cost = key ? (ctx.ix.card(key)?.cost ?? me.limits.buyCost) : 0;
-  const canBuy = recruiting && !!key && me.state.energy >= cost && me.state.hand.length < me.limits.handSize;
+  const health = key ? ctx.ix.card(key)?.costType === "HEALTH" : false;
+  const hp = view.players.find((p) => p.id === me.id)?.hp ?? 0;
+  // Health can pay only while the hero keeps at least 1.
+  const canBuy = recruiting && !!key && (health ? hp > cost : me.state.energy >= cost) && me.state.hand.length < me.limits.handSize;
   return h(
     "div",
     { class: "gear-slot" },
     h("div", { class: "gear-slot-label", text: "Gear" }),
-    key ? draggableCard(cardEl(ctx.ix, { key, cost, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: tr("Sold out until the next refresh", "หมดแล้ว รอรีเฟรชครั้งหน้า") }),
+    key ? draggableCard(cardEl(ctx.ix, { key, cost, costHealth: health, classes: [canBuy ? "" : "unaffordable"], onClick: () => recruiting && void ctx.act({ type: "BUY_GEAR" }) }), recruiting, "gear", 0) : h("div", { class: "gear-empty", text: tr("Sold out until the next refresh", "หมดแล้ว รอรีเฟรชครั้งหน้า") }),
   );
 }
 
