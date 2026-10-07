@@ -1,7 +1,7 @@
 import { CardDef, Selector, Trigger, Action } from "@herotime/shared";
 import { Content } from "@herotime/engine";
 import { describe, expect, it } from "vitest";
-import { buildCard, checkRecipe, choicesFor, DO, keyFromName, newAbility, newRecipe, TARGET, WHEN, type Recipe } from "../src/card-recipe.js";
+import { buildCard, checkRecipe, choicesFor, describeRecipe, DO, keyFromName, newAbility, newRecipe, TARGET, WHEN, type Recipe } from "../src/card-recipe.js";
 
 const recipe = (o: Partial<Recipe>): Recipe => ({ ...newRecipe(), name: "Test", key: "test", ...o });
 const cub = CardDef.parse({ key: "cub", name: "Cub", rank: 1, atk: 1, hp: 1, token: true });
@@ -81,6 +81,11 @@ describe("card wizard", () => {
     expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), do: "SUMMON", cardKey: "" }] }), new Set()).join()).toMatch(/pick the card|เลือกการ์ด/);
     expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "LAST_STAND", do: "GAIN_ENERGY" }] }), new Set()).join()).toMatch(/does not work|ใช้ในจังหวะนั้นไม่ได้/);
     expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "ON_ATTACK", do: "SUMMON", cardKey: "cub" }] }), new Set())).toEqual([]);
+  });
+
+  it("reads as a sentence: target labels start lower case inside it", () => {
+    const r = recipe({ type: "GEAR", abilities: [{ ...newAbility("GEAR"), do: "BUFF", atk: 2, hp: 2, target: "CHOSEN_FRIENDLY" }] });
+    expect(describeRecipe(r, (k) => k, (k) => k)).toEqual(["Use: give a unit the player picks +2/+2"]);
   });
 
   it("makes a key from the name, unique among the cards", () => {

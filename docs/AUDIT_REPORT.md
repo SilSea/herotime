@@ -45,3 +45,21 @@
 - `docs/RULES.md`: keyword Echo, trigger/selector/action ใหม่ทั้งหมด, `repeat`/`limit`, กฎ Gear กับหุ่น
 - `docs/FEATURES.md`: F5.15–F5.17, F6.11, F6.12
 - `README.md`: ชุดการ์ด prototype/production/blank, ลิงก์คู่มือและรายงานนี้
+
+---
+
+# รอบที่ 2 — 2026-10-07 (ก่อนเปลี่ยนเป็น production ชุดเปล่า)
+
+## วิธีตรวจ
+| วิธี | ผล |
+|---|---|
+| Test ทุก package + Postgres จริง | engine 463, content 61, web 111, server 156 (+18 Postgres) — ผ่านหมด |
+| Smoke test ในเบราว์เซอร์ ทุกหน้าจอ ทั้งชุด prototype และ production (เปล่า) | สมัคร/ล็อกอิน, สลับภาษา, ตัวปรับเสียง, สร้าง/ออกห้องเพื่อน, เข้า/ออกคิว Quick Mode, คลังการ์ด, Admin ทุกแท็บ (Cards, Heroes, Relics, Factions, Series, Gauges, Rules, Sounds), Card wizard, Simulate, Stats, Versions, History, เล่นเกมฝึก (ซื้อ, ลงยูนิต, หนังสือการ์ด) จนต่อสู้แล้วยอมแพ้ถึงหน้าจบเกม — **ไม่มี error ในเบราว์เซอร์เลยทั้ง 2 ชุด** |
+| ชุดเปล่า (production) | server เปิดได้, เล่นจบได้, Admin สร้างของใหม่ได้, Simulate รันได้ |
+
+## เจอและแก้แล้ว
+| # | ระดับ | ปัญหา | แก้ |
+|---|---|---|---|
+| 6 | ต่ำ | Card wizard อธิบายความสามารถเป็นประโยคที่มีตัวพิมพ์ใหญ่กลางประโยค เช่น "give A unit the player picks" | ตัวแรกของเป้าหมายเป็นตัวเล็กในประโยค + test |
+
+ความเสี่ยงที่ยังเหลือเหมือนรอบแรก: ข้อ A (ตารางอันดับ/Stats โหลดทุกเกม), C (ตรวจ MP3 จากหัวไฟล์), D (เสียงต้องรอคลิกแรก), E (balance), G (Redis, deploy)

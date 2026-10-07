@@ -286,7 +286,9 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
 export function describeRecipe(r: Recipe, cardName: (key: string) => string, factionName: (key: string) => string): string[] {
   return r.abilities.map((a) => {
     const when = r.type === "GEAR" ? tr("Use", "ใช้") : a.when === "AVENGE" ? `Avenge (${a.every})` : (WHEN.find((w) => w.key === a.when)?.label() ?? a.when);
-    const who = (TARGET.find((t) => t.key === a.target)?.label() ?? "") + (a.targetFaction ? ` (${factionName(a.targetFaction)})` : "");
+    // The labels are written to stand alone ("A unit the player picks"); inside a sentence they start lower case.
+    const label = TARGET.find((t) => t.key === a.target)?.label() ?? "";
+    const who = label.charAt(0).toLowerCase() + label.slice(1) + (a.targetFaction ? ` (${factionName(a.targetFaction)})` : "");
     const cond =
       a.condition === "TEAM_UP_COLORS_GTE" ? tr(`if you have ${a.conditionValue}+ Sentai colours, `, `ถ้ามี Sentai ${a.conditionValue} สีขึ้นไป `)
       : a.condition === "FACTION_COUNT_GTE" ? tr(`if you have ${a.conditionValue}+ ${factionName(a.conditionFaction)} units, `, `ถ้ามียูนิต ${factionName(a.conditionFaction)} ${a.conditionValue} ตัวขึ้นไป `)
