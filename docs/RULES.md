@@ -53,7 +53,7 @@
 | **Sentai** | ทีม 5 สี | **Team-Up**: บัฟตามจำนวนสีไม่ซ้ำบนบอร์ด |
 | **Mecha** | หุ่นยนต์/ยาน | **Gattai**: วาง core ไว้ซ้ายสุดของ Mecha Gattai ≥3 ตัวที่ติดกัน แล้วกด Combine ช่วงซื้อของ → รวมเป็นการ์ดร่างของ core ถาวร |
 | **Kaijin** | สัตว์ประหลาด/ปีศาจ | **Kyodaika**: ตายครั้งแรกฟื้นเป็นร่างยักษ์ |
-| **Grunt** | พลทหารองค์กรร้าย | swarm, token, Last Stand เรียกลูกน้อง |
+| **Beast** | ฝูงสัตว์ | **เรียกพวก**: เรียกยูนิตเข้าสนามตอนโจมตี/ตอนตาย/เริ่มสู้ + จ่าฝูง (trigger `ALLY_SUMMONED`) บัฟทุกตัวที่ถูกเรียกเข้ามาใหม่ |
 | **Ally** | พลเรือน/ทีม support | economy และ support: ได้ Energy, เพิ่มการ์ดเข้ามือ, บัฟ ally ตอนจบเทิร์น (ลดราคา/บัฟการ์ดในมือ: ยังไม่มีการ์ดที่ทำ) |
 | **Dark Rider** | ไรเดอร์ฝ่ายร้าย | sacrifice: Henshin Call ทำลาย ally สุ่ม 1 ตัว แล้วตัวเองได้ stat ตายตัว (ขโมย stat/keyword ของตัวที่ทำลาย: ยังไม่มี action นี้ใน engine) |
 
@@ -142,7 +142,7 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 ## 10. ตัวอย่างยูนิต Rank 1 (prototype set หลัง balance pass ล่าสุด)
 | ชื่อ | Faction | ATK/HP | Effect |
 |---|---|---|---|
-| Combatant | Grunt | 2/1 | Last Stand: เรียก Recruit 1/1 |
+| Den Mother | Beast | 2/2 | Last Stand: เรียก Cub |
 | Red Cadet | Sentai (Red) | 1/3 | Team-Up(2): +2/+2 ตอนเริ่มสู้ |
 | Rookie Rider | Rider | 2/2 | Henshin(2) → Rider Form 4/4 Rider Kick |
 | Scout Drone | Mecha | 2/2 | Gattai |
@@ -180,7 +180,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
   "target": { "selector": "SELF" },      // + faction / series filter สำหรับ selector ฝั่งเรา
   "actions": [
     { "type": "BUFF", "atk": 2, "hp": 2, "permanent": false },
-    { "type": "SUMMON", "cardKey": "grunt_token", "count": 1 }
+    { "type": "SUMMON", "cardKey": "beast_cub", "count": 1 }
   ],
   "goldenMultiplier": 2
 }
@@ -256,7 +256,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 | Rider Pass | Den-O | 0 | Imagin ราคาลด 1 |
 | Shodophone | Shinkenger | 2 | Mojikara ให้ Lethal เป็นตัวเลือกได้ด้วย |
 | Brave Battery | Kyoryuger | 1 | ยูนิต Kyoryuger ทุกตัวเริ่มด้วย Brave 1 stack |
-| Grunt Whistle | Grunt | 1 | Last Stand ที่เรียก Grunt เรียกเพิ่มอีก 1 |
+| Pack Horn | Beast | 2 | เริ่มการต่อสู้: เรียก Cub |
 | Base Café Coupon | Ally | 0 | ทุกๆ 3 เทิร์น +1 Energy |
 | Training Bracelet | ทั่วไป | 3 | ยูนิตในร้าน +1/+1 |
 

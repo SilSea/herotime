@@ -36,6 +36,7 @@ export const discoverUnit = (faction?: string): Action => (faction ? { type: "DI
 
 // ------------------------------------------------------------------ targets
 export const self: Target = { selector: "SELF" };
+export const summoned: Target = { selector: "SUMMONED" };
 export const adjacent: Target = { selector: "ADJACENT" };
 export const leftmost = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "LEFTMOST_FRIENDLY", ...filter });
 export const rightmost = (filter: { faction?: string; series?: string } = {}): Target => ({ selector: "RIGHTMOST_FRIENDLY", ...filter });
@@ -87,6 +88,8 @@ export const henshinCall = (a: Action | Action[], o?: EffectOptions) => on("ON_P
 export const endOfTurn = (a: Action | Action[], o?: EffectOptions) => on("END_OF_TURN", a, o);
 export const onAttack = (a: Action | Action[], o?: EffectOptions) => on("ON_ATTACK", a, o);
 export const afterDamaged = (a: Action | Action[], o?: EffectOptions) => on("AFTER_DAMAGED", a, o);
+/** When another friendly unit is summoned (in either phase); target `summoned` is the newcomer. */
+export const onSummon = (a: Action | Action[], o?: EffectOptions) => on("ALLY_SUMMONED", a, o);
 export const avenge = (every: number, a: Action | Action[], o: EffectOptions = {}) => on("AVENGE", a, { ...o, every });
 export const onHenshin = (a: Action | Action[], o?: EffectOptions) => on("HENSHIN", a, o);
 

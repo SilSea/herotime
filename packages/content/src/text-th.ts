@@ -27,6 +27,7 @@ const TRIGGER: Record<Trigger, string> = {
   AFTER_DAMAGED: "เมื่อโดนดาเมจแล้วยังรอด",
   LAST_STAND: "Last Stand",
   AVENGE: "Avenge",
+  ALLY_SUMMONED: "เมื่อเรียกยูนิตเข้าสนาม",
   ON_ACQUIRE: "เมื่อได้รับ",
   ON_TURN_START: "ต้นทุกเทิร์น",
   ON_USE: "เมื่อใช้",
@@ -47,6 +48,7 @@ function who(t: Target | undefined, names: Names): string {
     case "RIGHTMOST_FRIENDLY": return `${one}ขวาสุด`;
     case "RANDOM_FRIENDLY": return `${one}อื่นแบบสุ่ม 1 ตัว`;
     case "ALL_FRIENDLY": return many;
+    case "SUMMONED": return "ตัวที่ถูกเรียก";
     case "CHOSEN_FRIENDLY": return filter ? `ยูนิต ${filter} ที่เลือก` : "พันธมิตรที่เลือก";
     case "LEFTMOST_ENEMY": return "ศัตรูซ้ายสุด";
     case "RANDOM_ENEMY": return "ศัตรูแบบสุ่ม 1 ตัว";

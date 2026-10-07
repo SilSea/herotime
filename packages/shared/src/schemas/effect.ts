@@ -31,6 +31,7 @@ export const Trigger = z.enum([
   "AFTER_DAMAGED",
   "LAST_STAND",
   "AVENGE",
+  "ALLY_SUMMONED", // another friendly unit was summoned (recruit or fight); target SUMMONED is that unit
   // player effects
   "ON_ACQUIRE", // relic picked / hero chosen: runs once, rules it sets persist
   "ON_TURN_START",
@@ -59,6 +60,8 @@ export const Selector = z.enum([
   "ALL_FRIENDLY",
   /** The friendly unit the player picks when using gear; anywhere else (or with no pick) the leftmost match. */
   "CHOSEN_FRIENDLY",
+  /** ALLY_SUMMONED only: the unit that was just summoned. */
+  "SUMMONED",
   "LEFTMOST_ENEMY",
   "RANDOM_ENEMY",
   "ALL_ENEMY",

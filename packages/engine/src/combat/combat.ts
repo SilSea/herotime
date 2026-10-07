@@ -166,7 +166,7 @@ export function simulateCombat(
   const matches = (f: Fighter, t: Target): boolean =>
     (t.faction === undefined || f.factions.includes(t.faction)) && (t.series === undefined || f.series === t.series);
 
-  const select = (selector: Selector, t: Target, source: Fighter | null, s: SideState): Fighter[] => {
+  const select = (selector: Selector, t: Target, source: Fighter | null, s: SideState, subject?: Fighter): Fighter[] => {
     const mine = friendly(s).filter((f) => matches(f, t));
     const foes = friendly(sides[other(s.id)]);
     switch (selector) {
@@ -181,6 +181,8 @@ export function simulateCombat(
       case "LEFTMOST_FRIENDLY":
       case "CHOSEN_FRIENDLY": // nobody picks during a fight
         return mine.slice(0, 1);
+      case "SUMMONED":
+        return subject && alive(subject) ? [subject] : [];
       case "RIGHTMOST_FRIENDLY":
         return mine.slice(-1);
       case "RANDOM_FRIENDLY": {
@@ -261,6 +263,8 @@ export function simulateCombat(
           const index = Math.min(at(), s.list.length);
           insertAt(s, index, f);
           events.push({ type: "SUMMON", unit: uid, cardKey: action.cardKey, side: s.id, index, atk: f.atk, hp: f.hp, keywords: [...f.keywords] });
+          // Everyone already there hears about the newcomer (e.g. "when you summon a unit, give it +1/+1").
+          for (const mate of friendly(s)) if (mate !== f) fire("ALLY_SUMMONED", mate, s, rightOf(s, mate), undefined, f);
         }
         return;
       }
@@ -316,22 +320,22 @@ export function simulateCombat(
     }
   };
 
-  const runEffect = (effect: Effect, source: Fighter | null, s: SideState, at: () => number): void => {
+  const runEffect = (effect: Effect, source: Fighter | null, s: SideState, at: () => number, subject?: Fighter): void => {
     if (!checkCondition(effect.condition, friendly(s))) return;
     const mult = source?.golden ? (effect.goldenMultiplier ?? 2) : 1;
     const target: Target = effect.target ?? { selector: "SELF" };
     // Select once so a single random pick feeds every action in the effect.
-    const targets = effect.actions.some(needsTargets) ? select(target.selector, target, source, s) : [];
+    const targets = effect.actions.some(needsTargets) ? select(target.selector, target, source, s, subject) : [];
     for (const action of effect.actions) runAction(action, mult, s, targets, at);
   };
 
-  const fire = (trigger: Effect["trigger"], f: Fighter, s: SideState, at: () => number, deaths?: number): void => {
+  function fire(trigger: Effect["trigger"], f: Fighter, s: SideState, at: () => number, deaths?: number, subject?: Fighter): void {
     for (const e of f.effects) {
       if (e.scope !== "UNIT" || e.trigger !== trigger) continue;
       if (deaths !== undefined && deaths % (e.every ?? 1) !== 0) continue;
-      runEffect(e, f, s, at);
+      runEffect(e, f, s, at, subject);
     }
-  };
+  }
 
   /** Summons from a living unit land right of it, in order. */
   const rightOf = (s: SideState, f: Fighter): (() => number) => {

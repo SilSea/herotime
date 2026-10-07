@@ -122,6 +122,13 @@ export class Content {
     const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
     const RECRUIT_ONLY = new Set(["GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI"]);
     const checkPhase = (e: Effect, from: string): void => {
+      if (e.target?.selector === "SUMMONED" && e.trigger !== "ALLY_SUMMONED") problems.push(`${from}: target SUMMONED only works with ALLY_SUMMONED`);
+      // A summon can happen in either phase, so its reactions must work in both.
+      if (e.trigger === "ALLY_SUMMONED") {
+        for (const a of e.actions) if (RECRUIT_ONLY.has(a.type) || a.type === "DAMAGE") problems.push(`${from}: ${a.type} cannot be used on ALLY_SUMMONED (summons happen in fights too)`);
+        if (e.target?.selector.endsWith("_ENEMY")) problems.push(`${from}: ALLY_SUMMONED cannot target enemies`);
+        return;
+      }
       const fight = FIGHT.has(e.trigger);
       for (const a of e.actions) {
         if (fight && RECRUIT_ONLY.has(a.type)) problems.push(`${from}: ${a.type} only works in the recruit phase, not on ${e.trigger}`);

@@ -39,6 +39,8 @@ import {
   superGattai,
   damage,
   randomFoe,
+  onSummon,
+  summoned,
 } from "./dsl.js";
 import type { ContentSetData } from "./types.js";
 
@@ -57,7 +59,7 @@ const factions = [
   faction("sentai", "Sentai", "#1e88e5", "Five colours. Team-Up bonuses and the Roll Call that charges the Mecha Gauge.", "ทีม 5 สี: โบนัส Team-Up และ Roll Call ที่เติม Mecha Gauge"),
   faction("mecha", "Mecha", "#78909c", "Gattai: line up a core and its parts, press Combine, and they become one robot for good.", "Gattai: วาง core กับชิ้นส่วนเรียงกัน กด Combine แล้วรวมเป็นหุ่นตัวเดียวถาวร"),
   faction("kaijin", "Kaijin", "#8e24aa", "Kyodaika: the first time it dies it comes back twice as big.", "Kyodaika: ตายครั้งแรกฟื้นเป็นร่างยักษ์ stat ×2"),
-  faction("grunt", "Grunt", "#6d4c41", "Swarms of cheap bodies that leave more bodies behind.", "ลูกน้องจำนวนมาก ตายแล้วเรียกลูกน้องเพิ่ม"),
+  faction("beast", "Beast", "#8d6e63", "Summons: calls the pack when it attacks and when it falls, and pack leaders power up every newcomer.", "เรียกพวก: เรียกยูนิตเข้าสนามตอนโจมตีและตอนตาย และจ่าฝูงบัฟทุกตัวที่ถูกเรียกเข้ามาใหม่"),
   faction("ally", "Ally", "#43a047", "Economy and support: Energy, buffs and cards in hand.", "เศรษฐกิจและสนับสนุน: Energy, บัฟ, การ์ดเข้ามือ"),
   faction("dark_rider", "Dark Rider", "#37474f", "Sacrifice allies to grow monstrous.", "สังเวยพวกเดียวกันเพื่อแข็งแกร่งขึ้น"),
   // The first faction of the Anime universe (original characters).
@@ -98,7 +100,7 @@ function ranger(key: string, name: string, rank: number, atk: number, hp: number
 
 const cards = [
   // ---- tokens, forms, gear and giants (not in the shop)
-  token("grunt_token", "Recruit", { atk: 1, hp: 1, factions: ["grunt"] }),
+  token("beast_cub", "Cub", { atk: 2, hp: 1, factions: ["beast"] }),
   token("rider_form", "Rider Form", { atk: 4, hp: 4, factions: ["rider"], keywords: ["RIDER_KICK"] }),
   token("super_form", "Super Form", { atk: 9, hp: 9, factions: ["rider"], keywords: ["RIDER_KICK", "RAPID"] }),
   gear("kyodai_gattai", "Kyodai Gattai!", [player("ON_PLAY", discoverGiant())]),
@@ -177,13 +179,15 @@ const cards = [
   unit("kj5", "Greeed Ankh", { rank: 5, atk: 5, hp: 7, factions: ["kaijin"], series: "ooo", keywords: ["KYODAIKA"], effects: [avenge(2, buff(2, 2))] }),
   unit("kj6", "Monster General", { rank: 6, atk: 7, hp: 9, factions: ["kaijin"], keywords: ["KYODAIKA"], effects: [startOfCombat(buff(0, 2), { target: allAllies({ faction: "kaijin" }) })] }),
 
-  // ---- Grunt (swarm)
-  unit("gr1", "Combatant", { rank: 1, atk: 2, hp: 1, factions: ["grunt"], effects: [lastStand(summon("grunt_token"))] }),
-  unit("gr2", "Foot Soldier", { rank: 2, atk: 3, hp: 2, factions: ["grunt"], effects: [lastStand(summon("grunt_token", 2))] }),
-  unit("gr3", "Squad Leader", { rank: 3, atk: 3, hp: 4, factions: ["grunt"], effects: [startOfCombat(buff(1, 1), { target: allAllies({ faction: "grunt" }) })] }),
-  unit("gr4", "Commander", { rank: 4, atk: 4, hp: 5, factions: ["grunt"], effects: [avenge(2, summon("grunt_token", 2))] }),
-  unit("gr5", "Elite Guard", { rank: 5, atk: 6, hp: 6, factions: ["grunt"], keywords: ["GUARD"], effects: [lastStand(summon("grunt_token", 3))] }),
-  unit("gr6", "Grunt Overlord", { rank: 6, atk: 8, hp: 8, factions: ["grunt"], effects: [startOfCombat(summon("grunt_token", 3)), lastStand(summon("grunt_token", 3))] }),
+  // ---- Beast (summon on attack and on death; pack leaders power up every newcomer)
+  unit("bs1", "Den Mother", { rank: 1, atk: 2, hp: 2, factions: ["beast"], effects: [lastStand(summon("beast_cub"))] }),
+  unit("bs2", "Pack Wolf", { rank: 1, atk: 1, hp: 3, factions: ["beast"], effects: [onSummon(buff(1, 1), { target: summoned })] }),
+  unit("bs3", "Hunting Hawk", { rank: 2, atk: 2, hp: 3, factions: ["beast"], effects: [onAttack(summon("beast_cub"))] }),
+  unit("bs4", "Beast Tamer", { rank: 2, atk: 2, hp: 4, factions: ["beast"], effects: [onSummon(buff(2, 1), { target: summoned })] }),
+  unit("bs5", "Hive Queen", { rank: 3, atk: 3, hp: 4, factions: ["beast"], effects: [startOfCombat(summon("beast_cub", 2))] }),
+  unit("bs6", "Alpha Wolf", { rank: 4, atk: 5, hp: 5, factions: ["beast"], effects: [lastStand(summon("beast_cub", 2)), onSummon(buff(2, 2), { target: summoned })] }),
+  unit("bs7", "Spirit Totem", { rank: 5, atk: 4, hp: 8, factions: ["beast"], keywords: ["GUARD"], effects: [onSummon(buff(3, 3), { target: summoned })] }),
+  unit("bs8", "Primal King", { rank: 6, atk: 8, hp: 9, factions: ["beast"], effects: [onAttack(summon("beast_cub", 2)), lastStand(summon("beast_cub", 2))] }),
 
   // ---- Ally (economy and support). Den-O's Imagin live here.
   unit("al1", "Cafe Owner", { rank: 1, atk: 1, hp: 2, factions: ["ally"], effects: [endOfTurn(buff(1, 1), { condition: energyAtLeast(1), target: randomAlly() })] }),
@@ -233,7 +237,7 @@ const tavernGear = [
   shopGear("g_call_sentai", "Sentai Call", 2, 3, [player("ON_PLAY", discoverUnit("sentai"))], { factions: ["sentai"] }),
   shopGear("g_call_mecha", "Mecha Call", 2, 3, [player("ON_PLAY", discoverUnit("mecha"))], { factions: ["mecha"] }),
   shopGear("g_call_kaijin", "Kaijin Call", 2, 3, [player("ON_PLAY", discoverUnit("kaijin"))], { factions: ["kaijin"] }),
-  shopGear("g_call_grunt", "Grunt Call", 2, 3, [player("ON_PLAY", discoverUnit("grunt"))], { factions: ["grunt"] }),
+  shopGear("g_call_beast", "Beast Call", 2, 3, [player("ON_PLAY", discoverUnit("beast"))], { factions: ["beast"] }),
   shopGear("g_call_ally", "Ally Call", 2, 3, [player("ON_PLAY", discoverUnit("ally"))], { factions: ["ally"] }),
   shopGear("g_call_dark_rider", "Dark Rider Call", 2, 3, [player("ON_PLAY", discoverUnit("dark_rider"))], { factions: ["dark_rider"] }),
   shopGear("g_call_shonen", "Shonen Call", 2, 3, [player("ON_PLAY", discoverUnit("shonen"))], { factions: ["shonen"] }),
@@ -264,7 +268,7 @@ const relics = [
   relic("gaia_memory", "Gaia Memory", "LESSER", 2, [player("START_OF_COMBAT", buff(2, 2), { target: leftmost({ series: "w" }) })], { series: "w" }),
   relic("rider_pass", "Rider Pass", "LESSER", 0, [player("START_OF_COMBAT", buff(2, 0), { target: leftmost({ series: "den_o" }) })], { series: "den_o" }),
   relic("core_medal_set", "Core Medal Set", "LESSER", 1, [player("START_OF_COMBAT", buff(1, 1), { target: allAllies({ series: "ooo" }) })], { series: "ooo" }),
-  relic("grunt_whistle", "Grunt Whistle", "LESSER", 2, [player("START_OF_COMBAT", summon("grunt_token"))], { factions: ["grunt"] }),
+  relic("pack_horn", "Pack Horn", "LESSER", 2, [player("START_OF_COMBAT", summon("beast_cub"))], { factions: ["beast"] }),
   relic("cafe_coupon", "Cafe Coupon", "LESSER", 3, [player("ON_TURN_START", energy(1))], { factions: ["ally"] }),
   relic("training_bracelet", "Training Bracelet", "LESSER", 3, [player("START_OF_COMBAT", buff(1, 1), { target: allAllies() })]),
   relic("lucky_charm", "Lucky Charm", "LESSER", 0, [player("ON_ACQUIRE", energy(1))]),
@@ -295,7 +299,7 @@ const heroes = [
   hero("eiji_hino", "Eiji Hino", { power: { mode: "ACTIVE", cost: 1, effects: [player("ON_USE", buff(1, 1), { target: leftmost({ faction: "rider" }) })] } }),
   hero("professor_belt", "Professor Belt", { power: { mode: "ONCE", cost: 0, effects: [player("ON_USE", toHand("n2"))] } }),
   hero("himmapan_guardian", "Himmapan Guardian", { armor: 3, power: { mode: "ACTIVE", cost: 2, effects: [player("ON_USE", buff(0, 3), { target: leftmost({ series: "himmapan" }) })] } }),
-  hero("shocker_boss", "Shocker Boss", { power: { mode: "PASSIVE", effects: [player("ON_TURN_START", summon("grunt_token"))] } }),
+  hero("beast_master", "Beast Master", { power: { mode: "PASSIVE", effects: [player("ON_TURN_START", summon("beast_cub"))] } }),
   hero("iron_guard", "Iron Guard", { armor: 6 }),
   hero("hot_blooded_captain", "Hot-Blooded Captain", { power: { mode: "ACTIVE", cost: 1, effects: [player("ON_USE", buff(1, 1, true), { target: leftmost({ faction: "shonen" }) })] } }),
 ];

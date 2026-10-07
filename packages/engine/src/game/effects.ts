@@ -51,6 +51,8 @@ function select(
       return mine;
     case "CHOSEN_FRIENDLY":
       return chosen && mine.includes(chosen) ? [chosen] : mine.slice(0, 1);
+    case "SUMMONED": // ALLY_SUMMONED passes the newcomer in as `chosen`
+      return chosen && board.includes(chosen) ? [chosen] : [];
     case "LEFTMOST_ENEMY":
     case "RANDOM_ENEMY":
     case "ALL_ENEMY":
@@ -162,7 +164,13 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
       for (let n = 0; n < count && player.board.length < c.boardSize; n++) {
         if (!reserve(env, action.cardKey)) break;
         const at = source && player.board.includes(source) ? player.board.indexOf(source) + 1 : player.board.length;
-        player.board.splice(at, 0, { key: action.cardKey, golden: false });
+        const summoned: Unit = { key: action.cardKey, golden: false };
+        player.board.splice(at, 0, summoned);
+        // Units already on the board react to the newcomer (their buffs stick: this is the recruit phase).
+        for (const mate of [...player.board]) {
+          if (mate === summoned || !player.board.includes(mate)) continue;
+          runTrigger(env.content.card(mate.key).effects, "ALLY_SUMMONED", "UNIT", mate, player, env, undefined, summoned);
+        }
       }
       return;
     }

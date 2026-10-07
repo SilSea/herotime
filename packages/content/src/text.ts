@@ -24,6 +24,7 @@ const TRIGGER: Record<Trigger, string> = {
   AFTER_DAMAGED: "After this takes damage and survives",
   LAST_STAND: "Last Stand",
   AVENGE: "Avenge",
+  ALLY_SUMMONED: "When you summon a unit",
   ON_ACQUIRE: "When acquired",
   ON_TURN_START: "At the start of each turn",
   ON_USE: "When used",
@@ -47,6 +48,7 @@ function who(t: Target | undefined, names: Names): string {
     case "RANDOM_FRIENDLY": return `another random ${one}`;
     case "ALL_FRIENDLY": return `all ${many}`;
     case "CHOSEN_FRIENDLY": return `a chosen ${one}`;
+    case "SUMMONED": return "it";
     case "LEFTMOST_ENEMY": return "the leftmost enemy";
     case "RANDOM_ENEMY": return "a random enemy";
     case "ALL_ENEMY": return "all enemies";
