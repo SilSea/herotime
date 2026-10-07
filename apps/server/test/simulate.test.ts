@@ -27,6 +27,17 @@ describe("simulate", () => {
     expect(r.cards.some((c) => c.name !== c.key)).toBe(true);
   });
 
+  it("reports relics held at the end, and can start the first bot of every match with a relic", () => {
+    const relic = [...content.relics.keys()][0] as string;
+    const r = simulate(content, { ...quick, relic });
+    expect(r.forced).toMatchObject({ key: relic, count: 6 });
+    expect(r.forced?.avgPlacement).toBeGreaterThanOrEqual(1);
+    expect(r.relics.find((x) => x.key === relic)?.count).toBeGreaterThanOrEqual(6);
+    for (const row of r.relics) expect(content.relics.has(row.key)).toBe(true);
+    expect(simulate(content, quick).forced).toBeUndefined();
+    expect(() => simulate(content, { ...quick, relic: "nope" })).toThrow(/unknown relic/);
+  });
+
   it("is deterministic for a seed, and different seeds differ", () => {
     const a = simulate(content, quick);
     expect(simulate(content, quick)).toEqual(a);

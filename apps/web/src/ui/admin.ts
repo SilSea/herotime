@@ -28,13 +28,15 @@ interface EditorState {
   sim?: SimulationReport;
   simMatches: number;
   simTarget: "draft" | "published";
+  /** Relic handed to the first bot of every simulated match ("" = none). */
+  simRelic: string;
   versions?: { current: number; versions: VersionMeta[] };
   audit?: AuditEntry[];
   /** Problems from the last failed publish (the draft's own issues are in draft.issues). */
   publishIssues: string[];
 }
 
-const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft" };
+const ed: EditorState = { loading: false, kind: "cards", query: "", dirty: false, busy: false, raw: false, panel: "edit", publishIssues: [], simMatches: 60, simTarget: "draft", simRelic: "" };
 
 /** The element the screen was last drawn into: the app redraws and replaces it, so async work must not hold on to an old one. */
 let host: HTMLElement | undefined;
@@ -242,7 +244,7 @@ async function restore(ctx: Ctx, n: number): Promise<void> {
 async function runSimulation(ctx: Ctx): Promise<void> {
   // The server simulates the saved draft, so save pending edits first.
   if (ed.simTarget === "draft" && ed.dirty && !(await save(ctx))) return;
-  const r = await guarded(ctx, () => ctx.api.adminSimulate(token(ctx), ed.simMatches, ed.simTarget));
+  const r = await guarded(ctx, () => ctx.api.adminSimulate(token(ctx), ed.simMatches, ed.simTarget, ed.simRelic || undefined));
   if (r) {
     ed.sim = r;
     redraw(); // guarded() already redrew, before the result was stored
@@ -264,18 +266,23 @@ function simulatePanel(ctx: Ctx): HTMLElement {
   matches.addEventListener("input", () => (ed.simMatches = Math.max(1, Math.min(300, Math.trunc(matches.valueAsNumber) || 1))));
   const target = h("select", null, h("option", { value: "draft", text: "the draft", selected: ed.simTarget === "draft" }), h("option", { value: "published", text: "what is published", selected: ed.simTarget === "published" }));
   target.addEventListener("change", () => (ed.simTarget = target.value as "draft" | "published"));
+  const relicKeys = (ed.draft ? (data().relics ?? []) : []).map((x: { key?: string; name?: string }) => ({ key: String(x.key ?? ""), name: String(x.name ?? x.key ?? "") })).filter((x) => x.key);
+  const relic = h("select", { title: "Give this relic to the first bot of every match from the start" }, h("option", { value: "", text: "no forced relic", selected: ed.simRelic === "" }), ...relicKeys.map((x) => h("option", { value: x.key, text: `bot 1 starts with ${x.name}`, selected: ed.simRelic === x.key })));
+  relic.addEventListener("change", () => (ed.simRelic = relic.value));
   const r = ed.sim;
   const cards = r ? r.cards.filter((c) => c.count >= Math.max(3, r.matches / 4)) : [];
   return h(
     "div",
     null,
-    h("div", { class: "panel" }, h("h3", { text: "Sandbox: bots play full matches" }), h("p", { class: "muted", text: "Eight bots per match. Read it as 'does anything stand out' rather than a verdict: the bots play simply. Green = places well, red = places badly, against the average." }), h("div", { class: "row" }, matches, "matches on", target, h("button", { class: "btn primary", text: ed.busy ? "Running..." : "Run", disabled: ed.busy, on: { click: () => void runSimulation(ctx) } }))),
+    h("div", { class: "panel" }, h("h3", { text: "Sandbox: bots play full matches" }), h("p", { class: "muted", text: "Eight bots per match. Read it as 'does anything stand out' rather than a verdict: the bots play simply. Green = places well, red = places badly, against the average." }), h("div", { class: "row" }, matches, "matches on", target, relic, h("button", { class: "btn primary", text: ed.busy ? "Running..." : "Run", disabled: ed.busy, on: { click: () => void runSimulation(ctx) } }))),
     r &&
       h(
         "div",
         { class: "sim-grid" },
         h("div", { class: "panel" }, h("strong", { text: `${r.matches} of ${r.requested} matches` }), h("p", { class: "muted", text: `Average place ${r.expected}. Average length ${r.avgTurns} turns (${r.target}).` }), r.neverUsed.length > 0 && h("p", { text: `Never on a final board: ${r.neverUsed.map(ctx.ix.cardName).join(", ")}` })),
+        r.forced && h("div", { class: "panel" }, h("strong", { text: `Bot 1 with ${r.forced.name}` }), h("p", { text: `Average place ${r.forced.avgPlacement.toFixed(2)} (expected ${r.expected}), wins ${(r.forced.winRate * 100).toFixed(0)}% over ${r.forced.count} matches.` })),
         simTable("Heroes", r.heroes, r.expected),
+        simTable("Relics (held at the end)", r.relics ?? [], r.expected),
         simTable("Factions (3+ units on the final board)", r.factions, r.expected),
         simTable("Best cards", cards, r.expected),
         simTable("Worst cards", [...cards].reverse(), r.expected),

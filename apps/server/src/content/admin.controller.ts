@@ -114,13 +114,14 @@ export class AdminController {
    * factions fare. Runs on this thread, so it is capped; it stops early after about ten seconds.
    */
   @Post("simulate")
-  simulate(@Body() body: { matches?: number; seed?: number; target?: "draft" | "published" } | undefined) {
+  simulate(@Body() body: { matches?: number; seed?: number; target?: "draft" | "published"; relic?: string } | undefined) {
     const matches = Math.min(300, Math.max(1, Math.trunc(Number(body?.matches ?? 40)) || 40));
     const seed = Number.isInteger(body?.seed) ? (body?.seed as number) : 1;
-    return this.simulateTarget(body?.target === "published" ? "published" : "draft", matches, seed);
+    const relic = typeof body?.relic === "string" && body.relic ? body.relic : undefined;
+    return this.simulateTarget(body?.target === "published" ? "published" : "draft", matches, seed, relic);
   }
 
-  private async simulateTarget(target: "draft" | "published", matches: number, seed: number) {
+  private async simulateTarget(target: "draft" | "published", matches: number, seed: number, relic?: string) {
     let content = this.content.latest.content;
     if (target === "draft") {
       const saved = await this.repo.loadDraft();
@@ -128,7 +129,8 @@ export class AdminController {
       if (!r.content) throw new UnprocessableEntityException({ message: "the draft is not playable, so it cannot be simulated", issues: r.issues });
       content = r.content;
     }
-    return { target, ...simulate(content, { matches, seed, budgetMs: 10_000 }) };
+    if (relic !== undefined && !content.relics.has(relic)) throw new BadRequestException(`unknown relic: ${relic}`);
+    return { target, ...simulate(content, { matches, seed, budgetMs: 10_000, ...(relic !== undefined ? { relic } : {}) }) };
   }
 
   /** Card art. Send { data: <base64 or data: URL> }; the file name in the reply is what goes in a card's `art`. */

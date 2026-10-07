@@ -292,6 +292,14 @@ export function chooseRelic(player: PlayerState, index: number, env: GameEnv): s
   return key;
 }
 
+/** Give a relic outright, free and outside any offer (the admin sandbox uses it); ON_ACQUIRE effects run. */
+export function grantRelic(player: PlayerState, key: string, env: GameEnv): void {
+  const def = env.content.relics.get(key);
+  if (!def) throw new RuleError(`unknown relic: ${key}`);
+  player.relics.push(key);
+  runTrigger(def.effects, "ON_ACQUIRE", "PLAYER", null, player, env, { kind: "relic", key });
+}
+
 /** Timeout fallback: take the free option (offers include one when content allows). */
 export function autoChooseRelic(player: PlayerState, env: GameEnv): string | undefined {
   const offer = player.relicOffer;

@@ -1,4 +1,4 @@
-import { Match, type Content, type Entrant, type MatchConfig } from "@herotime/engine";
+import { grantRelic, Match, type Content, type Entrant, type MatchConfig } from "@herotime/engine";
 
 export interface SimulateOptions {
   /** Matches to play (each has 8 bots). */
@@ -7,6 +7,8 @@ export interface SimulateOptions {
   /** Stop starting new matches after this long, and report what finished. */
   budgetMs?: number;
   match?: Partial<MatchConfig>;
+  /** Give this relic to the first bot of every match from the start, to see what it does for them. */
+  relic?: string;
 }
 
 export interface Row {
@@ -28,6 +30,10 @@ export interface SimulationReport {
   heroes: Row[];
   cards: Row[];
   factions: Row[];
+  /** Relics held at the end, by the players who held them. */
+  relics: Row[];
+  /** With options.relic: how the bot that started with it placed. */
+  forced?: Row;
   /** Cards never seen on a final board in any match. */
   neverUsed: string[];
 }
@@ -59,6 +65,9 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
   const heroes = new Map<string, Acc>();
   const cards = new Map<string, Acc>();
   const factions = new Map<string, Acc>();
+  const relics = new Map<string, Acc>();
+  const forced = new Map<string, Acc>();
+  if (opts.relic !== undefined && !content.relics.has(opts.relic)) throw new Error(`unknown relic: ${opts.relic}`);
   const started = Date.now();
   let played = 0;
   let turns = 0;
@@ -68,6 +77,7 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
     if (opts.budgetMs !== undefined && Date.now() - started > opts.budgetMs) break;
     const entrants: Entrant[] = Array.from({ length: size }, (_, n) => ({ id: `b${n}`, name: `Bot ${n}`, isBot: true }));
     const match = Match.create({ content, seed: opts.seed + i, entrants, now: 0, config: opts.match ?? {} });
+    if (opts.relic !== undefined) grantRelic(match.player("b0").state, opts.relic, match.env);
     for (let guard = 0; match.phase !== "ENDED" && guard < 1000; guard++) match.tick((match.deadline as number) + 1);
     if (match.phase !== "ENDED") continue;
     played++;
@@ -76,6 +86,8 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
     for (const p of match.players) {
       const place = p.placement as number;
       if (p.state.hero) bump(heroes, p.state.hero, place);
+      for (const r of p.state.relics) bump(relics, r, place);
+      if (opts.relic !== undefined && p.id === "b0") bump(forced, opts.relic, place);
       const seen = new Set<string>();
       const tally = new Map<string, number>();
       for (const u of p.state.board) {
@@ -97,6 +109,8 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
     heroes: rows(heroes, (k) => content.heroes.get(k)?.name ?? k),
     cards: rows(cards, (k) => content.cards.get(k)?.name ?? k),
     factions: rows(factions, (k) => content.factions.get(k)?.name ?? k),
+    relics: rows(relics, (k) => content.relics.get(k)?.name ?? k),
+    ...(opts.relic !== undefined ? { forced: rows(forced, (k) => content.relics.get(k)?.name ?? k)[0] } : {}),
     neverUsed: [...content.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && !used.has(c.key)).map((c) => c.key),
   };
 }

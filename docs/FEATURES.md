@@ -89,5 +89,5 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F7.6** (P0) Admin CRUD Relic + `weight` การสุ่ม
 - [x] **F7.7** (P0) Bot เลือก Relic
 - [x] **F7.8** (P0) Content: production 10 Lesser + 8 Greater, prototype 9 + 7
-- [ ] **F7.9** (P1) ใส่ Relic ใน admin sandbox
+- [x] **F7.9** (P1) ใส่ Relic ใน admin sandbox: ตาราง Relic (อันดับเฉลี่ยของคนที่ถือ) + เลือก Relic ให้ bot 1 ถือตั้งแต่เริ่มทุกแมตช์แล้วดูอันดับ
 - [ ] **F7.10** (P1) ปรับ weight จากสถิติ pick/win rate, เพิ่ม content

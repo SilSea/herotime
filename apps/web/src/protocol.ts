@@ -95,6 +95,8 @@ export interface SimulationReport {
   heroes: SimRow[];
   cards: SimRow[];
   factions: SimRow[];
+  relics: SimRow[];
+  forced?: SimRow;
   neverUsed: string[];
 }
 
