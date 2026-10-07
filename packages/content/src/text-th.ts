@@ -171,7 +171,7 @@ export function cardTextTh(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): แปลงร่างเป็น ${names(c.henshin.into)}`);
   if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
-  if (c.ultimateInto) lines.push(`ร่าง Ultimate: ${names(c.ultimateInto)}`);
+  // ร่าง Ultimate ไม่อยู่ในข้อความการ์ด: หน้าเว็บอธิบายในกล่องข้างการ์ดแบบ keyword
   if (c.keywords.includes("ECHO")) lines.push("Echo: Deploy ของเราทำงาน 2 ครั้ง");
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names));
   return lines.join(" · ");

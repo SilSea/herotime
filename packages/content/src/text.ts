@@ -172,7 +172,7 @@ export function cardText(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): becomes ${names(c.henshin.into)}.`);
   if (c.gattaiInto) lines.push(`Gattai core: leading a Gattai group, it becomes ${names(c.gattaiInto)}.`);
-  if (c.ultimateInto) lines.push(`Ultimate Form: ${names(c.ultimateInto)}.`);
+  // Ultimate Form is not rules text: the client explains it in a box beside the card, like a keyword.
   if (c.keywords.includes("ECHO")) lines.push("Echo: your Deploy effects happen twice.");
   // Gear is used from the hand, so its ON_PLAY reads "Use:" rather than the units' "Deploy:".
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectText(e, names).replace(/^Deploy: /, "Use: ") : effectText(e, names));

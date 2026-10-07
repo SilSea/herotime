@@ -68,6 +68,12 @@ describe("rules text for fight rewards", () => {
     expect(g.cards[1]?.textTh).toBe("เริ่มการต่อสู้: ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้ตัวนี้ได้ ATK/HP รวมของพวกมัน ถาวร");
   });
 
+  it("leaves Ultimate Form out of the rules text (the client shows it like a keyword)", () => {
+    const g = withGeneratedText({ ...blank, cards: [{ key: "r", name: "R", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", effects: [], henshin: { afterTurns: 2, into: "f" }, ultimateInto: "u" }, { key: "f", name: "F", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: true, text: "", effects: [] }, { key: "u", name: "U", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: true, text: "", effects: [] }] as never });
+    expect(g.cards[0]?.text).toBe("Henshin (2): becomes F.");
+    expect(g.cards[0]?.textTh).not.toMatch(/Ultimate/);
+  });
+
   it("names copies", () => {
     const g = withGeneratedText({
       ...blank,
