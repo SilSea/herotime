@@ -109,7 +109,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
 
   return h(
     "div",
-    { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip, kws: keywords.join(","), triggers: [...new Set((def?.effects ?? []).map((e) => e.trigger))].join(",") }, on: o.onClick ? { click: o.onClick } : {} },
+    { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip, kws: keywords.join(","), triggers: [...new Set((def?.effects ?? []).map((e) => e.trigger))].join(","), henshin: def?.henshin ? `${def.henshin.afterTurns}|${ix.cardName(def.henshin.into)}` : "", core: def?.gattaiInto ? ix.cardName(def.gattaiInto) : "" }, on: o.onClick ? { click: o.onClick } : {} },
     o.cost !== undefined && h("div", { class: "cost", text: String(o.cost), title: "Energy cost" }),
     h("div", { class: "art", style: bg(art) }, art ? null : h("span", { text: ix.initials(o.key) })),
     h("div", { class: "name", text: ix.cardName(o.key) }),

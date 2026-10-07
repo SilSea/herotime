@@ -250,19 +250,18 @@ export function startApp(root: HTMLElement): void {
     big.classList.remove("small", "minion", "clickable", "unaffordable", "attacking", "hit", "focus", "dying", "entering", "huge");
     big.classList.add("preview-card");
     big.style.transform = "";
-    // Explain what is on the card: each keyword and each kind of ability, with its icon.
+    // Battlegrounds-style: one box per keyword and per kind of ability, next to the big card.
     const kws = (card.dataset.kws ?? "").split(",").filter(Boolean);
     const triggers = (card.dataset.triggers ?? "").split(",").filter((t) => t && TRIGGER_ICON[t]);
-    const faction = (card.dataset.tip ?? "").split("\n")[1] ?? "";
-    const info = h(
-      "div",
-      { class: "preview-info" },
-      faction && !faction.includes(":") && h("div", { class: "pi-faction", text: faction }),
-      kws.length > 0 && h("div", { class: "pi-title", text: "Keywords" }),
-      ...kws.map((k) => h("div", { class: "pi-row" }, h("span", { class: "pi-icon", text: KEYWORD_ICON_OF(k) }), h("span", null, h("strong", { text: keywordName(k) }), " ", h("span", { class: "pi-text", text: KEYWORDS[k]?.text ?? "" })))),
-      triggers.length > 0 && h("div", { class: "pi-title", text: "Abilities" }),
-      ...triggers.map((t) => h("div", { class: "pi-row" }, h("span", { class: "pi-icon", text: TRIGGER_ICON[t]?.icon ?? "•" }), h("span", null, h("strong", { text: TRIGGER_ICON[t]?.name ?? t }), " ", h("span", { class: "pi-text", text: TRIGGER_ICON[t]?.text ?? "" })))),
-    );
+    const box = (icon: string, title: string, text: string): HTMLElement => h("div", { class: "kw-box" }, h("div", { class: "kw-box-title" }, h("span", { class: "pi-icon", text: icon }), title), h("div", { class: "kw-box-text", text }));
+    const [turns, form] = (card.dataset.henshin ?? "").split("|");
+    const boxes = [
+      ...triggers.map((t) => box(TRIGGER_ICON[t]?.icon ?? "•", TRIGGER_ICON[t]?.name ?? t, TRIGGER_ICON[t]?.text ?? "")),
+      ...(turns ? [box("✧", `Henshin (${turns})`, `After ${turns} turn${turns === "1" ? "" : "s"} on your board, transforms into ${form}.`)] : []),
+      ...(card.dataset.core ? [box("◈", "Gattai core", `Put it leftmost of enough adjacent Gattai units and press Combine: they become ${card.dataset.core} for good.`)] : []),
+      ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k), KEYWORDS[k]?.text ?? "")),
+    ];
+    const info = h("div", { class: "kw-boxes" }, ...boxes);
     preview.replaceChildren(big, info);
     preview.classList.toggle("left", card.getBoundingClientRect().left + card.offsetWidth / 2 > window.innerWidth / 2);
     preview.classList.add("show");
