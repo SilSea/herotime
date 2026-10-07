@@ -52,6 +52,8 @@ export function startApp(root: HTMLElement): void {
   const toastHost = document.getElementById("toasts") as HTMLElement;
   let replay: ReplayView | undefined;
   let replayTurn = 0;
+  /** The match we walked out of: anything still arriving for it is ignored. */
+  let leftMatch: string | undefined;
   let content: ContentIndex | undefined;
   let wantedVersion = 0;
   const pendingIntents = new Set<string>();
@@ -146,6 +148,8 @@ export function startApp(root: HTMLElement): void {
       if (!ack.ok) toast(serverText(ack.error), "error");
     },
     async leaveMatch() {
+      // Messages for the match already on their way must not pull us back into it.
+      leftMatch = store.state.matchId;
       await net.leaveMatch();
       invalidateStats();
       wantedVersion = 0;
@@ -176,6 +180,7 @@ export function startApp(root: HTMLElement): void {
   net.on("connection", (connected) => store.set({ connected }));
   net.on("status", (status) => store.update((s) => applyStatus(s, status)));
   net.on("view", (m) => {
+    if (m.matchId === leftMatch) return;
     const before = store.state.view;
     store.update((s) => applyView(s, m, clock));
     if (store.state.view) soundChanges(before, store.state.view);
@@ -185,7 +190,9 @@ export function startApp(root: HTMLElement): void {
       void ctx().refreshContent(m.contentVersion);
     }
   });
-  net.on("event", (m) => store.update((s) => applyEvent(s, m)));
+  net.on("event", (m) => {
+    if (m.matchId !== leftMatch) store.update((s) => applyEvent(s, m));
+  });
   net.on("matchError", (e) => toast(serverText(e), "error"));
   net.on("authError", () => {
     toast(tr("Your login expired. Please log in again.", "การล็อกอินหมดอายุ กรุณาล็อกอินใหม่"), "error");
@@ -256,8 +263,8 @@ export function startApp(root: HTMLElement): void {
 
   const syncReplay = (): void => {
     const phase = store.state.view?.phase;
-    if (phase === "RECRUIT") {
-      // The next turn has begun: any fight still on screen, or waiting to be shown, is old news.
+    if (phase === "RECRUIT" || !store.state.view) {
+      // The next turn has begun (or we left the match): any fight still on screen, or waiting to be shown, is old news.
       replay?.close();
       replay = undefined;
       if (store.state.replayPending) store.set({ replayPending: undefined });

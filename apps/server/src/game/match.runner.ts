@@ -24,6 +24,8 @@ export class MatchRunner {
   private cancelTimer: (() => void) | undefined;
   private reportedEnd = false;
   private stopped = false;
+  /** Knocked-out players who left: they get no more views or events. */
+  private readonly gone = new Set<string>();
 
   constructor(
     readonly id: string,
@@ -53,7 +55,24 @@ export class MatchRunner {
 
   /** Send the current full view (used when a client connects or reconnects). */
   sync(userId: string): void {
-    if (this.humanIds.has(userId)) this.sendView(userId, true);
+    if (this.humanIds.has(userId) && !this.gone.has(userId)) this.sendView(userId, true);
+  }
+
+  /**
+   * Stop sending this player anything. Allowed once they are knocked out (or the match is over);
+   * a player still in the game cannot walk away from it. Returns whether they left.
+   */
+  leave(userId: string): boolean {
+    if (!this.humanIds.has(userId)) return false;
+    const p = this.match.players.find((x) => x.id === userId);
+    if (!this.ended && p?.alive) return false;
+    this.gone.add(userId);
+    return true;
+  }
+
+  /** Humans still watching. */
+  private get audience(): string[] {
+    return [...this.humanIds].filter((id) => !this.gone.has(id));
   }
 
   stop(): void {
@@ -70,7 +89,7 @@ export class MatchRunner {
     if (transitioned) {
       // A fight just finished (or the match did): every client needs the replay data.
       const withCombat = this.match.phase === "BATTLE" || this.match.phase === "ENDED";
-      for (const id of this.humanIds) this.sendView(id, withCombat);
+      for (const id of this.audience) this.sendView(id, withCombat);
     } else if (actor) {
       this.sendView(actor, false);
     }
@@ -81,7 +100,7 @@ export class MatchRunner {
 
   private announce(e: MatchEvent): void {
     if (e.type === "PHASE") return; // the view carries phase, turn and deadline
-    for (const id of this.humanIds) this.publisher.toUser(id, "match:event", { matchId: this.id, event: e });
+    for (const id of this.audience) this.publisher.toUser(id, "match:event", { matchId: this.id, event: e });
   }
 
   private sendView(userId: string, withCombat: boolean): void {
@@ -106,7 +125,7 @@ export class MatchRunner {
     } catch (e) {
       // An engine bug must not silently freeze a room: tell the players and stop driving it.
       this.log(`match ${this.id} crashed`, e);
-      for (const id of this.humanIds) this.publisher.toUser(id, "match:error", { matchId: this.id, error: "the match crashed" });
+      for (const id of this.audience) this.publisher.toUser(id, "match:error", { matchId: this.id, error: "the match crashed" });
       this.stop();
     }
   }

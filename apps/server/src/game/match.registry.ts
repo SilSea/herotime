@@ -86,9 +86,13 @@ export class MatchRegistry {
     return id ? this.runners.get(id) : undefined;
   }
 
-  /** Forget a finished match so the user can queue again. Does nothing while it is still running. */
+  /**
+   * Forget the user's match so they can queue again: a finished one, or a running one they were
+   * knocked out of (it plays on without them). Does nothing while they are still in the game.
+   */
   release(userId: string): void {
-    if (this.activeFor(userId) === undefined) this.byUser.delete(userId);
+    const runner = this.runnerFor(userId);
+    if (!runner || runner.ended || runner.leave(userId)) this.byUser.delete(userId);
   }
 
   get count(): number {

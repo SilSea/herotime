@@ -211,6 +211,25 @@ describe("MatchRegistry", () => {
     expect(registry.runnerFor("u1")).toBeUndefined();
   });
 
+  it("lets a knocked-out player leave a running match and stops sending them its updates", () => {
+    const { registry, publisher, timers } = setup();
+    const runner = registry.startMatch([user(1), user(2)]);
+    registry.release("u1"); // still in the game: cannot walk out
+    expect(registry.activeFor("u1")).toBe(runner);
+
+    const p1 = runner.match.players.find((p) => p.id === "u1");
+    if (!p1) throw new Error("no u1");
+    p1.alive = false; // as if knocked out
+    registry.release("u1");
+    expect(registry.runnerFor("u1")).toBeUndefined();
+    expect(registry.activeFor("u2")).toBe(runner); // the match plays on
+
+    publisher.clear();
+    playOut(timers, runner);
+    expect(publisher.of("u1")).toEqual([]);
+    expect(publisher.of("u2", "match:view").length).toBeGreaterThan(0);
+  });
+
   it("garbage-collects a finished match after ten minutes", () => {
     const { registry, timers } = setup();
     const runner = registry.startMatch([user(1)]);
