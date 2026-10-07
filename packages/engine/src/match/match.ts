@@ -112,12 +112,14 @@ export class Match {
 
     const rng = new Rng(opts.seed);
     const factions = this.pickFactions(opts.content, rng);
-    // Neutral cards are always in; a faction card is in if any of its factions is.
+    const benched = this.benchedSeries(opts.content, rng);
+    // Neutral cards are always in; a faction card is in if any of its factions is. Benched series are out.
     const poolDefs = [...opts.content.cards.values()].filter(
       (c) =>
         c.kind === "UNIT" &&
         !c.token &&
-        (factions === undefined || c.factions.length === 0 || c.factions.some((f) => factions.has(f))),
+        (factions === undefined || c.factions.length === 0 || c.factions.some((f) => factions.has(f))) &&
+        (c.series === undefined || !benched.has(c.series)),
     );
     const poolCards = poolDefs.map((c) => ({ key: c.key, rank: c.rank }));
     // Tavern gear follows the same faction rule as units, but is never pooled.
@@ -131,10 +133,8 @@ export class Match {
       cfg: opts.gameConfig ?? configFromRules(opts.content.rules),
       gear,
     });
-    if (factions) {
-      this.env.activeFactions = factions;
-      this.env.activeSeries = new Set(poolDefs.flatMap((c) => (c.series === undefined ? [] : [c.series])));
-    }
+    if (factions) this.env.activeFactions = factions;
+    if (factions || benched.size > 0) this.env.activeSeries = new Set(poolDefs.flatMap((c) => (c.series === undefined ? [] : [c.series])));
     this.combatRng = new Rng((opts.seed ^ 0x9e3779b9) >>> 0);
 
     const heroKeys = [...opts.content.heroes.keys()];
@@ -170,6 +170,26 @@ export class Match {
     return new Set(n <= 0 || n >= all.length ? all : rng.shuffle(all).slice(0, n));
   }
 
+  /**
+   * Featured Series: in a franchise with more series than featuredSeriesPerFranchise, the series left out of
+   * this match. Draws from the RNG only when some franchise is that big, so smaller content plays as before.
+   */
+  private benchedSeries(content: Content, rng: Rng): Set<string> {
+    const n = this.config.featuredSeriesPerFranchise;
+    const benched = new Set<string>();
+    if (n <= 0) return benched;
+    const byFranchise = new Map<string, string[]>();
+    for (const s of [...content.series.values()].sort((a, b) => a.key.localeCompare(b.key))) {
+      if (s.franchise === undefined) continue;
+      byFranchise.set(s.franchise, [...(byFranchise.get(s.franchise) ?? []), s.key]);
+    }
+    for (const [, keys] of [...byFranchise].sort((a, b) => a[0].localeCompare(b[0]))) {
+      if (keys.length <= n) continue;
+      for (const k of rng.shuffle(keys).slice(n)) benched.add(k);
+    }
+    return benched;
+  }
+
   static create(opts: CreateMatchOptions): Match {
     return new Match(opts);
   }
@@ -202,6 +222,7 @@ export class Match {
       turn: this.turn,
       deadline: this.deadline,
       factions: [...(this.env.activeFactions ?? [])].sort(),
+      series: this.env.activeSeries ? [...this.env.activeSeries].sort() : undefined,
       me: {
         id: p.id,
         state: p.state,

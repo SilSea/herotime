@@ -29,7 +29,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F3.1** (P0) ลำดับชั้น Universe → Franchise → Series
 - [x] **F3.2** (P0) Series Template (Core / Extra / Mecha / Villain / Bond / Signature)
 - [x] **F3.3** (P0) Series Bond (≥2 / ≥4 ยูนิตซีรีส์เดียวกัน)
-- [ ] **F3.4** (P1) Featured Series 3 ซีรีส์ต่อ franchise ต่อล็อบบี้
+- [x] **F3.4** (P1) Featured Series 3 ซีรีส์ต่อ franchise ต่อล็อบบี้ (`featuredSeriesPerFranchise`, franchise ที่มีซีรีส์ไม่เกิน 3 ใช้ทั้งหมด; หนังสือการ์ดแสดงเฉพาะซีรีส์ในเกม)
 - [x] **F3.5** (P0) Gauge system กลาง (sources / thresholds เก็บใน DB)
 - [x] **F3.6** (P0) Roll Call 5 สี → Mecha Gauge → การ์ด "Kyodai Gattai!" → Giant Slot
 - [x] **F3.7** (P0) Giant Robo ลงสนามเมื่อเหลือ ≤2 ตัว หรือศัตรูเกิด Kyodaika

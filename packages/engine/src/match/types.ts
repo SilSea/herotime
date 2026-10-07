@@ -124,6 +124,8 @@ export interface MatchView {
   deadline: number | null;
   /** Factions in play this match (empty when the content declares none). */
   factions: string[];
+  /** Series whose cards are in this match (undefined = no restriction). */
+  series?: string[];
   me: {
     id: string;
     state: PlayerState;

@@ -24,6 +24,11 @@ export interface MatchConfig {
   readyEndsRecruit: boolean;
   /** Force exactly these factions (for testing a matchup). Overrides factionsPerMatch. */
   fixedFactions?: string[];
+  /**
+   * Featured Series: a franchise with more series than this uses only this many, picked at random per match;
+   * cards of the other series stay out of the pool. 0 = every series.
+   */
+  featuredSeriesPerFranchise: number;
 }
 
 export const DEFAULT_MATCH_CONFIG: MatchConfig = {
@@ -40,6 +45,7 @@ export const DEFAULT_MATCH_CONFIG: MatchConfig = {
   heroChoices: 2,
   factionsPerMatch: 5,
   readyEndsRecruit: false,
+  featuredSeriesPerFranchise: 3,
 };
 
 /** Quick Mode (docs/RULES.md 1.1): every recruit turn lasts 35s and heroes start on 20 Health. */

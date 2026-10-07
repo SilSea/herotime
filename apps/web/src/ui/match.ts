@@ -220,6 +220,12 @@ let wasFrozen = false;
 /** The shop as last drawn, so the deal-in animation plays only for a new shop. */
 let lastShopSig = "";
 
+/** Whether a card can turn up in this match: one of its factions is in play (or it has none) and its series is featured. */
+const inMatchOf =
+  (view: View) =>
+  (c: { factions: string[]; series?: string }): boolean =>
+    (c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f))) && (view.series === undefined || c.series === undefined || view.series.includes(c.series));
+
 /** Book tab for tavern gear (ranks are 1-6, so 7 cannot clash). */
 const GEAR_TAB = 7;
 /** Book tab for cards that never come from the tavern: gauge rewards and the Giant Robos. */
@@ -237,7 +243,7 @@ function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
       }
     }
   }
-  const series = new Set([...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && (c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f)))).flatMap((c) => (c.series ? [c.series] : [])));
+  const series = new Set([...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatchOf(view)(c)).flatMap((c) => (c.series ? [c.series] : [])));
   const giants = [...ctx.ix.cards.values()].filter((c) => c.kind === "GIANT" && (c.series === undefined || series.has(c.series))).sort((a, b) => a.name.localeCompare(b.name));
   for (const c of giants) out.push({ key: c.key, how: tr("Giant Robo: chosen with Kyodai Gattai!, waits in the Giant Slot", "Giant Robo: เลือกได้จาก Kyodai Gattai! แล้วรออยู่ในช่อง Giant") });
   return out;
@@ -247,7 +253,7 @@ function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
 function bookModal(ctx: Ctx, view: View): HTMLElement {
   const state = ctx.store.state;
   const rank = state.bookRank || view.me.state.rank || 1;
-  const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
+  const inMatch = inMatchOf(view);
   const pool = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
   const gear = [...ctx.ix.cards.values()].filter((c) => c.kind === "GEAR" && !c.token && inMatch(c)).sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
   const fac = state.bookFaction;
@@ -264,7 +270,7 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
     h(
       "div",
       { class: "modal-box book-box" },
-      h("div", { class: "row" }, h("h2", { text: tr("Card book", "หนังสือการ์ด") }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `${tr("Factions this match", "เผ่าในเกมนี้")}: ${view.factions.map(ctx.ix.factionName).join(", ") || tr("all", "ทั้งหมด")} · ${tr("your tavern is rank", "ร้านของคุณ rank")} ${view.me.state.rank}` }), h("button", { class: "btn", text: tr("Close", "ปิด"), on: { click: close } })),
+      h("div", { class: "row" }, h("h2", { text: tr("Card book", "หนังสือการ์ด") }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `${tr("Factions this match", "เผ่าในเกมนี้")}: ${view.factions.map(ctx.ix.factionName).join(", ") || tr("all", "ทั้งหมด")} · ${tr("your tavern is rank", "ร้านของคุณ rank")} ${view.me.state.rank}`, title: view.series ? `${tr("Series this match", "ซีรีส์ในเกมนี้")}: ${view.series.map((k) => ctx.ix.snapshot.series.find((s) => s.key === k)?.name ?? k).join(", ")}` : "" }), h("button", { class: "btn", text: tr("Close", "ปิด"), on: { click: close } })),
       h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? tr("Upgrade your tavern to be offered these", "อัปเกรดร้านเพื่อให้สุ่มเจอการ์ดเหล่านี้") : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
         gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: tr("Gear the tavern can offer (from the rank shown on each card)", "Gear ที่ร้านสุ่มให้ได้ (ตั้งแต่ rank ที่เขียนบนการ์ด)"), on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) })),
         special.length > 0 && h("button", { class: `tab ${rank === SPECIAL_TAB ? "active" : ""}`, title: tr("Cards from the gauges, and the Giant Robos", "การ์ดจาก gauge และ Giant Robo"), on: { click: () => ctx.store.set({ bookRank: SPECIAL_TAB }) } }, tr("Special", "พิเศษ"), h("span", { class: "book-count", text: String(special.length) }))),
@@ -735,7 +741,7 @@ function gaugeBars(ctx: Ctx, view: View): HTMLElement {
 function showGaugeCard(ctx: Ctx, view: View, anchor: HTMLElement, g: (typeof ctx.ix.snapshot.gauges)[number]): void {
   hidePlayerCard();
   const t = gaugeText(g, ctx.ix.cardName, ctx.ix.rollCallColors);
-  const inMatch = (c: { factions: string[] }): boolean => c.factions.length === 0 || c.factions.some((f) => view.factions.includes(f));
+  const inMatch = inMatchOf(view);
   const shopUnits = [...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatch(c));
   const triggers = new Set(g.sources.map((s) => s.trigger));
   // Units that feed it: Sentai colours for Roll Call, Henshin units for transformations.
