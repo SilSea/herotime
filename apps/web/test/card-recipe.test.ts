@@ -1,0 +1,76 @@
+import { CardDef, Selector, Trigger, Action } from "@herotime/shared";
+import { Content } from "@herotime/engine";
+import { describe, expect, it } from "vitest";
+import { buildCard, checkRecipe, choicesFor, DO, keyFromName, newAbility, newRecipe, TARGET, WHEN, type Recipe } from "../src/card-recipe.js";
+
+const recipe = (o: Partial<Recipe>): Recipe => ({ ...newRecipe(), name: "Test", key: "test", ...o });
+const cub = CardDef.parse({ key: "cub", name: "Cub", rank: 1, atk: 1, hp: 1, token: true });
+/** The engine's own validation: the card must be playable as built. */
+const playable = (card: Record<string, unknown>): string[] => {
+  try {
+    new Content({ factions: [{ key: "beast", name: "Beast", color: "#888", text: "", textTh: "" }], cards: [cub, CardDef.parse(card)] } as never);
+    return [];
+  } catch (e) {
+    return [(e as Error).message];
+  }
+};
+
+describe("card wizard", () => {
+  it("only offers real triggers, actions and targets", () => {
+    for (const w of WHEN) expect(Trigger.options).toContain(w.key);
+    for (const d of DO) expect(Action.options.map((o) => o.shape.type.value)).toContain(d.key);
+    for (const t of TARGET) expect(Selector.options).toContain(t.key);
+  });
+
+  it("offers only what works at that moment", () => {
+    const dies = { ...newAbility("UNIT"), when: "LAST_STAND" };
+    const c = choicesFor(dies, "UNIT");
+    expect(c.do.map((d) => d.key)).not.toContain("GAIN_ENERGY"); // recruit-only
+    expect(c.do.map((d) => d.key)).toContain("DAMAGE");
+    expect(c.target.map((t) => t.key)).toContain("RANDOM_ENEMY");
+    expect(c.target.map((t) => t.key)).not.toContain("SUMMONED");
+    const played = choicesFor({ ...newAbility("UNIT"), when: "ON_PLAY" }, "UNIT");
+    expect(played.do.map((d) => d.key)).not.toContain("DAMAGE");
+    expect(played.target.map((t) => t.key)).not.toContain("RANDOM_ENEMY");
+    const onSummon = choicesFor({ ...newAbility("UNIT"), when: "ALLY_SUMMONED" }, "UNIT");
+    expect(onSummon.target.map((t) => t.key)).toContain("SUMMONED");
+    expect(onSummon.do.map((d) => d.key)).not.toContain("GAIN_ENERGY");
+    expect(onSummon.do.map((d) => d.key)).not.toContain("DAMAGE");
+    const gear = choicesFor(newAbility("GEAR"), "GEAR");
+    expect(gear.when).toEqual([]);
+    expect(gear.target.map((t) => t.key)).toContain("CHOSEN_FRIENDLY");
+    expect(gear.target.map((t) => t.key)).not.toContain("SELF");
+  });
+
+  it("builds cards the engine accepts: a summoner, a pack leader and a gear", () => {
+    const summoner = buildCard(recipe({ key: "den", factions: ["beast"], abilities: [{ ...newAbility("UNIT"), when: "LAST_STAND", do: "SUMMON", cardKey: "cub", count: 2 }] }));
+    expect(summoner).toMatchObject({ kind: "UNIT", token: false, effects: [{ scope: "UNIT", trigger: "LAST_STAND", actions: [{ type: "SUMMON", cardKey: "cub", count: 2 }] }] });
+    expect(playable(summoner)).toEqual([]);
+
+    const leader = buildCard(recipe({ key: "pack", abilities: [{ ...newAbility("UNIT"), when: "ALLY_SUMMONED", do: "BUFF", atk: 1, hp: 1, target: "SUMMONED" }] }));
+    expect(leader.effects).toEqual([{ scope: "UNIT", trigger: "ALLY_SUMMONED", actions: [{ type: "BUFF", atk: 1, hp: 1, permanent: false }], target: { selector: "SUMMONED" } }]);
+    expect(playable(leader)).toEqual([]);
+
+    const gear = buildCard(recipe({ key: "blade", type: "GEAR", cost: 3, costType: "HEALTH", abilities: [{ ...newAbility("GEAR"), do: "GIVE_KEYWORD", keyword: "LETHAL" }] }));
+    expect(gear).toMatchObject({ kind: "GEAR", cost: 3, costType: "HEALTH", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY" } }] });
+    expect(playable(gear)).toEqual([]);
+
+    const token = buildCard(recipe({ key: "tok", type: "TOKEN" }));
+    expect(token).toMatchObject({ kind: "UNIT", token: true });
+  });
+
+  it("says what is missing in words", () => {
+    expect(checkRecipe(recipe({ name: "", key: "Bad Key" }), new Set())).toHaveLength(2);
+    expect(checkRecipe(recipe({ key: "cub" }), new Set(["cub"])).join()).toMatch(/already|อยู่แล้ว/);
+    expect(checkRecipe(recipe({ type: "GEAR" }), new Set()).join()).toMatch(/at least one ability|อย่างน้อย 1/);
+    expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), do: "SUMMON", cardKey: "" }] }), new Set()).join()).toMatch(/pick the card|เลือกการ์ด/);
+    expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "LAST_STAND", do: "GAIN_ENERGY" }] }), new Set()).join()).toMatch(/does not work|ใช้ในจังหวะนั้นไม่ได้/);
+    expect(checkRecipe(recipe({ abilities: [{ ...newAbility("UNIT"), when: "ON_ATTACK", do: "SUMMON", cardKey: "cub" }] }), new Set())).toEqual([]);
+  });
+
+  it("makes a key from the name, unique among the cards", () => {
+    expect(keyFromName("Pack Wolf", new Set())).toBe("pack_wolf");
+    expect(keyFromName("Pack Wolf", new Set(["pack_wolf", "pack_wolf_2"]))).toBe("pack_wolf_3");
+    expect(keyFromName("หมาป่า", new Set())).toBe("card");
+  });
+});

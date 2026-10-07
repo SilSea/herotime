@@ -1,0 +1,286 @@
+import { buildCard, checkRecipe, choicesFor, DO, describeRecipe, keyFromName, newAbility, newRecipe, type Ability, type CardType, type Recipe } from "../card-recipe.js";
+import { ContentIndex } from "../content-index.js";
+import { KEYWORDS, keywordName, keywordText, SENTAI_COLORS } from "../format.js";
+import { tr } from "../i18n.js";
+import type { CardDef } from "../protocol.js";
+import { cardEl } from "./card.js";
+import { h } from "./dom.js";
+
+/** What the wizard needs from the editor around it. */
+export interface WizardDeps {
+  /** The draft as the game would see it (names, factions, series, cards to summon). */
+  ix: ContentIndex;
+  /** Keys already used by cards in the draft. */
+  takenKeys: ReadonlySet<string>;
+  upload: (file: File) => Promise<string>;
+  /** Put the card in the draft; `save` also saves the draft (the server then writes its rules text). */
+  create: (card: Record<string, unknown>, save: boolean) => void;
+  /** Draw the whole editor again (after a choice that changes which fields are shown). */
+  rerender: () => void;
+}
+
+let wz: Recipe = newRecipe();
+let previewHost: HTMLElement | undefined;
+let deps: WizardDeps | undefined;
+
+/** Start over with an empty card. */
+export function resetWizard(): void {
+  wz = newRecipe();
+}
+
+/** Quick starts: a typical card of each kind, to edit from. */
+type Template = Omit<Partial<Recipe>, "abilities"> & { abilities: Partial<Ability>[] };
+const TEMPLATES: { label: () => string; make: () => Template }[] = [
+  { label: () => tr("Dies → summons", "ตาย → เรียกพวก"), make: () => ({ type: "UNIT", abilities: [{ when: "LAST_STAND", do: "SUMMON", count: 1 }] }) },
+  { label: () => tr("Attacks → summons", "โจมตี → เรียกพวก"), make: () => ({ type: "UNIT", abilities: [{ when: "ON_ATTACK", do: "SUMMON", count: 1 }] }) },
+  { label: () => tr("Buffs every summoned unit", "บัฟทุกตัวที่ถูกเรียก"), make: () => ({ type: "UNIT", abilities: [{ when: "ALLY_SUMMONED", do: "BUFF", atk: 1, hp: 1, target: "SUMMONED" }] }) },
+  { label: () => tr("Played → buff an ally", "ลงจากมือ → บัฟพวก"), make: () => ({ type: "UNIT", abilities: [{ when: "ON_PLAY", do: "BUFF", atk: 2, hp: 2, target: "LEFTMOST_FRIENDLY" }] }) },
+  { label: () => tr("Start of combat → buff all", "เริ่มสู้ → บัฟทุกตัว"), make: () => ({ type: "UNIT", abilities: [{ when: "START_OF_COMBAT", do: "BUFF", atk: 1, hp: 1, target: "ALL_FRIENDLY" }] }) },
+  { label: () => tr("Gear: buff a chosen unit", "Gear: บัฟตัวที่เลือก"), make: () => ({ type: "GEAR", rank: 1, cost: 2, abilities: [{ do: "BUFF", atk: 2, hp: 2, target: "CHOSEN_FRIENDLY" }] }) },
+  { label: () => tr("Summoned token", "Token ที่ถูกเรียก"), make: () => ({ type: "TOKEN", atk: 1, hp: 1, abilities: [] }) },
+];
+
+function applyTemplate(t: (typeof TEMPLATES)[number]): void {
+  const m = t.make();
+  const type = (m.type ?? "UNIT") as CardType;
+  wz = { ...wz, ...m, type, abilities: m.abilities.map((a) => ({ ...newAbility(type), ...a })) } as Recipe;
+}
+
+// ------------------------------------------------------------------ small inputs
+
+const field = (label: string, ...control: (Node | string | false | null | undefined)[]): HTMLElement => h("label", { class: "wz-field" }, h("span", { class: "wz-label", text: label }), ...control);
+
+function num(value: number, set: (n: number) => void, min = 0, max = 99): HTMLInputElement {
+  const el = h("input", { type: "number", value: String(value), attrs: { min: String(min), max: String(max) } }) as HTMLInputElement;
+  el.addEventListener("input", () => {
+    set(Math.max(min, Math.min(max, Math.trunc(el.valueAsNumber) || 0)));
+    refreshPreview();
+  });
+  return el;
+}
+
+/** A dropdown. `structural` choices change which fields are shown, so they redraw the whole wizard. */
+function pick(value: string, options: { value: string; label: string }[], set: (v: string) => void, structural = false): HTMLSelectElement {
+  const el = h("select", null, ...options.map((o) => h("option", { value: o.value, text: o.label, selected: o.value === value }))) as HTMLSelectElement;
+  el.addEventListener("change", () => {
+    set(el.value);
+    if (structural) deps?.rerender();
+    else refreshPreview();
+  });
+  return el;
+}
+
+function check(label: string, on: boolean, set: (v: boolean) => void, title = "", style = ""): HTMLElement {
+  const box = h("input", { type: "checkbox", checked: on }) as HTMLInputElement;
+  box.addEventListener("change", () => {
+    set(box.checked);
+    refreshPreview();
+  });
+  return h("label", { class: "wz-check", title, style }, box, label);
+}
+
+const toggle = (list: string[], v: string, on: boolean): string[] => (on ? [...new Set([...list, v])] : list.filter((x) => x !== v));
+
+// ------------------------------------------------------------------ the screen
+
+export function wizardPanel(d: WizardDeps): HTMLElement {
+  deps = d;
+  const ix = d.ix;
+  const factions = [...ix.factions.values()];
+  const cards = [...ix.cards.values()].filter((c) => c.key !== wz.key);
+  const units = cards.filter((c) => c.kind === "UNIT").sort((a, b) => Number(b.token) - Number(a.token) || a.rank - b.rank || a.name.localeCompare(b.name));
+  const cardOptions = (list: CardDef[]) => [{ value: "", label: tr("— pick a card —", "— เลือกการ์ด —") }, ...list.map((c) => ({ value: c.key, label: `${c.name}${c.token ? " (token)" : ""} · ${c.atk}/${c.hp}` }))];
+  const factionOptions = (none: string) => [{ value: "", label: none }, ...factions.map((f) => ({ value: f.key, label: f.name }))];
+  const isGear = wz.type === "GEAR";
+
+  // 1. what kind of card
+  const typeRow = h(
+    "div",
+    { class: "wz-types" },
+    ...(
+      [
+        ["UNIT", tr("Unit (sold in the tavern)", "ยูนิต (ขายในร้าน)")],
+        ["TOKEN", tr("Token (only summoned)", "Token (ถูกเรียกเท่านั้น)")],
+        ["GEAR", tr("Gear (used from hand)", "Gear (ใช้จากมือ)")],
+        ["GIANT", tr("Giant Robo", "Giant Robo")],
+      ] as [CardType, string][]
+    ).map(([t, label]) =>
+      h("button", {
+        class: `chip wz-type ${wz.type === t ? "active" : ""}`,
+        text: label,
+        on: {
+          click: () => {
+            wz.type = t;
+            wz.abilities = wz.abilities.map((a) => (t === "GEAR" ? { ...a, when: "ON_PLAY", target: DO.find((x) => x.key === a.do)?.targeted ? "CHOSEN_FRIENDLY" : a.target } : a));
+            if (t === "GIANT") wz.rank = 6;
+            d.rerender();
+          },
+        },
+      }),
+    ),
+  );
+
+  // 2. name, stats, tribe
+  const keyInput = h("input", { type: "text", value: wz.key, attrs: { maxlength: "40" } }) as HTMLInputElement;
+  keyInput.addEventListener("input", () => {
+    wz.key = keyInput.value.trim();
+    wz.keyEdited = true;
+    refreshPreview();
+  });
+  const nameInput = h("input", { type: "text", value: wz.name, placeholder: tr("e.g. Pack Wolf", "เช่น Pack Wolf"), attrs: { maxlength: "40" } }) as HTMLInputElement;
+  nameInput.addEventListener("input", () => {
+    wz.name = nameInput.value;
+    if (!wz.keyEdited) {
+      wz.key = keyFromName(wz.name, d.takenKeys);
+      keyInput.value = wz.key;
+    }
+    refreshPreview();
+  });
+  const artInput = h("input", { type: "file", attrs: { accept: "image/*" } }) as HTMLInputElement;
+  artInput.addEventListener("change", () => {
+    const file = artInput.files?.[0];
+    if (file) void d.upload(file).then((name) => ((wz.art = name), refreshPreview()));
+  });
+  const basics = h(
+    "div",
+    { class: "wz-grid" },
+    field(tr("Name", "ชื่อ"), nameInput),
+    field(tr("Key (id, cannot change later)", "Key (รหัสถาวร เปลี่ยนทีหลังไม่ได้)"), keyInput),
+    field("Rank", num(wz.rank, (n) => (wz.rank = n), 1, 6)),
+    !isGear && field("ATK", num(wz.atk, (n) => (wz.atk = n), 0, 99)),
+    !isGear && field("HP", num(wz.hp, (n) => (wz.hp = n), 1, 99)),
+    isGear && field(tr("Price", "ราคา"), num(wz.cost, (n) => (wz.cost = n), 0, 20)),
+    isGear && field(tr("Paid with", "จ่ายด้วย"), pick(wz.costType, [{ value: "ENERGY", label: "Energy" }, { value: "HEALTH", label: tr("Health", "เลือด") }], (v) => (wz.costType = v as Recipe["costType"]))),
+    field(tr("Series", "ซีรีส์"), pick(wz.series, [{ value: "", label: tr("none", "ไม่มี") }, ...ix.snapshot.series.map((s) => ({ value: s.key, label: s.name }))], (v) => (wz.series = v))),
+    field(tr("Picture", "รูป"), artInput, wz.art && h("span", { class: "muted small", text: wz.art })),
+  );
+  const tribe = h(
+    "div",
+    null,
+    h("div", { class: "wz-label", text: tr("Faction (none = neutral, in every match)", "เผ่า (ไม่เลือก = ไม่มีเผ่า มีทุกเกม)") }),
+    h("div", { class: "wz-chips" }, ...factions.map((f) => check(f.name, wz.factions.includes(f.key), (on) => (wz.factions = toggle(wz.factions, f.key, on)), ix.factionText(f.key), `--c:${f.color}`))),
+    !isGear && h("div", { class: "wz-label", text: tr("Sentai colours (for Team-Up and Roll Call)", "สี Sentai (ใช้กับ Team-Up และ Roll Call)") }),
+    !isGear && h("div", { class: "wz-chips" }, ...Object.keys(SENTAI_COLORS).map((c) => check(c, wz.colors.includes(c), (on) => (wz.colors = toggle(wz.colors, c, on)), "", `--c:${SENTAI_COLORS[c]}`))),
+    !isGear && h("div", { class: "wz-label", text: "Keywords" }),
+    !isGear && h("div", { class: "wz-chips" }, ...Object.keys(KEYWORDS).map((k) => check(keywordName(k), wz.keywords.includes(k), (on) => (wz.keywords = toggle(wz.keywords, k, on)), keywordText(k)))),
+  );
+
+  // 3. abilities
+  const abilities = h(
+    "div",
+    { class: "wz-abilities" },
+    ...wz.abilities.map((a, i) => abilityBox(a, i, { units, cards, cardOptions, factionOptions })),
+    h("button", { class: "btn", text: tr("+ Add an ability", "+ เพิ่มความสามารถ"), on: { click: () => ((wz.abilities = [...wz.abilities, newAbility(wz.type)]), d.rerender()) } }),
+  );
+
+  // 4. transformations (units)
+  const special = !isGear && h(
+    "div",
+    { class: "wz-grid" },
+    field(tr("Henshin after N turns (0 = never)", "Henshin หลัง N เทิร์น (0 = ไม่แปลง)"), num(wz.henshinTurns, (n) => (wz.henshinTurns = n), 0, 9)),
+    field(tr("…into", "…แปลงเป็น"), pick(wz.henshinInto, cardOptions(units), (v) => (wz.henshinInto = v))),
+    field(tr("Gattai core: the group becomes", "Gattai core: กลุ่มรวมเป็น"), pick(wz.gattaiInto, [{ value: "", label: tr("not a core", "ไม่ใช่ core") }, ...units.map((c) => ({ value: c.key, label: c.name }))], (v) => (wz.gattaiInto = v))),
+  );
+
+  previewHost = h("div", { class: "wz-preview" });
+  refreshPreview();
+
+  const step = (n: number, title: string, ...body: (Node | false | null | undefined)[]): HTMLElement => h("section", { class: "panel wz-step" }, h("h3", null, h("span", { class: "wz-num", text: String(n) }), title), ...body);
+  return h(
+    "div",
+    { class: "wz" },
+    h(
+      "div",
+      { class: "wz-form" },
+      h("div", { class: "panel" }, h("h3", { text: tr("Card wizard", "ตัวช่วยสร้างการ์ด") }), h("p", { class: "muted", text: tr("Build a card step by step. Only choices that work together are offered; the preview on the right updates as you go. Start from a template if you like.", "สร้างการ์ดทีละขั้น ระบบให้เลือกเฉพาะตัวเลือกที่ใช้ด้วยกันได้ ดูตัวอย่างทางขวาได้ทันที จะเริ่มจากแบบสำเร็จรูปก็ได้") }),
+        h("div", { class: "wz-chips" }, ...TEMPLATES.map((t) => h("button", { class: "chip", text: t.label(), on: { click: () => (applyTemplate(t), d.rerender()) } })), h("button", { class: "chip", text: tr("Start over", "เริ่มใหม่"), on: { click: () => (resetWizard(), d.rerender()) } }))),
+      step(1, tr("What kind of card", "การ์ดประเภทไหน"), typeRow),
+      step(2, tr("Name, stats and faction", "ชื่อ ค่าพลัง และเผ่า"), basics, tribe),
+      step(3, tr("Abilities", "ความสามารถ"), abilities),
+      special && step(4, tr("Transformations", "การแปลงร่าง"), special),
+    ),
+    previewHost,
+  );
+}
+
+function abilityBox(
+  a: Ability,
+  i: number,
+  o: { units: CardDef[]; cards: CardDef[]; cardOptions: (l: CardDef[]) => { value: string; label: string }[]; factionOptions: (none: string) => { value: string; label: string }[] },
+): HTMLElement {
+  const c = choicesFor(a, wz.type);
+  const d = DO.find((x) => x.key === a.do);
+  // keep the picks valid when an earlier choice took an option away
+  if (!c.do.some((x) => x.key === a.do) && c.do[0]) a.do = c.do[0].key;
+  if (d?.targeted && !c.target.some((x) => x.key === a.target) && c.target[0]) a.target = c.target[0].key;
+  const dd = DO.find((x) => x.key === a.do);
+  const remove = h("button", { class: "mini danger", text: "✕", title: tr("Remove this ability", "ลบความสามารถนี้"), on: { click: () => ((wz.abilities = wz.abilities.filter((_, j) => j !== i)), deps?.rerender()) } });
+  return h(
+    "div",
+    { class: "wz-ability" },
+    h("div", { class: "row" }, h("strong", { text: tr(`Ability ${i + 1}`, `ความสามารถ ${i + 1}`) }), h("span", { class: "spacer" }), remove),
+    h(
+      "div",
+      { class: "wz-grid" },
+      wz.type !== "GEAR" && field(tr("When", "เมื่อไหร่"), pick(a.when, c.when.map((w) => ({ value: w.key, label: w.label() })), (v) => (a.when = v), true)),
+      wz.type !== "GEAR" && a.when === "AVENGE" && field(tr("Every N deaths", "ทุกๆ กี่ตัวที่ตาย"), num(a.every, (n) => (a.every = n), 1, 9)),
+      field(
+        tr("Only if", "เงื่อนไข"),
+        pick(a.condition, [
+          { value: "", label: tr("always", "ทุกครั้ง") },
+          { value: "TEAM_UP_COLORS_GTE", label: tr("Sentai colours at least", "มีสี Sentai อย่างน้อย") },
+          { value: "FACTION_COUNT_GTE", label: tr("units of a faction at least", "มียูนิตเผ่าหนึ่งอย่างน้อย") },
+          { value: "ENERGY_GTE", label: tr("Energy at least", "มี Energy อย่างน้อย") },
+        ], (v) => (a.condition = v), true),
+      ),
+      a.condition && field(tr("…how many", "…จำนวน"), num(a.conditionValue, (n) => (a.conditionValue = n), 0, 10)),
+      a.condition === "FACTION_COUNT_GTE" && field(tr("…of faction", "…เผ่า"), pick(a.conditionFaction, o.factionOptions("—"), (v) => (a.conditionFaction = v))),
+      field(tr("Do what", "ทำอะไร"), pick(a.do, c.do.map((x) => ({ value: x.key, label: x.label() })), (v) => (a.do = v), true)),
+      a.do === "BUFF" && field("+ATK", num(a.atk, (n) => (a.atk = n), -20, 50)),
+      a.do === "BUFF" && field("+HP", num(a.hp, (n) => (a.hp = n), -20, 50)),
+      a.do === "BUFF" && c.when.length > 0 && ["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE", "ALLY_SUMMONED"].includes(a.when) && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
+      a.do === "GIVE_KEYWORD" && field("Keyword", pick(a.keyword, Object.keys(KEYWORDS).map((k) => ({ value: k, label: keywordName(k) })), (v) => (a.keyword = v))),
+      a.do === "SUMMON" && field(tr("Card", "การ์ด"), pick(a.cardKey, o.cardOptions(o.units), (v) => (a.cardKey = v))),
+      a.do === "SUMMON" && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
+      a.do === "ADD_TO_HAND" && field(tr("Card", "การ์ด"), pick(a.cardKey, o.cardOptions(o.cards), (v) => (a.cardKey = v))),
+      (a.do === "DAMAGE" || a.do === "GAIN_ENERGY") && field(tr("Amount", "จำนวน"), num(a.amount, (n) => (a.amount = n), 1, 20)),
+      a.do === "DISCOVER_UNIT" && field(tr("Faction", "เผ่า"), pick(a.faction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.faction = v))),
+      dd?.targeted && field(tr("Who", "กับใคร"), pick(a.target, c.target.map((t) => ({ value: t.key, label: t.label() })), (v) => (a.target = v), true)),
+      dd?.targeted && !["SELF", "SUMMONED", "ADJACENT"].includes(a.target) && !a.target.endsWith("_ENEMY") && field(tr("…only faction", "…เฉพาะเผ่า"), pick(a.targetFaction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.targetFaction = v))),
+    ),
+  );
+}
+
+/** Redraw just the preview (typing in a field must not rebuild the form under the cursor). */
+function refreshPreview(): void {
+  if (!previewHost || !deps) return;
+  const d = deps;
+  const ix = d.ix;
+  const card = buildCard(wz);
+  const lines = describeRecipe(wz, ix.cardName, ix.factionName);
+  const problems = checkRecipe(wz, d.takenKeys);
+  const previewCard = { ...card, key: card.key || "__wizard__", name: wz.name || tr("New card", "การ์ดใหม่"), text: lines.join(" · "), textTh: lines.join(" · ") } as unknown as CardDef;
+  const pix = new ContentIndex({ ...ix.snapshot, cards: [...ix.snapshot.cards.filter((c) => c.key !== previewCard.key), previewCard] });
+  previewHost.replaceChildren(
+    h("h3", { text: tr("Preview", "ตัวอย่าง") }),
+    cardEl(pix, { key: previewCard.key, ...(wz.type === "GEAR" ? { cost: wz.cost, costHealth: wz.costType === "HEALTH" } : {}) }),
+    h("div", { class: "wz-lines" }, ...(lines.length > 0 ? lines.map((l) => h("p", { text: l })) : [h("p", { class: "muted", text: tr("No abilities: a plain body.", "ไม่มีความสามารถ: ตัวเปล่า") })])),
+    problems.length > 0
+      ? h("div", { class: "admin-issues" }, h("strong", { text: tr("Before adding:", "ก่อนเพิ่มต้องแก้:") }), h("ul", null, ...problems.map((p) => h("li", { text: p }))))
+      : h("p", { class: "wz-ok", text: tr("✔ Ready to add", "✔ พร้อมเพิ่มแล้ว") }),
+    h(
+      "div",
+      { class: "row" },
+      h("button", { class: "btn primary", text: tr("Add and save the draft", "เพิ่มและบันทึก draft"), disabled: problems.length > 0, on: { click: () => created(true) } }),
+      h("button", { class: "btn", text: tr("Add to the draft", "เพิ่มเข้า draft"), disabled: problems.length > 0, on: { click: () => created(false) } }),
+    ),
+    h("p", { class: "muted small", text: tr("After saving, the card's rules text is written automatically in English and Thai. Publish to put it in new matches.", "บันทึกแล้วระบบเขียนคำอธิบายการ์ดให้ทั้งไทยและอังกฤษ กด Publish เพื่อให้เกมใหม่ใช้การ์ดนี้") }),
+  );
+}
+
+function created(save: boolean): void {
+  if (!deps) return;
+  const card = buildCard(wz);
+  resetWizard();
+  deps.create(card, save);
+}

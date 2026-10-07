@@ -4,6 +4,7 @@ import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport,
 import { ENTITIES, entityInfo, RULE_DEFAULTS, RULE_ROWS, type EntityKind, type RefKind } from "./admin-schema.js";
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
+import { wizardPanel } from "./card-wizard.js";
 import type { Ctx } from "./ctx.js";
 import { h, mount } from "./dom.js";
 import { renderRows, type FormEnv } from "./form.js";
@@ -24,7 +25,7 @@ interface EditorState {
   dirty: boolean;
   busy: boolean;
   raw: boolean;
-  panel: "edit" | "versions" | "audit" | "simulate" | "stats";
+  panel: "edit" | "versions" | "audit" | "simulate" | "stats" | "wizard";
   stats?: GameStats;
   statsHumans: boolean;
   sim?: SimulationReport;
@@ -122,7 +123,7 @@ export function renderAdmin(root: HTMLElement, ctx: Ctx): void {
   const datalists = (["cards", "factions", "series", "gauges", "heroes", "relics"] as RefKind[]).map((k) => h("datalist", { id: `dl-${k}` }, ...refs(k).map((v) => h("option", { value: v }))));
 
   const panel =
-    ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : ed.panel === "simulate" ? simulatePanel(ctx) : ed.panel === "stats" ? statsPanel(ctx) : editorBody(ctx, refs);
+    ed.panel === "versions" ? versionsPanel(ctx) : ed.panel === "audit" ? auditPanel() : ed.panel === "simulate" ? simulatePanel(ctx) : ed.panel === "stats" ? statsPanel(ctx) : ed.panel === "wizard" ? wizard(ctx) : editorBody(ctx, refs);
 
   mount(root, h("div", { class: "admin" }, ...datalists, toolbar(ctx), issuesBox(), panel));
 }
@@ -156,6 +157,7 @@ function toolbar(ctx: Ctx): HTMLElement {
     b("Save draft", () => void save(ctx), { primary: ed.dirty, off: !ed.dirty && d.saved, title: "Check the draft and keep it for later. Players do not see it yet." }),
     b("Publish", () => void publish(ctx), { title: "Make the draft the content new matches use. Matches already running are not affected." }),
     b("Discard draft", () => void discard(ctx), { danger: true, off: !d.saved && !ed.dirty }),
+    b("＋ Card wizard", () => ((ed.panel = "wizard"), redraw()), { primary: ed.panel !== "wizard", title: "Make a new card step by step, with a live preview" }),
     b("Versions", () => void showVersions(ctx)),
     b("Simulate", () => ((ed.panel = "simulate"), redraw()), { title: "Play bot matches on the content and see what stands out" }),
     b("Stats", () => void showStats(ctx), { title: "Pick rate and results of cards, heroes and relics in real matches" }),
@@ -240,6 +242,27 @@ async function restore(ctx: Ctx, n: number): Promise<void> {
   ed.index = undefined;
   ed.panel = "edit";
   ctx.toast(`Version ${n} copied into the draft. Publish it to make it live.`);
+}
+
+// ----------------------------------------------------------------- card wizard
+
+function wizard(ctx: Ctx): HTMLElement {
+  return wizardPanel({
+    ix: localIndex(ctx),
+    takenKeys: new Set(list("cards").map((c) => String(c.key ?? ""))),
+    upload: (file) => uploadImage(ctx, file),
+    rerender: redraw,
+    create: (card, andSave) => {
+      list("cards").push(card);
+      ed.kind = "cards";
+      ed.index = list("cards").length - 1;
+      ed.panel = "edit";
+      ed.dirty = true;
+      ctx.toast(`${String(card.name)} was added to the draft.`);
+      if (andSave) void save(ctx).then(() => redraw());
+      else redraw();
+    },
+  });
 }
 
 // ----------------------------------------------------------------- statistics from real matches
@@ -551,8 +574,11 @@ function remove(): void {
 function localIndex(ctx: Ctx): ContentIndex {
   const d = ed.draft as AdminDraft;
   const base: ContentSnapshot = d.snapshot ?? ctx.ix.snapshot;
-  const generated = (arr: { key: string; text?: string }[], key: string): string => arr.find((x) => x.key === key)?.text ?? "";
-  const fill = <T extends { key: string; text?: string }>(items: T[], from: { key: string; text?: string }[]): T[] => items.map((x) => ({ ...x, text: x.text || generated(from, x.key) }));
+  type Texts = { key: string; text?: string; textTh?: string };
+  const generated = (arr: Texts[], key: string): Texts | undefined => arr.find((x) => x.key === key);
+  // Written text wins; otherwise the server-generated one (both languages) from the last save.
+  const fill = <T extends Texts>(items: T[], from: Texts[]): T[] =>
+    items.map((x) => (x.text ? x : { ...x, text: generated(from, x.key)?.text ?? "", textTh: x.textTh || (generated(from, x.key)?.textTh ?? "") }));
   const cards = (data().cards ?? []).map((c: any) => ({ kind: "UNIT", factions: [], colors: [], keywords: [], effects: [], token: false, text: "", ...c }));
   return new ContentIndex({
     ...base,

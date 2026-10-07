@@ -78,6 +78,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F6.5** (P0) Upload รูป (PNG/JPEG/GIF/WebP ≤ ~1.4 MB, ตรวจชนิดจาก bytes ไม่รับ SVG, ตั้งชื่อไฟล์จาก hash, เก็บใน `UPLOAD_DIR`, เสิร์ฟที่ `/art/`)
 - [x] **F6.6** (P1) Sandbox: bot 8 ตัวเล่นเต็มแมตช์บน draft หรือชุดที่ publish (สูงสุด 300 แมตช์) สรุป hero/faction/การ์ดที่ชนะมากหรือน้อยผิดปกติ (ยังไม่ใช่การเลือกบอร์ด 2 ฝั่งเอง)
 - [~] **F6.7** (P1) Rollback (restore เวอร์ชันเก่าเข้า draft แล้ว publish) + Audit log ทำแล้ว; Diff ยังไม่ทำ
+- [x] **F6.9** (P1) Card wizard ใน Admin: สร้างการ์ดทีละขั้น (ประเภท → ชื่อ/ค่าพลัง/เผ่า → ความสามารถจาก dropdown ที่กรองเฉพาะตัวเลือกที่ใช้ด้วยกันได้ → แปลงร่าง) พร้อม template, ตัวอย่างการ์ดสด, ตรวจสิ่งที่ขาดเป็นประโยค, 2 ภาษา
 - [x] **F6.8** (P2) Stat dashboard (pick rate, win rate ต่อการ์ด): Admin → Stats จากแมตช์จริงที่บันทึกไว้ (บอร์ดสุดท้าย + Relic ต่อผู้เล่นเก็บใน MatchPlayer), การ์ด/Hero/Relic: Seen, Pick %, อันดับเฉลี่ย, Win %; กรองเฉพาะคน; API `GET /admin/stats?humans=1&modes=queue,quick`
 
 ## F7. Relic (ระบบสมบัติ) — ดู [RULES.md §13](RULES.md#13-relic-ระบบสมบัติ)

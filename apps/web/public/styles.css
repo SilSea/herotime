@@ -815,3 +815,22 @@ body.dragging .drop-marker.show { display: block; }
 .room-section input[type=text] { width: 110px; text-transform: uppercase; letter-spacing: .12em; }
 .room-code { font-size: 22px; letter-spacing: .2em; color: var(--cyan); text-shadow: 0 0 10px #2fe4ff88; user-select: all; }
 .room-box { border-color: var(--cyan-dim); }
+
+/* ---- admin: card wizard */
+.wz { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.wz-form { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.wz-step h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.wz-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--cyan); color: #04101f; font-weight: 900; }
+.wz-types, .wz-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.wz-type.active { background: var(--cyan); color: #04101f; }
+.wz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px 12px; margin-bottom: 8px; }
+.wz-field { display: flex; flex-direction: column; gap: 3px; }
+.wz-label { font-size: 12px; color: #8fa8d0; margin: 4px 0 2px; }
+.wz-check { display: inline-flex; gap: 5px; align-items: center; padding: 3px 8px; border: 1px solid var(--line); border-left: 3px solid var(--c, var(--cyan-dim)); cursor: pointer; font-size: 13px; }
+.wz-abilities { display: flex; flex-direction: column; gap: 10px; }
+.wz-ability { border: 1px solid var(--line); border-left: 3px solid var(--cyan); padding: 8px 10px; background: #0a1430aa; }
+.wz-preview { position: sticky; top: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.wz-lines { align-self: stretch; font-size: 13px; }
+.wz-lines p { margin: 3px 0; }
+.wz-ok { color: #69f0ae; font-weight: 700; }
+@media (max-width: 1100px) { .wz { grid-template-columns: 1fr; } .wz-preview { position: static; } }
