@@ -19,6 +19,11 @@ const world = content({
     card("caller", { rank: 1, atk: 1, hp: 1, effects: [deployBuff] }),
     card("fan", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "ON_PLAY", condition: { type: "HAS_CARD", cards: ["zeztz"] }, target: { selector: "SELF" }, actions: [{ type: "BUFF", atk: 3, hp: 3 }] })] }),
     card("kit", { kind: "GEAR", rank: 1, cost: 1, effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY", cards: ["zeztz"] }, actions: [{ type: "BUFF", atk: 1, hp: 1 }] })] }),
+    // A Capsem: any unit takes the buff, only Zeztz also changes form.
+    card("capsem", { kind: "GEAR", rank: 1, cost: 1, effects: [
+      effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "BUFF", atk: 1, hp: 1 }] }),
+      effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY", cards: ["zeztz"] }, actions: [{ type: "TRANSFORM", into: "zeztz_form" }] }),
+    ] }),
   ],
 });
 const env = () => makeEnv({ content: world, pool: new Pool([{ key: "bystander", rank: 1 }]), rng: new Rng(3) });
@@ -54,6 +59,17 @@ describe("target filter: named cards", () => {
     useGear(p, 0, e); // the only unit it fits is picked for you
     expect(p.board[0]?.bonusAtk ?? 0).toBe(0);
     expect(p.board[1]?.bonusAtk).toBe(1);
+  });
+
+  it("a gear in parts goes on a unit any part fits; the parts that do not fit it are skipped, not moved", () => {
+    const e = env();
+    const p = newPlayer();
+    p.board = [unit("zeztz"), unit("bystander")];
+    p.hand = [unit("capsem"), unit("capsem")];
+    useGear(p, 0, e, 1); // the bystander: buffed, and the Zeztz next to it is left alone
+    expect(p.board.map((u) => [u.key, u.bonusAtk ?? 0])).toEqual([["zeztz", 0], ["bystander", 1]]);
+    useGear(p, 0, e, 0); // the Zeztz: buffed and transformed
+    expect(p.board.map((u) => [u.key, u.bonusAtk ?? 0])).toEqual([["zeztz_form", 1], ["bystander", 1]]);
   });
 
   it("works in a fight too", () => {

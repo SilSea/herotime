@@ -138,7 +138,7 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 - Gear ไม่อยู่ใน shared pool: หลายคนได้ชิ้นเดียวกันได้. ขาย Gear ไม่ได้
 - Gear ที่ได้จาก Gauge (Kyodai Gattai!, Final Form) ไม่ขายในร้าน — ดูได้ใน Book แท็บ **ร่างแปลง & พิเศษ** (พร้อม Giant Robo)
 - ร้านมี Gear 1 ใบเสมอ: ทุก Refresh สุ่มใหม่; Freeze แล้วซื้อ Gear ไป เทิร์นหน้าเติมใหม่ให้
-- **เลือกเป้าหมาย**: Gear ที่ใช้ selector `CHOSEN_FRIENDLY` ต้องเลือกยูนิต — ลาก Gear ไปวางบนยูนิต หรือกด Use แล้วคลิกยูนิต (Esc ยกเลิก). มียูนิตเข้าเงื่อนไขตัวเดียว = เลือกให้เอง; ไม่มีเลย = ใช้ไม่ได้ (การ์ดยังอยู่ในมือ). นอกจาก Gear (เช่นในการต่อสู้) `CHOSEN_FRIENDLY` = ซ้ายสุดที่เข้าเงื่อนไข
+- **เลือกเป้าหมาย**: Gear ที่ใช้ selector `CHOSEN_FRIENDLY` ต้องเลือกยูนิต — ลาก Gear ไปวางบนยูนิต หรือกด Use แล้วคลิกยูนิต (Esc ยกเลิก). มียูนิตเข้าเงื่อนไขตัวเดียว = เลือกให้เอง; ไม่มีเลย = ใช้ไม่ได้ (การ์ดยังอยู่ในมือ). Gear ที่มีหลายผล (หลาย effect) ใช้กับยูนิตที่เข้าเงื่อนไข**ผลใดผลหนึ่ง**ได้ ผลที่ไม่เข้ากับยูนิตนั้นถูกข้าม ไม่ไปลงตัวอื่นแทน (เช่น Capsem: Rider ทุกตัวได้บัฟ แต่แปลงร่างเฉพาะ Zeztz). นอกจาก Gear (เช่นในการต่อสู้) `CHOSEN_FRIENDLY` = ซ้ายสุดที่เข้าเงื่อนไข
 - **ให้ keyword**: Guard Shield (Guard), Barrier Emitter (Barrier), Venom Edge (Lethal), Overclock Chip (Rapid), Revive Chip (Revive)
 - **ได้การ์ดตามเผ่า**: `X Call` (action `DISCOVER_UNIT {faction}`) Discover ยูนิตเผ่านั้น 1 จาก 3 จาก pool ที่ rank ≤ ร้าน (มีเฉพาะเผ่าที่อยู่ในแมตช์)
 

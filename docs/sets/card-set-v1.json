@@ -927,9 +927,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -937,7 +935,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_wing"
@@ -964,9 +974,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -974,7 +982,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_transform"
@@ -1001,9 +1021,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1011,7 +1029,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_stream"
@@ -1038,9 +1068,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1048,7 +1076,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_recovery"
@@ -1075,9 +1115,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1085,7 +1123,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_machinery"
@@ -1112,9 +1162,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1122,7 +1170,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_wonder"
@@ -1149,9 +1209,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1159,7 +1217,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_barrier"
@@ -1186,9 +1256,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1196,7 +1264,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_projection"
@@ -1223,9 +1303,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1233,7 +1311,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_gravity"
@@ -1260,9 +1350,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1270,7 +1358,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_plasma"
@@ -1297,9 +1397,7 @@
      "trigger": "ON_PLAY",
      "target": {
       "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "zeztz_plasma"
-      ]
+      "faction": "rider"
      },
      "actions": [
       {
@@ -1307,7 +1405,19 @@
        "atk": 1,
        "hp": 1,
        "permanent": true
-      },
+      }
+     ]
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz_plasma"
+      ]
+     },
+     "actions": [
       {
        "type": "TRANSFORM",
        "into": "zeztz_booster"

@@ -80,7 +80,7 @@
 | `zeztz_booster` | Plasma Booster | 6/5 *(Rapid, Rider Kick)* | — |
 | `zeztz_exdream` | **Kamen Rider Zeztz Exdream** (Final Form) | 10/10 *(Rider Kick, Barrier)* | เริ่มการต่อสู้: ให้พวกเราทุกตัว +2/+2 (จนจบการสู้) |
 
-**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz (นับทุกร่างผ่าน `formOf`) · ทำ: +1/+1 ถาวร แล้วแปลงร่างเป็น…)
+**Capsem** (Gear เผ่า Rider · ใช้กับ: Rider ที่เลือก · ทำ: +1/+1 ถาวร · ถ้าเป็น Zeztz (นับทุกร่างผ่าน `formOf`) แปลงร่างเป็น… ด้วย)
 | R | key | Gear | ราคา | แปลงเป็น |
 |---|---|---|---|---|
 | 1 | `capsem_wing` | Wing Capsem | 1 | Physicam Wing |
@@ -504,6 +504,13 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 - **Beast**: Legoshi 7/8 → 8/9 · Yahya +2/+2 → +3/+3 · Sagwan 3/5 → 4/6 · Shishigumi Lion 3/2 → 4/3 · Bill, Haru, Juno บัฟถาวร · Tem Last Stand +1/+1 → +2/+2
 
 **ที่ยังต้องดู**: Shonen ตกเป็นอ่อนสุด (4.70) · Kaiju/Mecha ยังนำราว 0.5 · ตัวเลขมาจากบอท ต้องดูจากการเล่นจริงด้วย
+
+## Balance pass 2 (2026-10-08, ใส่ใน draft แล้ว ยังไม่ publish)
+
+- ร้านสุ่มการ์ดของ Hero (ซีรีส์เดียวกัน / ที่ Hero Power ระบุ) บ่อยขึ้น 2 เท่า (`heroCardWeight`) → Sentai, Beast ดีขึ้น · Hero Zeztz แย่ลง (Rider 4.49 → 4.71)
+- **Capsem ใช้กับ Rider ทุกตัว**: +1/+1 ถาวร ส่วนการแปลงร่างยังเฉพาะ Zeztz → Rider 4.71 → **3.77** (2,400 เกม) · Mecha 3.77, Kaiju 4.28, Sentai 4.29, Beast 4.52, Shonen 4.63 (ห่างสุด 0.86)
+- ทางเลือกที่ทดลองแต่ไม่เลือก: ตัวที่ไม่ใช่ Zeztz ได้ +1/+0 (Rider 4.31) · Baku แปลงร่างแล้วได้ Capsem (ไม่ต่าง) · Capsem +2/+2 (Rider 4.60)
+- **ต้องดูต่อ**: Rider อาจแรงเกินในเกมจริง · Shonen อ่อนสุด
 
 ## 8. สิ่งที่ต้องรู้ก่อนสร้างจริง
 

@@ -57,7 +57,9 @@ function select(
     case "ALL_FRIENDLY":
       return mine;
     case "CHOSEN_FRIENDLY":
-      return chosen && mine.includes(chosen) ? [chosen] : mine.slice(0, 1);
+      // A picked unit this part does not fit gets nothing from it (never someone else instead).
+      if (chosen) return mine.includes(chosen) ? [chosen] : [];
+      return mine.slice(0, 1);
     case "GIANT_SLOT":
       return player.giant ? [player.giant] : [];
     case "SUMMONED": // ALLY_SUMMONED passes the newcomer in as `chosen`

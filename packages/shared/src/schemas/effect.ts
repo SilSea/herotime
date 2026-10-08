@@ -65,7 +65,7 @@ export const Selector = z.enum([
   "RIGHTMOST_FRIENDLY",
   "RANDOM_FRIENDLY",
   "ALL_FRIENDLY",
-  /** The friendly unit the player picks when using gear; anywhere else (or with no pick) the leftmost match. */
+  /** The friendly unit the player picks when using gear (a part the pick does not fit skips it); with no pick, the leftmost match. */
   "CHOSEN_FRIENDLY",
   /** ALLY_SUMMONED only: the unit that was just summoned. */
   "SUMMONED",

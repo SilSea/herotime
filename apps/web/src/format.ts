@@ -12,7 +12,7 @@ export function gearTargetSlots(gear: CardDef | undefined, board: readonly (Card
   if (chosen.length === 0) return null;
   const fits = (d: CardDef | undefined): boolean =>
     d !== undefined &&
-    chosen.every(
+    chosen.some(
       (e) =>
         (e.target?.faction === undefined || d.factions.includes(e.target.faction)) &&
         (e.target?.series === undefined || d.series === e.target.series) &&

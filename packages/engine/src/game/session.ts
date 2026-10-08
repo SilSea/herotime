@@ -132,8 +132,9 @@ export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv):
   }
   // A Final Form card only fits a unit that has a Final Form: on any other it would be used up for nothing.
   const finalForm = chosen.some((e) => e.actions.some((a) => a.type === "ULTIMATE_FORM"));
+  // A unit fits when any of the gear's parts can go on it; the parts that do not fit it are skipped.
   return player.board.flatMap((u, i) =>
-    chosen.every((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) && (!finalForm || env.content.card(u.key).ultimateInto !== undefined) ? [i] : [],
+    chosen.some((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) && (!finalForm || env.content.card(u.key).ultimateInto !== undefined) ? [i] : [],
   );
 }
 

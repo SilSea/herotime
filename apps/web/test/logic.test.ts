@@ -248,6 +248,13 @@ describe("gearTargetSlots", async () => {
     expect(gearTargetSlots(onChosen({ cards: ["zeztz"] }), [board[0], zeztz, form], lineage)).toEqual([1, 2]);
     expect(gearTargetSlots(onChosen({ cards: ["agent7"] }), [board[0], zeztz], lineage)).toEqual([]);
   });
+  it("a gear in parts fits a unit any part fits (a Capsem: any Rider, Zeztz also transforms)", () => {
+    const capsem = def({ kind: "GEAR", effects: [
+      { scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY", faction: "rider" }, actions: [{ type: "BUFF", atk: 1, hp: 1 }] },
+      { scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY", cards: ["zeztz"] }, actions: [{ type: "TRANSFORM", into: "y" }] },
+    ] });
+    expect(gearTargetSlots(capsem, [...board, def({ key: "zeztz", factions: ["rider"] })])).toEqual([0, 2, 3]);
+  });
   it("is null for gear that needs no unit", () => {
     expect(gearTargetSlots(def({ kind: "GEAR", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", actions: [{ type: "DISCOVER_UNIT", faction: "rider" }] }] }), board)).toBeNull();
   });
