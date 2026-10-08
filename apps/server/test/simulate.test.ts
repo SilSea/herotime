@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { simulate } from "../src/content/simulate.js";
+import { simulate, summonedTokens } from "../src/content/simulate.js";
 import { starterContent } from "./fakes.js";
 
 describe("simulate", () => {
@@ -51,5 +51,23 @@ describe("simulate", () => {
       const c = content.card(key);
       expect(c.kind === "UNIT" && !c.token).toBe(true);
     }
+  });
+});
+
+describe("summonedTokens", () => {
+  it("lists tokens that only come from SUMMON, not the forms a unit turns into", async () => {
+    const { Content } = await import("@herotime/engine");
+    const { CardDef } = await import("@herotime/shared");
+    const card = (key: string, o: Record<string, unknown> = {}) => CardDef.parse({ key, name: key, rank: 1, atk: 1, hp: 1, ...o });
+    const content = new Content({
+      cards: [
+        card("caller", { effects: [{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "SUMMON", cardKey: "pup" }] }] }),
+        card("pup", { token: true }),
+        card("civ", { henshin: { afterTurns: 1, into: "hero_form" } }),
+        card("hero_form", { token: true, effects: [{ scope: "UNIT", trigger: "LAST_STAND", actions: [{ type: "SUMMON", cardKey: "hero_form" }] }] }),
+        card("pup_shop", { effects: [{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "SUMMON", cardKey: "civ" }] }] }),
+      ],
+    });
+    expect([...summonedTokens(content)]).toEqual(["pup"]);
   });
 });

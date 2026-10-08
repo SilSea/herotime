@@ -58,6 +58,30 @@ const rows = (map: Map<string, Acc>, name: (key: string) => string): Row[] =>
     .sort((x, y) => x.avgPlacement - y.avgPlacement || y.count - x.count);
 
 /**
+ * Tokens that only ever come from SUMMON (e.g. a 2/2 called in by another card): a board full of them was not
+ * built around their faction. Forms a unit turns into (Henshin, Final Form, Gattai, TRANSFORM, formOf) still count.
+ */
+export function summonedTokens(content: Content): Set<string> {
+  const summoned = new Set<string>();
+  const forms = new Set<string>();
+  const walk = (x: unknown): void => {
+    if (Array.isArray(x)) return x.forEach(walk);
+    if (!x || typeof x !== "object") return;
+    const o = x as Record<string, unknown>;
+    if (o.type === "SUMMON" && typeof o.cardKey === "string") summoned.add(o.cardKey);
+    if (o.type === "TRANSFORM" && typeof o.into === "string") forms.add(o.into);
+    Object.values(o).forEach(walk);
+  };
+  for (const c of content.cards.values()) {
+    walk(c.effects);
+    for (const k of [c.henshin?.into, c.ultimateInto, c.gattaiInto]) if (k !== undefined) forms.add(k);
+    if (c.formOf !== undefined) forms.add(c.key);
+  }
+  for (const x of [...content.heroes.values(), ...content.relics.values(), ...content.gauges.values()]) walk(x);
+  return new Set([...summoned].filter((k) => content.card(k).token && !forms.has(k)));
+}
+
+/**
  * Play full bot-only matches on `content` and summarise who does well. Not a balance verdict: bots play
  * simply, so read it as "does anything stand out", e.g. a card whose owners always win or always lose.
  */
@@ -68,6 +92,7 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
   const relics = new Map<string, Acc>();
   const forced = new Map<string, Acc>();
   if (opts.relic !== undefined && !content.relics.has(opts.relic)) throw new Error(`unknown relic: ${opts.relic}`);
+  const summonedOnly = summonedTokens(content);
   const started = Date.now();
   let played = 0;
   let turns = 0;
@@ -92,6 +117,7 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
       const tally = new Map<string, number>();
       for (const u of p.state.board) {
         seen.add(u.key);
+        if (summonedOnly.has(u.key)) continue; // summoned helpers do not decide what a board is built around
         for (const f of content.card(u.key).factions) tally.set(f, (tally.get(f) ?? 0) + 1);
       }
       for (const key of seen) bump(cards, key, place);
