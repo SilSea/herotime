@@ -1,12 +1,12 @@
 # ชุดการ์ด v1 (ร่างแรก รอผู้ใช้ตรวจ)
 
 ร่างการ์ดของทั้ง 7 เผ่า ตามแนวใน `FACTIONS.md` และเรื่องที่กำหนด **ยังไม่ได้ใส่ลง draft** ผู้ใช้จะตรวจและปรับก่อน
-ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider และ Sentai มีทั้งฝ่ายพระเอกและ**ตัวร้าย** (เผ่าเดียวกัน)
+ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider มีพระเอกและ**ไรเดอร์ฝ่ายร้าย** (ไม่มีสัตว์ประหลาด) · Sentai มีแต่ฝ่ายเรนเจอร์
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
-| Rider | Kamen Rider ZEZTZ | 18 (พระเอก 9 + ตัวร้าย 9) | 16 | 12 |
-| Sentai | Ohsama Sentai King-Ohger | 22 (พระเอก 14 + ตัวร้าย 8) | 1 | 1 + Giant 5 |
+| Rider | Kamen Rider ZEZTZ | 14 (พระเอก 9 + ไรเดอร์ฝ่ายร้าย 5) | 14 | 12 |
+| Sentai | Ohsama Sentai King-Ohger | 15 | 1 | 1 + Giant 5 |
 | Mecha | Genesis of Aquarion | 14 | 4 | 2 |
 | Kaiju | Godzilla | 14 | 5 | 0 |
 | Beast | Beastars | 15 | 3 | 0 |
@@ -73,26 +73,19 @@
 | 5 | `capsem_booster` | Booster Capsem | 3 | Plasma Booster · **เฉพาะการ์ด: Inazuma Plasma** |
 | — | `capsem_exdreamrise` | Exdreamrise Capsem (token, รางวัล Rider Gauge) | 0 | **เปลี่ยนเป็นร่าง Final Form** (`ULTIMATE_FORM`) · ใช้กับ Rider ที่เลือก |
 
-**ตัวร้าย — Nightmare และ CODE ฝ่ายร้าย** (เผ่า Rider · แผนรองของเผ่า: **ทำให้ศัตรูอ่อนแอก่อนสู้** และเรียกพวก Nightmare)
+**ไรเดอร์ฝ่ายร้าย** (เผ่า Rider · แผนรอง: ทำให้ศัตรูอ่อนแอก่อนสู้ และกำจัดศัตรูตัวสำคัญ)
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `death_evil` | Death Evil | 2/1 | — | พลทหารของ Punish Gore Nightmare |
-| 1 | `baby_nightmare` | Baby Nightmare | 1/2 | Henshin (2) → Crow Nightmare | Nightmare ร่างยังไม่โต |
-| 2 | `gun_nightmare` | Gun Nightmare | 3/2 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) | Nightmare ปืน |
-| 3 | `lord_three` | Lord Three | 4/3 *(Barrier)* | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 ผู้บริหารโหดเหี้ยม ใช้ Extra Capsem, Clear Capsem ล่องหน |
-| 3 | `kamen_rider_dawn` | Kamen Rider Dawn | 4/4 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Sieg ผู้ก่อการร้ายในความฝัน ใช้ Punish Capsem |
-| 4 | `the_lady` | The Lady | 3/6 | เริ่มการต่อสู้: เรียก Phantom Apparition 2/2 ×2 | ผู้นำ Nightmare (CODE 2), Chaos / Phantom Capsem |
-| 5 | `oblivion_gore` | Oblivion Gore Nightmare | 3/7 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด | Gore Lord ที่จะลบโลกแห่งความฝัน |
-| 6 | `catastrophe_gore` | Catastrophe Gore Nightmare | 9/9 | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −2/−0 (จนจบการสู้) | Gore Lord จากจิตใต้สำนึกของ Baku ทำลาย CODE ทุกสาขา |
-| 6 | `kamen_rider_mugen` | Kamen Rider Mugen | 8/8 | เริ่มการต่อสู้: เปลี่ยนศัตรูซ้ายสุดเป็น Death Evil | Shuma Kumon ใช้ Daydream Capsem บิดเบือนความจริง |
-
-**Token ฝั่งตัวร้าย**: `crow_nightmare` Crow Nightmare 4/3 *(Rapid)* · `phantom_apparition` Phantom Apparition 2/2
+| 2 | `lord_thirteen` | Lord Thirteen | 3/2 *(Barrier)* | — | กลุ่ม CODE ที่หลงเหลือ ใช้ Clear Capsem (ล่องหน), Breakam Breaker โหมดดาบ |
+| 3 | `kamen_rider_dawn` | Kamen Rider Dawn | 4/4 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Sieg ผู้ก่อการร้ายในความฝัน ใช้ Punish Capsem และดาบ Breakam Dawn |
+| 4 | `lord_three` | Lord Three | 5/4 *(Barrier)* | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 ผู้บริหารโหดเหี้ยม ใช้ Extra Capsem, Clear Capsem ล่องหน |
+| 5 | `lord_two` | Lord Two | 6/6 *(Rider Kick)* | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −1/−0 (จนจบการสู้) | ร่าง Lord ของ The Lady (หนัง Farewell Mission), Breakam Breaker โหมดหมัด |
+| 6 | `kamen_rider_mugen` | Kamen Rider Mugen | 8/8 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด | Shuma Kumon ใช้ Daydream Capsem บิดเบือนความจริง ถือคาตานะ |
 
 **หมายเหตุ Rider**
 - ตัวกรอง "เฉพาะการ์ด" นับร่างที่มาจาก Henshin / Final Form แต่**ไม่นับร่างที่มาจาก Capsem (TRANSFORM)** ดังนั้นต้องใส่ทุกร่างของ Zeztz ในตัวกรองของ Capsem, Nem และ Knight Seventeen
 - Rider Gauge: ตั้งรางวัลเป็น ADD_TO_HAND `capsem_exdreamrise` (เช่น ครบ 2 ครั้งต่อเกม)
-- ไม่ได้ใส่: Lord Two / Lord Thirteen (ซ้ำกับ The Lady และ Lord Three), Lord Zero (มีแค่ในหนัง), Gore Nightmare อีก 2 ตัว (Phantom, Punish) เพื่อไม่ให้ Rider มีการ์ดเยอะเกิน
-- Rider มีการ์ดในร้าน 18 ใบ (มากกว่าเผ่าอื่น) โอกาสเจอ Zeztz ในร้านจะลดลง ถ้าเกมแรกๆ หา Zeztz ยาก ให้ย้ายตัวร้ายบางตัวออก
+- ไม่ได้ใส่: สัตว์ประหลาด Nightmare / Gore Nightmare / The Lady (ร่างคน) ตามที่กำหนด, Lord Zero (มีแค่ในหนัง)
 - "−2/−0" กับศัตรู: ลดได้ต่ำสุด ATK 0 ไม่ทำให้ตาย และไม่ติดถาวร
 
 ---
@@ -117,6 +110,7 @@
 | 4 | `god_scorpion` | God Scorpion | — | 4/5 | Deploy: ให้ Giant Robo ได้ Lethal | Shugod แมงป่อง (Scorpion King-Ohger) |
 | 4 | `god_hopper` | God Hopper | — | 5/4 | Deploy: ให้ Giant Robo ได้ Rapid | Shugod ตั๊กแตน (Hopper King-Ohger) |
 | 5 | `guardian_hercules` | Guardian Hercules | — | 6/8 *(Guard)* | Deploy: Mecha Gauge +2 | Guardian Weapon ด้วงเฮอร์คิวลีส |
+| 5 | `ohkuwagata_ohger` | Ohkuwagata Ohger | SILVER | 6/6 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +3/+3 | Rcules อดีตราชา Shugodom เคยเป็นศัตรูแล้วกลับมาเป็นพวก, Ohger Calibur Zero |
 | 6 | `god_tarantula` | God Tarantula | — | 9/10 | Team-Up (4): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 | Shugod ของ Jeramie, ร่างยักษ์ Tarantula Knight |
 
 สีตรงกับในเรื่องแล้ว (เกมเพิ่มสี BLACK, WHITE, PURPLE, SILVER, GOLD, ORANGE) · King-Ohger ไม่มีสีเขียวและชมพู · Extra (นับเป็นสีใดก็ได้) ไม่มีในเรื่องนี้
@@ -132,21 +126,8 @@
 | Giant | `king_ohger_zero` | King-Ohger Zero | 11/11 *(Final Blow, Lethal)* | หุ่น Shugod Zero 10 ตัวของ Rcules |
 | Giant (ร่างอัปเกรด) | `god_king_ohger` | God King-Ohger | 18/18 *(Final Blow, Rapid)* | รวม 20 Shugod — ได้จาก Gear Final Form เป้า Giant Robo |
 
-**ตัวร้าย — Galactinsects และ Bug Naraku** (เผ่า Sentai · ไม่มีสี ยกเว้น Ohkuwagata Ohger · แผนรอง: กองทัพ Kaijim และทำให้ศัตรูอ่อนแอ)
-| R | key | การ์ด | สี | ATK/HP | ความสามารถ | อ้างอิง |
-|---|---|---|---|---|---|---|
-| 1 | `kaijim` | Kaijim | — | 2/1 | — | สัตว์ประหลาดของ Bug Naraku (ใช้เป็นตัวที่ถูกเรียกด้วย) |
-| 2 | `geroujim` | Geroujim | — | 2/3 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/−0 (จนจบการสู้) | Kaijim แมลงเม่า ใช้ภาพลวงตา |
-| 3 | `goma_rosalia` | Goma Rosalia | — | 4/3 *(Rapid)* | — | นินจาธีมด้วงหนวดยาว หนึ่งใน Five Jesters |
-| 3 | `hilbil_leech` | Hilbil Leech | — | 3/4 | เมื่อโจมตี: ตัวนี้ +1/+1 ถาวร | หนึ่งใน Five Jesters (ธีมปลิงตามชื่อ ยังไม่ได้ยืนยัน) |
-| 4 | `kamejim` | Kamejim | — | 4/5 | Deploy: ทำลายพวกเราขวาสุด · Deploy: ตัวนี้ +3/+3 ถาวร | Jester ที่ทรยศแทง Desnaraku |
-| 5 | `desnaraku` | Desnaraku VIII | — | 6/7 | Deploy: เรียก Kaijim ×2 | ราชาแห่ง Bug Naraku |
-| 5 | `ohkuwagata_ohger` | Ohkuwagata Ohger | SILVER | 6/6 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +3/+3 | Rcules อดีตราชา Shugodom เคยเป็นศัตรู · Final Form ไม่มี |
-| 6 | `dagded` | Dagded Dujardin | — | 9/9 | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −2/−0 (จนจบการสู้) | ราชา Galactinsects ตัวการของสงคราม |
-
 **หมายเหตุ Sentai**
-- ไม่ได้ใส่: Minongan Moth, Glodi Leucodium (ข้อมูลธีม/พลังไม่พอ)
-- Kamejim ใช้ 2 ความสามารถ (ทำลาย + บัฟตัวเองค่าคงที่) เพราะยังไม่มี action "ได้ค่าพลังของตัวที่ทำลาย 1 ตัว" (มีแต่แบบกินทั้งบอร์ด)
+- ไม่ได้ใส่ (ตัวร้าย): Galactinsects (Dagded Dujardin, Five Jesters), Bug Naraku (Desnaraku, Kaijim)
 - Shugod ไม่มีสี ไม่ช่วย Roll Call แต่ช่วย Giant Robo ทำให้ Sentai เลือกได้ว่าจะเน้นสีหรือหุ่น
 
 ---
@@ -319,12 +300,11 @@
 
 1. **บัคที่เจอระหว่างออกแบบ (แก้แล้ว)**: บัพค่าติดลบใส่ศัตรู (Shikamaru) เคยทำให้ ATK ติดลบได้ และถ้าตั้ง "ถาวร" จะติดไปกับยูนิตของผู้เล่นฝั่งตรงข้าม ตอนนี้หยุดที่ ATK 0 / HP 1 (ไม่ฆ่า) และ "ถาวร" มีผลกับยูนิตฝั่งตัวเองเท่านั้น
 2. ตัวกรองชื่อการ์ดไม่นับร่างจาก Capsem / TRANSFORM (ดูหมายเหตุ Rider)
-3. ทุกเผ่ามีการ์ดครบตามจำนวนขั้นต่ำใน `FACTIONS.md` แล้ว (Rider และ Sentai มีมากกว่า เพราะมีตัวร้ายด้วย)
+3. ทุกเผ่ามีการ์ดครบตามจำนวนขั้นต่ำใน `FACTIONS.md` แล้ว
 4. ชื่อตัวละครและท่าเป็นเครื่องหมายการค้าของเจ้าของ (Toei, Toho, Satelight, Akita Shoten, Shueisha) ใช้ได้กับโปรเจกต์เล่นกันเอง ถ้าจะเปิดสาธารณะควรเปลี่ยนเป็นของ original
 
 ## แหล่งอ้างอิง
 - [List of Genesis of Aquarion characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Genesis_of_Aquarion_characters) · [Toma (Aquarion Wiki)](https://aquarion.fandom.com/wiki/Toma)
-- [Ohsama Sentai King-Ohger (Wikipedia)](https://en.wikipedia.org/wiki/Ohsama_Sentai_King-Ohger) · [Goma Rosalia (Power Rangers Wiki)](https://powerrangers.fandom.com/wiki/Goma_Rosalia)
 - [List of Kamen Rider ZEZTZ characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Kamen_Rider_ZEZTZ_characters) · [Capsems (Kamen Rider Wiki)](https://kamenrider.fandom.com/wiki/Capsems)
 - [List of Ohsama Sentai King-Ohger characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Ohsama_Sentai_King-Ohger_characters)
 - [Genesis of Aquarion (Wikipedia)](https://en.wikipedia.org/wiki/Genesis_of_Aquarion) · [Road to SMP: Genesis of Aquarion](https://mechacatalogue.com/2022/05/22/road-to-smp-no-100-smp-shokugan-modeling-project-genesis-of-aquarion/)

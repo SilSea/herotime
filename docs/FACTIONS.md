@@ -8,8 +8,8 @@
 **เรื่องที่ใช้ทำการ์ดแต่ละเผ่า** (ร่างการ์ดอยู่ใน `CARD_SET_V1.md`)
 | เผ่า | เรื่อง | หมายเหตุ |
 |---|---|---|
-| Rider | Kamen Rider ZEZTZ | พระเอก + ตัวร้าย (Nightmare, CODE ฝ่ายร้าย) |
-| Sentai | Ohsama Sentai King-Ohger | พระเอก + ตัวร้าย (Galactinsects, Bug Naraku) |
+| Rider | Kamen Rider ZEZTZ | พระเอก + ไรเดอร์ฝ่ายร้าย (ไม่มีสัตว์ประหลาด) |
+| Sentai | Ohsama Sentai King-Ohger | ฝ่ายเรนเจอร์เท่านั้น |
 | Mecha | Genesis of Aquarion | |
 | Kaiju | Godzilla | |
 | Beast | Beastars | |
@@ -80,7 +80,7 @@
 ### 2.4 Rider — ปั้นตัวเดียว
 - **แนว**: เลือก Rider 1 ตัว ใส่ Gear และรอแปลงร่าง ไปจนถึงร่าง Final Form
 - **เครื่องมือ**: `henshin` (N เทิร์น → ร่างใหม่ บัฟติดไป), `HENSHIN` trigger (ใส่ที่ร่างก่อนแปลง), `ultimateInto` + Gear `ULTIMATE_FORM`, Rider Gauge (ได้แต้มเมื่อ Henshin), Gear เป้า `CHOSEN_FRIENDLY` + ตัวกรองการ์ด, `TRANSFORM` (Capsem เปลี่ยนฟอร์ม), `RIDER_KICK`, `BUFF_GEAR`
-- **แผนรอง**: Gear เศรษฐกิจ (ได้ Gear สุ่ม, Gear แรงขึ้น) · **ตัวร้าย**: ทำให้ศัตรูอ่อนแอก่อนสู้ (−ATK), เรียก Nightmare, ทำลาย/เปลี่ยนร่างศัตรูซ้ายสุด
+- **แผนรอง**: Gear เศรษฐกิจ (ได้ Gear สุ่ม, Gear แรงขึ้น) · **ไรเดอร์ฝ่ายร้าย**: ทำให้ศัตรูอ่อนแอก่อนสู้ (−ATK), ทำลายศัตรูตัวสำคัญ
 - **บทบาทตาม Rank**
   - R1–2: Rider ร่างแรก (Henshin 2 เทิร์น) / ตัวช่วยให้ Gear
   - R3–4: Rider รอง, ตัวที่บัฟเฉพาะการ์ดชื่อ (`cards` filter / `HAS_CARD`)
@@ -91,7 +91,7 @@
 ### 2.5 Sentai — ทีมหลายสีกับหุ่นยักษ์
 - **แนว**: เก็บ Sentai สีไม่ซ้ำให้ครบ เกิด Roll Call เติม Mecha Gauge แล้วเรียก Giant Robo
 - **เครื่องมือ**: `colors` (RED, BLUE, YELLOW, GREEN, PINK, BLACK, WHITE, PURPLE, SILVER, GOLD, ORANGE · EXTRA = นับเป็นสีที่ขาดได้ 1 สี), เงื่อนไข `TEAM_UP_COLORS_GTE`, Roll Call (ครบ `rollCallColors` = 3 สี: Sentai +1/+1 ในการสู้และ Gauge +1), `DISCOVER_GIANT`, `GIANT_SLOT`, `FINAL_BLOW`
-- **แผนรอง**: บัฟ Sentai ทุกตัวตามจำนวนสี · **ตัวร้าย**: กองทัพ Kaijim (เรียกพวก), ทำให้ศัตรูอ่อนแอ, ทรยศพวกเองเพื่อพลัง
+- **แผนรอง**: บัฟ Sentai ทุกตัวตามจำนวนสี
 - **บทบาทตาม Rank**
   - R1–2: สีหลักตัวละ 1 สี ค่าพลังกลาง
   - R3–4: Team-Up (3): บัฟทีม / ตัว EXTRA (นับทุกสี)
