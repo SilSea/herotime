@@ -6,8 +6,8 @@
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
 | Rider | Kamen Rider ZEZTZ | 14 (ร่างคน + ผู้ช่วย, รวมฝ่ายร้าย 5) | 24 | 12 |
-| Sentai | Ohsama Sentai King-Ohger | 15 | 1 | 1 + Giant 5 |
-| Mecha | Genesis of Aquarion | 14 | 4 | 2 |
+| Sentai | Ohsama Sentai King-Ohger | 15 | 1 | Giant 5 |
+| Mecha | Genesis of Aquarion | 14 | 4 | 1 |
 | Kaiju | Godzilla | 14 | 5 | 0 |
 | Beast | Beastars | 15 | 3 | 0 |
 | Human | ออกแบบเอง (ไม่มีเรื่อง) | 14 | 0 | 3 |
@@ -24,7 +24,7 @@
 
 ## 1. Rider — Kamen Rider ZEZTZ
 
-**แนว**: ในร้านขาย**ร่างคน** ซึ่ง Henshin เป็นร่างไรเดอร์ตอนจบเทิร์น (ร่างไรเดอร์เป็น token ไม่ขายในร้าน) · Zeztz ใช้ **Capsem** (Gear) เปลี่ยนร่างไปมา บัฟติดไปทุกร่าง · Henshin ทุกครั้งเติม **Rider Gauge** ครบ 3 ได้ Exdreamrise Capsem → **Final Form: Zeztz Exdream**
+**แนว**: ในร้านขาย**ร่างคน** ซึ่ง Henshin เป็นร่างไรเดอร์ตอนจบเทิร์น (ร่างไรเดอร์เป็น token ไม่ขายในร้าน) · Zeztz ใช้ **Capsem** (Gear) เปลี่ยนร่างไปมา บัฟติดไปทุกร่าง · Henshin ทุกครั้งเติม **Rider Gauge** ครบ 3 ได้**การ์ด Final Form** (การ์ดกลาง ใช้ได้ทุกเรื่อง) → **Zeztz Exdream**
 
 > ชุดนี้ทดสอบแล้ว (ดู "ผลทดสอบ" ท้ายหัวข้อ) ข้อมูลการ์ดที่ใช้ทดสอบเป็น JSON อยู่ที่ `docs/sets/zeztz-rider.json` (`cards` + `riderGauge`) คัดลอกแต่ละใบไปวางในแท็บ JSON ของการ์ดใน Admin ได้
 
@@ -92,9 +92,10 @@
 | 4 | `capsem_gravity` | Gravity Capsem | 4 | Paradigm Gravity |
 | 4 | `capsem_plasma` | Plasma Capsem | 4 | Inazuma Plasma |
 | 5 | `capsem_booster` | Booster Capsem | 3 | Plasma Booster · **เฉพาะการ์ด: Inazuma Plasma** |
-| — | `capsem_exdreamrise` | Exdreamrise Capsem (token) | 0 | **เปลี่ยนเป็นร่าง Final Form** · ใช้กับ: Rider ที่เลือก |
 
-**Rider Gauge**: ได้ +1 ทุกครั้งที่ Henshin · ทุกๆ 3 → ได้ Exdreamrise Capsem เข้ามือ (ตั้งในแท็บ Gauges)
+**Rider Gauge**: ได้ +1 ทุกครั้งที่ Henshin · ทุกๆ 3 → ได้การ์ด Final Form เข้ามือ (ตั้งในแท็บ Gauges)
+
+**การ์ด Final Form (การ์ดกลาง ทุกเรื่องใช้ใบเดียวกัน)** · `final_form` · Gear ไม่มีเผ่า Rank 5 ราคา 4 · ใช้กับ: ยูนิตที่เลือก (เลือกได้เฉพาะตัวที่มีร่าง Final Form) · ทำ: เปลี่ยนเป็นร่าง Final Form · ขายในร้านทุกเกม และ Rider Gauge ให้ฟรี · ไม่มีไอเท็ม Final Form ประจำเรื่อง
 
 **หมายเหตุ Rider**
 - Henshin (1) = ลงสนามแล้ว แปลงร่างตอนจบเทิร์นนั้นเลย จึงเข้าสู้เป็นร่างไรเดอร์ทันที ความสามารถ "เมื่อแปลงร่าง" ใส่ที่ร่างคน (Minami, Three)
@@ -109,7 +110,7 @@
   - Capsem เปลี่ยนร่างแล้วบัฟติดไป
   - Booster Capsem ใช้ได้เฉพาะกับ Plasma
   - Minami แปลงร่างแล้วให้ Barrier กับ Zeztz
-  - Henshin ครบ 3 ครั้งได้ Exdreamrise Capsem
+  - Henshin ครบ 3 ครั้งได้ การ์ด Final Form
   - Final Form ยังมีบัฟและ Barrier เดิม
   - Nox Knight รอ 2 เทิร์นแล้วเป็น Nox
   - Three แปลงร่างแล้วได้ Gear
@@ -148,8 +149,7 @@
 **ร่าง / Gear / หุ่นยักษ์**
 | ชนิด | key | การ์ด | ATK/HP | ความสามารถ |
 |---|---|---|---|---|
-| ร่าง (token) | `king_kuwagata` | King Kuwagata Ohger (Final Form ของ Kuwagata Ohger) | 8/8 *(Rider Kick)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 |
-| Gear | `ohger_crown_lance` | Ohger Crown Lance (R5, ราคา 4) | — | ใช้กับ Kuwagata Ohger: เปลี่ยนเป็นร่าง Final Form |
+| ร่าง (token) | `king_kuwagata` | King Kuwagata Ohger (Final Form ของ Kuwagata Ohger · ได้จากการ์ด Final Form) | 8/8 *(Rider Kick)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 |
 | Giant | `king_ohger` | King-Ohger | 10/12 *(Final Blow)* | หุ่นรวม 5 Shugod หลัก · Final Form → `god_king_ohger` |
 | Giant | `king_caucasus_kabuto` | King Caucasus Kabuto | 12/10 *(Final Blow, Barrier)* | ร่างยักษ์ของ God Caucasus Kabuto |
 | Giant | `tarantula_knight` | Tarantula Knight | 9/12 *(Final Blow, Guard)* | ร่างยักษ์ของ God Tarantula |
@@ -198,7 +198,6 @@
 | R | key | Gear | ราคา | ความสามารถ |
 |---|---|---|---|---|
 | 3 | `sousei_gattai` | Sousei Gattai! | 2 | ใช้กับ Mecha ที่เลือก: ให้ keyword Gattai และ +1/+1 |
-| 6 | `solar_wings` | Solar Wings | 5 | ใช้กับ Solar Aquarion: เปลี่ยนเป็นร่าง Final Form |
 
 ---
 
@@ -341,7 +340,7 @@
 | Sentai | `h_hymeno` | Hymeno Ran | 0 | กดใช้ (1): Sentai แบบสุ่ม +0/+2 ถาวร | หมอ ราชินีแห่ง Ishabana |
 | Sentai | `h_rita` | Rita Kaniska | 5 | ครั้งเดียว (1): เลือกรับยูนิต Sentai 1 จาก 3 | ประธานศาลแห่ง Gokkan |
 | Mecha | `h_gen_fudo` | Gen Fudo | 0 | ติดตัว: Gattai ใช้แค่ 2 ตัว | ผู้บัญชาการ DEAVA |
-| Mecha | `h_celiane` | Celiane | 0 | ครั้งเดียว (0): ได้ Gear Solar Wings เข้ามือ | คนรักของ Apollonius |
+| Mecha | `h_celiane` | Celiane | 0 | ครั้งเดียว (2): ได้การ์ด Final Form เข้ามือ | คนรักของ Apollonius |
 | Mecha | `h_sirius` | Sirius de Alisia | 0 | กดใช้ (1): Mecha ขวาสุดได้ keyword Gattai | นักบิน Element |
 | Mecha | `h_apollo` | Apollo | 3 | กดใช้ (1): Mecha ซ้ายสุด (core) +1/+1 ถาวร | นักบิน Vector Sol |
 | Kaiju | `h_shobijin` | Shobijin | 0 | กดใช้ (2): Kaiju แบบสุ่มได้ Revive | คู่แฝดตัวจิ๋วของ Mothra |
@@ -369,7 +368,7 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 |---|---|---|---|---|---|
 | Rider | `rl_zeztz_driver` | Zeztz Driver | Lesser | 2 | เริ่มการต่อสู้: Rider ทุกตัว +1/+1 |
 | Rider | `rl_capsem_case` | Capsem Case | Lesser | 1 | ได้ทันที: Gear Rider แบบสุ่ม 2 ใบ และ Rider Gauge +1 |
-| Rider | `rl_exdream_driver` | Zeztz Exdream Driver | Greater | 4 | ได้ทันที: Exdreamrise Capsem เข้ามือ |
+| ทุกเผ่า | `rl_final_form_belt` | Final Form Belt | Greater | 3 | ได้ทันที: การ์ด Final Form เข้ามือ |
 | Sentai | `rl_ohger_calibur` | Ohger Calibur | Lesser | 1 | เริ่มการต่อสู้: Sentai ทุกตัว +1/+1 |
 | Sentai | `rl_shugod_nest` | Shugod Nest | Lesser | 1 | ได้ทันที: Mecha Gauge +2 |
 | Sentai | `rl_kings_crown` | Ohger Crown | Greater | 5 | เริ่มการต่อสู้: Giant Robo +4/+4 |
@@ -435,6 +434,8 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 | Beast | 5.01 / 6.1% |
 
 บอทเล่นตามแผนมากขึ้นมาก: ร่าง Zeztz จาก Capsem 55 → 479 ครั้ง · Aquarion รวมร่าง 129 → 537 · Solar Wings และ King Kuwagata เกิดครั้งแรก (32, 38) · การ์ด Final Form จาก Rider Gauge บอทใช้กับ Nox (Nox Midnight Shadow 525 ครั้ง) มากกว่า Zeztz
+
+**หลังเปลี่ยนเป็นการ์ด Final Form กลาง** (1,200 เกม): Kaiju 3.30 · Mecha 3.68 · Shonen 4.39 · Sentai 4.60 · Human 4.69 · Rider 4.94 · Beast 5.13 · ร่าง Final Form เกิดครบทุกเรื่อง: King Kuwagata 38 → 129 ครั้ง, Solar Wings 32 → 63, Zeztz Exdream 0 → 18, Nox Midnight 546
 
 **Kaiju ยังแรงเกิน**: ลองตัด Kyodaika ทั้งเผ่า หรือตัด Avenge ทั้งเผ่า ก็ยังอยู่ที่ 3.3 ความแรงกระจายอยู่ที่ Godzilla, King Ghidorah, Destoroyah (อันดับดีกว่าค่าเฉลี่ยของ Rank เดียวกันชัดเจน) ต้องปรับทีละใบในรอบหน้า
 

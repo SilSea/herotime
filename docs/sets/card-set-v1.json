@@ -1324,24 +1324,20 @@
    ]
   },
   {
-   "key": "capsem_exdreamrise",
-   "name": "Exdreamrise Capsem",
+   "key": "final_form",
+   "name": "Final Form",
    "kind": "GEAR",
-   "rank": 6,
+   "rank": 5,
    "atk": 0,
    "hp": 1,
-   "cost": 0,
-   "token": true,
-   "factions": [
-    "rider"
-   ],
+   "cost": 4,
+   "factions": [],
    "effects": [
     {
      "scope": "PLAYER",
      "trigger": "ON_PLAY",
      "target": {
-      "selector": "CHOSEN_FRIENDLY",
-      "faction": "rider"
+      "selector": "CHOSEN_FRIENDLY"
      },
      "actions": [
       {
@@ -1826,35 +1822,6 @@
    ],
    "keywords": [
     "RIDER_KICK"
-   ]
-  },
-  {
-   "key": "ohger_crown_lance",
-   "name": "Ohger Crown Lance",
-   "kind": "GEAR",
-   "rank": 5,
-   "atk": 0,
-   "hp": 1,
-   "cost": 4,
-   "factions": [
-    "sentai"
-   ],
-   "effects": [
-    {
-     "scope": "PLAYER",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "ULTIMATE_FORM"
-      }
-     ],
-     "target": {
-      "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "kuwagata_ohger"
-      ]
-     }
-    }
    ]
   },
   {
@@ -2483,35 +2450,6 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "faction": "mecha"
-     }
-    }
-   ]
-  },
-  {
-   "key": "solar_wings",
-   "name": "Solar Wings",
-   "kind": "GEAR",
-   "rank": 6,
-   "atk": 0,
-   "hp": 1,
-   "cost": 5,
-   "factions": [
-    "mecha"
-   ],
-   "effects": [
-    {
-     "scope": "PLAYER",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "ULTIMATE_FORM"
-      }
-     ],
-     "target": {
-      "selector": "CHOSEN_FRIENDLY",
-      "cards": [
-       "solar_aquarion"
-      ]
      }
     }
    ]
@@ -4290,7 +4228,7 @@
      "reward": [
       {
        "type": "ADD_TO_HAND",
-       "cardKey": "capsem_exdreamrise"
+       "cardKey": "final_form"
       }
      ]
     }
@@ -4530,7 +4468,7 @@
    "armor": 0,
    "power": {
     "mode": "ONCE",
-    "cost": 0,
+    "cost": 2,
     "effects": [
      {
       "scope": "PLAYER",
@@ -4538,7 +4476,7 @@
       "actions": [
        {
         "type": "ADD_TO_HAND",
-        "cardKey": "solar_wings"
+        "cardKey": "final_form"
        }
       ]
      }
@@ -5062,13 +5000,11 @@
    ]
   },
   {
-   "key": "rl_exdream_driver",
-   "name": "Zeztz Exdream Driver",
+   "key": "rl_final_form_belt",
+   "name": "Final Form Belt",
    "tier": "GREATER",
-   "cost": 4,
-   "factions": [
-    "rider"
-   ],
+   "cost": 3,
+   "factions": [],
    "weight": 100,
    "effects": [
     {
@@ -5077,7 +5013,7 @@
      "actions": [
       {
        "type": "ADD_TO_HAND",
-       "cardKey": "capsem_exdreamrise"
+       "cardKey": "final_form"
       }
      ]
     }

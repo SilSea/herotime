@@ -1287,24 +1287,20 @@
    ]
   },
   {
-   "key": "capsem_exdreamrise",
-   "name": "Exdreamrise Capsem",
+   "key": "final_form",
+   "name": "Final Form",
    "kind": "GEAR",
-   "rank": 6,
+   "rank": 5,
    "atk": 0,
    "hp": 1,
-   "cost": 0,
-   "token": true,
-   "factions": [
-    "rider"
-   ],
+   "cost": 4,
+   "factions": [],
    "effects": [
     {
      "scope": "PLAYER",
      "trigger": "ON_PLAY",
      "target": {
-      "selector": "CHOSEN_FRIENDLY",
-      "faction": "rider"
+      "selector": "CHOSEN_FRIENDLY"
      },
      "actions": [
       {
@@ -1332,7 +1328,7 @@
     "reward": [
      {
       "type": "ADD_TO_HAND",
-      "cardKey": "capsem_exdreamrise"
+      "cardKey": "final_form"
      }
     ]
    }
