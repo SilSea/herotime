@@ -16,6 +16,7 @@ import { renderLibrary } from "./ui/library.js";
 import { invalidateStats, renderLobby } from "./ui/lobby.js";
 import { DRAGGING, hidePlayerCard, renderMatch } from "./ui/match.js";
 import { ReplayView } from "./ui/replay-view.js";
+import { userMessage } from "./errors.js";
 
 const TOKEN_KEY = "herotime.token";
 
@@ -425,7 +426,7 @@ export function startApp(root: HTMLElement): void {
       content = new ContentIndex(await api.content());
       setContentSounds(content.snapshot.sounds);
     } catch (e) {
-      mount(root, h("p", { class: "form-error center-text", text: `Cannot reach the game server (${e instanceof Error ? e.message : "unknown error"}).` }));
+      mount(root, h("p", { class: "form-error center-text", text: userMessage(e, "startup", tr("Cannot reach the game server.", "เชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้")) }));
       return;
     }
     store.set({ content });

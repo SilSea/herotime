@@ -46,6 +46,7 @@ describe("server messages", async () => {
     expect(serverText("not enough energy: need 3, have 1")).toBe("Energy ไม่พอ: ต้องใช้ 3 มี 1");
     expect(serverText("choose a unit for Guard Shield")).toBe("เลือกยูนิตที่จะใช้ Guard Shield");
     expect(serverText("something new")).toBe("something new");
+    expect(serverText("something went wrong on the server (ref 1a2b3c4d)")).toBe("เซิร์ฟเวอร์ขัดข้อง ลองใหม่อีกครั้ง (รหัส 1a2b3c4d)");
     setLang("en");
     expect(serverText("hand is full")).toBe("hand is full");
   });

@@ -38,6 +38,11 @@ export const pick = (o: { text?: string; textTh?: string } | undefined): string 
 
 /** Server refusals players see often, in Thai (anything else is shown as the server wrote it). */
 const SERVER_TH: [RegExp, (m: RegExpMatchArray) => string][] = [
+  [/^something went wrong on the server \(ref ([0-9a-f]+)\)$/, (m) => `เซิร์ฟเวอร์ขัดข้อง ลองใหม่อีกครั้ง (รหัส ${m[1]})`],
+  [/^the match crashed$/, () => "เกมนี้ขัดข้องและหยุดลง"],
+  [/^the request body is not valid JSON$/, () => "ข้อมูลที่ส่งไม่ถูกต้อง"],
+  [/^not connected to the server$/, () => "ยังไม่ได้เชื่อมต่อเซิร์ฟเวอร์"],
+  [/^the server did not answer$/, () => "เซิร์ฟเวอร์ไม่ตอบกลับ"],
   [/^not enough energy: need (\d+), have (\d+)$/, (m) => `Energy ไม่พอ: ต้องใช้ ${m[1]} มี ${m[2]}`],
   [/^hand is full$/, () => "มือเต็มแล้ว"],
   [/^not enough health: need more than (\d+), have (\d+)$/, (m) => `เลือดไม่พอ: ต้องมีมากกว่า ${m[1]} มี ${m[2]}`],

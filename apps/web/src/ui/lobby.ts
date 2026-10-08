@@ -4,6 +4,7 @@ import { tr } from "../i18n.js";
 import type { LeaderboardRow, MyMatch, PracticeOptions } from "../protocol.js";
 import { h, mount } from "./dom.js";
 import type { Ctx } from "./ctx.js";
+import { userMessage } from "../errors.js";
 
 /** Remembered between visits so a tester does not re-enter the same setup each game. */
 interface PracticeForm {
@@ -34,7 +35,7 @@ function refreshStats(ctx: Ctx): void {
       Object.assign(stats, { user, mine: mine.matches, board, error: undefined });
     })
     .catch((e: unknown) => {
-      stats.error = e instanceof Error ? e.message : "could not load";
+      stats.error = userMessage(e, "lobby stats", tr("Could not load", "โหลดไม่ได้"));
       stats.user = user;
     })
     .finally(() => {

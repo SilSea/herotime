@@ -13,6 +13,7 @@ import { RuleError } from "@herotime/engine";
 import { IntentSchema, PracticeSchema, QueueJoinSchema, RoomJoinSchema, RoomStartSchema } from "@herotime/shared";
 import type { Server, Socket } from "socket.io";
 import { AuthService, type PublicUser } from "../auth/auth.service.js";
+import { logInternal } from "../errors.js";
 import { RateLimiter } from "../rate-limiter.js";
 import { LobbyService } from "./lobby.service.js";
 import { MatchRegistry } from "./match.registry.js";
@@ -57,6 +58,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   async handleConnection(socket: GameSocket): Promise<void> {
+    try {
+      await this.connect(socket);
+    } catch (e) {
+      // The database or a match view failed: tell the client only that something went wrong.
+      socket.emit("match:error", { error: logInternal(this.log, `connecting ${socket.data.user?.username ?? socket.id}`, e) });
+    }
+  }
+
+  private async connect(socket: GameSocket): Promise<void> {
     const token = socket.handshake.auth?.token;
     const user = typeof token === "string" ? await this.auth.authenticate(token) : undefined;
     if (!user) {
@@ -75,6 +85,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   handleDisconnect(socket: GameSocket): void {
+    try {
+      this.disconnect(socket);
+    } catch (e) {
+      logInternal(this.log, `disconnecting ${socket.data.user?.username ?? socket.id}`, e);
+    }
+  }
+
+  private disconnect(socket: GameSocket): void {
     const user = socket.data.user;
     if (!user) return;
     this.limiter.forget(socket.id);
@@ -173,8 +191,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return fn(user);
     } catch (e) {
       if (e instanceof RuleError) return { ok: false, error: e.message };
-      this.log.error(`unexpected error for ${user.username}`, e instanceof Error ? e.stack : String(e));
-      return { ok: false, error: "internal error" };
+      return { ok: false, error: logInternal(this.log, `${user.username}`, e) };
     }
   }
 }

@@ -43,6 +43,15 @@ export async function bootstrap(initial: ServerConfig = loadConfig()): Promise<N
 
 // Run only when started directly (not when imported by tests).
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // Last line of defence: anything that escaped every handler is logged in full (never sent to a client).
+  process.on("unhandledRejection", (reason) => {
+    console.error("[unhandledRejection]", reason instanceof Error ? reason.stack : reason);
+  });
+  process.on("uncaughtException", (e) => {
+    // State may be broken: log and exit; docker compose restarts the server (restart: unless-stopped).
+    console.error("[uncaughtException]", e.stack ?? e);
+    process.exit(1);
+  });
   bootstrap()
     .then((app) => app.getUrl().then((url) => console.log(`herotime server listening on ${url}`)))
     .catch((e: unknown) => {

@@ -10,6 +10,7 @@ import { CUES, MUSIC_SLOTS, play, preview, SOUND_SLOTS } from "../sound.js";
 import type { Ctx } from "./ctx.js";
 import { h, mount } from "./dom.js";
 import { renderRows, type FormEnv } from "./form.js";
+import { userMessage } from "../errors.js";
 
 /**
  * The content editor. Everything the admin changes lives in `ed.draft.data` (the same JSON the server stores);
@@ -87,7 +88,7 @@ async function guarded<T>(ctx: Ctx, work: () => Promise<T>): Promise<T | undefin
     return await work();
   } catch (e) {
     if (e instanceof ApiError && e.issues.length > 0) ed.publishIssues = e.issues;
-    ctx.toast(e instanceof Error ? e.message : "something went wrong", "error");
+    ctx.toast(userMessage(e, "admin"), "error");
     return undefined;
   } finally {
     ed.busy = false;
@@ -105,7 +106,7 @@ async function load(ctx: Ctx): Promise<void> {
     ed.loadError = undefined;
     ed.dirty = false;
   } catch (e) {
-    ed.loadError = e instanceof Error ? e.message : "could not load the draft";
+    ed.loadError = userMessage(e, "admin load", "could not load the draft");
   } finally {
     ed.loading = false;
     redraw();
@@ -626,7 +627,7 @@ async function uploadImage(ctx: Ctx, file: File): Promise<string> {
     ctx.toast(`Uploaded ${file.name}`);
     return saved.file;
   } catch (e) {
-    ctx.toast(e instanceof Error ? e.message : "upload failed", "error");
+    ctx.toast(userMessage(e, "admin upload", "upload failed"), "error");
     throw e;
   }
 }

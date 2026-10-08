@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import type { ServerConfig } from "./config.js";
+import { AllExceptionsFilter } from "./errors.js";
 import { AppIoAdapter } from "./io-adapter.js";
 
 /** Request bodies other than the admin upload. */
@@ -9,6 +10,8 @@ export const SMALL_BODY = 4 * 1024 * 1024;
 /** Everything that turns a bare Nest app into the real server. Shared by main.ts and the tests. */
 export function configureApp(app: NestExpressApplication, config: ServerConfig): void {
   app.disable("x-powered-by");
+  // Raw errors (stacks, parser and database messages) stay in the server log; clients get a generic message.
+  app.useGlobalFilters(new AllExceptionsFilter());
   // Only the admin upload may send big bodies (a 6 MB music file is about 8 MB as base64); everything else,
   // including the public sign-up, keeps the old 4 MB cap. Checked before parsing, from Content-Length.
   app.use((req: { path: string; headers: Record<string, unknown> }, res: { status: (n: number) => { json: (b: unknown) => void } }, next: () => void) => {

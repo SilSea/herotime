@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Content } from "@herotime/engine";
 import { getContentSet, getRawContentSet, withGeneratedText, type ContentSetData } from "@herotime/content";
 import { CardDef, ContentRules, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef, SoundsDef } from "@herotime/shared";
 import { z } from "zod";
+import { logInternal } from "../errors.js";
 import type { ContentData, ContentRepository } from "../persistence/repositories.js";
 
 export const ContentFile = z.object({
@@ -25,6 +26,8 @@ export interface Inspection {
   content?: Content;
 }
 
+const contentLog = new Logger("Content");
+
 /** Check content JSON without throwing: all problems listed, so an editor can show them at once. */
 export function inspectContent(raw: unknown): Inspection {
   const parsed = ContentFile.safeParse(raw);
@@ -35,7 +38,9 @@ export function inspectContent(raw: unknown): Inspection {
   try {
     content = new Content(withGeneratedText(data)); // throws on dangling references
   } catch (e) {
+    // Content checks throw "invalid content: ..." (or "duplicate ... key") with readable problems; anything else is a bug, kept in the log.
     const text = e instanceof Error ? e.message : String(e);
+    if (!/^(invalid content:|duplicate )/.test(text)) return { data, issues: [logInternal(contentLog, "checking content", e)] };
     return { data, issues: text.replace(/^invalid content:\s*/, "").split(/\n- ?|\n/).map((s) => s.replace(/^- /, "").trim()).filter(Boolean) };
   }
   const issues: string[] = [];

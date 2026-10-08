@@ -2,6 +2,7 @@ import type { Api } from "../net.js";
 import type { AuthResult } from "../protocol.js";
 import { lang, setLang, tr } from "../i18n.js";
 import { h, mount } from "./dom.js";
+import { userMessage } from "../errors.js";
 
 /** Login / register. `onDone` gets the token once the server accepts it. */
 export function renderAuth(root: HTMLElement, api: Api, onDone: (r: AuthResult) => Promise<void>, startMode: "login" | "register" = "login"): void {
@@ -28,7 +29,7 @@ export function renderAuth(root: HTMLElement, api: Api, onDone: (r: AuthResult) 
               .then((r) => onDone(r))
               .catch((err: unknown) => {
                 submit.disabled = false;
-                status.textContent = err instanceof Error ? err.message : tr("something went wrong", "เกิดข้อผิดพลาด");
+                status.textContent = userMessage(err, "auth");
               });
           },
         },

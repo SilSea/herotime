@@ -3,6 +3,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthController, JwtAuthGuard } from "./auth/auth.controller.js";
 import { AuthService } from "./auth/auth.service.js";
 import type { ServerConfig } from "./config.js";
+import { ClientErrorsController } from "./client-errors.controller.js";
 import { AdminController, AdminGuard } from "./content/admin.controller.js";
 import { UploadStore } from "./content/uploads.js";
 import { ContentController } from "./content/content.controller.js";
@@ -54,7 +55,7 @@ export class AppModule implements OnApplicationShutdown {
           verifyOptions: { algorithms: ["HS256"] },
         }),
       ],
-      controllers: [AuthController, ContentController, AdminController, StatsController],
+      controllers: [AuthController, ContentController, AdminController, StatsController, ClientErrorsController],
       providers: [
         { provide: CONFIG, useValue: deps.config },
         { provide: SHUTDOWN_HOOK, useValue: deps.onShutdown },
