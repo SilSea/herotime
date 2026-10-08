@@ -348,6 +348,19 @@
 - Kaiju: Shin Godzilla แปลงร่างช้าลง (3 เทิร์นต่อขั้น) ร่าง 4 เหลือ 7/7 ไม่มี Kyodaika · Godzilla 5/6 Avenge +2/+2 · Godzilla Junior Avenge (3) · Burning Godzilla 9/9 ไม่มี Kyodaika
 - Beast: token 2/2 และ 2/1 · Haru ให้ +1/+1 · Pina, Collot, Kibi แรงขึ้น
 
+**หลังปรับบอท (ระดับ A)** · 1,200 เกม · การ์ดชุดเดียวกับ "รอบสุดท้าย"
+| เผ่า | อันดับ / ชนะ |
+|---|---|
+| Kaiju | **3.13** / 36.0% |
+| Mecha | 3.81 / 14.0% |
+| Shonen | 4.49 / 10.1% |
+| Rider | 4.68 / 8.7% |
+| Sentai | 4.95 / 9.1% |
+| Human | 5.01 / 9.9% |
+| Beast | 5.01 / 6.1% |
+
+บอทเล่นตามแผนมากขึ้นมาก: ร่าง Zeztz จาก Capsem 55 → 479 ครั้ง · Aquarion รวมร่าง 129 → 537 · Solar Wings และ King Kuwagata เกิดครั้งแรก (32, 38) · การ์ด Final Form จาก Rider Gauge บอทใช้กับ Nox (Nox Midnight Shadow 525 ครั้ง) มากกว่า Zeztz
+
 **Kaiju ยังแรงเกิน**: ลองตัด Kyodaika ทั้งเผ่า หรือตัด Avenge ทั้งเผ่า ก็ยังอยู่ที่ 3.3 ความแรงกระจายอยู่ที่ Godzilla, King Ghidorah, Destoroyah (อันดับดีกว่าค่าเฉลี่ยของ Rank เดียวกันชัดเจน) ต้องปรับทีละใบในรอบหน้า
 
 อันดับรายการ์ดดูได้จากหน้า Admin → Simulate หลังใส่ชุดนี้ใน draft · การ์ด Rank สูงจะมีอันดับดีกว่าเสมอ เพราะอยู่บนบอร์ดของผู้ชนะตอนท้ายเกม ให้เทียบกับการ์ด Rank เดียวกัน

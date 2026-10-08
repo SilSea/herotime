@@ -1,5 +1,6 @@
-import { withRules } from "../rules.js";
-import { refresh, RuleError, upgrade, upgradeCost, type PlayerState } from "../shop/economy.js";
+import { DEFAULT_COMBAT_RULES } from "../config.js";
+import { combatRulesOf, withRules } from "../rules.js";
+import { refresh, reorder, RuleError, toggleFreeze, upgrade, upgradeCost, type PlayerState, type Unit } from "../shop/economy.js";
 import type { GameEnv } from "../game/env.js";
 import {
   autoChooseRelic,
@@ -57,11 +58,81 @@ function mainFaction(p: PlayerState, env: GameEnv): string | undefined {
   return best;
 }
 
-/** How much a bot wants a shop card: pairs first (triples), then its main faction, then higher rank. */
+/** Sentai colours the player's units already have (Team-Up and Roll Call count distinct ones). */
+function coloursOwned(p: PlayerState, env: GameEnv): Set<string> {
+  return new Set([...p.board, ...p.hand].flatMap((u) => env.content.card(u.key).colors));
+}
+
+/**
+ * How much a bot wants a shop card: pairs first (triples), then its main faction, then higher rank. A Sentai
+ * colour the team does not have yet counts too, once it plays Sentai.
+ */
 function want(p: PlayerState, key: string, faction: string | undefined, env: GameEnv): number {
   const def = env.content.card(key);
   const owned = [...p.board, ...p.hand].filter((u) => u.key === key && !u.golden).length;
-  return owned * 4 + (faction !== undefined && def.factions.includes(faction) ? 2 : 0) + def.rank;
+  const playsSentai = faction === "sentai" || [...p.board, ...p.hand].some((u) => env.content.card(u.key).colors.length > 0);
+  const have = coloursOwned(p, env);
+  const newColour = playsSentai && def.colors.some((c) => c === "EXTRA" || !have.has(c)) ? 3 : 0;
+  return owned * 4 + (faction !== undefined && def.factions.includes(faction) ? 2 : 0) + newColour + def.rank;
+}
+
+/** The best option of a pending Discover: a Giant by size, a card by how much the bot wants it. */
+function bestDiscover(p: PlayerState, env: GameEnv): number {
+  const offer = p.discovers[0];
+  if (!offer) return 0;
+  const faction = mainFaction(p, env);
+  const score = (key: string): number => {
+    const d = env.content.card(key);
+    return offer.destination === "GIANT" ? d.atk + d.hp : want(p, key, faction, env);
+  };
+  let best = 0;
+  offer.options.forEach((key, i) => {
+    if (score(key) > score(offer.options[best] as string)) best = i;
+  });
+  return best;
+}
+
+function takeDiscovers(p: PlayerState, env: GameEnv): void {
+  for (let guard = 0; guard < 6 && p.discovers.length > 0; guard++) {
+    if (!attempt(() => pickDiscover(p, bestDiscover(p, env), env))) break;
+  }
+}
+
+/**
+ * Line up a Gattai group so it can combine: a core (a card with a Gattai form) leftmost, the other Gattai
+ * units right after it. Only when there are enough Gattai units on the board for a group.
+ */
+function arrangeGattai(p: PlayerState, env: GameEnv): void {
+  const hasGattai = (u: Unit): boolean => !u.components && (env.content.card(u.key).keywords.includes("GATTAI") || (u.keywords ?? []).includes("GATTAI"));
+  const size = combatRulesOf(p).gattaiSize ?? env.cfg.combatDefaults?.gattaiSize ?? DEFAULT_COMBAT_RULES.gattaiSize;
+  const core = p.board.findIndex((u) => hasGattai(u) && env.content.card(u.key).gattaiInto !== undefined);
+  if (core < 0 || p.board.filter(hasGattai).length < size) return;
+  attempt(() => reorder(p, core, 0));
+  let next = 1;
+  for (let i = 1; i < p.board.length; i++) {
+    if (!hasGattai(p.board[i] as Unit)) continue;
+    const from = i;
+    const to = next;
+    if (from !== to) attempt(() => reorder(p, from, to));
+    next++;
+  }
+}
+
+/**
+ * Tavern Gear worth buying before any unit: one made for particular cards the bot has (a Capsem for its
+ * Rider, a Final Form for a unit that has one), rather than a plain buff it can pick up with spare Energy.
+ */
+function gearFitsBoard(p: PlayerState, key: string, env: GameEnv): boolean {
+  const def = env.content.card(key);
+  const special = def.effects.some((e) => (e.target?.cards?.length ?? 0) > 0 || e.actions.some((a) => a.type === "ULTIMATE_FORM" || a.type === "TRANSFORM"));
+  if (!special || !gearUsable(p, key, env)) return false;
+  // gearTargets refuses (throws) when the gear has nothing to act on, e.g. a Giant upgrade with no Giant.
+  try {
+    const targets = gearTargets(p, key, env);
+    return Array.isArray(targets) && targets.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 function buyAndDeploy(p: PlayerState, env: GameEnv): boolean {
@@ -122,12 +193,16 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv, payHealth?: (
     if (!pick || !attempt(() => chooseRelic(p, pick.i, env))) autoChooseRelic(p, env);
   }
 
-  for (let guard = 0; guard < 6 && p.discovers.length > 0; guard++) {
-    if (!attempt(() => pickDiscover(p, 0, env))) break;
-  }
+  takeDiscovers(p, env);
   for (let guard = 0; guard < 6; guard++) {
     const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
     if (i < 0 || !attempt(() => useGearWell(p, i, env))) break;
+  }
+
+  // Gear made for a card on the board (a Capsem for its Rider, a Final Form) comes before any unit.
+  if (p.shopGear && gearFitsBoard(p, p.shopGear, env) && attempt(() => buyGear(p, env, payHealth))) {
+    const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
+    if (i >= 0) attempt(() => useGearWell(p, i, env));
   }
 
   // climb ranks on a schedule: about one rank every two turns
@@ -139,15 +214,14 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv, payHealth?: (
 
   for (let round = 0; round < 3; round++) {
     for (let guard = 0; guard < 10 && buyAndDeploy(p, env); guard++);
-    for (let guard = 0; guard < 6 && p.discovers.length > 0; guard++) {
-      if (!attempt(() => pickDiscover(p, 0, env))) break;
-    }
+    takeDiscovers(p, env);
     for (let guard = 0; guard < 4 && upgradeBoard(p, env); guard++);
     if (p.energy >= c.buyCost + c.refreshCost) attempt(() => refresh(p, env.pool, env.rng, env.cfg, env.gear));
     else break;
   }
 
   // Combine any Gattai group led by a core: it frees board slots and keeps the merged strength.
+  arrangeGattai(p, env);
   for (let i = 0; i < p.board.length; i++) if (gattaiGroupAt(p, i, env)) attempt(() => combineGattai(p, i, env));
 
   attempt(() => useHeroPower(p, env));
@@ -157,7 +231,10 @@ export function runBot(p: PlayerState, turn: number, env: GameEnv, payHealth?: (
     const i = p.hand.findIndex((u) => env.content.card(u.key).kind === "GEAR");
     if (i >= 0) attempt(() => useGearWell(p, i, env));
   }
-  for (let guard = 0; guard < 6 && p.discovers.length > 0; guard++) {
-    if (!attempt(() => pickDiscover(p, 0, env))) break;
-  }
+  takeDiscovers(p, env);
+
+  // Keep a tavern that holds the third copy of a pair: the triple can be bought next turn.
+  const plain = [...p.board, ...p.hand].filter((u) => !u.golden).map((u) => u.key);
+  const pairs = new Set(plain.filter((k) => plain.filter((x) => x === k).length >= 2));
+  if (!p.frozen && p.shop.some((k) => pairs.has(k))) attempt(() => toggleFreeze(p));
 }

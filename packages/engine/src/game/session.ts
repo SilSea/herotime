@@ -130,7 +130,11 @@ export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv):
     if (effects.some((e) => e.target?.selector === "GIANT_SLOT") && !player.giant) throw new RuleError(`${env.content.card(gearKey).name} needs a Giant Robo in the Giant Slot`);
     return null;
   }
-  return player.board.flatMap((u, i) => (chosen.every((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) ? [i] : []));
+  // A Final Form card only fits a unit that has a Final Form: on any other it would be used up for nothing.
+  const finalForm = chosen.some((e) => e.actions.some((a) => a.type === "ULTIMATE_FORM"));
+  return player.board.flatMap((u, i) =>
+    chosen.every((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) && (!finalForm || env.content.card(u.key).ultimateInto !== undefined) ? [i] : [],
+  );
 }
 
 /**

@@ -127,14 +127,14 @@ describe("runBot", () => {
     expect(p.discovers).toEqual([]);
   });
 
-  it("resolves a pending Discover", () => {
+  it("resolves a pending Discover, taking the option it wants most (higher rank)", () => {
     const { env, p } = setup();
     p.discovers = [{ options: ["scout", "elder"], destination: "HAND" }];
     env.pool.take("scout");
     env.pool.take("elder");
     runBot(p, 1, env);
     expect(p.discovers).toEqual([]);
-    expect([...p.board, ...p.hand].some((x) => x.key === "scout")).toBe(true);
+    expect([...p.board, ...p.hand].some((x) => x.key === "elder")).toBe(true);
   });
 
   describe("relics", () => {

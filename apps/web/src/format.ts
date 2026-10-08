@@ -16,7 +16,9 @@ export function gearTargetSlots(gear: CardDef | undefined, board: readonly (Card
       (e) =>
         (e.target?.faction === undefined || d.factions.includes(e.target.faction)) &&
         (e.target?.series === undefined || d.series === e.target.series) &&
-        (e.target?.cards === undefined || lineage(d.key).some((k) => e.target?.cards?.includes(k))),
+        (e.target?.cards === undefined || lineage(d.key).some((k) => e.target?.cards?.includes(k))) &&
+        // a Final Form card only fits a unit that has a Final Form (same rule as the engine)
+        (!e.actions.some((a) => a.type === "ULTIMATE_FORM") || d.ultimateInto !== undefined),
     );
   return board.flatMap((d, i) => (fits(d) ? [i] : []));
 }
