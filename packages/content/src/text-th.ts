@@ -1,5 +1,5 @@
 import type { Action, CardDef, Condition, Effect, HeroDef, KeywordKey, RelicDef, Target, Trigger } from "@herotime/shared";
-import type { Names } from "./text.js";
+import { mergeGifts, type Gift, type Names } from "./text.js";
 
 /**
  * Thai rules text, generated from the same effects as the English text (text.ts). Keyword and trigger names
@@ -40,7 +40,9 @@ const TRIGGER: Record<Trigger, string> = {
 
 const signed = (n: number): string => (n >= 0 ? `+${n}` : `${n}`);
 
-function who(t: Target | undefined, names: Names): string {
+// A player effect (hero power, relic, gear) has no unit of its own, so a random ally is not "another" one.
+function who(t: Target | undefined, names: Names, player = false): string {
+  const other = player ? "" : "อื่น";
   const filter = [t?.faction, t?.series].filter((x): x is string => !!x).map(names).join(" ");
   const one = filter ? `ยูนิต ${filter} ` : "พันธมิตร";
   const many = filter ? `ยูนิต ${filter} ทุกตัว` : "พันธมิตรทุกตัว";
@@ -50,7 +52,7 @@ function who(t: Target | undefined, names: Names): string {
     switch (t.selector) {
       case "LEFTMOST_FRIENDLY": return `${list} ตัวซ้ายสุด`;
       case "RIGHTMOST_FRIENDLY": return `${list} ตัวขวาสุด`;
-      case "RANDOM_FRIENDLY": return `${list} ตัวอื่นแบบสุ่ม 1 ตัว`;
+      case "RANDOM_FRIENDLY": return `${list} ตัว${other}แบบสุ่ม 1 ตัว`;
       case "ALL_FRIENDLY": return `${list} ทุกตัว`;
       case "CHOSEN_FRIENDLY": return `${list} ที่เลือก`;
       default: break;
@@ -61,7 +63,7 @@ function who(t: Target | undefined, names: Names): string {
     case "ADJACENT": return "ยูนิตที่อยู่ข้างๆ";
     case "LEFTMOST_FRIENDLY": return `${one}ซ้ายสุด`;
     case "RIGHTMOST_FRIENDLY": return `${one}ขวาสุด`;
-    case "RANDOM_FRIENDLY": return `${one}อื่นแบบสุ่ม 1 ตัว`;
+    case "RANDOM_FRIENDLY": return `${one}${other}แบบสุ่ม 1 ตัว`;
     case "ALL_FRIENDLY": return many;
     case "SUMMONED": return "ตัวที่ถูกเรียก";
     case "GIANT_SLOT": return "Giant Robo ของเรา";
@@ -83,8 +85,8 @@ function condition(c: Condition | undefined, names: Names): string {
   }
 }
 
-function action(a: Action, target: Target | undefined, names: Names): string {
-  const t = who(target, names);
+function action(a: Action, target: Target | undefined, names: Names, player = false): string {
+  const t = who(target, names, player);
   switch (a.type) {
     case "BUFF": {
       const stats = `${signed(a.atk)}/${signed(a.hp)}`;
@@ -168,11 +170,22 @@ export function ruleTextTh(rule: string, op: "SET" | "ADD" | "MUL", value: numbe
 const FIGHT_TRIGGERS = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
 const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
+/** "ให้ยูนิต Mecha ขวาสุดได้ Gattai และ +1/+1 ถาวร" */
+function gifts(g: Gift[], t: string): string {
+  const parts = g.map((a) => (a.type === "GIVE_KEYWORD" ? `ได้ ${KEYWORD[a.keyword]}` : `${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " ถาวร" : ""}`));
+  const first = parts[0] as string;
+  const rest = parts.slice(1).map((p) => (p.startsWith("ได้") ? ` และ${p}` : ` และ ${p}`)).join("");
+  return `ให้${t}${first.startsWith("ได้") ? "" : " "}${first}${rest}`;
+}
+
 export function effectTextTh(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
   const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && (LATER.has(a.type) || (a.type === "COPY" && a.to === "HAND")) ? " ในเทิร์นหน้า" : "");
-  const body = e.actions.map((a) => action(a, e.target, names) + later(a)).join(" แล้ว");
+  const player = e.scope === "PLAYER";
+  const body = mergeGifts(e.actions)
+    .map((g) => (Array.isArray(g) ? gifts(g, who(e.target, names, player)) : action(g, e.target, names, player) + later(g)))
+    .join(" แล้ว");
   const limit = e.limit ? (e.limit.times === 1 ? ` (${e.limit.per === "TURN" ? "เทิร์นละครั้ง" : "ครั้งเดียวต่อเกม"})` : ` (ไม่เกิน ${e.limit.times} ครั้งต่อ${e.limit.per === "TURN" ? "เทิร์น" : "เกม"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} ครั้ง)` : ""}${limit}`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;

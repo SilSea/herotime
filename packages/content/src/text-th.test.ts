@@ -130,3 +130,28 @@ describe("gauge names in rules text", () => {
     expect(g.cards[0]?.text).toBe("Deploy: add 1 to the Rider Gauge.");
   });
 });
+
+describe("hero and relic powers in rules text", () => {
+  const set = (power: unknown) =>
+    withGeneratedText({
+      ...getContentSet("blank"),
+      factions: [{ key: "shonen", name: "Shonen", color: "#f80", text: "", textTh: "" }],
+      heroes: [{ key: "h", name: "H", armor: 0, text: "", textTh: "", power }],
+    } as never).heroes[0];
+
+  it("a random ally of a hero power is not 'another' one, and gifts to one target name it once", () => {
+    const h = set({ mode: "ACTIVE", cost: 1, effects: [{ scope: "PLAYER", trigger: "ON_USE", target: { selector: "RANDOM_FRIENDLY", faction: "shonen" }, actions: [{ type: "GIVE_KEYWORD", keyword: "BARRIER" }, { type: "BUFF", atk: 1, hp: 1, permanent: true }] }] });
+    expect(h?.textTh).toBe("Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Shonen แบบสุ่ม 1 ตัวได้ Barrier และ +1/+1 ถาวร");
+    expect(h?.text).toBe("Hero Power (1 Energy, once per turn): Give a random Shonen unit Barrier and +1/+1 permanently.");
+  });
+});
+
+describe("gifts to one target, stats first", () => {
+  it("reads 'และได้' with no space", () => {
+    const g = withGeneratedText({
+      ...getContentSet("blank"),
+      cards: [{ key: "c", name: "C", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", textTh: "", effects: [{ scope: "UNIT", trigger: "ON_PLAY", target: { selector: "ALL_FRIENDLY" }, actions: [{ type: "BUFF", atk: 2, hp: 2 }, { type: "GIVE_KEYWORD", keyword: "BARRIER" }] }] }],
+    } as never);
+    expect(g.cards[0]?.textTh).toBe("Deploy: ให้พันธมิตรทุกตัว +2/+2 และได้ Barrier");
+  });
+});

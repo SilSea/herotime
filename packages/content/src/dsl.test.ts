@@ -63,7 +63,7 @@ describe("rules text", () => {
     [d.player("ON_PLAY", d.discoverGiant()), "discover a Giant Robo"],
     [d.player("ON_TURN_START", d.summon("tok")), "At the start of each turn: summon Token."],
     [d.startOfCombat(d.buff(1, 1), { golden: 3 }), "(Golden: x3)"],
-    [d.startOfCombat([d.buff(1, 1), d.give("RAPID")], { target: d.adjacent }), "give adjacent units +1/+1, then give adjacent units Rapid"],
+    [d.startOfCombat([d.buff(1, 1), d.give("RAPID")], { target: d.adjacent }), "give adjacent units +1/+1 and Rapid"],
     [d.startOfCombat(d.buff(1, 1), { target: d.rightmost({ series: "q" }) }), "the rightmost q unit"],
   ])("%#", (effect, expected) => {
     expect(t(effect)).toContain(expected);

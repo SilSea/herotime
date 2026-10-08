@@ -38,7 +38,9 @@ const TRIGGER: Record<Trigger, string> = {
 const signed = (n: number): string => (n >= 0 ? `+${n}` : `${n}`);
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
-function who(t: Target | undefined, names: Names): string {
+// A player effect (hero power, relic, gear) has no unit of its own, so a random ally is not "another" one.
+function who(t: Target | undefined, names: Names, player = false): string {
+  const another = player ? "a" : "another";
   // "the leftmost Ally unit" reads better than "the leftmost ally ally".
   const filter = [t?.faction, t?.series].filter((x): x is string => !!x).map(names).join(" ");
   const one = filter ? `${filter} unit` : "ally";
@@ -49,7 +51,7 @@ function who(t: Target | undefined, names: Names): string {
     switch (t.selector) {
       case "LEFTMOST_FRIENDLY": return `your leftmost ${list}`;
       case "RIGHTMOST_FRIENDLY": return `your rightmost ${list}`;
-      case "RANDOM_FRIENDLY": return `another random ${list}`;
+      case "RANDOM_FRIENDLY": return `${another} random ${list}`;
       case "ALL_FRIENDLY": return `your ${list}`;
       case "CHOSEN_FRIENDLY": return `a chosen ${list}`;
       default: break;
@@ -60,7 +62,7 @@ function who(t: Target | undefined, names: Names): string {
     case "ADJACENT": return "adjacent units";
     case "LEFTMOST_FRIENDLY": return `the leftmost ${one}`;
     case "RIGHTMOST_FRIENDLY": return `the rightmost ${one}`;
-    case "RANDOM_FRIENDLY": return `another random ${one}`;
+    case "RANDOM_FRIENDLY": return `${another} random ${one}`;
     case "ALL_FRIENDLY": return `all ${many}`;
     case "CHOSEN_FRIENDLY": return `a chosen ${one}`;
     case "SUMMONED": return "it";
@@ -82,8 +84,8 @@ function condition(c: Condition | undefined, names: Names): string {
   }
 }
 
-function action(a: Action, target: Target | undefined, names: Names): string {
-  const t = who(target, names);
+function action(a: Action, target: Target | undefined, names: Names, player = false): string {
+  const t = who(target, names, player);
   switch (a.type) {
     case "BUFF": {
       const stats = `${signed(a.atk)}/${signed(a.hp)}`;
@@ -160,11 +162,35 @@ export function ruleText(rule: string, op: "SET" | "ADD" | "MUL", value: number)
 const FIGHT_TRIGGERS = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
 const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
+export type Gift = Extract<Action, { type: "BUFF" | "GIVE_KEYWORD" }>;
+const isGift = (a: Action): a is Gift => a.type === "GIVE_KEYWORD" || (a.type === "BUFF" && !a.fromSelf);
+
+/** Runs of 2+ keyword / stat gifts become one group: they all land on the same target, so it is named once. */
+export function mergeGifts(actions: readonly Action[]): (Action | Gift[])[] {
+  const out: (Action | Gift[])[] = [];
+  for (const a of actions) {
+    const last = out[out.length - 1];
+    if (isGift(a) && last !== undefined && (Array.isArray(last) || isGift(last))) {
+      if (Array.isArray(last)) last.push(a);
+      else out[out.length - 1] = [last as Gift, a];
+    } else out.push(a);
+  }
+  return out;
+}
+
+/** "give the rightmost Mecha unit Gattai and +1/+1 permanently" */
+function gifts(g: Gift[], t: string): string {
+  return `give ${t} ${g.map((a) => (a.type === "GIVE_KEYWORD" ? KEYWORD[a.keyword] : `${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " permanently" : ""}`)).join(" and ")}`;
+}
+
 export function effectText(e: Effect, names: Names): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
   const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && (LATER.has(a.type) || (a.type === "COPY" && a.to === "HAND")) ? " next turn" : "");
-  const body = e.actions.map((a) => action(a, e.target, names) + later(a)).join(", then ");
+  const player = e.scope === "PLAYER";
+  const body = mergeGifts(e.actions)
+    .map((g) => (Array.isArray(g) ? gifts(g, who(e.target, names, player)) : action(g, e.target, names, player) + later(g)))
+    .join(", then ");
   const limit = e.limit ? (e.limit.times === 1 ? ` (once per ${e.limit.per === "TURN" ? "turn" : "game"})` : ` (up to ${e.limit.times} times per ${e.limit.per === "TURN" ? "turn" : "game"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}${limit}.`;
   return e.goldenMultiplier && e.goldenMultiplier !== 2 ? `${text} (Golden: x${e.goldenMultiplier})` : text;

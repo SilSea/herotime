@@ -38,7 +38,7 @@ export function renderLibrary(root: HTMLElement, ctx: Ctx): void {
             { class: "info-card" },
             artBox("relic-art", ix.relicArt(r.key), r.name, r.artCrop),
             h("h3", { text: r.name }),
-            h("p", { class: "muted", text: `${r.tier === "LESSER" ? "Lesser" : "Greater"} relic - ${r.cost} Energy${r.factions.length ? ` - ${r.factions.map(ix.factionName).join(", ")}` : ""}` }),
+            h("p", { class: "muted", text: `${tr(`${r.tier === "LESSER" ? "Lesser" : "Greater"} relic - ${r.cost} Energy`, `Relic ระดับ ${r.tier === "LESSER" ? "Lesser" : "Greater"} · ราคา ${r.cost} Energy`)}${r.factions.length ? ` - ${r.factions.map(ix.factionName).join(", ")}` : ""}` }),
             h("p", { text: ix.relicText(r.key) }),
           ),
         );

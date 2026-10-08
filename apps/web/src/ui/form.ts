@@ -9,6 +9,8 @@ export interface FormEnv {
   changed(): void;
   /** Upload an image and return the file name to store (absent when uploads are not available). */
   upload?(file: File): Promise<string>;
+  /** Grey text shown in an empty text field of `obj` (e.g. the rules text the server would generate). */
+  placeholder?(obj: Record<string, unknown>, key: string): string | undefined;
 }
 
 /** A starting value for a field that has just been switched on or added. */
@@ -50,6 +52,14 @@ export function renderRows(rows: Row[], obj: Record<string, unknown>, env: FormE
   return wrap;
 }
 
+/** A text field with the placeholder the editor gives for it, if any. */
+function withPlaceholder(row: Row, obj: Record<string, unknown>, env: FormEnv): Field {
+  const field = row.field;
+  if (field.kind !== "text") return field;
+  const hint = env.placeholder?.(obj, row.key);
+  return hint ? { ...field, placeholder: hint } : field;
+}
+
 function renderRow(row: Row, obj: Record<string, unknown>, env: FormEnv): HTMLElement {
   const holder = h("div", { class: "frow-body" });
   const present = (): boolean => obj[row.key] !== undefined;
@@ -58,7 +68,7 @@ function renderRow(row: Row, obj: Record<string, unknown>, env: FormEnv): HTMLEl
     if (row.optional && !present()) return;
     if (obj[row.key] === undefined) obj[row.key] = defaultFor(row.field); // old data may lack a field the form shows
     holder.append(
-      renderField(row.field, obj[row.key], (v) => {
+      renderField(withPlaceholder(row, obj, env), obj[row.key], (v) => {
         obj[row.key] = v;
         env.changed();
       }, env),
@@ -83,7 +93,7 @@ function renderRow(row: Row, obj: Record<string, unknown>, env: FormEnv): HTMLEl
 export function renderField(field: Field, value: unknown, set: (v: unknown) => void, env: FormEnv): HTMLElement {
   switch (field.kind) {
     case "text": {
-      const el = field.area ? h("textarea", { value: String(value ?? ""), attrs: { rows: "3" } }) : h("input", { type: "text", value: String(value ?? ""), ...(field.placeholder ? { placeholder: field.placeholder } : {}) });
+      const el = field.area ? h("textarea", { value: String(value ?? ""), attrs: { rows: "3", ...(field.placeholder ? { placeholder: field.placeholder } : {}) } }) : h("input", { type: "text", value: String(value ?? ""), ...(field.placeholder ? { placeholder: field.placeholder } : {}) });
       el.addEventListener("input", () => set(el.value));
       if (field.upload && env.upload) {
         const pick = h("input", { type: "file", attrs: { accept: field.audio ? "audio/mpeg,audio/ogg,audio/wav,.mp3,.ogg,.wav" : "image/png,image/jpeg,image/gif,image/webp" } });

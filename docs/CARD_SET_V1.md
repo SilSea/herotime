@@ -329,69 +329,69 @@
 
 ## Hero (เผ่าละ 4 ตัว)
 
-พลัง Hero แบบ **กดใช้** = ใช้ได้เทิร์นละครั้ง · **ครั้งเดียว** = ใช้ได้ครั้งเดียวต่อเกม · **ติดตัว** = ทำงานเอง · ตัวเลขในวงเล็บ = ราคา Energy · Armor = เลือดเสริม
+คอลัมน์พลังเป็นข้อความภาษาไทยที่ผู้เล่นเห็นในเกม (ระบบสร้างจาก effect) · **Hero Power (N Energy, เทิร์นละครั้ง)** = กดใช้ได้เทิร์นละครั้ง ราคา N · **ครั้งเดียวต่อเกม** = ใช้ได้ครั้งเดียว · **Passive** = ทำงานเอง · Armor = เลือดเสริม · ซีรีส์ของ Hero = ซีรีส์ของเผ่านั้น (Human ไม่มี)
 
-| เผ่า | key | Hero | Armor | พลัง | อ้างอิง |
+| เผ่า | key | Hero | Armor | พลัง (ข้อความในเกม) | อ้างอิง |
 |---|---|---|---|---|---|
-| Rider | `h_lord_zero` | Lord Zero | 0 | กดใช้ (1): ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ และ Rider แบบสุ่ม +1/+1 ถาวร | ผู้บัญชาการ CODE พ่อของ Baku |
-| Rider | `h_baku` | Baku Yorozu | 0 | ติดตัว: เริ่มเกมด้วย Rider Gauge +2 | ตัวเอก |
-| Rider | `h_nem` | Nem | 0 | กดใช้ (1): Zeztz (ทุกร่าง) +1/+1 ถาวร | ครอบครัวบุญธรรมของ Baku |
-| Rider | `h_kensei` | Kensei Odaka | 3 | ครั้งเดียว (3): ได้การ์ด Kensei Odaka เข้ามือ (สาย Nox) | Kamen Rider Nox |
-| Sentai | `h_gira` | Gira Husty | 0 | ติดตัว: Roll Call ใช้แค่ 2 สี | ราชาแห่ง Shugodom |
-| Sentai | `h_yanma` | Yanma Gast | 0 | กดใช้ (2): Giant Robo +2/+2 ถาวร และ Mecha Gauge +1 (Gauge ได้ไม่เกิน 2 ครั้งต่อเกม) | วิศวกรผู้สร้าง Shugod |
-| Sentai | `h_hymeno` | Hymeno Ran | 0 | กดใช้ (1): Sentai แบบสุ่ม +0/+2 ถาวร | หมอ ราชินีแห่ง Ishabana |
-| Sentai | `h_rita` | Rita Kaniska | 5 | ครั้งเดียว (1): เลือกรับยูนิต Sentai 1 จาก 3 | ประธานศาลแห่ง Gokkan |
-| Mecha | `h_gen_fudo` | Gen Fudo | 0 | ติดตัว: Gattai ใช้แค่ 2 ตัว | ผู้บัญชาการ DEAVA |
-| Mecha | `h_celiane` | Celiane | 0 | ครั้งเดียว (2): ได้การ์ด Final Form เข้ามือ | คนรักของ Apollonius |
-| Mecha | `h_sirius` | Sirius de Alisia | 0 | กดใช้ (1): Mecha ขวาสุดได้ keyword Gattai และ +1/+1 ถาวร | นักบิน Element |
-| Mecha | `h_apollo` | Apollo | 3 | กดใช้ (1): Mecha ซ้ายสุด (core) +1/+1 ถาวร | นักบิน Vector Sol |
-| Kaiju | `h_shobijin` | Shobijin | 0 | กดใช้ (1): Kaiju แบบสุ่มได้ Revive | คู่แฝดตัวจิ๋วของ Mothra |
-| Kaiju | `h_daisuke` | Daisuke Serizawa | 0 | ครั้งเดียว (0): ทำลายพวกขวาสุด แล้วเลือกรับยูนิต Kaiju 2 ครั้ง | ผู้สร้าง Oxygen Destroyer |
-| Kaiju | `h_ishiro` | Ishiro Serizawa | 0 | ติดตัว: ต้นทุกเทิร์น Kaiju แบบสุ่ม +1/+1 ถาวร | นักวิทยาศาสตร์ Monarch |
-| Kaiju | `h_jet_jaguar` | Jet Jaguar | 0 | กดใช้ (1): พวกขวาสุด +1/+1 ถาวร | หุ่นยนต์ที่ขยายร่างได้ |
-| Beast | `h_legoshi` | Legoshi | 0 | กดใช้ (2): เรียก Durham | ตัวเอก |
-| Beast | `h_haru` | Haru | 0 | กดใช้ (1): Beast แบบสุ่ม +1/+2 ถาวร | กระต่ายขาว |
-| Beast | `h_louis` | Louis | 0 | ครั้งเดียว (0): เรียก Shishigumi Lion ×2 | หัวหน้ากลุ่มสิงโต |
-| Beast | `h_gohin` | Gohin | 5 | กดใช้ (1): Beast แบบสุ่มได้ Guard | หมอใต้ดิน |
-| Human | `h_merchant` | Guild Merchant | 0 | ติดตัว: Refresh ฟรีเทิร์นละ 2 ครั้ง | ออกแบบเอง |
-| Human | `h_mayor` | City Mayor | 0 | กดใช้ (2): ยูนิตในร้าน +1/+0 จนจบเกม | ออกแบบเอง |
-| Human | `h_banker` | Central Banker | 0 | ครั้งเดียว (0): ได้ 3 Energy | ออกแบบเอง |
-| Human | `h_general` | Defense General | 5 | กดใช้ (2): พวกเราทุกตัว +0/+1 ถาวร | ออกแบบเอง |
-| Shonen | `h_minato` | Minato Namikaze | 0 | กดใช้ (1): พวกซ้ายสุด +1/+0 ถาวร | โฮคาเงะรุ่นที่ 4 |
-| Shonen | `h_hiruzen` | Hiruzen Sarutobi | 0 | ติดตัว: ต้นทุกเทิร์น Shonen แบบสุ่ม +1/+1 ถาวร | โฮคาเงะรุ่นที่ 3 |
-| Shonen | `h_iruka` | Iruka Umino | 3 | ครั้งเดียว (0): เลือกรับยูนิต Shonen 1 จาก 3 | ครูของ Naruto |
-| Shonen | `h_kushina` | Kushina Uzumaki | 0 | กดใช้ (1): Shonen แบบสุ่มได้ Barrier และ +1/+1 ถาวร | แม่ของ Naruto |
+| Rider | `h_lord_zero` | Lord Zero | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ได้ Gear Kamen Rider แบบสุ่มเข้ามือ · ให้ยูนิต Kamen Rider แบบสุ่ม 1 ตัว +1/+1 ถาวร | ผู้บัญชาการ CODE พ่อของ Baku |
+| Rider | `h_baku` | Baku Yorozu | 0 | Passive: เพิ่ม Rider Gauge 2 | ตัวเอก |
+| Rider | `h_nem` | Nem | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Kamen Rider Zeztz ทุกตัว +1/+1 ถาวร | ครอบครัวบุญธรรมของ Baku |
+| Rider | `h_kensei` | Kensei Odaka | 3 | Hero Power (3 Energy, ครั้งเดียวต่อเกม): ได้ Kensei Odaka เข้ามือ | Kamen Rider Nox |
+| Sentai | `h_gira` | Gira Husty | 0 | Passive: Roll Call ใช้แค่ 2 สี | ราชาแห่ง Shugodom |
+| Sentai | `h_yanma` | Yanma Gast | 0 | Hero Power (2 Energy, เทิร์นละครั้ง): ให้ Giant Robo ของเรา +2/+2 ถาวร · เพิ่ม Mecha Gauge 1 (ไม่เกิน 2 ครั้งต่อเกม) | วิศวกรผู้สร้าง Shugod |
+| Sentai | `h_hymeno` | Hymeno Ran | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Super Sentai แบบสุ่ม 1 ตัว +0/+2 ถาวร | หมอ ราชินีแห่ง Ishabana |
+| Sentai | `h_rita` | Rita Kaniska | 5 | Hero Power (1 Energy, ครั้งเดียวต่อเกม): เลือกรับยูนิต Super Sentai 1 จาก 3 | ประธานศาลแห่ง Gokkan |
+| Mecha | `h_gen_fudo` | Gen Fudo | 0 | Passive: Gattai ใช้แค่ 2 ตัวที่ติดกัน | ผู้บัญชาการ DEAVA |
+| Mecha | `h_celiane` | Celiane | 0 | Hero Power (2 Energy, ครั้งเดียวต่อเกม): ได้ Final Form เข้ามือ | คนรักของ Apollonius |
+| Mecha | `h_sirius` | Sirius de Alisia | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Mecha ขวาสุดได้ Gattai และ +1/+1 ถาวร | นักบิน Element |
+| Mecha | `h_apollo` | Apollo | 3 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Mecha ซ้ายสุด +1/+1 ถาวร | นักบิน Vector Sol |
+| Kaiju | `h_shobijin` | Shobijin | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Kaiju แบบสุ่ม 1 ตัวได้ Revive | คู่แฝดตัวจิ๋วของ Mothra |
+| Kaiju | `h_daisuke` | Daisuke Serizawa | 0 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): ทำลายพันธมิตรขวาสุด · เลือกรับยูนิต Kaiju 1 จาก 3 (2 ครั้ง) | ผู้สร้าง Oxygen Destroyer |
+| Kaiju | `h_ishiro` | Ishiro Serizawa | 0 | Passive: ต้นทุกเทิร์น: ให้ยูนิต Kaiju แบบสุ่ม 1 ตัว +1/+1 ถาวร | นักวิทยาศาสตร์ Monarch |
+| Kaiju | `h_jet_jaguar` | Jet Jaguar | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้พันธมิตรขวาสุด +1/+1 ถาวร | หุ่นยนต์ที่ขยายร่างได้ |
+| Beast | `h_legoshi` | Legoshi | 0 | Hero Power (2 Energy, เทิร์นละครั้ง): เรียก Durham | ตัวเอก |
+| Beast | `h_haru` | Haru | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Beast แบบสุ่ม 1 ตัว +1/+2 ถาวร | กระต่ายขาว |
+| Beast | `h_louis` | Louis | 0 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): เรียก Shishigumi Lion 2 ตัว | หัวหน้ากลุ่มสิงโต |
+| Beast | `h_gohin` | Gohin | 5 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Beast แบบสุ่ม 1 ตัวได้ Guard | หมอใต้ดิน |
+| Human | `h_merchant` | Guild Merchant | 0 | Passive: Refresh ฟรี 2 ครั้งต่อเทิร์น | ออกแบบเอง |
+| Human | `h_mayor` | City Mayor | 0 | Hero Power (2 Energy, เทิร์นละครั้ง): ยูนิตในร้านได้ +1/+0 จนจบเกม | ออกแบบเอง |
+| Human | `h_banker` | Central Banker | 0 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): ได้ 3 Energy | ออกแบบเอง |
+| Human | `h_general` | Defense General | 5 | Hero Power (2 Energy, เทิร์นละครั้ง): ให้พันธมิตรทุกตัว +0/+1 ถาวร | ออกแบบเอง |
+| Shonen | `h_minato` | Minato Namikaze | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้พันธมิตรซ้ายสุด +1/+0 ถาวร | โฮคาเงะรุ่นที่ 4 |
+| Shonen | `h_hiruzen` | Hiruzen Sarutobi | 0 | Passive: ต้นทุกเทิร์น: ให้ยูนิต Shonen แบบสุ่ม 1 ตัว +1/+1 ถาวร | โฮคาเงะรุ่นที่ 3 |
+| Shonen | `h_iruka` | Iruka Umino | 3 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): เลือกรับยูนิต Shonen 1 จาก 3 | ครูของ Naruto |
+| Shonen | `h_kushina` | Kushina Uzumaki | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Shonen แบบสุ่ม 1 ตัวได้ Barrier และ +1/+1 ถาวร | แม่ของ Naruto |
 
 ## Relic (ไอเท็มจากเรื่อง)
 
 Lesser = เลือกเทิร์น 5 · Greater = เลือกเทิร์น 9 · ราคาเป็น Energy · ระบบสุ่มให้เลือก 4 อัน (อันหนึ่งตรงเผ่าหลัก) และมีอันฟรีอย่างน้อย 1 อัน
 
-| เผ่า | key | Relic | ระดับ | ราคา | ผล |
+| เผ่า | key | Relic | ระดับ | ราคา | ผล (ข้อความในเกม) |
 |---|---|---|---|---|---|
-| Rider | `rl_zeztz_driver` | Zeztz Driver | Lesser | 2 | เริ่มการต่อสู้: Rider ทุกตัว +1/+1 |
-| Rider | `rl_capsem_case` | Capsem Case | Lesser | 0 | ได้ทันที: Gear Rider แบบสุ่ม 2 ใบ และ Rider Gauge +1 |
-| ทุกเผ่า | `rl_final_form_belt` | Final Form Belt | Greater | 4 | ได้ทันที: การ์ด Final Form เข้ามือ |
-| Sentai | `rl_ohger_calibur` | Ohger Calibur | Lesser | 1 | เริ่มการต่อสู้: Sentai ทุกตัว +1/+1 |
-| Sentai | `rl_shugod_nest` | Shugod Nest | Lesser | 1 | ได้ทันที: Mecha Gauge +2 |
-| Sentai | `rl_kings_crown` | Ohger Crown | Greater | 5 | เริ่มการต่อสู้: Giant Robo +4/+4 |
-| Mecha | `rl_vector_engine` | Vector Engine | Lesser | 1 | เริ่มการต่อสู้: Mecha ซ้ายสุด +2/+2 |
-| Mecha | `rl_element_training` | Element Training | Lesser | 1 | ได้ทันที: Gattai ใช้แค่ 2 ตัว |
-| Mecha | `rl_tree_of_life` | Tree of Life | Greater | 5 | ต้นทุกเทิร์น: Mecha ทุกตัว +1/+1 ถาวร |
-| Kaiju | `rl_monster_island` | Monster Island | Lesser | 2 | เริ่มการต่อสู้: Kaiju แบบสุ่มได้ Revive |
-| Kaiju | `rl_g_cells` | G-Cells | Lesser | 1 | ต้นทุกเทิร์น: Kaiju แบบสุ่ม +1/+0 ถาวร |
+| Rider | `rl_zeztz_driver` | Zeztz Driver | Lesser | 2 | เริ่มการต่อสู้: ให้ยูนิต Kamen Rider ทุกตัว +1/+1 |
+| Rider | `rl_capsem_case` | Capsem Case | Lesser | 0 | เมื่อได้รับ: ได้ Gear Kamen Rider แบบสุ่มเข้ามือ (2 ครั้ง) · เมื่อได้รับ: เพิ่ม Rider Gauge 1 |
+| ทุกเผ่า | `rl_final_form_belt` | Final Form Belt | Greater | 4 | เมื่อได้รับ: ได้ Final Form เข้ามือ |
+| Sentai | `rl_ohger_calibur` | Ohger Calibur | Lesser | 1 | เริ่มการต่อสู้: ให้ยูนิต Super Sentai ทุกตัว +1/+1 |
+| Sentai | `rl_shugod_nest` | Shugod Nest | Lesser | 1 | เมื่อได้รับ: เพิ่ม Mecha Gauge 2 |
+| Sentai | `rl_kings_crown` | Ohger Crown | Greater | 5 | เริ่มการต่อสู้: ให้ Giant Robo ของเรา +4/+4 |
+| Mecha | `rl_vector_engine` | Vector Engine | Lesser | 1 | เริ่มการต่อสู้: ให้ยูนิต Mecha ซ้ายสุด +2/+2 |
+| Mecha | `rl_element_training` | Element Training | Lesser | 1 | เมื่อได้รับ: Gattai ใช้แค่ 2 ตัวที่ติดกัน |
+| Mecha | `rl_tree_of_life` | Tree of Life | Greater | 5 | ต้นทุกเทิร์น: ให้ยูนิต Mecha ทุกตัว +1/+1 ถาวร |
+| Kaiju | `rl_monster_island` | Monster Island | Lesser | 2 | เริ่มการต่อสู้: ให้ยูนิต Kaiju แบบสุ่ม 1 ตัวได้ Revive |
+| Kaiju | `rl_g_cells` | G-Cells | Lesser | 1 | ต้นทุกเทิร์น: ให้ยูนิต Kaiju แบบสุ่ม 1 ตัว +1/+0 ถาวร |
 | Kaiju | `rl_oxygen_destroyer` | Oxygen Destroyer | Greater | 5 | เริ่มการต่อสู้: ทำดาเมจ 5 ใส่ศัตรูซ้ายสุด |
-| Beast | `rl_drama_club` | Cherryton Drama Club | Lesser | 1 | เริ่มการต่อสู้: Beast ทุกตัว +1/+0 |
-| Beast | `rl_black_market` | Black Market | Lesser | 2 | ได้ทันที: เลือกรับยูนิต Beast 1 จาก 3 |
-| Beast | `rl_beastar` | Beastar Title | Greater | 4 | เริ่มการต่อสู้: Beast ทุกตัว +2/+2 |
+| Beast | `rl_drama_club` | Cherryton Drama Club | Lesser | 1 | เริ่มการต่อสู้: ให้ยูนิต Beast ทุกตัว +1/+0 |
+| Beast | `rl_black_market` | Black Market | Lesser | 2 | เมื่อได้รับ: เลือกรับยูนิต Beast 1 จาก 3 |
+| Beast | `rl_beastar` | Beastar Title | Greater | 4 | เริ่มการต่อสู้: ให้ยูนิต Beast ทุกตัว +2/+2 |
 | Human | `rl_savings_bond` | Savings Bond | Lesser | 0 | ต้นทุกเทิร์น: ได้ 1 Energy |
-| Human | `rl_coupon_book` | Coupon Book | Lesser | 0 | ได้ทันที: 4 Energy |
-| Human | `rl_city_grant` | City Grant | Greater | 3 | ได้ทันที: ยูนิตในร้าน +2/+2 จนจบเกม |
-| Shonen | `rl_leaf_headband` | Leaf Headband | Lesser | 1 | เริ่มการต่อสู้: Shonen ทุกตัว +0/+2 |
-| Shonen | `rl_ninja_scroll` | Ninja Scroll | Lesser | 2 | ได้ทันที: เลือกรับยูนิต Shonen 1 จาก 3 |
-| Shonen | `rl_sage_training` | Sage Training | Greater | 4 | เริ่มการต่อสู้: Shonen ทุกตัว +2/+1 |
-| ทุกเผ่า | `rl_lucky_coin` | Lucky Coin | Lesser | 0 | ได้ทันที: 2 Energy |
-| ทุกเผ่า | `rl_training_weights` | Training Weights | Lesser | 2 | เริ่มการต่อสู้: พวกซ้ายสุด +2/+2 |
-| ทุกเผ่า | `rl_war_banner` | War Banner | Greater | 3 | เริ่มการต่อสู้: พวกเราทุกตัว +1/+0 |
+| Human | `rl_coupon_book` | Coupon Book | Lesser | 0 | เมื่อได้รับ: ได้ 4 Energy |
+| Human | `rl_city_grant` | City Grant | Greater | 3 | เมื่อได้รับ: ยูนิตในร้านได้ +2/+2 จนจบเกม |
+| Shonen | `rl_leaf_headband` | Leaf Headband | Lesser | 1 | เริ่มการต่อสู้: ให้ยูนิต Shonen ทุกตัว +0/+2 |
+| Shonen | `rl_ninja_scroll` | Ninja Scroll | Lesser | 2 | เมื่อได้รับ: เลือกรับยูนิต Shonen 1 จาก 3 |
+| Shonen | `rl_sage_training` | Sage Training | Greater | 4 | เริ่มการต่อสู้: ให้ยูนิต Shonen ทุกตัว +2/+1 |
+| ทุกเผ่า | `rl_lucky_coin` | Lucky Coin | Lesser | 0 | เมื่อได้รับ: ได้ 2 Energy |
+| ทุกเผ่า | `rl_training_weights` | Training Weights | Lesser | 2 | เริ่มการต่อสู้: ให้พันธมิตรซ้ายสุด +2/+2 |
+| ทุกเผ่า | `rl_war_banner` | War Banner | Greater | 3 | เริ่มการต่อสู้: ให้พันธมิตรทุกตัว +1/+0 |
 | ทุกเผ่า | `rl_treasury` | Treasury | Greater | 3 | ต้นทุกเทิร์น: ได้ 1 Energy |
 
 **ผล Simulate (1,200 เกม, หลังปรับ 1 รอบ)**
