@@ -89,7 +89,15 @@ export const SENTAI_COLORS: Record<string, string> = {
   YELLOW: "#fdd835",
   GREEN: "#43a047",
   PINK: "#ec407a",
-  EXTRA: "#8e24aa",
+  // Black is drawn dark grey so it still shows on the dark background.
+  BLACK: "#5c6370",
+  WHITE: "#f5f5f5",
+  PURPLE: "#9c27b0",
+  SILVER: "#b0bec5",
+  GOLD: "#ffb300",
+  ORANGE: "#fb8c00",
+  // The wildcard: a colour no ranger uses.
+  EXTRA: "#00e5ff",
 };
 
 export const stars = (rank: number): string => "★".repeat(rank);

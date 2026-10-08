@@ -1,17 +1,17 @@
 # ชุดการ์ด v1 (ร่างแรก รอผู้ใช้ตรวจ)
 
 ร่างการ์ดของทั้ง 7 เผ่า ตามแนวใน `FACTIONS.md` และเรื่องที่กำหนด **ยังไม่ได้ใส่ลง draft** ผู้ใช้จะตรวจและปรับก่อน
-ฝั่ง Rider และ Sentai มีเฉพาะฝ่ายพระเอกและพวกเดียวกัน ไม่มีตัวร้าย
+ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider และ Sentai มีทั้งฝ่ายพระเอกและ**ตัวร้าย** (เผ่าเดียวกัน)
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
-| Rider | Kamen Rider ZEZTZ | 9 | 14 | 12 |
-| Sentai | Ohsama Sentai King-Ohger | 14 | 1 | 1 + Giant 4 |
-| Mecha | Genesis of Aquarion | 11 | 4 | 2 |
-| Kaiju | Godzilla | 13 | 5 | 0 |
+| Rider | Kamen Rider ZEZTZ | 18 (พระเอก 9 + ตัวร้าย 9) | 16 | 12 |
+| Sentai | Ohsama Sentai King-Ohger | 22 (พระเอก 14 + ตัวร้าย 8) | 1 | 1 + Giant 5 |
+| Mecha | Genesis of Aquarion | 14 | 4 | 2 |
+| Kaiju | Godzilla | 14 | 5 | 0 |
 | Beast | Beastars | 15 | 3 | 0 |
 | Human | ออกแบบเอง (ไม่มีเรื่อง) | 14 | 0 | 3 |
-| Shonen | Naruto | 13 | 2 | 0 |
+| Shonen | Naruto | 14 | 2 | 0 |
 
 **วิธีอ่าน**
 - `R` = Rank · `ATK/HP` · keyword ตัวเอียงในวงเล็บ เช่น *(Guard)*
@@ -73,11 +73,27 @@
 | 5 | `capsem_booster` | Booster Capsem | 3 | Plasma Booster · **เฉพาะการ์ด: Inazuma Plasma** |
 | — | `capsem_exdreamrise` | Exdreamrise Capsem (token, รางวัล Rider Gauge) | 0 | **เปลี่ยนเป็นร่าง Final Form** (`ULTIMATE_FORM`) · ใช้กับ Rider ที่เลือก |
 
+**ตัวร้าย — Nightmare และ CODE ฝ่ายร้าย** (เผ่า Rider · แผนรองของเผ่า: **ทำให้ศัตรูอ่อนแอก่อนสู้** และเรียกพวก Nightmare)
+| R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
+|---|---|---|---|---|---|
+| 1 | `death_evil` | Death Evil | 2/1 | — | พลทหารของ Punish Gore Nightmare |
+| 1 | `baby_nightmare` | Baby Nightmare | 1/2 | Henshin (2) → Crow Nightmare | Nightmare ร่างยังไม่โต |
+| 2 | `gun_nightmare` | Gun Nightmare | 3/2 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) | Nightmare ปืน |
+| 3 | `lord_three` | Lord Three | 4/3 *(Barrier)* | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 ผู้บริหารโหดเหี้ยม ใช้ Extra Capsem, Clear Capsem ล่องหน |
+| 3 | `kamen_rider_dawn` | Kamen Rider Dawn | 4/4 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Sieg ผู้ก่อการร้ายในความฝัน ใช้ Punish Capsem |
+| 4 | `the_lady` | The Lady | 3/6 | เริ่มการต่อสู้: เรียก Phantom Apparition 2/2 ×2 | ผู้นำ Nightmare (CODE 2), Chaos / Phantom Capsem |
+| 5 | `oblivion_gore` | Oblivion Gore Nightmare | 3/7 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด | Gore Lord ที่จะลบโลกแห่งความฝัน |
+| 6 | `catastrophe_gore` | Catastrophe Gore Nightmare | 9/9 | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −2/−0 (จนจบการสู้) | Gore Lord จากจิตใต้สำนึกของ Baku ทำลาย CODE ทุกสาขา |
+| 6 | `kamen_rider_mugen` | Kamen Rider Mugen | 8/8 | เริ่มการต่อสู้: เปลี่ยนศัตรูซ้ายสุดเป็น Death Evil | Shuma Kumon ใช้ Daydream Capsem บิดเบือนความจริง |
+
+**Token ฝั่งตัวร้าย**: `crow_nightmare` Crow Nightmare 4/3 *(Rapid)* · `phantom_apparition` Phantom Apparition 2/2
+
 **หมายเหตุ Rider**
 - ตัวกรอง "เฉพาะการ์ด" นับร่างที่มาจาก Henshin / Final Form แต่**ไม่นับร่างที่มาจาก Capsem (TRANSFORM)** ดังนั้นต้องใส่ทุกร่างของ Zeztz ในตัวกรองของ Capsem, Nem และ Knight Seventeen
 - Rider Gauge: ตั้งรางวัลเป็น ADD_TO_HAND `capsem_exdreamrise` (เช่น ครบ 2 ครั้งต่อเกม)
-- ไม่ได้ใส่: Kamen Rider Dawn (เป็นศัตรูก่อนแล้วกลับใจ), Lord Three / Lord Two / Lord Thirteen / Mugen (ฝ่ายร้าย), Lord Zero (มีแค่ในหนัง)
-- การ์ดในร้านมีแค่ 9 ใบ (ตัวละครฝ่ายพระเอกมีน้อย) Rider ใช้ Capsem 11 ใบชดเชย ถ้าอยากได้ครบ 14 ใบให้เพิ่มตัวละครสมทบ
+- ไม่ได้ใส่: Lord Two / Lord Thirteen (ซ้ำกับ The Lady และ Lord Three), Lord Zero (มีแค่ในหนัง), Gore Nightmare อีก 2 ตัว (Phantom, Punish) เพื่อไม่ให้ Rider มีการ์ดเยอะเกิน
+- Rider มีการ์ดในร้าน 18 ใบ (มากกว่าเผ่าอื่น) โอกาสเจอ Zeztz ในร้านจะลดลง ถ้าเกมแรกๆ หา Zeztz ยาก ให้ย้ายตัวร้ายบางตัวออก
+- "−2/−0" กับศัตรู: ลดได้ต่ำสุด ATK 0 ไม่ทำให้ตาย และไม่ติดถาวร
 
 ---
 
@@ -89,21 +105,21 @@
 | R | key | การ์ด | สี | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|---|
 | 1 | `kuwagata_ohger` | Kuwagata Ohger | RED | 2/2 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +2/+2 · Final Form → `king_kuwagata` | Gira Husty กษัตริย์ Shugodom |
-| 1 | `hachi_ohger` | Hachi Ohger | GREEN* | 2/2 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | Kaguragi Dybowski แห่ง Tofu |
+| 1 | `hachi_ohger` | Hachi Ohger | BLACK | 2/2 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | Kaguragi Dybowski แห่ง Tofu |
 | 1 | `god_tentou` | God Tentou | — | 1/2 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod เต่าทอง (เสริม) |
 | 2 | `tombo_ohger` | Tombo Ohger | BLUE | 3/3 | Deploy: ให้ Giant Robo +2/+2 ถาวร | Yanma Gast วิศวกรผู้สร้าง Shugod |
 | 2 | `kamakiri_ohger` | Kamakiri Ohger | YELLOW | 2/4 | จบเทิร์น: ให้ Sentai ตัวอื่นแบบสุ่ม +0/+2 | Hymeno Ran หมอ ราชินีแห่ง Ishabana |
 | 2 | `god_kumo` | God Kumo | — | 2/3 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod แมงมุม (เสริม) |
 | 2 | `god_ant` | God Ant | — | 2/2 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ถ้าเป็น Sentai ให้ตัวนั้น +1/+0 | Shugod มด (เสริม) |
-| 3 | `papillon_ohger` | Papillon Ohger | PINK* | 3/4 *(Guard)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +1/+0 | Rita Kaniska ประธานศาล ใช้ Ice Seal |
-| 3 | `spider_kumonos` | Spider Kumonos | EXTRA | 3/4 | Deploy: เลือกรับยูนิต Sentai 1 จาก 3 | Jeramie Brasieri นักประวัติศาสตร์ (กลายเป็นพวก) |
+| 3 | `papillon_ohger` | Papillon Ohger | PURPLE | 3/4 *(Guard)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +1/+0 | Rita Kaniska ประธานศาล ใช้ Ice Seal |
+| 3 | `spider_kumonos` | Spider Kumonos | WHITE | 3/4 | Deploy: เลือกรับยูนิต Sentai 1 จาก 3 | Jeramie Brasieri นักประวัติศาสตร์ (กลายเป็นพวก) |
 | 3 | `god_kabuto` | God Kabuto | — | 3/3 | Deploy: ให้ Giant Robo +3/+3 ถาวร | Shugod ด้วงกว่าง (เสริมร่าง Kabuto King-Ohger) |
 | 4 | `god_scorpion` | God Scorpion | — | 4/5 | Deploy: ให้ Giant Robo ได้ Lethal | Shugod แมงป่อง (Scorpion King-Ohger) |
 | 4 | `god_hopper` | God Hopper | — | 5/4 | Deploy: ให้ Giant Robo ได้ Rapid | Shugod ตั๊กแตน (Hopper King-Ohger) |
 | 5 | `guardian_hercules` | Guardian Hercules | — | 6/8 *(Guard)* | Deploy: Mecha Gauge +2 | Guardian Weapon ด้วงเฮอร์คิวลีส |
-| 6 | `god_tarantula` | God Tarantula | EXTRA | 9/10 | Team-Up (4): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 | Shugod ของ Jeramie, ร่างยักษ์ Tarantula Knight |
+| 6 | `god_tarantula` | God Tarantula | — | 9/10 | Team-Up (4): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 | Shugod ของ Jeramie, ร่างยักษ์ Tarantula Knight |
 
-\* สีในเกมมีแค่ RED/BLUE/YELLOW/GREEN/PINK/EXTRA: Hachi Ohger (ดำ) ใช้ GREEN, Papillon Ohger (ม่วง) ใช้ PINK
+สีตรงกับในเรื่องแล้ว (เกมเพิ่มสี BLACK, WHITE, PURPLE, SILVER, GOLD, ORANGE) · King-Ohger ไม่มีสีเขียวและชมพู · Extra (นับเป็นสีใดก็ได้) ไม่มีในเรื่องนี้
 
 **ร่าง / Gear / หุ่นยักษ์**
 | ชนิด | key | การ์ด | ATK/HP | ความสามารถ |
@@ -113,10 +129,24 @@
 | Giant | `king_ohger` | King-Ohger | 10/12 *(Final Blow)* | หุ่นรวม 5 Shugod หลัก · Final Form → `god_king_ohger` |
 | Giant | `king_caucasus_kabuto` | King Caucasus Kabuto | 12/10 *(Final Blow, Barrier)* | ร่างยักษ์ของ God Caucasus Kabuto |
 | Giant | `tarantula_knight` | Tarantula Knight | 9/12 *(Final Blow, Guard)* | ร่างยักษ์ของ God Tarantula |
+| Giant | `king_ohger_zero` | King-Ohger Zero | 11/11 *(Final Blow, Lethal)* | หุ่น Shugod Zero 10 ตัวของ Rcules |
 | Giant (ร่างอัปเกรด) | `god_king_ohger` | God King-Ohger | 18/18 *(Final Blow, Rapid)* | รวม 20 Shugod — ได้จาก Gear Final Form เป้า Giant Robo |
 
+**ตัวร้าย — Galactinsects และ Bug Naraku** (เผ่า Sentai · ไม่มีสี ยกเว้น Ohkuwagata Ohger · แผนรอง: กองทัพ Kaijim และทำให้ศัตรูอ่อนแอ)
+| R | key | การ์ด | สี | ATK/HP | ความสามารถ | อ้างอิง |
+|---|---|---|---|---|---|---|
+| 1 | `kaijim` | Kaijim | — | 2/1 | — | สัตว์ประหลาดของ Bug Naraku (ใช้เป็นตัวที่ถูกเรียกด้วย) |
+| 2 | `geroujim` | Geroujim | — | 2/3 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/−0 (จนจบการสู้) | Kaijim แมลงเม่า ใช้ภาพลวงตา |
+| 3 | `goma_rosalia` | Goma Rosalia | — | 4/3 *(Rapid)* | — | นินจาธีมด้วงหนวดยาว หนึ่งใน Five Jesters |
+| 3 | `hilbil_leech` | Hilbil Leech | — | 3/4 | เมื่อโจมตี: ตัวนี้ +1/+1 ถาวร | หนึ่งใน Five Jesters (ธีมปลิงตามชื่อ ยังไม่ได้ยืนยัน) |
+| 4 | `kamejim` | Kamejim | — | 4/5 | Deploy: ทำลายพวกเราขวาสุด · Deploy: ตัวนี้ +3/+3 ถาวร | Jester ที่ทรยศแทง Desnaraku |
+| 5 | `desnaraku` | Desnaraku VIII | — | 6/7 | Deploy: เรียก Kaijim ×2 | ราชาแห่ง Bug Naraku |
+| 5 | `ohkuwagata_ohger` | Ohkuwagata Ohger | SILVER | 6/6 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +3/+3 | Rcules อดีตราชา Shugodom เคยเป็นศัตรู · Final Form ไม่มี |
+| 6 | `dagded` | Dagded Dujardin | — | 9/9 | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −2/−0 (จนจบการสู้) | ราชา Galactinsects ตัวการของสงคราม |
+
 **หมายเหตุ Sentai**
-- ไม่ได้ใส่: Ohkuwagata Ohger / Rcules (เป็นตัวร้ายช่วงแรก), กลุ่ม Galactinsects และ Bug Naraku
+- ไม่ได้ใส่: Minongan Moth, Glodi Leucodium (ข้อมูลธีม/พลังไม่พอ)
+- Kamejim ใช้ 2 ความสามารถ (ทำลาย + บัฟตัวเองค่าคงที่) เพราะยังไม่มี action "ได้ค่าพลังของตัวที่ทำลาย 1 ตัว" (มีแต่แบบกินทั้งบอร์ด)
 - Shugod ไม่มีสี ไม่ช่วย Roll Call แต่ช่วย Giant Robo ทำให้ Sentai เลือกได้ว่าจะเน้นสีหรือหุ่น
 
 ---
@@ -137,10 +167,13 @@
 | 3 | `sirius` | Sirius de Alisia | 3/4 *(Gattai)* | Deploy: ให้ Mecha ทุกตัวที่มี Gattai +1/+1 ถาวร | นักบิน Mars |
 | 3 | `reika` | Reika Kou | 3/4 *(Gattai)* | จบเทิร์น: ให้ Mecha ตัวอื่นแบบสุ่ม +1/+1 | นักบิน Luna |
 | 3 | `deava_hangar` | DEAVA Hangar | 1/5 *(Guard)* | Deploy: เลือกรับยูนิต Mecha 1 จาก 3 | องค์กรที่วิจัย Vector |
+| 4 | `cherubim_soldier` | Cherubim Soldier | 4/5 *(Guard)* | Last Stand: เรียก Harvest Beast | หุ่นยักษ์ของ Shadow Angel ที่คุ้มกันเครื่องเก็บเกี่ยว (ฝ่ายศัตรู) |
+| 4 | `johannes` | Johannes | 4/4 | Deploy: ให้ Mecha ทุกตัว +1/+1 ถาวร | ผู้นำ Shadow Angel ในนาม (ฝ่ายศัตรู) |
 | 5 | `gen_fudo` | Gen Fudo | 5/7 | Deploy: ให้ Mecha ทุกตัว +2/+2 ถาวร และ Giant Robo +2/+2 ถาวร | ผู้นำคณะสำรวจที่ขุดพบ Vector |
+| 5 | `toma` | Toma | 6/6 *(Rapid)* | เริ่มการต่อสู้: เรียก Cherubim Soldier | Shadow Angel ตัวร้ายหลัก อดีตคู่หูของ Apollonius บังคับ Cherubim |
 | 6 | `apollonius` | Apollonius | 8/8 *(Rapid)* | เมื่อเรียกยูนิตอื่นเข้าสนาม: ถ้าเป็น Mecha ให้ตัวนั้น +3/+3 ถาวร | ร่างเดิมของ Apollo (Shadow Angel ที่ช่วยมนุษย์) |
 
-> ไม่มีการ์ด R4: ข้อมูลนักบินคนอื่นที่ตรวจสอบได้มีไม่พอ ถ้าต้องการให้ครบตาม `FACTIONS.md` เติม R4 อีก 2 ใบ
+> ฝั่ง Shadow Angel (Cherubim, Johannes, Toma) เป็นแผนรองของ Mecha: หุ่นเดี่ยวที่ไม่ต้องรวมร่าง · Token: `harvest_beast` Harvest Beast 2/6 *(Guard)*
 
 **ร่างรวม (token)** — ค่าพลังร่างรวม = ค่าในตาราง + ผลรวมชิ้นส่วน
 | key | ร่าง | ATK/HP | ความสามารถ | อ้างอิง |
@@ -175,11 +208,11 @@
 | 3 | `biollante` | Biollante | 3/4 *(Revive)* | Last Stand: ให้ Kaiju ทุกตัว +1/+0 (จนจบการสู้) | ไฮบริดพืช-Godzilla |
 | 3 | `gigan` | Gigan | 4/3 *(Rider Kick)* | — | ไซบอร์กใบเลื่อย |
 | 4 | `destoroyah` | Destoroyah | 3/4 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 ×2 · Avenge (2): ตัวนี้ +2/+2 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
+| 4 | `mechagodzilla` | Mechagodzilla | 4/6 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
 | 5 | `godzilla` | Godzilla | 6/7 *(Kyodaika)* | Avenge (3): ตัวนี้ +3/+3 ถาวร | ราชาแห่งสัตว์ประหลาด |
 | 5 | `king_ghidorah` | King Ghidorah | 6/6 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว (3 ครั้ง, 3 หัว) | มังกรสามหัว |
 | 6 | `burning_godzilla` | Burning Godzilla | 10/10 *(Kyodaika)* | Last Stand: ทำดาเมจ 4 ใส่ศัตรูทุกตัว (meltdown) | ความร้อนในตัวพุ่งจนใกล้หลอมละลาย |
 
-> R4 มีใบเดียว (Mothra ตัวเต็มวัยได้จาก Henshin) ถ้าต้องการให้ครบ เติม Kaiju อีกตัว เช่น Mechagodzilla (ใส่เผ่า Mecha คู่กันได้)
 
 **ร่าง / Token**
 | key | ร่าง | ATK/HP | ความสามารถ |
@@ -267,6 +300,7 @@
 | 4 | `jiraiya` | Jiraiya | 4/5 | เริ่มการต่อสู้: เรียก Gamabunta 5/5 | อัญเชิญคางคก |
 | 4 | `tsunade` | Tsunade | 3/6 | เมื่อโดนดาเมจแล้วยังรอด: ให้พวกเราทุกตัว +0/+1 (ไม่เกิน 2 ครั้งต่อเทิร์น*) | ฟื้นฟูด้วย Katsuyu |
 | 5 | `might_guy` | Might Guy | 5/6 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +8/+0 (จนจบการสู้, **ไม่เกิน 1 ครั้งต่อเกม** — Night Guy) | Eight Gates ครบ 8 ประตู |
+| 5 | `itachi` | Itachi Uchiha | 6/5 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −4/−0 (จนจบการสู้) | Sharingan, Tsukuyomi (ภาพลวง) |
 | 6 | `naruto_kurama` | Naruto (Kurama Chakra Mode) | 9/9 *(Rapid, Rider Kick)* | Avenge (2): ตัวนี้ +2/+2 ถาวร | พลังเก้าหาง |
 
 **ร่าง / Token**
@@ -277,7 +311,6 @@
 | (สำเนาของ Naruto) | ใช้ action COPY ไม่ต้องสร้างการ์ด | | |
 
 \* limit มีแค่ "ต่อเทิร์น" กับ "ต่อเกม" 1 เทิร์นมีการสู้ครั้งเดียว "ต่อเทิร์น" จึงเท่ากับต่อการสู้
-> Shonen มี R5 ใบเดียว ถ้าต้องการให้ครบ เติมอีก 1 ใบ
 \*\* ค่าติดลบใส่ศัตรูหยุดที่ ATK 0 และไม่ทำให้ตาย (ดูข้อ 8)
 
 ---
@@ -286,10 +319,12 @@
 
 1. **บัคที่เจอระหว่างออกแบบ (แก้แล้ว)**: บัพค่าติดลบใส่ศัตรู (Shikamaru) เคยทำให้ ATK ติดลบได้ และถ้าตั้ง "ถาวร" จะติดไปกับยูนิตของผู้เล่นฝั่งตรงข้าม ตอนนี้หยุดที่ ATK 0 / HP 1 (ไม่ฆ่า) และ "ถาวร" มีผลกับยูนิตฝั่งตัวเองเท่านั้น
 2. ตัวกรองชื่อการ์ดไม่นับร่างจาก Capsem / TRANSFORM (ดูหมายเหตุ Rider)
-3. เผ่าที่การ์ดไม่ครบตาม `FACTIONS.md` (Rider, Mecha R4, Kaiju R4, Shonen R5) เขียนไว้ใต้ตารางของเผ่านั้น
+3. ทุกเผ่ามีการ์ดครบตามจำนวนขั้นต่ำใน `FACTIONS.md` แล้ว (Rider และ Sentai มีมากกว่า เพราะมีตัวร้ายด้วย)
 4. ชื่อตัวละครและท่าเป็นเครื่องหมายการค้าของเจ้าของ (Toei, Toho, Satelight, Akita Shoten, Shueisha) ใช้ได้กับโปรเจกต์เล่นกันเอง ถ้าจะเปิดสาธารณะควรเปลี่ยนเป็นของ original
 
 ## แหล่งอ้างอิง
+- [List of Genesis of Aquarion characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Genesis_of_Aquarion_characters) · [Toma (Aquarion Wiki)](https://aquarion.fandom.com/wiki/Toma)
+- [Ohsama Sentai King-Ohger (Wikipedia)](https://en.wikipedia.org/wiki/Ohsama_Sentai_King-Ohger) · [Goma Rosalia (Power Rangers Wiki)](https://powerrangers.fandom.com/wiki/Goma_Rosalia)
 - [List of Kamen Rider ZEZTZ characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Kamen_Rider_ZEZTZ_characters) · [Capsems (Kamen Rider Wiki)](https://kamenrider.fandom.com/wiki/Capsems)
 - [List of Ohsama Sentai King-Ohger characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Ohsama_Sentai_King-Ohger_characters)
 - [Genesis of Aquarion (Wikipedia)](https://en.wikipedia.org/wiki/Genesis_of_Aquarion) · [Road to SMP: Genesis of Aquarion](https://mechacatalogue.com/2022/05/22/road-to-smp-no-100-smp-shokugan-modeling-project-genesis-of-aquarion/)

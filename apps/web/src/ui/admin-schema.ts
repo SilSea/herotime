@@ -30,7 +30,8 @@ export type Field =
   | { kind: "union"; tag: string; variants: Record<string, Row[]>; make: (tag: string) => Record<string, unknown> };
 
 export const KEYWORDS = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI", "ECHO"] as const;
-export const COLORS = ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "EXTRA"] as const;
+/* Same as @herotime/shared SentaiColor (a test keeps them equal). */
+export const COLORS = ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "BLACK", "WHITE", "PURPLE", "SILVER", "GOLD", "ORANGE", "EXTRA"] as const;
 export const SCOPES = ["UNIT", "PLAYER"] as const;
 export const TRIGGERS = [
   "ON_PLAY",

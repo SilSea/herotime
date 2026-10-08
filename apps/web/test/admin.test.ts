@@ -1,5 +1,6 @@
 import { Action, CardDef, Condition, Effect, FactionDef, GaugeDef, HeroDef, RelicDef, SeriesDef, KeywordKey, SentaiColor, Selector, Trigger, OwnerScope, CardKind } from "@herotime/shared";
 import { describe, expect, it } from "vitest";
+import { SENTAI_COLORS } from "../src/format.js";
 import { ACTION, ACTION_FIELDS, ACTION_TYPES, CARD_KINDS, COLORS, CONDITION, CONDITION_TYPES, EFFECT, ENTITIES, KEYWORDS, SCOPES, SELECTORS, TRIGGERS, type Row } from "../src/ui/admin-schema.js";
 import { defaultFor, rowsDefault } from "../src/ui/form.js";
 
@@ -10,6 +11,8 @@ describe("the editor's option lists match the real schema", () => {
   it("enums", () => {
     expect(sorted(KEYWORDS)).toEqual(sorted(KeywordKey.options));
     expect(sorted(COLORS)).toEqual(sorted(SentaiColor.options));
+    // every colour has a swatch on cards and in the wizard
+    expect(sorted(Object.keys(SENTAI_COLORS))).toEqual(sorted(SentaiColor.options));
     expect(sorted(TRIGGERS)).toEqual(sorted(Trigger.options));
     expect(sorted(SELECTORS)).toEqual(sorted(Selector.options));
     expect(sorted(SCOPES)).toEqual(sorted(OwnerScope.options));

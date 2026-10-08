@@ -13,11 +13,11 @@ export interface UnitView {
 export const isOneOf = (names: readonly string[] | undefined, cards: readonly string[]): boolean =>
   names !== undefined && names.some((n) => cards.includes(n));
 
-const REAL_COLORS: readonly SentaiColor[] = ["RED", "BLUE", "YELLOW", "GREEN", "PINK"];
+const REAL_COLORS: readonly SentaiColor[] = ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "BLACK", "WHITE", "PURPLE", "SILVER", "GOLD", "ORANGE"];
 
 /**
  * Team-Up / Roll Call color count: distinct real colors, plus one per Extra
- * (a wildcard fills any missing color), never above 5.
+ * (a wildcard fills any missing color), never above the number of real colors.
  */
 export function sentaiColorCount(units: readonly UnitView[]): number {
   const seen = new Set<SentaiColor>();

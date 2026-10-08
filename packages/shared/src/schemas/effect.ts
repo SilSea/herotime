@@ -16,7 +16,8 @@ export const KeywordKey = z.enum([
 ]);
 export type KeywordKey = z.infer<typeof KeywordKey>;
 
-export const SentaiColor = z.enum(["RED", "BLUE", "YELLOW", "GREEN", "PINK", "EXTRA"]);
+// EXTRA is a wildcard (counts as any missing colour); the rest are real ranger colours.
+export const SentaiColor = z.enum(["RED", "BLUE", "YELLOW", "GREEN", "PINK", "BLACK", "WHITE", "PURPLE", "SILVER", "GOLD", "ORANGE", "EXTRA"]);
 export type SentaiColor = z.infer<typeof SentaiColor>;
 
 /** Who owns an effect: a unit on the board, or the player (hero power, relic, series bond, gear). */
