@@ -5,7 +5,7 @@
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
-| Rider | Kamen Rider ZEZTZ | 14 (ร่างคน + ผู้ช่วย, รวมฝ่ายร้าย 5) | 24 | 12 |
+| Rider | Kamen Rider ZEZTZ | 14 (ร่างคน + ผู้ช่วย, รวมฝ่ายร้าย 5) | 24 | 11 (+ การ์ด Final Form กลาง) |
 | Sentai | Ohsama Sentai King-Ohger | 15 | 1 | Giant 5 |
 | Mecha | Genesis of Aquarion | 14 | 4 | 1 |
 | Kaiju | Godzilla | 14 | 5 | 0 |
