@@ -66,8 +66,24 @@ function drawOffer(pool: Pool, rng: Rng, rank: number): string[] {
 }
 
 /**
+ * The triple reward: a Discover of `target` rank. When the pool has nothing of that rank (a small card
+ * set, or every copy bought), the nearest rank that does is used instead, lower ranks first, so a
+ * triple always pays out while any unit is left in the pool.
+ */
+function rewardOffer(pool: Pool, rng: Rng, target: number, maxRank: number): string[] {
+  const ranks: number[] = [];
+  for (let r = target; r >= 1; r--) ranks.push(r);
+  for (let r = target + 1; r <= maxRank; r++) ranks.push(r);
+  for (const rank of ranks) {
+    const offer = drawOffer(pool, rng, rank);
+    if (offer.length > 0) return offer;
+  }
+  return [];
+}
+
+/**
  * Merge every set of 3 plain copies into one Final Form (golden) and queue a
- * Discover of rank+1. The golden takes the slot of the first merged copy, so a
+ * Discover of rank+1 (or the nearest rank with cards). The golden takes the slot of the first merged copy, so a
  * merge never needs extra hand space. Call after anything that adds a unit.
  */
 export function resolveTriples(
@@ -96,7 +112,7 @@ export function resolveTriples(
     if (!anchor) throw new Error("unreachable: findTripleKey guarantees 3 copies");
     anchor.zone.splice(anchor.index, 0, mergeCopies(key, merged));
 
-    const offer = drawOffer(pool, rng, Math.min(player.rank + 1, cfg.maxRank));
+    const offer = rewardOffer(pool, rng, Math.min(player.rank + 1, cfg.maxRank), cfg.maxRank);
     if (offer.length > 0) player.discovers.push({ options: offer, destination: "HAND" });
     results.push({ key, offer });
     noteMoment(player, "triples");

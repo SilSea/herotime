@@ -121,8 +121,42 @@ describe("resolveTriples", () => {
     for (const k of res?.offer ?? []) expect(high.rankOf(k)).toBe(6);
   });
 
-  it("skips the Discover when the pool has nothing of that rank", () => {
-    const tiny = new Pool([{ key: "a", rank: 1 }], { 1: 16 });
+  it("falls back to the nearest rank with cards, lower first, when rank + 1 has none", () => {
+    // ranks 1 and 3 only (like a small card set): a rank-1 triple wants rank 2
+    const gappy = new Pool(
+      [
+        { key: "a", rank: 1 },
+        { key: "b", rank: 1 },
+        { key: "t", rank: 3 },
+      ],
+      { 1: 16, 3: 13 },
+    );
+    p.rank = 1;
+    p.hand = [u("a"), u("a"), u("a")];
+    const [res] = resolveTriples(p, gappy, rng);
+    expect(res?.offer.length).toBeGreaterThan(0);
+    for (const k of res?.offer ?? []) expect(gappy.rankOf(k)).toBe(1);
+    expect(p.discovers).toEqual([{ options: res?.offer, destination: "HAND" }]);
+  });
+
+  it("falls back to a higher rank when nothing lower is left", () => {
+    const onlyHigh = new Pool(
+      [
+        { key: "a", rank: 1 },
+        { key: "t", rank: 3 },
+      ],
+      { 1: 3, 3: 13 },
+    );
+    for (let i = 0; i < 3; i++) onlyHigh.take("a"); // all three copies are in hand
+    p.rank = 1;
+    p.hand = [u("a"), u("a"), u("a")];
+    const [res] = resolveTriples(p, onlyHigh, rng);
+    expect(res?.offer).toEqual(["t"]);
+  });
+
+  it("skips the Discover only when the pool is empty", () => {
+    const tiny = new Pool([{ key: "a", rank: 1 }], { 1: 3 });
+    for (let i = 0; i < 3; i++) tiny.take("a");
     p.hand = [u("a"), u("a"), u("a")];
     const [res] = resolveTriples(p, tiny, rng);
     expect(res?.offer).toEqual([]);
