@@ -178,7 +178,7 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
       h(
         "section",
         { class: "lobby-hero" },
-        h("div", { class: "hero-copy" }, h("div", { class: "eyebrow", text: "Auto-battler · Rider × Sentai" }), h("h1", { class: "logo", text: "HeroTime" }), h("p", { class: "tagline", text: tr("Recruit your squad, transform, and call the giant robo. Last hero standing wins.", "รวมทีม แปลงร่าง แล้วเรียกหุ่นยักษ์ ฮีโร่คนสุดท้ายที่รอดคือผู้ชนะ") })),
+        h("div", { class: "hero-copy" }, h("h1", { class: "logo", text: "HeroTime" }), h("p", { class: "tagline", text: tr("Recruit your squad, transform, and call the giant robo. Last hero standing wins.", "รวมทีม แปลงร่าง แล้วเรียกหุ่นยักษ์ ฮีโร่คนสุดท้ายที่รอดคือผู้ชนะ") })),
         h(
           "div",
           { class: "hero-stats" },

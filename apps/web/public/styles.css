@@ -90,7 +90,6 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 /* ---- lobby */
 .lobby { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 18px; align-items: start; max-width: 1400px; margin: 0 auto; }
 .lobby-hero { grid-column: 1 / -1; display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; padding: 26px 30px; border: 1px solid var(--line-2); background: linear-gradient(110deg, #0f2147ee, #1a0f3acc 60%, #2a0a2acc), repeating-linear-gradient(115deg, transparent 0 22px, #ffffff06 22px 23px); box-shadow: 0 0 50px #2fe4ff1f, inset 0 0 60px #2fe4ff10; clip-path: polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px); }
-.eyebrow { color: var(--cyan); text-transform: uppercase; letter-spacing: .3em; font-size: 12px; font-weight: 700; }
 .hero-copy .tagline { font-size: 15px; max-width: 520px; color: #b8c9e8; }
 .hero-stats { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .pilot { font-size: 18px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #fff; text-shadow: 0 0 10px #2fe4ff88; }
