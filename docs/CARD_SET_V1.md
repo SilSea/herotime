@@ -13,6 +13,8 @@
 | Human | ออกแบบเอง (ไม่มีเรื่อง) | 14 | 0 | 3 |
 | Shonen | Naruto | 14 | 2 | 0 |
 
+**ซีรีส์** (ช่อง `series` ของการ์ดและ Relic): Rider → `zeztz` · Sentai → `king_ohger` · Mecha → `aquarion` · Kaiju → `godzilla` (Mechagodzilla ด้วย) · Beast → `beastars` · Shonen → `naruto` · Human และการ์ด Final Form กลางไม่มีซีรีส์ · ยังไม่มี Series Bond (โบนัสเมื่อมีการ์ดซีรีส์เดียวกันครบ N ใบ)
+
 **วิธีอ่าน**
 - `R` = Rank · `ATK/HP` · keyword ตัวเอียงในวงเล็บ เช่น *(Guard)*
 - ความสามารถเขียนแบบ Card wizard: **จังหวะ: สิ่งที่ทำ** (ชื่อ trigger / action อยู่ใน `FACTIONS.md` และ `ADMIN_GUIDE.md` ข้อ 6)
