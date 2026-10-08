@@ -163,9 +163,9 @@
   {
    "key": "eight",
    "name": "Eight",
-   "rank": 3,
-   "atk": 3,
-   "hp": 4,
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
    "factions": [
     "rider"
    ],
@@ -209,9 +209,9 @@
   {
    "key": "sieg",
    "name": "Sieg",
-   "rank": 3,
-   "atk": 2,
-   "hp": 3,
+   "rank": 4,
+   "atk": 3,
+   "hp": 4,
    "factions": [
     "rider"
    ],
@@ -224,9 +224,9 @@
   {
    "key": "three",
    "name": "Three",
-   "rank": 4,
-   "atk": 3,
-   "hp": 4,
+   "rank": 5,
+   "atk": 4,
+   "hp": 5,
    "factions": [
     "rider"
    ],
@@ -736,9 +736,9 @@
   {
    "key": "kamen_rider_dawn",
    "name": "Kamen Rider Dawn",
-   "rank": 3,
-   "atk": 5,
-   "hp": 5,
+   "rank": 4,
+   "atk": 6,
+   "hp": 6,
    "factions": [
     "rider"
    ],
@@ -768,9 +768,9 @@
   {
    "key": "lord_three",
    "name": "Lord Three",
-   "rank": 4,
-   "atk": 6,
-   "hp": 5,
+   "rank": 5,
+   "atk": 7,
+   "hp": 7,
    "factions": [
     "rider"
    ],
@@ -858,6 +858,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_wing"
       }
@@ -887,6 +893,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_transform"
@@ -918,6 +930,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_stream"
       }
@@ -947,6 +965,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_recovery"
@@ -978,6 +1002,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_machinery"
       }
@@ -1007,6 +1037,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_wonder"
@@ -1038,6 +1074,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_barrier"
       }
@@ -1067,6 +1109,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_projection"
@@ -1098,6 +1146,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_gravity"
       }
@@ -1128,6 +1182,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_plasma"
       }
@@ -1157,6 +1217,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_booster"

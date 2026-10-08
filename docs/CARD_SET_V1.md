@@ -41,10 +41,10 @@
 | 2 | `kureha_miyamoto` | Kureha Miyamoto | 2/2 | Henshin (1) → Lord Six | CODE 6 |
 | 2 | `thirteen` | Thirteen *(ฝ่ายร้าย)* | 2/2 | Henshin (1) → Lord Thirteen | CODE ที่หลงเหลือ |
 | 3 | `minami_yorozu` | Minami Yorozu | 2/3 | Henshin (1) → Knight Seventeen · เมื่อแปลงร่าง: ให้ Zeztz (ทุกร่าง) ได้ Barrier | CODE 17 |
-| 3 | `eight` | Eight | 3/4 | Deploy: เสริมพลัง Gear +1/+1 จนจบเกม | CODE 8 |
+| 4 | `eight` | Eight | 4/5 | Deploy: เสริมพลัง Gear +1/+1 จนจบเกม | CODE 8 |
 | 3 | `fujimi` | Tetsuya Fujimi | 3/3 | Deploy: Rider Gauge +1 | ผู้บัญชาการตำรวจ |
-| 3 | `sieg` | Sieg *(ฝ่ายร้าย)* | 2/3 | Henshin (1) → Kamen Rider Dawn | ผู้ก่อการร้ายในความฝัน |
-| 4 | `three` | Three *(ฝ่ายร้าย)* | 3/4 | Henshin (1) → Lord Three · เมื่อแปลงร่าง: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 |
+| 4 | `sieg` | Sieg *(ฝ่ายร้าย)* | 3/4 | Henshin (1) → Kamen Rider Dawn | ผู้ก่อการร้ายในความฝัน |
+| 5 | `three` | Three *(ฝ่ายร้าย)* | 4/5 | Henshin (1) → Lord Three · เมื่อแปลงร่าง: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 |
 | 5 | `the_lady` | The Lady *(ฝ่ายร้าย)* | 4/5 | Henshin (1) → Lord Two | CODE 2 |
 | 6 | `shuma_kumon` | Shuma Kumon *(ฝ่ายร้าย)* | 4/5 | Henshin (1) → Kamen Rider Mugen | ใช้ Mugen Driver |
 
@@ -59,8 +59,8 @@
 | `lord_six` | Lord Six | 4/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) |
 | `knight_seventeen` | Knight Seventeen | 5/5 | — |
 | `lord_thirteen` | Lord Thirteen *(ฝ่ายร้าย)* | 4/3 *(Barrier)* | — |
-| `kamen_rider_dawn` | Kamen Rider Dawn *(ฝ่ายร้าย)* | 5/5 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร |
-| `lord_three` | Lord Three *(ฝ่ายร้าย)* | 6/5 *(Barrier)* | — |
+| `kamen_rider_dawn` | Kamen Rider Dawn *(ฝ่ายร้าย)* | 6/6 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร |
+| `lord_three` | Lord Three *(ฝ่ายร้าย)* | 7/7 *(Barrier)* | — |
 | `lord_two` | Lord Two *(ฝ่ายร้าย)* | 7/7 *(Rider Kick)* | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −1/−0 |
 | `kamen_rider_mugen` | Kamen Rider Mugen *(ฝ่ายร้าย)* | 9/9 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด |
 
@@ -80,7 +80,7 @@
 | `zeztz_booster` | Plasma Booster | 6/5 *(Rapid, Rider Kick)* | — |
 | `zeztz_exdream` | **Kamen Rider Zeztz Exdream** (Final Form) | 10/10 *(Rider Kick, Barrier)* | เริ่มการต่อสู้: ให้พวกเราทุกตัว +2/+2 (จนจบการสู้) |
 
-**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz (นับทุกร่างผ่าน `formOf`) · ทำ: แปลงร่างเป็น…)
+**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz (นับทุกร่างผ่าน `formOf`) · ทำ: +1/+1 ถาวร แล้วแปลงร่างเป็น…)
 | R | key | Gear | ราคา | แปลงเป็น |
 |---|---|---|---|---|
 | 1 | `capsem_wing` | Wing Capsem | 1 | Physicam Wing |
@@ -180,19 +180,19 @@
 | 3 | `sirius` | Sirius de Alisia | 3/4 *(Gattai)* | Deploy: ให้ Mecha ทุกตัวที่มี Gattai +1/+1 ถาวร | นักบิน Mars |
 | 3 | `reika` | Reika Kou | 3/4 *(Gattai)* | จบเทิร์น: ให้ Mecha ตัวอื่นแบบสุ่ม +1/+1 | นักบิน Luna |
 | 3 | `deava_hangar` | DEAVA Hangar | 2/5 *(Guard)* | Deploy: เลือกรับยูนิต Mecha 1 จาก 3 | องค์กรที่วิจัย Vector |
-| 4 | `cherubim_soldier` | Cherubim Soldier | 4/5 *(Guard)* | Last Stand: เรียก Harvest Beast | หุ่นยักษ์ของ Shadow Angel ที่คุ้มกันเครื่องเก็บเกี่ยว (ฝ่ายศัตรู) |
-| 4 | `johannes` | Johannes | 4/4 | Deploy: ให้ Mecha ทุกตัว +1/+1 ถาวร | ผู้นำ Shadow Angel ในนาม (ฝ่ายศัตรู) |
-| 5 | `gen_fudo` | Gen Fudo | 5/7 | Deploy: ให้ Mecha ทุกตัว +2/+2 ถาวร และ Giant Robo +2/+2 ถาวร | ผู้นำคณะสำรวจที่ขุดพบ Vector |
+| 4 | `cherubim_soldier` | Cherubim Soldier | 3/5 *(Guard)* | Last Stand: เรียก Harvest Beast | หุ่นยักษ์ของ Shadow Angel ที่คุ้มกันเครื่องเก็บเกี่ยว (ฝ่ายศัตรู) |
+| 4 | `johannes` | Johannes | 3/4 | Deploy: ให้ Mecha ทุกตัว +1/+1 ถาวร | ผู้นำ Shadow Angel ในนาม (ฝ่ายศัตรู) |
+| 5 | `gen_fudo` | Gen Fudo | 5/7 | Deploy: ให้ Mecha ทุกตัว +1/+1 ถาวร และ Giant Robo +2/+2 ถาวร | ผู้นำคณะสำรวจที่ขุดพบ Vector |
 | 5 | `toma` | Toma | 6/6 *(Rapid)* | เริ่มการต่อสู้: เรียก Cherubim Soldier | Shadow Angel ตัวร้ายหลัก อดีตคู่หูของ Apollonius บังคับ Cherubim |
-| 6 | `apollonius` | Apollonius | 8/8 *(Rapid)* | เมื่อเรียกยูนิตอื่นเข้าสนาม: ถ้าเป็น Mecha ให้ตัวนั้น +3/+3 ถาวร | ร่างเดิมของ Apollo (Shadow Angel ที่ช่วยมนุษย์) |
+| 6 | `apollonius` | Apollonius | 7/7 *(Rapid)* | เมื่อเรียกยูนิตอื่นเข้าสนาม: ถ้าเป็น Mecha ให้ตัวนั้น +2/+2 ถาวร | ร่างเดิมของ Apollo (Shadow Angel ที่ช่วยมนุษย์) |
 
-> ฝั่ง Shadow Angel (Cherubim, Johannes, Toma) เป็นแผนรองของ Mecha: หุ่นเดี่ยวที่ไม่ต้องรวมร่าง · Token: `harvest_beast` Harvest Beast 2/6 *(Guard)*
+> ฝั่ง Shadow Angel (Cherubim, Johannes, Toma) เป็นแผนรองของ Mecha: หุ่นเดี่ยวที่ไม่ต้องรวมร่าง · Token: `harvest_beast` Harvest Beast 2/4 *(Guard)*
 
 **ร่างรวม (token)** — ค่าพลังร่างรวม = ค่าในตาราง + ผลรวมชิ้นส่วน
 | key | ร่าง | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|
 | `solar_aquarion` | Solar Aquarion | 4/4 *(Power Strike)* | Final Form → `solar_aquarion_wings` | สมดุล ถนัดระยะประชิด ร่างจริงของ Aquarion |
-| `aquarion_luna` | Aquarion Luna | 3/4 | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูทุกตัว | ระยะไกล คันธนู |
+| `aquarion_luna` | Aquarion Luna | 3/4 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว | ระยะไกล คันธนู |
 | `aquarion_mars` | Aquarion Mars | 4/3 *(Rapid)* | — | เน้นความเร็ว |
 | `solar_aquarion_wings` | Solar Aquarion — Solar Wings (Final Form) | 12/12 *(Power Strike, Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (Infinity Punch) | ปีกสุริยะ, Infinity Punch |
 
@@ -217,19 +217,19 @@
 | 2 | `rodan` | Rodan | 3/2 *(Rapid)* | — | บินเร็ว คลื่นกระแทก |
 | 2 | `hedorah` | Hedorah | 1/2 *(Lethal)* | Last Stand: เรียก Hedorah Spawn 1/1 | สัตว์ประหลาดมลพิษ |
 | 3 | `godzilla_junior` | Godzilla Junior | 2/2 *(Kyodaika)* | — | ลูกที่โตขึ้น |
-| 3 | `biollante` | Biollante | 3/4 *(Revive)* | Last Stand: ให้ Kaiju ทุกตัว +1/+0 (จนจบการสู้) | ไฮบริดพืช-Godzilla |
+| 3 | `biollante` | Biollante | 2/4 *(Revive)* | Last Stand: ให้ Kaiju ทุกตัว +1/+0 (จนจบการสู้) | ไฮบริดพืช-Godzilla |
 | 3 | `gigan` | Gigan | 4/3 *(Power Strike)* | — | ไซบอร์กใบเลื่อย |
-| 4 | `destoroyah` | Destoroyah | 3/3 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 · Avenge (3): ตัวนี้ +2/+2 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
-| 4 | `mechagodzilla` | Mechagodzilla | 4/5 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
-| 5 | `godzilla` | Godzilla | 5/5 *(Kyodaika)* | Avenge (4): ตัวนี้ +1/+1 ถาวร | ราชาแห่งสัตว์ประหลาด |
-| 5 | `king_ghidorah` | King Ghidorah | 6/6 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว (3 ครั้ง, 3 หัว) | มังกรสามหัว |
-| 6 | `burning_godzilla` | Burning Godzilla | 9/9 | Last Stand: ทำดาเมจ 4 ใส่ศัตรูทุกตัว (meltdown) | ความร้อนในตัวพุ่งจนใกล้หลอมละลาย |
+| 4 | `destoroyah` | Destoroyah | 3/3 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 · Avenge (3): ตัวนี้ +1/+1 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
+| 4 | `mechagodzilla` | Mechagodzilla | 3/5 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
+| 5 | `godzilla` | Godzilla | 4/4 *(Kyodaika)* | Avenge (4): ตัวนี้ +1/+1 ถาวร | ราชาแห่งสัตว์ประหลาด |
+| 5 | `king_ghidorah` | King Ghidorah | 6/6 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว (2 ครั้ง) | มังกรสามหัว |
+| 6 | `burning_godzilla` | Burning Godzilla | 8/8 | Last Stand: ทำดาเมจ 3 ใส่ศัตรูทุกตัว (meltdown) | ความร้อนในตัวพุ่งจนใกล้หลอมละลาย |
 
 
 **ร่าง / Token**
 | key | ร่าง | ATK/HP | ความสามารถ |
 |---|---|---|---|
-| `mothra` | Mothra | 4/5 | เริ่มการต่อสู้: ให้พวกเราตัวอื่นแบบสุ่มได้ Barrier (เกล็ดสะท้อนการโจมตี) |
+| `mothra` | Mothra | 3/4 | เริ่มการต่อสู้: ให้พวกเราตัวอื่นแบบสุ่มได้ Barrier (เกล็ดสะท้อนการโจมตี) |
 | `shin_godzilla_3` | Shin Godzilla (3rd Form) | 3/4 | Henshin (3) → Shin Godzilla (4th Form) |
 | `shin_godzilla_4` | Shin Godzilla (4th Form) | 7/7 | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (atomic breath) |
 | `hedorah_spawn` / `destoroyah_aggregate` | token | 1/1 / 2/2 | — |
@@ -242,23 +242,23 @@
 
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `haru` | Haru | 1/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +1/+1 | กระต่ายขาว ชมรมจัดสวน |
+| 1 | `haru` | Haru | 1/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +1/+1 ถาวร | กระต่ายขาว ชมรมจัดสวน |
 | 1 | `jack` | Jack | 2/3 | Deploy: ถ้ามี Legoshi บนบอร์ด ตัวนี้ +2/+2 ถาวร | ลาบราดอร์ เพื่อนสนิทของ Legoshi |
-| 1 | `tem` | Tem | 1/3 | Last Stand: ให้ Beast แบบสุ่ม +1/+1 ถาวร | อัลปากา สมาชิกชมรมการละคร |
+| 1 | `tem` | Tem | 1/3 | Last Stand: ให้ Beast แบบสุ่ม +2/+2 ถาวร | อัลปากา สมาชิกชมรมการละคร |
 | 2 | `collot` | Collot | 3/2 | Deploy: เรียก Durham 2/2 | Old English Sheepdog เพื่อนร่วมหอ |
 | 2 | `pina` | Pina | 3/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | แกะ Dall ปีหนึ่ง ชมรมการละคร |
 | 2 | `els` | Els | 2/3 | Deploy: ให้ตัวที่อยู่ข้างๆ +2/+1 | แพะแองโกรา |
 | 2 | `kibi` | Kibi | 3/3 | Deploy: เรียก Dom 2/1 | ตัวกินมด ทีมเวที |
-| 3 | `juno` | Juno | 3/4 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +2/+1 | หมาป่าเทา ปีหนึ่ง |
-| 3 | `bill` | Bill | 4/3 | Deploy: ให้ Beast ทุกตัว +1/+0 | เสือเบงกอล อยากเป็น Beastar |
+| 3 | `juno` | Juno | 3/4 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +2/+1 ถาวร | หมาป่าเทา ปีหนึ่ง |
+| 3 | `bill` | Bill | 4/3 | Deploy: ให้ Beast ทุกตัว +1/+0 ถาวร | เสือเบงกอล อยากเป็น Beastar |
 | 3 | `gohin` | Gohin | 3/5 *(Guard)* | Deploy: ให้ Legoshi +2/+2 ถาวร และ Barrier | แพนด้า หมอใต้ดิน อาจารย์ของ Legoshi |
 | 4 | `louis` | Louis | 4/6 | Deploy: เรียก Shishigumi Lion 2/2 ×2 | กวางแดง ดาวชมรมการละคร เคยนำกลุ่มสิงโต |
 | 4 | `gosha` | Gosha | 4/6 | Deploy: ให้ Legoshi ได้ Lethal | มังกรโคโมโด ปู่ของ Legoshi |
-| 4 | `sagwan` | Sagwan | 3/5 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ได้ +1/+1 ถาวร (ไม่เกิน 3 ครั้งต่อเทิร์น) | แมวน้ำ เพื่อนบ้านที่ Beast Apartments |
-| 5 | `legoshi` | Legoshi | 7/8 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | หมาป่าเทา ตัวเอก |
-| 6 | `yahya` | Yahya | 8/9 *(Echo)* | Deploy: ให้ Beast ทุกตัว +2/+2 ถาวร | ม้า Beastar คนปัจจุบัน |
+| 4 | `sagwan` | Sagwan | 4/6 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ได้ +1/+1 ถาวร (ไม่เกิน 3 ครั้งต่อเทิร์น) | แมวน้ำ เพื่อนบ้านที่ Beast Apartments |
+| 5 | `legoshi` | Legoshi | 8/9 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | หมาป่าเทา ตัวเอก |
+| 6 | `yahya` | Yahya | 8/9 *(Echo)* | Deploy: ให้ Beast ทุกตัว +3/+3 ถาวร | ม้า Beastar คนปัจจุบัน |
 
-**Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 3/2
+**Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 4/3
 - ไม่ได้ใส่ (ตัวร้าย): Riz, Melon, Ibuki — Louis เรียก "Shishigumi Lion" เป็น token ทั่วไปแทน
 - Durham และ Dom เป็นตัวละครที่มีในเรื่อง แต่ทำเป็น token เพื่อให้เป็นการ์ดที่ถูกเรียก
 
@@ -473,7 +473,7 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 อันดับรายการ์ดดูได้จากหน้า Admin → Simulate หลังใส่ชุดนี้ใน draft · การ์ด Rank สูงจะมีอันดับดีกว่าเสมอ เพราะอยู่บนบอร์ดของผู้ชนะตอนท้ายเกม ให้เทียบกับการ์ด Rank เดียวกัน
 
-## ทดลองบัฟ Rider / Beast (2026-10-08, ยังไม่ได้ใส่ใน draft)
+## ทดลองบัฟ Rider / Beast (2026-10-08)
 
 ทดสอบบน test server ด้วย draft ปัจจุบัน (Human ปิดอยู่) รูปแบบละ 1,200 เกม · ตัวเลข = อันดับเฉลี่ย (ต่ำ = ดี)
 
@@ -486,7 +486,24 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 | Beast A | Gosha r4→r5 (5/8), Louis r4→r5 (5/7), Bill r3→r4 (5/4) | — | 4.85 | การ์ดดีขึ้นเป็นใบๆ แต่ทั้งเผ่าไม่ขยับ |
 
 **นับเผ่าแบบใหม่ (C)**: ไม่นับ token ที่ถูกเรียก Beast ดีขึ้นจาก 5.11 เป็น 4.86 ส่วนหนึ่งของความ "อ่อน" มาจากวิธีวัด · ผลข้างเคียง: Rider แรงขึ้นแล้ว Shonen กับ Sentai ตก (Shonen 4.43 → 4.81)
-**ที่ยังต้องทำ**: Kaiju/Mecha แรงเกิน · Beast ต้องหาจุดอื่น (token แรงขึ้น, ช่วงต้นเกม) · Rider A+B รอตัดสินใจ
+
+## Balance pass 1 (2026-10-08, ใส่ใน draft แล้ว ยังไม่ publish)
+
+ตารางการ์ดข้างบนเป็นค่าหลังปรับแล้ว · ทดสอบชุดละ 2,400 เกม (Human ปิด) · อันดับเฉลี่ย ต่ำ = ดี
+
+| ชุด | Kaiju | Mecha | Rider | Sentai | Beast | Shonen | ห่างสุด |
+|---|---|---|---|---|---|---|---|
+| ก่อนปรับ | 3.78 | 3.77 | 4.89 | 4.37 | 4.83 | 4.43 | 1.12 |
+| เนิฟ Kaiju/Mecha | 4.06 | 3.92 | 4.98 | 4.20 | 4.75 | 4.27 | 1.06 |
+| + Rider A+B | 3.94 | 3.93 | 4.49 | 4.61 | 4.77 | 4.53 | 0.84 |
+| **+ บัฟ Beast (ที่ใส่)** | 4.03 | 4.04 | 4.51 | 4.56 | 4.60 | 4.70 | **0.67** |
+
+- **Kaiju**: Burning Godzilla 9/9 → 8/8 ดาเมจ 4 → 3 · Godzilla 5/5 → 4/4 · King Ghidorah 3 ครั้ง → 2 · Destoroyah Avenge +2/+2 → +1/+1 · Mechagodzilla 4/5 → 3/5 · Biollante 3/4 → 2/4 · Mothra 4/5 → 3/4
+- **Mecha**: Apollonius 8/8 → 7/7, +3/+3 → +2/+2 · Gen Fudo บัฟ Mecha +2/+2 → +1/+1 · Johannes 4/4 → 3/4 · Aquarion Luna ดาเมจ 2 → 1 · Cherubim Soldier 4/5 → 3/5 · Harvest Beast 2/6 → 2/4
+- **Rider**: Rider A (Sieg r4 → Dawn 6/6, Eight r4 4/5, Three r5 → Lord Three 7/7) + Capsem ทุกใบ +1/+1 ถาวรก่อนเปลี่ยนร่าง
+- **Beast**: Legoshi 7/8 → 8/9 · Yahya +2/+2 → +3/+3 · Sagwan 3/5 → 4/6 · Shishigumi Lion 3/2 → 4/3 · Bill, Haru, Juno บัฟถาวร · Tem Last Stand +1/+1 → +2/+2
+
+**ที่ยังต้องดู**: Shonen ตกเป็นอ่อนสุด (4.70) · Kaiju/Mecha ยังนำราว 0.5 · ตัวเลขมาจากบอท ต้องดูจากการเล่นจริงด้วย
 
 ## 8. สิ่งที่ต้องรู้ก่อนสร้างจริง
 

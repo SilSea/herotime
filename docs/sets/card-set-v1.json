@@ -208,9 +208,9 @@
   {
    "key": "eight",
    "name": "Eight",
-   "rank": 3,
-   "atk": 3,
-   "hp": 4,
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
    "factions": [
     "rider"
    ],
@@ -256,9 +256,9 @@
   {
    "key": "sieg",
    "name": "Sieg",
-   "rank": 3,
-   "atk": 2,
-   "hp": 3,
+   "rank": 4,
+   "atk": 3,
+   "hp": 4,
    "factions": [
     "rider"
    ],
@@ -272,9 +272,9 @@
   {
    "key": "three",
    "name": "Three",
-   "rank": 4,
-   "atk": 3,
-   "hp": 4,
+   "rank": 5,
+   "atk": 4,
+   "hp": 5,
    "factions": [
     "rider"
    ],
@@ -807,9 +807,9 @@
   {
    "key": "kamen_rider_dawn",
    "name": "Kamen Rider Dawn",
-   "rank": 3,
-   "atk": 5,
-   "hp": 5,
+   "rank": 4,
+   "atk": 6,
+   "hp": 6,
    "factions": [
     "rider"
    ],
@@ -840,9 +840,9 @@
   {
    "key": "lord_three",
    "name": "Lord Three",
-   "rank": 4,
-   "atk": 6,
-   "hp": 5,
+   "rank": 5,
+   "atk": 7,
+   "hp": 7,
    "factions": [
     "rider"
    ],
@@ -933,6 +933,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_wing"
       }
@@ -963,6 +969,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_transform"
@@ -995,6 +1007,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_stream"
       }
@@ -1025,6 +1043,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_recovery"
@@ -1057,6 +1081,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_machinery"
       }
@@ -1087,6 +1117,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_wonder"
@@ -1119,6 +1155,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_barrier"
       }
@@ -1149,6 +1191,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_projection"
@@ -1181,6 +1229,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_gravity"
       }
@@ -1212,6 +1266,12 @@
      },
      "actions": [
       {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
+      {
        "type": "TRANSFORM",
        "into": "zeztz_plasma"
       }
@@ -1242,6 +1302,12 @@
       ]
      },
      "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      },
       {
        "type": "TRANSFORM",
        "into": "zeztz_booster"
@@ -2127,7 +2193,7 @@
    "key": "cherubim_soldier",
    "name": "Cherubim Soldier",
    "rank": 4,
-   "atk": 4,
+   "atk": 3,
    "hp": 5,
    "factions": [
     "mecha"
@@ -2154,7 +2220,7 @@
    "key": "johannes",
    "name": "Johannes",
    "rank": 4,
-   "atk": 4,
+   "atk": 3,
    "hp": 4,
    "factions": [
     "mecha"
@@ -2195,8 +2261,8 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 2,
-       "hp": 2,
+       "atk": 1,
+       "hp": 1,
        "permanent": true
       }
      ],
@@ -2254,8 +2320,8 @@
    "key": "apollonius",
    "name": "Apollonius",
    "rank": 6,
-   "atk": 8,
-   "hp": 8,
+   "atk": 7,
+   "hp": 7,
    "factions": [
     "mecha"
    ],
@@ -2266,8 +2332,8 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 3,
-       "hp": 3,
+       "atk": 2,
+       "hp": 2,
        "permanent": true
       }
      ],
@@ -2315,7 +2381,7 @@
      "actions": [
       {
        "type": "DAMAGE",
-       "amount": 2
+       "amount": 1
       }
      ],
      "target": {
@@ -2378,7 +2444,7 @@
    "name": "Harvest Beast",
    "rank": 2,
    "atk": 2,
-   "hp": 6,
+   "hp": 4,
    "factions": [
     "mecha"
    ],
@@ -2562,7 +2628,7 @@
    "key": "biollante",
    "name": "Biollante",
    "rank": 3,
-   "atk": 3,
+   "atk": 2,
    "hp": 4,
    "factions": [
     "kaiju"
@@ -2632,8 +2698,8 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 2,
-       "hp": 2,
+       "atk": 1,
+       "hp": 1,
        "permanent": true
       }
      ],
@@ -2649,7 +2715,7 @@
    "key": "mechagodzilla",
    "name": "Mechagodzilla",
    "rank": 4,
-   "atk": 4,
+   "atk": 3,
    "hp": 5,
    "factions": [
     "kaiju",
@@ -2679,8 +2745,8 @@
    "key": "godzilla",
    "name": "Godzilla",
    "rank": 5,
-   "atk": 5,
-   "hp": 5,
+   "atk": 4,
+   "hp": 4,
    "factions": [
     "kaiju"
    ],
@@ -2729,7 +2795,7 @@
      "target": {
       "selector": "ALL_ENEMY"
      },
-     "repeat": 3
+     "repeat": 2
     }
    ],
    "series": "godzilla"
@@ -2738,8 +2804,8 @@
    "key": "burning_godzilla",
    "name": "Burning Godzilla",
    "rank": 6,
-   "atk": 9,
-   "hp": 9,
+   "atk": 8,
+   "hp": 8,
    "factions": [
     "kaiju"
    ],
@@ -2750,7 +2816,7 @@
      "actions": [
       {
        "type": "DAMAGE",
-       "amount": 4
+       "amount": 3
       }
      ],
      "target": {
@@ -2764,8 +2830,8 @@
    "key": "mothra",
    "name": "Mothra",
    "rank": 3,
-   "atk": 4,
-   "hp": 5,
+   "atk": 3,
+   "hp": 4,
    "factions": [
     "kaiju"
    ],
@@ -2875,7 +2941,7 @@
        "type": "BUFF",
        "atk": 1,
        "hp": 1,
-       "permanent": false
+       "permanent": true
       }
      ],
      "target": {
@@ -2935,8 +3001,8 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 1,
-       "hp": 1,
+       "atk": 2,
+       "hp": 2,
        "permanent": true
       }
      ],
@@ -3070,7 +3136,7 @@
        "type": "BUFF",
        "atk": 2,
        "hp": 1,
-       "permanent": false
+       "permanent": true
       }
      ],
      "target": {
@@ -3098,7 +3164,7 @@
        "type": "BUFF",
        "atk": 1,
        "hp": 0,
-       "permanent": false
+       "permanent": true
       }
      ],
      "target": {
@@ -3204,8 +3270,8 @@
    "key": "sagwan",
    "name": "Sagwan",
    "rank": 4,
-   "atk": 3,
-   "hp": 5,
+   "atk": 4,
+   "hp": 6,
    "factions": [
     "beast"
    ],
@@ -3236,8 +3302,8 @@
    "key": "legoshi",
    "name": "Legoshi",
    "rank": 5,
-   "atk": 7,
-   "hp": 8,
+   "atk": 8,
+   "hp": 9,
    "factions": [
     "beast"
    ],
@@ -3276,8 +3342,8 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 2,
-       "hp": 2,
+       "atk": 3,
+       "hp": 3,
        "permanent": true
       }
      ],
@@ -3322,8 +3388,8 @@
    "key": "shishigumi_lion",
    "name": "Shishigumi Lion",
    "rank": 2,
-   "atk": 3,
-   "hp": 2,
+   "atk": 4,
+   "hp": 3,
    "factions": [
     "beast"
    ],
