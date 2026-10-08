@@ -103,7 +103,8 @@ export class Content {
   private lineageCache = new Map<string, readonly string[]>();
 
   /**
-   * The card key plus every card that turns into it through Henshin or its Final Form (ultimateInto)
+   * The card key plus every card that turns into it through Henshin or its Final Form (ultimateInto), or that
+   * it says it is a form of (formOf)
    * (a Final Form: zeztz_ultimate -> [zeztz_ultimate, zeztz]), so a filter naming a card also finds its later forms.
    */
   lineage(key: string): readonly string[] {
@@ -114,6 +115,7 @@ export class Content {
       for (const into of [c.henshin?.into, c.ultimateInto]) {
         if (into !== undefined) from.set(into, [...(from.get(into) ?? []), c.key]);
       }
+      if (c.formOf !== undefined) from.set(c.key, [...(from.get(c.key) ?? []), c.formOf]);
     }
     const out = [key];
     for (let i = 0; i < out.length; i++) for (const k of from.get(out[i]!) ?? []) if (!out.includes(k)) out.push(k);
@@ -197,6 +199,7 @@ export class Content {
       checkFilters(c.effects, from);
       if (c.henshin) needCard(c.henshin.into, `${from} henshin`);
       if (c.ultimateInto) needCard(c.ultimateInto, `${from} ultimateInto`);
+      if (c.formOf) needCard(c.formOf, `${from} formOf`);
       if (c.gattaiInto) {
         needCard(c.gattaiInto, `${from} gattaiInto`);
         const form = this.cards.get(c.gattaiInto);

@@ -77,18 +77,7 @@
      "target": {
       "selector": "ALL_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      }
     }
@@ -205,18 +194,7 @@
      "target": {
       "selector": "ALL_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      }
     }
@@ -392,7 +370,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_transform",
@@ -421,7 +400,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_stream",
@@ -449,7 +429,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_machinery",
@@ -466,7 +447,8 @@
    "keywords": [
     "RIDER_KICK"
    ],
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_projection",
@@ -494,7 +476,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_recovery",
@@ -523,7 +506,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_barrier",
@@ -541,7 +525,8 @@
     "BARRIER",
     "GUARD"
    ],
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_wonder",
@@ -570,7 +555,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_gravity",
@@ -598,7 +584,8 @@
    ],
    "token": true,
    "ultimateInto": "zeztz_exdream",
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_plasma",
@@ -615,7 +602,8 @@
    "keywords": [
     "RAPID"
    ],
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_booster",
@@ -633,7 +621,8 @@
     "RAPID",
     "RIDER_KICK"
    ],
-   "series": "zeztz"
+   "series": "zeztz",
+   "formOf": "zeztz"
   },
   {
    "key": "zeztz_exdream",
@@ -939,18 +928,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -981,18 +959,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1023,18 +990,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1065,18 +1021,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1107,18 +1052,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1149,18 +1083,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1191,18 +1114,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1233,18 +1145,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1275,18 +1176,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -1317,18 +1207,7 @@
      "target": {
       "selector": "CHOSEN_FRIENDLY",
       "cards": [
-       "zeztz",
-       "zeztz_wing",
-       "zeztz_transform",
-       "zeztz_stream",
-       "zeztz_machinery",
-       "zeztz_projection",
-       "zeztz_recovery",
-       "zeztz_barrier",
-       "zeztz_wonder",
-       "zeztz_gravity",
-       "zeztz_plasma",
-       "zeztz_booster"
+       "zeztz"
       ]
      },
      "actions": [
@@ -4491,19 +4370,7 @@
       "target": {
        "selector": "ALL_FRIENDLY",
        "cards": [
-        "zeztz",
-        "zeztz_wing",
-        "zeztz_transform",
-        "zeztz_stream",
-        "zeztz_machinery",
-        "zeztz_projection",
-        "zeztz_recovery",
-        "zeztz_barrier",
-        "zeztz_wonder",
-        "zeztz_gravity",
-        "zeztz_plasma",
-        "zeztz_booster",
-        "zeztz_exdream"
+        "zeztz"
        ]
       }
      }

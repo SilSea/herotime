@@ -99,7 +99,10 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "TRANSFORM": return `เปลี่ยน${t}เป็น ${names(a.into)}`;
     case "DESTROY": return `ทำลาย${t}`;
     case "GAIN_ENERGY": return `ได้ ${a.amount} Energy`;
-    case "GAUGE_ADD": return `เพิ่ม ${a.gauge} gauge ${a.amount}`;
+    case "GAUGE_ADD": {
+      const name = names(`gauge:${a.gauge}`);
+      return `เพิ่ม ${name.startsWith("gauge:") ? `${a.gauge} gauge` : name} ${a.amount}`;
+    }
     case "MODIFY_RULE": return ruleTextTh(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `ได้ ${names(a.cardKey)} เข้ามือ`;
     case "DISCOVER_GIANT": return "เลือกรับ Giant Robo";

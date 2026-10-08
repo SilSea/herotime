@@ -31,6 +31,8 @@ export class ContentIndex {
     const out = [key];
     for (let i = 0; i < out.length; i++) {
       for (const c of this.cards.values()) if ((c.henshin?.into === out[i] || c.ultimateInto === out[i]) && !out.includes(c.key)) out.push(c.key);
+      const of = this.cards.get(out[i] as string)?.formOf;
+      if (of !== undefined && !out.includes(of)) out.push(of);
     }
     return out;
   };

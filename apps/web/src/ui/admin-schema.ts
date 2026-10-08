@@ -262,6 +262,7 @@ const CARD_ROWS: Row[] = [
   { key: "costType", label: "paid with", field: { kind: "enum", options: ["ENERGY", "HEALTH"] }, hint: "HEALTH: the price comes off the hero's Health (never down to 0)" },
   CARD_SOUNDS,
   { key: "ultimateInto", label: "final form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Its Final Form: what a Final Form card (action ULTIMATE_FORM) turns this unit into, e.g. the Rider's last form" },
+  { key: "formOf", label: "form of", field: { kind: "ref", to: "cards" }, optional: true, hint: "A form of this card reached another way (e.g. a Gear that transforms into it): filters and conditions naming that card count this one too" },
   { key: "gattaiInto", label: "gattai form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Gattai core: when this is the leftmost of a Gattai group, the group becomes this card (needs the GATTAI keyword)" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },

@@ -76,6 +76,11 @@ export const CardDef = z.object({
   gattaiInto: z.string().optional(),
   /** The form ULTIMATE_FORM turns this unit into (e.g. a Rider's series-specific final form). */
   ultimateInto: z.string().optional(),
+  /**
+   * A form of another card that is reached some other way (e.g. a Gear that TRANSFORMs into it): a target or
+   * condition naming that card also counts this one, like a Henshin or Final Form of it.
+   */
+  formOf: z.string().optional(),
   /** This card's own sounds (played / attacks / dies / transforms into it). */
   sounds: CardSounds.optional(),
   /** Tavern price of Gear sold in the shop (not a token). Units always use the standard buy cost. */

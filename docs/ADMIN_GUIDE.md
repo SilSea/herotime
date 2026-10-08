@@ -152,6 +152,7 @@
 | `costType` | `ENERGY` = จ่ายทอง, `HEALTH` = จ่ายเลือด Hero (ซื้อจนเหลือ 0 ไม่ได้, เกราะไม่ช่วย) |
 | `GIANT` | Giant Robo อยู่ในช่อง Giant ได้จาก Kyodai Gattai! (ใส่ `series` เพื่อให้ขบวนการที่มีบนบอร์ดเยอะได้หุ่นของตัวเองแน่นอน) |
 | `henshin` | `afterTurns` = อยู่บนบอร์ดครบกี่เทิร์นแล้วแปลงร่าง, `into` = การ์ดร่างใหม่ (ปกติเป็น token) |
+| `formOf` (form of) | ร่างนี้เป็นร่างหนึ่งของการ์ดไหน (ใช้กับร่างที่ได้จาก Gear `TRANSFORM` เช่นร่าง Capsem ของ Zeztz) ตัวกรอง "เฉพาะการ์ด" และเงื่อนไขที่ระบุการ์ดนั้นนับร่างนี้ด้วย ไม่ต้องใส่ทุกร่างในตัวกรอง |
 | `ultimateInto` (final form) | ร่างที่ action `ULTIMATE_FORM` เปลี่ยนให้ ใช้ได้**ทุกเผ่า**: ร่างสุดท้ายของ Rider แต่ละซีรีส์, หุ่น Sentai ร่างอัปเกรด, หรือ gimmick ของซีรีส์ไหนก็ได้ (ค่าบัฟที่สะสมไว้ติดไปด้วย) |
 | `gattaiInto` | ทำให้การ์ดนี้เป็น **Gattai core**: เมื่ออยู่ซ้ายสุดของกลุ่มยูนิต Gattai ที่ติดกันครบ แล้วผู้เล่นกด Combine กลุ่มจะรวมเป็นการ์ดนี้ (ต้องมี keyword `GATTAI` ด้วย) |
 | `colors` | สี Sentai: RED BLUE YELLOW GREEN PINK, `EXTRA` = นับเป็นสีอะไรก็ได้ (และใช้กับ Super Gattai) |
@@ -362,6 +363,7 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 | `DAMAGE only works in a fight` / `enemies can only be targeted in a fight` | ดาเมจ/เป้าหมายศัตรูใช้ได้เฉพาะ trigger ช่วงต่อสู้ |
 | `target SUMMONED only works with ALLY_SUMMONED` | เป้าหมาย "ตัวที่ถูกเรียก" ต้องใช้กับ trigger ALLY_SUMMONED |
 | `references unknown card` ใน ultimateInto | ร่าง Final Form ที่ตั้งไว้ไม่มีอยู่ |
+| `references unknown card` ใน formOf | การ์ดที่ `formOf` ชี้ไปไม่มีอยู่ |
 | `X cannot be used on ALLY_SUMMONED` | ALLY_SUMMONED ใช้ได้แค่ action ที่ทำงานทั้งช่วงซื้อของและต่อสู้ |
 | `duplicate card key` | key ซ้ำ เปลี่ยน key ของอันใหม่ |
 

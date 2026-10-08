@@ -19,7 +19,8 @@ export interface ContentSetData {
 /** Fill in rules text for anything whose author did not write any. */
 export function withGeneratedText(set: ContentSetData): ContentSetData {
   // Cards first, then factions and series, so a target filter reads "Ally units", not "ally units".
-  const byKey = new Map<string, string>([...set.series.map((s) => [s.key, s.name] as const), ...set.factions.map((f) => [f.key, f.name] as const), ...set.cards.map((c) => [c.key, c.name] as const)]);
+  // Gauges are looked up as "gauge:<key>": their keys share names with factions ("rider").
+  const byKey = new Map<string, string>([...set.gauges.map((g) => [`gauge:${g.key}`, g.name] as const), ...set.series.map((s) => [s.key, s.name] as const), ...set.factions.map((f) => [f.key, f.name] as const), ...set.cards.map((c) => [c.key, c.name] as const)]);
   const names = (key: string): string => byKey.get(key) ?? key;
   return {
     ...set,

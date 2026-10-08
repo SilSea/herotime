@@ -116,3 +116,17 @@ describe("shipped rules", () => {
     for (const name of ["prototype", "production", "blank"] as const) expect(getContentSet(name).rules?.rollCallColors).toBe(3);
   });
 });
+
+describe("gauge names in rules text", () => {
+  it("says the gauge's name, even when a faction has the same key", () => {
+    const blank = getContentSet("blank");
+    const g = withGeneratedText({
+      ...blank,
+      factions: [{ key: "rider", name: "Kamen Rider", color: "#f00", text: "", textTh: "" }],
+      gauges: [{ key: "rider", name: "Rider Gauge", max: 6, sources: [], thresholds: [] }],
+      cards: [{ key: "c", name: "C", rank: 1, atk: 1, hp: 1, kind: "UNIT", factions: [], colors: [], keywords: [], token: false, text: "", textTh: "", effects: [{ scope: "UNIT", trigger: "ON_PLAY", actions: [{ type: "GAUGE_ADD", gauge: "rider", amount: 1 }] }] }],
+    } as never);
+    expect(g.cards[0]?.textTh).toBe("Deploy: เพิ่ม Rider Gauge 1");
+    expect(g.cards[0]?.text).toBe("Deploy: add 1 to the Rider Gauge.");
+  });
+});

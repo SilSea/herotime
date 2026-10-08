@@ -64,7 +64,7 @@
 | `lord_two` | Lord Two *(ฝ่ายร้าย)* | 7/7 *(Rider Kick)* | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −1/−0 |
 | `kamen_rider_mugen` | Kamen Rider Mugen *(ฝ่ายร้าย)* | 9/9 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด |
 
-**ร่างของ Zeztz จาก Capsem** (token · ทุกร่างตั้ง Final Form → `zeztz_exdream`)
+**ร่างของ Zeztz จาก Capsem** (token · ทุกร่างตั้ง Final Form → `zeztz_exdream` และ `formOf: zeztz`)
 | key | ร่าง | ATK/HP | ความสามารถ |
 |---|---|---|---|
 | `zeztz_wing` | Physicam Wing | 4/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) |
@@ -80,7 +80,7 @@
 | `zeztz_booster` | Plasma Booster | 6/5 *(Rapid, Rider Kick)* | — |
 | `zeztz_exdream` | **Kamen Rider Zeztz Exdream** (Final Form) | 10/10 *(Rider Kick, Barrier)* | เริ่มการต่อสู้: ให้พวกเราทุกตัว +2/+2 (จนจบการสู้) |
 
-**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz และทุกร่างในตารางบน · ทำ: แปลงร่างเป็น…)
+**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz (นับทุกร่างผ่าน `formOf`) · ทำ: แปลงร่างเป็น…)
 | R | key | Gear | ราคา | แปลงเป็น |
 |---|---|---|---|---|
 | 1 | `capsem_wing` | Wing Capsem | 1 | Physicam Wing |
@@ -101,7 +101,7 @@
 
 **หมายเหตุ Rider**
 - Henshin (1) = ลงสนามแล้ว แปลงร่างตอนจบเทิร์นนั้นเลย จึงเข้าสู้เป็นร่างไรเดอร์ทันที ความสามารถ "เมื่อแปลงร่าง" ใส่ที่ร่างคน (Minami, Three)
-- ตัวกรอง "เฉพาะการ์ด" นับร่างจาก Henshin แต่**ไม่นับร่างจาก Capsem** ต้องใส่ทุกร่างของ Zeztz ในตัวกรองของ Capsem, Nem และ Minami
+- ตัวกรอง "เฉพาะการ์ด" นับร่างจาก Henshin เอง ส่วนร่างจาก Capsem ตั้ง `formOf: zeztz` ไว้ ตัวกรองของ Capsem, Nem, Minami และ Hero Nem เลยใส่แค่ `zeztz` (คำอธิบายการ์ดสั้นลง)
 - "−1/−0" ใส่ศัตรู: ลดได้ต่ำสุด ATK 0 ไม่ทำให้ตาย และไม่ติดถาวร
 - ไม่ได้ใส่: สัตว์ประหลาด Nightmare / Gore Nightmare (ตามที่กำหนด), Lord Zero (มีแค่ในหนัง)
 

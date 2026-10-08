@@ -98,7 +98,10 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "TRANSFORM": return `transform ${t} into ${names(a.into)}`;
     case "DESTROY": return `destroy ${t}`;
     case "GAIN_ENERGY": return `gain ${a.amount} Energy`;
-    case "GAUGE_ADD": return `add ${a.amount} to the ${a.gauge} gauge`;
+    case "GAUGE_ADD": {
+      const name = names(`gauge:${a.gauge}`);
+      return `add ${a.amount} to the ${name.startsWith("gauge:") ? `${a.gauge} gauge` : name}`;
+    }
     case "MODIFY_RULE": return ruleText(a.rule, a.op, a.value);
     case "ADD_TO_HAND": return `add ${names(a.cardKey)} to your hand`;
     case "DISCOVER_GIANT": return "discover a Giant Robo";
