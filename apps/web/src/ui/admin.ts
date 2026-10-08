@@ -5,6 +5,7 @@ import { ENTITIES, entityInfo, KEYWORDS, RULE_DEFAULTS, RULE_ROWS, TRIGGERS, typ
 import { byName } from "../format.js";
 import { artBox } from "./art.js";
 import { cardEl } from "./card.js";
+import { artCropTools } from "./art-crop.js";
 import { wizardPanel } from "./card-wizard.js";
 import { CUES, MUSIC_SLOTS, play, preview, SOUND_SLOTS } from "../sound.js";
 import type { Ctx } from "./ctx.js";
@@ -51,6 +52,9 @@ let host: HTMLElement | undefined;
 let live: Ctx | undefined;
 let statusEl: HTMLElement | undefined;
 let previewEl: HTMLElement | undefined;
+/** The toolbar buttons an edit turns on (see setDirty). */
+let saveEl: HTMLButtonElement | undefined;
+let discardEl: HTMLButtonElement | undefined;
 
 /** The entity list being edited (the Rules tab has no list; entity code never runs there). */
 const kindNow = (): EntityKind => (ed.kind === "rules" || ed.kind === "sounds" ? "cards" : ed.kind);
@@ -149,6 +153,9 @@ function setDirty(): void {
   ed.dirty = true;
   if (statusEl) statusEl.textContent = summary();
   statusEl?.classList.add("dirty");
+  // An edit that does not redraw the page must still turn Save (and Discard) on.
+  for (const btn of [saveEl, discardEl]) if (btn && !ed.busy) btn.disabled = false;
+  saveEl?.classList.add("primary");
   updatePreview();
 }
 
@@ -163,9 +170,9 @@ function toolbar(ctx: Ctx): HTMLElement {
     h("strong", { text: "Content editor" }),
     statusEl,
     h("span", { class: "spacer" }),
-    b("Save draft", () => void save(ctx), { primary: ed.dirty, off: !ed.dirty && d.saved, title: "Check the draft and keep it for later. Players do not see it yet." }),
+    (saveEl = b("Save draft", () => void save(ctx), { primary: ed.dirty, off: !ed.dirty && d.saved, title: "Check the draft and keep it for later. Players do not see it yet." }) as HTMLButtonElement),
     b("Publish", () => void publish(ctx), { title: "Make the draft the content new matches use. Matches already running are not affected." }),
-    b("Discard draft", () => void discard(ctx), { danger: true, off: !d.saved && !ed.dirty }),
+    (discardEl = b("Discard draft", () => void discard(ctx), { danger: true, off: !d.saved && !ed.dirty }) as HTMLButtonElement),
     b("＋ Card wizard", () => ((ed.panel = "wizard"), redraw()), { primary: ed.panel !== "wizard", title: "Make a new card step by step, with a live preview" }),
     b("Versions", () => void showVersions(ctx)),
     b("Simulate", () => ((ed.panel = "simulate"), redraw()), { title: "Play bot matches on the content and see what stands out" }),
@@ -702,7 +709,17 @@ function updatePreview(): void {
   const ix = localIndex(live);
   const note = h("p", { class: "muted small", text: "Rules text made from the effects updates when you save the draft." });
   if (ed.kind === "cards") {
-    return mount(previewEl, h("h3", { text: "Preview" }), cardEl(ix, { key: String(entity.key) }), h("div", { class: "preview-small" }, cardEl(ix, { key: String(entity.key), small: true })), note);
+    const cards = h("div", { class: "crop-scope" }, cardEl(ix, { key: String(entity.key) }), h("div", { class: "preview-small" }, cardEl(ix, { key: String(entity.key), small: true })));
+    // A card with a picture can be framed: drag / scroll on the big card, or the sliders.
+    const framing =
+      entity.art &&
+      artCropTools(cards, entity.artCrop, (c) => {
+        if (c) entity.artCrop = c;
+        else delete entity.artCrop;
+        setDirty();
+        redraw(); // the form's "picture framing" numbers follow
+      });
+    return mount(previewEl, h("h3", { text: "Preview" }), cards, framing, note);
   }
   if (ed.kind === "heroes") return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(String(entity.key)), String(entity.name ?? "")), h("h3", { text: String(entity.name ?? "") }), h("p", { text: ix.heroes.get(String(entity.key))?.text || "No hero power." }), Number(entity.armor) > 0 && h("p", { class: "muted", text: `${entity.armor} armor` })), note);
   if (ed.kind === "relics") {

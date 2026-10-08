@@ -65,6 +65,11 @@ export const CardDef = z.object({
   /** Image path or URL, resolved by the client. */
   art: z.string().optional(),
   /**
+   * How the picture sits in the card's frame: the point (0-100 % across / down) kept in view, and the zoom
+   * (1 = fill the frame). Only the client reads it.
+   */
+  artCrop: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100), zoom: z.number().min(1).max(4) }).optional(),
+  /**
    * Gattai core: when this unit is the leftmost of a Gattai group, the group becomes this card (in combat, or
    * for good with COMBINE). The result has this card's stats plus the parts' stats, its effects, and all keywords.
    */

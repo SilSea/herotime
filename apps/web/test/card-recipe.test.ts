@@ -16,6 +16,14 @@ const playable = (card: Record<string, unknown>): string[] => {
 };
 
 describe("card wizard", () => {
+  it("keeps a picture's framing on the card it builds, and drops it without a picture", () => {
+    const crop = { x: 30, y: 20, zoom: 1.5 };
+    expect(buildCard(recipe({ art: "a.png", artCrop: crop })).artCrop).toEqual(crop);
+    expect(buildCard(recipe({ art: "", artCrop: crop })).artCrop).toBeUndefined();
+    expect(CardDef.safeParse({ ...buildCard(recipe({ art: "a.png", artCrop: crop })), text: "" }).success).toBe(true);
+    expect(CardDef.safeParse({ key: "k", name: "K", rank: 1, atk: 1, hp: 1, artCrop: { x: 120, y: 0, zoom: 1 } }).success).toBe(false);
+  });
+
   it("leaves out target filters the current target hides (left over from an earlier choice)", () => {
     const a = { ...newAbility("UNIT"), when: "START_OF_COMBAT", target: "SELF", targetFaction: "beast", targetCards: ["cub"] };
     const card = buildCard(recipe({ abilities: [a] }));

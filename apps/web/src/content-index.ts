@@ -1,5 +1,6 @@
 import { pick } from "./i18n.js";
 import type { CardDef, ContentSnapshot, FactionDef, HeroDef, RelicDef } from "./protocol.js";
+import type { ArtCrop } from "./ui/art.js";
 
 /** An uploaded file name becomes /art/<name>; a full URL or absolute path is used as it is. */
 export function resolveArt(art: string | undefined): string | undefined {
@@ -65,6 +66,11 @@ export class ContentIndex {
   /** Where the card's art lives, or undefined to draw the placeholder. */
   artUrl(key: string): string | undefined {
     return resolveArt(this.cards.get(key)?.art);
+  }
+
+  /** How the card's picture is framed (see CardDef.artCrop). */
+  artCrop(key: string): ArtCrop | undefined {
+    return this.cards.get(key)?.artCrop;
   }
 
   heroArt(key: string | undefined): string | undefined {

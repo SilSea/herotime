@@ -1,7 +1,7 @@
 import type { ContentIndex } from "../content-index.js";
 import { keywordName, keywordText, SENTAI_COLORS, stars } from "../format.js";
 import { tr } from "../i18n.js";
-import { bg } from "./art.js";
+import { artStyle } from "./art.js";
 import { h } from "./dom.js";
 
 export interface CardOpts {
@@ -128,7 +128,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
     { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip, kws: keywords.join(","), triggers: [...new Set((def?.effects ?? []).map((e) => e.trigger))].join(","), henshin: def?.henshin ? `${def.henshin.afterTurns}|${ix.cardName(def.henshin.into)}` : "", core: def?.gattaiInto ? ix.cardName(def.gattaiInto) : "", ultimate: def?.ultimateInto ? ix.cardName(def.ultimateInto) : "" }, on: o.onClick ? { click: o.onClick } : {} },
     o.note && h("div", { class: "card-note", text: o.note.text, title: o.note.title }),
     o.cost !== undefined && h("div", { class: `cost ${o.costHealth ? "health" : ""}`, text: String(o.cost), title: o.costHealth ? tr("Health cost: paid from your hero's Health", "ราคาเป็นเลือด: จ่ายจาก HP ของ Hero") : tr("Energy cost", "ราคา Energy") }),
-    h("div", { class: "art", style: bg(art) }, art ? null : h("span", { text: ix.initials(o.key) })),
+    h("div", { class: "art" }, art ? h("div", { class: "art-img", style: artStyle(art, ix.artCrop(o.key)) }) : h("span", { text: ix.initials(o.key) })),
     h("div", { class: "name", text: ix.cardName(o.key) }),
     def && kind === "UNIT" && h("div", { class: "rank", title: `Rank ${def.rank} ${stars(def.rank)}` }, h("span", { text: String(def.rank) })),
     def && def.colors.length > 0 && h("div", { class: "colors" }, ...def.colors.map((c) => h("span", { class: "dot", style: `background:${SENTAI_COLORS[c] ?? "#999"}`, title: c }))),

@@ -961,3 +961,13 @@ body.aiming .slot.aim-no > :first-child { opacity: .4; filter: grayscale(.6); }
 @keyframes reticle-lock { 50% { filter: drop-shadow(0 0 16px #69f0ae); } }
 /* Aiming a gear: the tavern is not where it goes, so no "drop here to sell" over it. */
 body.aiming .tavern::after { display: none !important; }
+
+/* ---- card pictures: laid over the frame so they can be panned and zoomed (CardDef.artCrop) */
+.card .art .art-img { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; background-position: 50% 50%; }
+.card .art.adjustable { cursor: grab; touch-action: none; outline: 2px dashed #2fe4ffaa; outline-offset: 2px; }
+.card .art.adjustable:active { cursor: grabbing; }
+.crop-tools { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center; width: 100%; max-width: 300px; font-size: 12px; }
+.crop-tools input[type=range] { width: 100%; }
+.crop-tools .crop-val { font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; color: var(--cyan); }
+.crop-tools .crop-row { grid-column: 1 / -1; display: flex; gap: 6px; justify-content: space-between; align-items: center; }
+.crop-scope { display: flex; flex-direction: column; align-items: center; gap: 10px; }

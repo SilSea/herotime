@@ -267,6 +267,7 @@ const CARD_ROWS: Row[] = [
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
   { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
+  { key: "artCrop", label: "picture framing", field: { kind: "object", rows: [{ key: "x", label: "left/right %", field: int(0, 100) }, { key: "y", label: "up/down %", field: int(0, 100) }, { key: "zoom", field: { kind: "num" }, hint: "1 to 4" }], make: () => ({ x: 50, y: 50, zoom: 1 }) }, optional: true, hint: "Easier: drag / scroll the picture on the big preview card, or use the sliders under it" },
   { key: "effects", field: effects() },
 ];
 

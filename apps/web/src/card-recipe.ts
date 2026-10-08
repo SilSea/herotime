@@ -156,6 +156,8 @@ export interface Recipe {
   /** ULTIMATE_FORM turns this unit into this card. */
   ultimateInto: string;
   art: string;
+  /** How the picture sits in the card's frame (undefined = centred, no zoom). */
+  artCrop?: { x: number; y: number; zoom: number };
 }
 
 export const newAbility = (type: CardType): Ability => ({
@@ -282,6 +284,7 @@ export function buildCard(r: Recipe): Record<string, unknown> {
   if (r.type !== "GEAR" && r.gattaiInto) card.gattaiInto = r.gattaiInto;
   if (r.type !== "GEAR" && r.ultimateInto) card.ultimateInto = r.ultimateInto;
   if (r.art) card.art = r.art;
+  if (r.art && r.artCrop) card.artCrop = { ...r.artCrop };
   return card;
 }
 

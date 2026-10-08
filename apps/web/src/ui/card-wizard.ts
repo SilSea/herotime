@@ -3,6 +3,7 @@ import { ContentIndex } from "../content-index.js";
 import { byName, KEYWORDS, keywordName, keywordText, SENTAI_COLORS } from "../format.js";
 import { tr } from "../i18n.js";
 import type { CardDef } from "../protocol.js";
+import { artCropTools } from "./art-crop.js";
 import { cardEl } from "./card.js";
 import { h } from "./dom.js";
 
@@ -191,7 +192,8 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
   const artInput = h("input", { type: "file", attrs: { accept: "image/*" } }) as HTMLInputElement;
   artInput.addEventListener("change", () => {
     const file = artInput.files?.[0];
-    if (file) void d.upload(file).then((name) => ((wz.art = name), refreshPreview()));
+    // A new picture starts centred: the old framing was for the old one.
+    if (file) void d.upload(file).then((name) => ((wz.art = name), delete wz.artCrop, refreshPreview()));
   });
   const basics = h(
     "div",
@@ -379,9 +381,12 @@ function refreshPreview(): void {
   const problems = checkRecipe(wz, d.takenKeys);
   const previewCard = { ...card, key: card.key || "__wizard__", name: wz.name || tr("New card", "การ์ดใหม่"), text: lines.join(" · "), textTh: lines.join(" · ") } as unknown as CardDef;
   const pix = new ContentIndex({ ...ix.snapshot, cards: [...ix.snapshot.cards.filter((c) => c.key !== previewCard.key), previewCard] });
+  const shown = h("div", { class: "crop-scope" }, cardEl(pix, { key: previewCard.key, ...(wz.type === "GEAR" ? { cost: wz.cost, costHealth: wz.costType === "HEALTH" } : {}) }));
+  const framing = wz.art && artCropTools(shown, wz.artCrop, (c) => ((wz.artCrop = c), refreshPreview()));
   previewHost.replaceChildren(
     h("h3", { text: tr("Preview", "ตัวอย่าง") }),
-    cardEl(pix, { key: previewCard.key, ...(wz.type === "GEAR" ? { cost: wz.cost, costHealth: wz.costType === "HEALTH" } : {}) }),
+    shown,
+    framing || "",
     h("div", { class: "wz-lines" }, ...(lines.length > 0 ? lines.map((l) => h("p", { text: l })) : [h("p", { class: "muted", text: tr("No abilities: a plain body.", "ไม่มีความสามารถ: ตัวเปล่า") })])),
     problems.length > 0
       ? h("div", { class: "admin-issues" }, h("strong", { text: tr("Before adding:", "ก่อนเพิ่มต้องแก้:") }), h("ul", null, ...problems.map((p) => h("li", { text: p }))))
