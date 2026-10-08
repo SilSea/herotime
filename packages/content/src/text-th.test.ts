@@ -155,3 +155,17 @@ describe("gifts to one target, stats first", () => {
     expect(g.cards[0]?.textTh).toBe("Deploy: ให้พันธมิตรทุกตัว +2/+2 และได้ Barrier");
   });
 });
+
+describe("RIDER_KICK is Power Strike, and Rider Kick on Riders", () => {
+  const unit = (key: string, factions: string[], target: Record<string, unknown>) => ({ key, name: key, rank: 1, atk: 1, hp: 1, kind: "UNIT", factions, colors: [], keywords: [], token: false, text: "", textTh: "", effects: [{ scope: "UNIT", trigger: "ON_PLAY", target, actions: [{ type: "GIVE_KEYWORD", keyword: "RIDER_KICK" }] }] });
+  const g = withGeneratedText({
+    ...getContentSet("blank"),
+    factions: ["rider", "shonen"].map((key) => ({ key, name: key === "rider" ? "Kamen Rider" : "Shonen", color: "#f00", text: "", textTh: "" })),
+    cards: [unit("ninja", ["shonen"], { selector: "SELF" }), unit("baku", ["rider"], { selector: "SELF" }), unit("coach", ["shonen"], { selector: "ALL_FRIENDLY", faction: "rider" })],
+  } as never);
+  it("names it by who gets it", () => {
+    expect(g.cards[0]?.text).toBe("Deploy: give this Power Strike.");
+    expect(g.cards[1]?.text).toBe("Deploy: give this Rider Kick.");
+    expect(g.cards[2]?.textTh).toBe("Deploy: ให้ยูนิต Kamen Rider ทุกตัวได้ Rider Kick");
+  });
+});

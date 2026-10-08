@@ -108,7 +108,7 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 | Rapid | Windfury | ตี 2 ครั้ง |
 | Lethal | Poisonous | ทำดาเมจโดน = ตายทันที |
 | Revive | Reborn | ฟื้นครั้งเดียว HP 1 |
-| Rider Kick | — | การตีครั้งแรกของการสู้ดาเมจ ×2 |
+| Power Strike (บน Rider เรียก **Rider Kick**) | — | การตีครั้งแรกของการสู้ดาเมจ ×2 · key ในข้อมูลยังเป็น `RIDER_KICK` ชื่อที่โชว์ขึ้นกับเผ่าของการ์ด: การ์ดเผ่า Rider (หรือ effect ที่ให้กับยูนิต Rider) เห็นเป็น Rider Kick ที่เหลือเป็น Power Strike |
 | Henshin(N) | — | อยู่บนบอร์ดครบ N เทิร์น/ถึงเงื่อนไข → แปลงเป็น `transformInto` |
 | Team-Up(k) | — | ทำงานเมื่อมีสี Sentai ไม่ซ้ำ ≥ k · สีที่มี: RED, BLUE, YELLOW, GREEN, PINK, BLACK, WHITE, PURPLE, SILVER, GOLD, ORANGE · EXTRA = นับแทนสีที่ขาดได้ 1 สี |
 | Gattai | — | เป็นชิ้นส่วนรวมร่างได้: core (การ์ดที่มี `gattaiInto`) อยู่ซ้ายสุด + Gattai ติดกันครบจำนวน → กด Combine ตอน recruit = รวมถาวรเป็นการ์ดร่าง (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด, effect ของร่าง) แล้วบัฟต่อได้. ไม่มีการรวมระหว่างสู้. ตัวที่รวมแล้วไม่ถูกรวมซ้ำ |

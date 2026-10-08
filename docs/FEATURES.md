@@ -22,7 +22,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 ## F2. Faction & Keyword
 - [x] **F2.1** (P0) 7 Faction: Rider, Sentai, Mecha, Kaijin, Grunt, Ally, Dark Rider — สุ่ม 5 ต่อล็อบบี้
 - [x] **F2.2** (P0) Keyword มาตรฐาน: Guard, Barrier, Last Stand, Henshin Call, Rapid, Lethal, Revive, Start of Combat, End of Turn, Avenge(N)
-- [x] **F2.3** (P0) Keyword ธีม: Henshin(N), Team-Up(k), Gattai, Kyodaika, Rider Kick
+- [x] **F2.3** (P0) Keyword ธีม: Henshin(N), Team-Up(k), Gattai, Kyodaika, Power Strike (บน Rider = Rider Kick)
 - [x] **F2.4** (P0) Sentai color (Red/Blue/Yellow/Green/Pink) + Extra = wildcard
 
 ## F3. Series & Giant Robo

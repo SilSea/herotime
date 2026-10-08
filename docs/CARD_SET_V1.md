@@ -151,7 +151,7 @@
 **ร่าง / Gear / หุ่นยักษ์**
 | ชนิด | key | การ์ด | ATK/HP | ความสามารถ |
 |---|---|---|---|---|
-| ร่าง (token) | `king_kuwagata` | King Kuwagata Ohger (Final Form ของ Kuwagata Ohger · ได้จากการ์ด Final Form) | 8/8 *(Rider Kick)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 |
+| ร่าง (token) | `king_kuwagata` | King Kuwagata Ohger (Final Form ของ Kuwagata Ohger · ได้จากการ์ด Final Form) | 8/8 *(Power Strike)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 |
 | Giant | `king_ohger` | King-Ohger | 10/12 *(Final Blow)* | หุ่นรวม 5 Shugod หลัก · Final Form → `god_king_ohger` |
 | Giant | `king_caucasus_kabuto` | King Caucasus Kabuto | 12/10 *(Final Blow, Barrier)* | ร่างยักษ์ของ God Caucasus Kabuto |
 | Giant | `tarantula_knight` | Tarantula Knight | 9/12 *(Final Blow, Guard)* | ร่างยักษ์ของ God Tarantula |
@@ -191,10 +191,10 @@
 **ร่างรวม (token)** — ค่าพลังร่างรวม = ค่าในตาราง + ผลรวมชิ้นส่วน
 | key | ร่าง | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|
-| `solar_aquarion` | Solar Aquarion | 4/4 *(Rider Kick)* | Final Form → `solar_aquarion_wings` | สมดุล ถนัดระยะประชิด ร่างจริงของ Aquarion |
+| `solar_aquarion` | Solar Aquarion | 4/4 *(Power Strike)* | Final Form → `solar_aquarion_wings` | สมดุล ถนัดระยะประชิด ร่างจริงของ Aquarion |
 | `aquarion_luna` | Aquarion Luna | 3/4 | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูทุกตัว | ระยะไกล คันธนู |
 | `aquarion_mars` | Aquarion Mars | 4/3 *(Rapid)* | — | เน้นความเร็ว |
-| `solar_aquarion_wings` | Solar Aquarion — Solar Wings (Final Form) | 12/12 *(Rider Kick, Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (Infinity Punch) | ปีกสุริยะ, Infinity Punch |
+| `solar_aquarion_wings` | Solar Aquarion — Solar Wings (Final Form) | 12/12 *(Power Strike, Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (Infinity Punch) | ปีกสุริยะ, Infinity Punch |
 
 **Gear**
 | R | key | Gear | ราคา | ความสามารถ |
@@ -218,7 +218,7 @@
 | 2 | `hedorah` | Hedorah | 1/2 *(Lethal)* | Last Stand: เรียก Hedorah Spawn 1/1 | สัตว์ประหลาดมลพิษ |
 | 3 | `godzilla_junior` | Godzilla Junior | 2/2 *(Kyodaika)* | — | ลูกที่โตขึ้น |
 | 3 | `biollante` | Biollante | 3/4 *(Revive)* | Last Stand: ให้ Kaiju ทุกตัว +1/+0 (จนจบการสู้) | ไฮบริดพืช-Godzilla |
-| 3 | `gigan` | Gigan | 4/3 *(Rider Kick)* | — | ไซบอร์กใบเลื่อย |
+| 3 | `gigan` | Gigan | 4/3 *(Power Strike)* | — | ไซบอร์กใบเลื่อย |
 | 4 | `destoroyah` | Destoroyah | 3/3 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 · Avenge (3): ตัวนี้ +2/+2 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
 | 4 | `mechagodzilla` | Mechagodzilla | 4/5 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
 | 5 | `godzilla` | Godzilla | 5/5 *(Kyodaika)* | Avenge (4): ตัวนี้ +1/+1 ถาวร | ราชาแห่งสัตว์ประหลาด |
@@ -306,14 +306,14 @@
 | 2 | `rock_lee` | Rock Lee | 2/3 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +2/+0 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น*) | Eight Gates (เปิดได้บางประตู) |
 | 2 | `neji` | Neji Hyuga | 3/2 | เมื่อโจมตี: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | หมัดอ่อน |
 | 2 | `shikamaru` | Shikamaru Nara | 2/3 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/+0 (จนจบการสู้)** | Shadow Possession |
-| 3 | `sasuke` | Sasuke Uchiha | 4/4 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Chidori — แทงเร็ว |
+| 3 | `sasuke` | Sasuke Uchiha | 4/4 *(Power Strike)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Chidori — แทงเร็ว |
 | 3 | `kakashi` | Kakashi Hatake | 3/4 | เริ่มการต่อสู้: เรียกสำเนาของศัตรูซ้ายสุด | Copy Ninja, Sharingan |
 | 3 | `gaara` | Gaara | 2/4 *(Guard, Barrier)* | — | โล่ทราย |
 | 4 | `jiraiya` | Jiraiya | 4/5 | เริ่มการต่อสู้: เรียก Gamabunta 5/5 | อัญเชิญคางคก |
 | 4 | `tsunade` | Tsunade | 3/6 | เมื่อโดนดาเมจแล้วยังรอด: ให้พวกเราทุกตัว +0/+1 (ไม่เกิน 2 ครั้งต่อเทิร์น*) | ฟื้นฟูด้วย Katsuyu |
 | 5 | `might_guy` | Might Guy | 5/6 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +8/+0 (จนจบการสู้, **ไม่เกิน 1 ครั้งต่อเกม** — Night Guy) | Eight Gates ครบ 8 ประตู |
 | 5 | `itachi` | Itachi Uchiha | 6/5 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −4/−0 (จนจบการสู้) | Sharingan, Tsukuyomi (ภาพลวง) |
-| 6 | `naruto_kurama` | Naruto (Kurama Chakra Mode) | 9/9 *(Rapid, Rider Kick)* | Avenge (2): ตัวนี้ +2/+2 ถาวร | พลังเก้าหาง |
+| 6 | `naruto_kurama` | Naruto (Kurama Chakra Mode) | 9/9 *(Rapid, Power Strike)* | Avenge (2): ตัวนี้ +2/+2 ถาวร | พลังเก้าหาง |
 
 **ร่าง / Token**
 | key | ร่าง | ATK/HP | ความสามารถ |

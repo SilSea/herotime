@@ -41,7 +41,9 @@ describe("card wizard", () => {
 
   it("names keywords in the preview line, not their ids", () => {
     const a = { ...newAbility("UNIT"), do: "GIVE_KEYWORD", keyword: "RIDER_KICK" };
-    expect(describeRecipe(recipe({ abilities: [a] }), (k) => k, (k) => k)[0]).toContain("Rider Kick");
+    expect(describeRecipe(recipe({ abilities: [a] }), (k) => k, (k) => k)[0]).toContain("Power Strike");
+    // On a Rider card it is a Rider Kick.
+    expect(describeRecipe(recipe({ factions: ["rider"], abilities: [{ ...a, target: "SELF" }] }), (k) => k, (k) => k)[0]).toContain("Rider Kick");
   });
 
   it("only offers real triggers, actions and targets", () => {

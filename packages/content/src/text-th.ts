@@ -1,5 +1,5 @@
 import type { Action, CardDef, Condition, Effect, HeroDef, KeywordKey, RelicDef, Target, Trigger } from "@herotime/shared";
-import { mergeGifts, type Gift, type Names } from "./text.js";
+import { keywordName, mergeGifts, type Gift, type Names } from "./text.js";
 
 /**
  * Thai rules text, generated from the same effects as the English text (text.ts). Keyword and trigger names
@@ -12,7 +12,7 @@ const KEYWORD: Record<KeywordKey, string> = {
   RAPID: "Rapid",
   LETHAL: "Lethal",
   REVIVE: "Revive",
-  RIDER_KICK: "Rider Kick",
+  RIDER_KICK: "Power Strike",
   FINAL_BLOW: "Final Blow",
   KYODAIKA: "Kyodaika",
   GATTAI: "Gattai",
@@ -85,7 +85,7 @@ function condition(c: Condition | undefined, names: Names): string {
   }
 }
 
-function action(a: Action, target: Target | undefined, names: Names, player = false): string {
+function action(a: Action, target: Target | undefined, names: Names, player = false, owner?: readonly string[]): string {
   const t = who(target, names, player);
   switch (a.type) {
     case "BUFF": {
@@ -97,7 +97,7 @@ function action(a: Action, target: Target | undefined, names: Names, player = fa
     case "CONSUME_ALLIES": return `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${t}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`;
     case "SUMMON": return `เรียก ${names(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`;
     case "DAMAGE": return `ทำดาเมจ ${a.amount} ใส่${t}`;
-    case "GIVE_KEYWORD": return `ให้${t}ได้ ${KEYWORD[a.keyword]}`;
+    case "GIVE_KEYWORD": return `ให้${t}ได้ ${keywordName(a.keyword, target, owner)}`;
     case "TRANSFORM": return `เปลี่ยน${t}เป็น ${names(a.into)}`;
     case "DESTROY": return `ทำลาย${t}`;
     case "GAIN_ENERGY": return `ได้ ${a.amount} Energy`;
@@ -171,20 +171,20 @@ const FIGHT_TRIGGERS = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED",
 const LATER = new Set(["GAIN_ENERGY", "ADD_TO_HAND", "RANDOM_CARD", "DISCOVER_UNIT", "GAUGE_ADD", "BUFF_SHOP", "BUFF_GEAR"]);
 
 /** "ให้ยูนิต Mecha ขวาสุดได้ Gattai และ +1/+1 ถาวร" */
-function gifts(g: Gift[], t: string): string {
-  const parts = g.map((a) => (a.type === "GIVE_KEYWORD" ? `ได้ ${KEYWORD[a.keyword]}` : `${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " ถาวร" : ""}`));
+function gifts(g: Gift[], t: string, target: Target | undefined, owner?: readonly string[]): string {
+  const parts = g.map((a) => (a.type === "GIVE_KEYWORD" ? `ได้ ${keywordName(a.keyword, target, owner)}` : `${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " ถาวร" : ""}`));
   const first = parts[0] as string;
   const rest = parts.slice(1).map((p) => (p.startsWith("ได้") ? ` และ${p}` : ` และ ${p}`)).join("");
   return `ให้${t}${first.startsWith("ได้") ? "" : " "}${first}${rest}`;
 }
 
-export function effectTextTh(e: Effect, names: Names): string {
+export function effectTextTh(e: Effect, names: Names, owner?: readonly string[]): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
   const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && (LATER.has(a.type) || (a.type === "COPY" && a.to === "HAND")) ? " ในเทิร์นหน้า" : "");
   const player = e.scope === "PLAYER";
   const body = mergeGifts(e.actions)
-    .map((g) => (Array.isArray(g) ? gifts(g, who(e.target, names, player)) : action(g, e.target, names, player) + later(g)))
+    .map((g) => (Array.isArray(g) ? gifts(g, who(e.target, names, player), e.target, owner) : action(g, e.target, names, player, owner) + later(g)))
     .join(" แล้ว");
   const limit = e.limit ? (e.limit.times === 1 ? ` (${e.limit.per === "TURN" ? "เทิร์นละครั้ง" : "ครั้งเดียวต่อเกม"})` : ` (ไม่เกิน ${e.limit.times} ครั้งต่อ${e.limit.per === "TURN" ? "เทิร์น" : "เกม"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} ครั้ง)` : ""}${limit}`;
@@ -197,7 +197,7 @@ export function cardTextTh(c: CardDef, names: Names): string {
   if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
   // ร่าง Final Form (ultimateInto) ไม่อยู่ในข้อความการ์ด: หน้าเว็บอธิบายในกล่องข้างการ์ดแบบ keyword
   if (c.keywords.includes("ECHO")) lines.push("Echo: Deploy ของเราทำงาน 2 ครั้ง");
-  for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names));
+  for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names, c.factions).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names, c.factions));
   return lines.join(" · ");
 }
 

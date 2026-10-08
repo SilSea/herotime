@@ -70,7 +70,7 @@ export const KEYWORDS: Record<string, { name: string; text: string; textTh: stri
   RAPID: { name: "Rapid", text: "Attacks twice each turn.", textTh: "โจมตี 2 ครั้งทุกครั้งที่ถึงตาของตัวเอง" },
   LETHAL: { name: "Lethal", text: "Any unit it damages is destroyed.", textTh: "ยูนิตใดที่โดนดาเมจจากตัวนี้ จะถูกทำลายทันที" },
   REVIVE: { name: "Revive", text: "Comes back once with 1 HP after dying.", textTh: "ตายครั้งแรกจะฟื้นกลับมาพร้อม HP 1" },
-  RIDER_KICK: { name: "Rider Kick", text: "Its first attack of the fight deals double damage.", textTh: "การโจมตีครั้งแรกของการต่อสู้ทำดาเมจ ×2" },
+  RIDER_KICK: { name: "Power Strike", text: "Its first attack of the fight deals double damage. On Rider units it is called Rider Kick.", textTh: "การโจมตีครั้งแรกของการต่อสู้ทำดาเมจ ×2 · บนยูนิต Rider เรียกว่า Rider Kick" },
   FINAL_BLOW: { name: "Final Blow", text: "First attack deals double damage, and double again against giants.", textTh: "การโจมตีครั้งแรกทำดาเมจ ×2 และ ×2 อีกเท่าเมื่อตีใส่ยูนิตยักษ์" },
   KYODAIKA: { name: "Kyodaika", text: "The first time it dies it returns as a giant with doubled stats and no keywords.", textTh: "ตายครั้งแรกจะฟื้นเป็นร่างยักษ์ stat ×2 แต่ไม่มี keyword อื่น" },
   ECHO: { name: "Echo", text: "While this is on your board, your Deploy effects happen twice.", textTh: "ระหว่างอยู่บนบอร์ด เอฟเฟค Deploy ของเราทำงาน 2 ครั้ง" },
@@ -83,7 +83,9 @@ export const keywordText = (k: string): string => {
   return kw ? tr(kw.text, kw.textTh) : "";
 };
 
-export const keywordName = (k: string): string => KEYWORDS[k]?.name ?? k;
+/** A keyword's printed name. Power Strike is called Rider Kick on a card of the Rider faction. */
+export const keywordName = (k: string, factions?: readonly string[]): string =>
+  k === "RIDER_KICK" && factions?.includes("rider") ? "Rider Kick" : (KEYWORDS[k]?.name ?? k);
 
 export const SENTAI_COLORS: Record<string, string> = {
   RED: "#e53935",

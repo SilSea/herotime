@@ -102,7 +102,9 @@ describe("format helpers", () => {
     for (const k of ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI"]) {
       expect(KEYWORDS[k]?.text.length, k).toBeGreaterThan(10);
     }
-    expect(keywordName("RIDER_KICK")).toBe("Rider Kick");
+    expect(keywordName("RIDER_KICK")).toBe("Power Strike");
+    expect(keywordName("RIDER_KICK", ["rider"])).toBe("Rider Kick");
+    expect(keywordName("RIDER_KICK", ["shonen"])).toBe("Power Strike");
     expect(keywordName("MYSTERY")).toBe("MYSTERY");
   });
 

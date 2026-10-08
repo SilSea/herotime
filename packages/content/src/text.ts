@@ -9,7 +9,7 @@ const KEYWORD: Record<KeywordKey, string> = {
   RAPID: "Rapid",
   LETHAL: "Lethal",
   REVIVE: "Revive",
-  RIDER_KICK: "Rider Kick",
+  RIDER_KICK: "Power Strike",
   FINAL_BLOW: "Final Blow",
   KYODAIKA: "Kyodaika",
   GATTAI: "Gattai",
@@ -37,6 +37,18 @@ const TRIGGER: Record<Trigger, string> = {
 
 const signed = (n: number): string => (n >= 0 ? `+${n}` : `${n}`);
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * A keyword's printed name. RIDER_KICK is "Power Strike" in general and "Rider Kick" on Riders: when it goes to
+ * Rider units, or to the Rider card itself.
+ */
+export function keywordName(k: KeywordKey, target?: Target, owner?: readonly string[]): string {
+  if (k === "RIDER_KICK") {
+    const self = !target || target.selector === "SELF";
+    if (target?.faction === "rider" || (self && owner?.includes("rider"))) return "Rider Kick";
+  }
+  return KEYWORD[k];
+}
 
 // A player effect (hero power, relic, gear) has no unit of its own, so a random ally is not "another" one.
 function who(t: Target | undefined, names: Names, player = false): string {
@@ -84,7 +96,7 @@ function condition(c: Condition | undefined, names: Names): string {
   }
 }
 
-function action(a: Action, target: Target | undefined, names: Names, player = false): string {
+function action(a: Action, target: Target | undefined, names: Names, player = false, owner?: readonly string[]): string {
   const t = who(target, names, player);
   switch (a.type) {
     case "BUFF": {
@@ -96,7 +108,7 @@ function action(a: Action, target: Target | undefined, names: Names, player = fa
     case "CONSUME_ALLIES": return `destroy all your other units and give ${t} their total ATK/HP${a.permanent ? " permanently" : ""}`;
     case "SUMMON": return `summon ${a.count > 1 ? `${a.count} ` : ""}${names(a.cardKey)}${a.count > 1 ? "s" : ""}`;
     case "DAMAGE": return `deal ${a.amount} damage to ${t}`;
-    case "GIVE_KEYWORD": return `give ${t} ${KEYWORD[a.keyword]}`;
+    case "GIVE_KEYWORD": return `give ${t} ${keywordName(a.keyword, target, owner)}`;
     case "TRANSFORM": return `transform ${t} into ${names(a.into)}`;
     case "DESTROY": return `destroy ${t}`;
     case "GAIN_ENERGY": return `gain ${a.amount} Energy`;
@@ -179,17 +191,17 @@ export function mergeGifts(actions: readonly Action[]): (Action | Gift[])[] {
 }
 
 /** "give the rightmost Mecha unit Gattai and +1/+1 permanently" */
-function gifts(g: Gift[], t: string): string {
-  return `give ${t} ${g.map((a) => (a.type === "GIVE_KEYWORD" ? KEYWORD[a.keyword] : `${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " permanently" : ""}`)).join(" and ")}`;
+function gifts(g: Gift[], t: string, target: Target | undefined, owner?: readonly string[]): string {
+  return `give ${t} ${g.map((a) => (a.type === "GIVE_KEYWORD" ? keywordName(a.keyword, target, owner) : `${signed(a.atk)}/${signed(a.hp)}${a.permanent ? " permanently" : ""}`)).join(" and ")}`;
 }
 
-export function effectText(e: Effect, names: Names): string {
+export function effectText(e: Effect, names: Names, owner?: readonly string[]): string {
   const trigger = e.trigger === "AVENGE" ? `Avenge (${e.every ?? 1})` : TRIGGER[e.trigger];
   // In a fight, Energy / cards / Gauge are earned for the start of the next turn.
   const later = (a: Effect["actions"][number]): string => (FIGHT_TRIGGERS.has(e.trigger) && (LATER.has(a.type) || (a.type === "COPY" && a.to === "HAND")) ? " next turn" : "");
   const player = e.scope === "PLAYER";
   const body = mergeGifts(e.actions)
-    .map((g) => (Array.isArray(g) ? gifts(g, who(e.target, names, player)) : action(g, e.target, names, player) + later(g)))
+    .map((g) => (Array.isArray(g) ? gifts(g, who(e.target, names, player), e.target, owner) : action(g, e.target, names, player, owner) + later(g)))
     .join(", then ");
   const limit = e.limit ? (e.limit.times === 1 ? ` (once per ${e.limit.per === "TURN" ? "turn" : "game"})` : ` (up to ${e.limit.times} times per ${e.limit.per === "TURN" ? "turn" : "game"})`) : "";
   const text = `${trigger}: ${condition(e.condition, names)}${body}${e.repeat && e.repeat > 1 ? ` (${e.repeat} times)` : ""}${limit}.`;
@@ -204,7 +216,7 @@ export function cardText(c: CardDef, names: Names): string {
   // The Final Form (ultimateInto) is not rules text: the client explains it in a box beside the card, like a keyword.
   if (c.keywords.includes("ECHO")) lines.push("Echo: your Deploy effects happen twice.");
   // Gear is used from the hand, so its ON_PLAY reads "Use:" rather than the units' "Deploy:".
-  for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectText(e, names).replace(/^Deploy: /, "Use: ") : effectText(e, names));
+  for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectText(e, names, c.factions).replace(/^Deploy: /, "Use: ") : effectText(e, names, c.factions));
   return lines.join(" ");
 }
 

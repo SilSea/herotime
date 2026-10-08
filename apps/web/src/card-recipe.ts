@@ -336,6 +336,8 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.condition === "HAS_CARD" ? tr(`if you have ${a.conditionCards.map(cardName).join(" or ")}, `, `ถ้ามี ${a.conditionCards.map(cardName).join(" หรือ ")} `)
       : "";
     const sign = (n: number): string => (n >= 0 ? `+${n}` : String(n));
+    // Keyword names follow the units that get them (Power Strike is Rider Kick on Riders).
+    const kwFactions = a.targetFaction && factionFilterFits(a.target) ? [a.targetFaction] : a.target === "SELF" ? r.factions : undefined;
     const what =
       a.do === "BUFF" && a.fromSelf && r.type !== "GEAR"
         ? tr(`give ${who} this card's ATK/HP${a.atk || a.hp ? ` ${sign(a.atk)}/${sign(a.hp)}` : ""}${a.permanent ? " permanently" : ""}`, `ให้${who} ได้ ATK/HP เท่าการ์ดนี้${a.atk || a.hp ? ` ${sign(a.atk)}/${sign(a.hp)}` : ""}${a.permanent ? " ถาวร" : ""}`)
@@ -344,7 +346,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
           ? tr(`add a copy of ${who} to your hand${a.copyBuffs ? " (bonuses included)" : ""}`, `ได้สำเนาของ${who}เข้ามือ${a.copyBuffs ? " (รวมบัฟ)" : ""}`)
           : tr(`summon a copy of ${who}${a.copyBuffs ? " (bonuses included)" : ""}`, `เรียกสำเนาของ${who}${a.copyBuffs ? " (รวมบัฟ)" : ""}`))
       : a.do === "CONSUME_ALLIES" ? tr(`destroy all your other units and give ${who} their total ATK/HP${a.permanent ? " permanently" : ""}`, `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${who}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`)
-      : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${keywordName(a.keyword)}`, `ให้${who}ได้ ${keywordName(a.keyword)}`)
+      : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${keywordName(a.keyword, kwFactions)}`, `ให้${who}ได้ ${keywordName(a.keyword, kwFactions)}`)
       : a.do === "SUMMON" ? tr(`summon ${a.count > 1 ? `${a.count} × ` : ""}${cardName(a.cardKey)}`, `เรียก ${cardName(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
       : a.do === "TRANSFORM" ? tr(`transform ${who} into ${cardName(a.cardKey)}`, `แปลง${who}เป็น ${cardName(a.cardKey)}`)
       : a.do === "DESTROY" ? tr(`destroy ${who}`, `ทำลาย${who}`)
