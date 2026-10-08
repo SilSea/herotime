@@ -284,8 +284,10 @@ describe("card art upload", () => {
     expect(jpg.body.file).toMatch(/\.jpg$/);
   });
 
-  it("refuses an image over the size limit before decoding it", async () => {
-    const big = Buffer.concat([PNG, Buffer.alloc(1_600_000)]);
+  it("takes a full-size picture, and refuses one over the size limit", async () => {
+    const fine = Buffer.concat([PNG, Buffer.alloc(13_500_000, 1)]); // a big generated picture
+    expect((await call("POST", "/admin/upload", admin.token, { data: b64(fine) })).status).toBe(201);
+    const big = Buffer.concat([PNG, Buffer.alloc(15_100_000)]);
     const r = await call("POST", "/admin/upload", admin.token, { data: b64(big) });
     expect(r.status).toBe(400);
     expect(r.body.message).toMatch(/too large/);

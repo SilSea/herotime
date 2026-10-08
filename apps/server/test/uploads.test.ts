@@ -21,13 +21,16 @@ describe("uploads", () => {
     expect((await store.list()).length).toBe(4);
   });
 
-  it("sounds may be larger than pictures, up to their own limit", async () => {
-    const bigSound = pad(Buffer.from("OggS", "latin1"), MAX_UPLOAD_BYTES + 1000);
-    await expect(store.save(b64(bigSound))).resolves.toMatchObject({ bytes: bigSound.length });
-    const bigPng = pad(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), MAX_UPLOAD_BYTES + 1000);
-    await expect(store.save(b64(bigPng))).rejects.toThrow(/image is too large/);
+  it("pictures and sounds each have their own limit", async () => {
+    const png = (n: number) => pad(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), n);
+    // a full-size picture, bigger than any sound may be, is fine
+    const bigPng = png(MAX_AUDIO_BYTES + 1000);
+    await expect(store.save(b64(bigPng))).resolves.toMatchObject({ bytes: bigPng.length });
+    await expect(store.save(b64(png(MAX_UPLOAD_BYTES + 1000)))).rejects.toThrow(/too large/);
+    const sound = pad(Buffer.from("OggS", "latin1"), MAX_AUDIO_BYTES - 1000);
+    await expect(store.save(b64(sound))).resolves.toMatchObject({ bytes: sound.length });
     const hugeSound = pad(Buffer.from("OggS", "latin1"), MAX_AUDIO_BYTES + 1000);
-    await expect(store.save(b64(hugeSound))).rejects.toThrow(/too large/);
+    await expect(store.save(b64(hugeSound))).rejects.toThrow(/sound is too large/);
   });
 
   it("refuses anything else", async () => {

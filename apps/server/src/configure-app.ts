@@ -19,7 +19,8 @@ export function configureApp(app: NestExpressApplication, config: ServerConfig):
     if (size > SMALL_BODY && req.path !== "/admin/upload") return res.status(413).json({ statusCode: 413, message: "request body too large" });
     next();
   });
-  app.useBodyParser("json", { limit: "10mb" });
+  // The admin upload sends a picture of up to 15 MB as base64 (about 20 MB); other routes stay under SMALL_BODY.
+  app.useBodyParser("json", { limit: "24mb" });
   app.enableCors({ origin: config.corsOrigin });
   app.useWebSocketAdapter(new AppIoAdapter(app, config));
   // Uploaded card art: names are content hashes, so they never change and can be cached for good.

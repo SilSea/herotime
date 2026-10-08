@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-/** Pictures (card art) and short sounds. */
-export const MAX_UPLOAD_BYTES = 1_500_000;
+/** Pictures (card art): big enough for full-size generated or downloaded art. */
+export const MAX_UPLOAD_BYTES = 15_000_000;
 /** Music can be longer. */
 export const MAX_AUDIO_BYTES = 6_000_000;
 
@@ -37,7 +37,8 @@ export class UploadStore {
   async save(base64: unknown): Promise<{ file: string; bytes: number }> {
     if (typeof base64 !== "string" || base64.length === 0) throw new UploadError("expected { data: <base64 image or sound> }");
     // Reject before decoding: base64 is about 4/3 of the real size.
-    if (base64.length > Math.ceil(MAX_AUDIO_BYTES * 1.4)) throw new UploadError(`file is too large (limit ${Math.round(MAX_AUDIO_BYTES / 1000)} KB)`);
+    const largest = Math.max(MAX_UPLOAD_BYTES, MAX_AUDIO_BYTES);
+    if (base64.length > Math.ceil(largest * 1.4)) throw new UploadError(`file is too large (limit ${Math.round(largest / 1000)} KB)`);
     const bytes = Buffer.from(base64.replace(/^data:[^,]*,/, ""), "base64");
     if (bytes.length === 0) throw new UploadError("the file is empty");
     const ext = detect(bytes);

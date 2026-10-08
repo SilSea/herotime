@@ -612,7 +612,7 @@ function entityEditor(ctx: Ctx, entity: Record<string, any>, refs: (k: RefKind) 
   return h("div", null, mode, body);
 }
 
-const MAX_IMAGE_BYTES = 1_400_000;
+const MAX_IMAGE_BYTES = 14_900_000;
 const MAX_AUDIO_BYTES = 5_900_000;
 
 /** Send a picked image or sound to the server and return the stored file name. */
