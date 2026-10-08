@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ServerClock } from "../src/clock.js";
 import { Api, ApiError, Net, type SocketLike } from "../src/net.js";
 import type { CombatRecord, QueueStatus, ViewMessage } from "../src/protocol.js";
-import { addToast, applyEvent, applyStatus, applyView, initialState, removeToast, Store, type AppState , unitsDestroyed } from "../src/store.js";
+import { addToast, applyEvent, applyStatus, applyView, initialState, removeToast, Store, type AppState , unitsDestroyed, watchReplay } from "../src/store.js";
 
 const record = (turn: number, over: Partial<CombatRecord> = {}): CombatRecord =>
   ({ turn, opponentName: "Bot 1", meSide: "A", damageTaken: 0, damageDealt: 4, result: { winner: "A", events: [{ type: "ATTACK" }] }, ...over }) as unknown as CombatRecord;
@@ -13,6 +13,37 @@ const viewMsg = (over: Record<string, unknown> = {}, matchId = "m1", serverNow =
     serverNow,
     view: { phase: "RECRUIT", turn: 1, deadline: 9000, factions: ["rider"], players: [{ id: "u1", name: "Me" }, { id: "b1", name: "Bot 1" }], me: {}, ...over },
   }) as unknown as ViewMessage;
+
+describe("watching others after being knocked out", () => {
+  const out = { alive: false };
+  const watched = (s: AppState): AppState => ({ ...s, defeatAck: "m1", spectating: "b1" });
+
+  it("plays the watched player's fight of this turn once, by itself", () => {
+    const c = new ServerClock();
+    let s = watched(applyView(initialState(), viewMsg({ phase: "RECRUIT", me: out }), c));
+    s = applyView(s, viewMsg({ phase: "BATTLE", me: out, watch: { b1: record(1, { opponentName: "Bot 2" }) } }), c);
+    expect(s.replayPending?.opponentName).toBe("Bot 2");
+    expect(s.replayOwner).toBe("b1");
+    s = { ...s, replayPending: undefined };
+    s = applyView(s, viewMsg({ phase: "BATTLE", me: out }), c); // a later update in the same battle
+    expect(s.replayPending).toBeUndefined();
+  });
+
+  it("waits for the defeat notice to close, and never plays for a player still in", () => {
+    const c = new ServerClock();
+    const fight = { b1: record(1) };
+    expect(applyView(initialState(), viewMsg({ phase: "BATTLE", me: out, watch: fight }), c).replayPending).toBeUndefined();
+    const alive = { ...applyView(initialState(), viewMsg({ phase: "BATTLE", me: { alive: true } }), c), defeatAck: "m1", watch: fight };
+    expect(watchReplay(alive, "b1", true)).toEqual({});
+  });
+
+  it("picking someone else mid-battle starts their fight right away", () => {
+    const c = new ServerClock();
+    const s = watched(applyView(initialState(), viewMsg({ phase: "BATTLE", me: out, watch: { b1: record(1), b2: record(1, { opponentName: "Bot 1" }) } }), c));
+    const next = watchReplay({ ...s, replayPending: record(1), watchedTurn: 1 }, "b2", true);
+    expect(next.replayOwner).toBe("b2");
+  });
+});
 
 describe("applyView", () => {
   const clock = () => new ServerClock();

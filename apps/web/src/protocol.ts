@@ -9,7 +9,7 @@ export interface ViewMessage {
   serverNow: number;
   /** Content version the match uses (absent from older servers). */
   contentVersion?: number;
-  view: Omit<MatchView, "lastCombat"> & { lastCombat?: CombatRecord };
+  view: Omit<MatchView, "lastCombat" | "watch"> & { lastCombat?: CombatRecord; watch?: Record<string, CombatRecord> };
 }
 
 export interface EventMessage {

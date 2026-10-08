@@ -691,6 +691,18 @@ describe("surrender", () => {
     expect(() => m.dispatch("h1", { type: "BUY", index: 0 }, T0 + 1500)).toThrow(RuleError);
   });
 
+  it("a player who is out sees the others' fights of this turn; one still in sees none", () => {
+    const m = recruiting(humans(3));
+    m.dispatch("h0", { type: "READY" }, T0 + 1000);
+    m.dispatch("h1", { type: "READY" }, T0 + 1100);
+    m.dispatch("h2", { type: "SURRENDER" }, T0 + 1200);
+    expect(m.phase).toBe("BATTLE");
+    const watch = m.view("h2").watch ?? {};
+    expect(Object.keys(watch).sort()).toEqual(["h0", "h1"]);
+    expect(watch.h0).toBe(m.player("h0").lastCombat);
+    expect(m.view("h0").watch).toBeUndefined();
+  });
+
   it("a surrendered player no longer holds up READY, and is skipped by later pairings", () => {
     const m = recruiting(humans(3));
     m.dispatch("h0", { type: "READY" }, T0 + 1000);

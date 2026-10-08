@@ -23,6 +23,12 @@ export interface AppState {
   combat?: CombatRecord;
   /** A fight the player has not watched yet; the UI plays it, then clears this. */
   replayPending?: CombatRecord;
+  /** Whose fight `replayPending` is when it is not your own (a knocked-out player watching someone). */
+  replayOwner?: string;
+  /** Knocked out: this turn's fights of the others, by player id (kept, since ordinary updates leave them out). */
+  watch?: Record<string, CombatRecord>;
+  /** Highest turn whose fight was played while spectating, so each turn plays once by itself. */
+  watchedTurn: number;
   /** Highest turn whose replay was already offered, so a reconnect does not replay old fights. */
   replayedTurn: number;
   placements?: { playerId: string; placement: number }[];
@@ -51,6 +57,7 @@ export const initialState = (): AppState => ({
   connected: false,
   status: { state: "idle" },
   replayedTurn: 0,
+  watchedTurn: 0,
   log: [],
   toasts: [],
   screen: "auth",
@@ -83,7 +90,7 @@ export function applyView(state: AppState, msg: ViewMessage, clock: ServerClock,
   if (newMatch && view.phase === "RECRUIT") log = push(log, `Turn ${view.turn}: recruit phase`);
 
   let next: AppState = { ...state, view, matchId: msg.matchId, log, screen: "match", status: { state: "playing", matchId: msg.matchId, ended: view.phase === "ENDED" } };
-  if (newMatch) next = { ...next, placements: undefined, combat: undefined, replayPending: undefined, replayedTurn: 0, hideOffers: false, selected: undefined };
+  if (newMatch) next = { ...next, placements: undefined, combat: undefined, replayPending: undefined, replayOwner: undefined, watch: undefined, replayedTurn: 0, watchedTurn: 0, hideOffers: false, selected: undefined };
 
   const record = view.lastCombat;
   if (record) {
@@ -91,9 +98,11 @@ export function applyView(state: AppState, msg: ViewMessage, clock: ServerClock,
     if (record.turn > next.replayedTurn) {
       // Two empty boards produce no events: log the result but do not interrupt the player with a blank replay.
       const watchable = record.result.events.length > 0;
-      next = { ...next, ...(watchable ? { replayPending: record } : {}), replayedTurn: record.turn, log: push(next.log, describeCombat(record)) };
+      next = { ...next, ...(watchable ? { replayPending: record, replayOwner: undefined } : {}), replayedTurn: record.turn, log: push(next.log, describeCombat(record)) };
     }
   }
+  if (view.watch) next = { ...next, watch: view.watch };
+  next = { ...next, ...watchReplay(next, next.spectating) };
   if (prev && (prev.phase !== view.phase || prev.turn !== view.turn)) next = { ...next, hideOffers: false, selected: undefined };
 
   const lost = unitsDestroyed(state, view, newMatch);
@@ -103,6 +112,19 @@ export function applyView(state: AppState, msg: ViewMessage, clock: ServerClock,
     next = addToast({ ...next, log: push(next.log, text) }, text, "info");
   }
   return next;
+}
+
+/**
+ * Once you are out and watching someone, their fight this turn plays by itself (once a turn).
+ * `now` = play it even if a fight is on screen or this turn was already played (the player picked someone else).
+ */
+export function watchReplay(state: AppState, playerId: string | undefined, now = false): Partial<AppState> {
+  const view = state.view;
+  if (!view || view.me.alive || view.phase !== "BATTLE" || state.defeatAck !== state.matchId || playerId === undefined) return {};
+  if (!now && (state.replayPending || state.watchedTurn >= view.turn)) return {};
+  const record = state.watch?.[playerId];
+  if (!record || record.turn !== view.turn || record.result.events.length === 0) return {};
+  return { replayPending: record, replayOwner: playerId, watchedTurn: view.turn };
 }
 
 /**

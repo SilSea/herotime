@@ -52,7 +52,8 @@ export function startApp(root: HTMLElement): void {
   const replayHost = document.getElementById("replay-host") as HTMLElement;
   const toastHost = document.getElementById("toasts") as HTMLElement;
   let replay: ReplayView | undefined;
-  let replayTurn = 0;
+  /** Turn and owner of the fight on screen (owner empty = your own). */
+  let replayTurn = "";
   /** The match we walked out of: anything still arriving for it is ignored. */
   let leftMatch: string | undefined;
   let content: ContentIndex | undefined;
@@ -273,16 +274,18 @@ export function startApp(root: HTMLElement): void {
     }
     const s = store.state;
     const pending = s.replayPending;
-    if (pending && (!replay || replayTurn !== pending.turn)) {
+    const key = `${pending?.turn}:${s.replayOwner ?? ""}`;
+    if (pending && (!replay || replayTurn !== key)) {
       replay?.close();
-      replayTurn = pending.turn;
+      replayTurn = key;
       const budget = Math.max(3000, (clock.remaining(s.view?.deadline ?? null) ?? 15_000) - 2500);
       replay = new ReplayView(replayHost, pending, content as ContentIndex, {
         budgetMs: budget,
         nextTurnText: () => `${tr("Next turn in", "เทิร์นถัดไปใน")} ${formatClock(clock.remaining(store.state.view?.deadline ?? null))}`,
+        owner: s.replayOwner ? (s.view?.players.find((p) => p.id === s.replayOwner)?.name ?? "?") : undefined,
         onClose: () => {
           replay = undefined;
-          store.update((st) => (st.replayPending?.turn === pending.turn ? { ...st, replayPending: undefined } : st));
+          store.update((st) => (st.replayPending === pending ? { ...st, replayPending: undefined } : st));
         },
       });
     }

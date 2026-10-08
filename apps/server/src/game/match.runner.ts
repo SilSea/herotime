@@ -106,7 +106,10 @@ export class MatchRunner {
   private sendView(userId: string, withCombat: boolean): void {
     const view: Payload["view"] = { ...this.match.view(userId) };
     // The replay is large and only changes once a turn, so ordinary updates leave it out.
-    if (!withCombat) delete view.lastCombat;
+    if (!withCombat) {
+      delete view.lastCombat;
+      delete view.watch;
+    }
     this.publisher.toUser(userId, "match:view", { matchId: this.id, serverNow: this.timers.now(), contentVersion: this.meta.contentVersion, view } satisfies Payload);
   }
 

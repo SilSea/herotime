@@ -148,4 +148,6 @@ export interface MatchView {
   };
   players: PublicPlayer[];
   lastCombat?: CombatRecord;
+  /** Knocked-out viewers only: this turn's fight of every other player, by player id, from that player's side. */
+  watch?: Record<string, CombatRecord>;
 }

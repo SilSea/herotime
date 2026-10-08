@@ -4,7 +4,7 @@ import { tr } from "../i18n.js";
 import { play, slotForPlace } from "../sound.js";
 import { langToggle, muteToggle } from "./lang.js";
 import type { CardDef, MatchView } from "../protocol.js";
-import type { AppState } from "../store.js";
+import { watchReplay, type AppState } from "../store.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
 import { artBox, artLayer, initialsOf } from "./art.js";
@@ -47,16 +47,24 @@ function defeatNotice(ctx: Ctx, view: View): HTMLElement | null {
       { class: "modal-box defeat-box" },
       h("div", { class: "defeat-title", text: tr("Defeated", "แพ้แล้ว") }),
       h("p", { class: "defeat-place", text: place ? tr(`You finished ${ordinal(place)}`, `คุณได้อันดับ${ordinal(place)}`) : tr("You are out of the match", "คุณตกรอบแล้ว") }),
-      h("p", { class: "muted", text: tr("The match goes on without you. You can watch the other players' boards from their last fight, or leave.", "เกมยังเล่นต่อโดยไม่มีคุณ ดูบอร์ดของผู้เล่นคนอื่นจากการต่อสู้ล่าสุดได้ หรือออกจากเกม") }),
+      h("p", { class: "muted", text: tr("The match goes on without you. You can watch the other players fight, or leave.", "เกมยังเล่นต่อโดยไม่มีคุณ ดูผู้เล่นคนอื่นสู้กันได้ หรือออกจากเกม") }),
       h("div", { class: "row center-row" },
-        h("button", { class: "btn primary big", text: tr("Watch other players", "ดูผู้เล่นคนอื่น"), on: { click: () => ctx.store.set({ defeatAck: state.matchId, spectating: state.spectating ?? firstAlive }) } }),
+        h("button", { class: "btn primary big", text: tr("Watch other players", "ดูผู้เล่นคนอื่น"), on: { click: () => spectate(ctx, state.spectating ?? firstAlive) } }),
         h("button", { class: "btn big", text: tr("Leave match", "ออกจากเกม"), on: { click: () => void ctx.leaveMatch() } }),
       ),
     ),
   );
 }
 
-/** A knocked-out player's view: pick anyone and see the board they last fought with. */
+/** Watch a player: their board, and their fight this turn if one is on (it starts right away). */
+function spectate(ctx: Ctx, playerId: string | undefined): void {
+  ctx.store.update((st) => {
+    const next = { ...st, spectating: playerId, defeatAck: st.matchId };
+    return { ...next, ...watchReplay(next, playerId, true) };
+  });
+}
+
+/** A knocked-out player's view: pick anyone, see the board they last fought with, and watch their fights. */
 function spectateStage(ctx: Ctx, view: View): HTMLElement {
   const state = ctx.store.state;
   const others = view.players.filter((p) => p.id !== view.me.id).sort((a, b) => Number(b.alive) - Number(a.alive) || b.hp - a.hp);
@@ -70,7 +78,7 @@ function spectateStage(ctx: Ctx, view: View): HTMLElement {
     defeatNotice(ctx, view),
     h("div", { class: "spectate-head" },
       h("span", { class: "spectate-tag", text: tr("Spectating", "กำลังดู") }),
-      h("div", { class: "spectate-tabs" }, ...others.map((p) => h("button", { class: `tab ${p.id === target?.id ? "active" : ""} ${p.alive ? "" : "out"}`, text: `${p.name}${p.alive ? ` · ${Math.max(0, p.hp)} HP` : ` · ${p.placement ? ordinal(p.placement) : tr("out", "ตกรอบ")}`}`, on: { click: () => ctx.store.set({ spectating: p.id }) } }))),
+      h("div", { class: "spectate-tabs" }, ...others.map((p) => h("button", { class: `tab ${p.id === target?.id ? "active" : ""} ${p.alive ? "" : "out"}`, text: `${p.name}${p.alive ? ` · ${Math.max(0, p.hp)} HP` : ` · ${p.placement ? ordinal(p.placement) : tr("out", "ตกรอบ")}`}`, on: { click: () => spectate(ctx, p.id) } }))),
       h("span", { class: "spacer" }),
       h("button", { class: "btn", text: tr("Leave match", "ออกจากเกม"), on: { click: () => void ctx.leaveMatch() } }),
     ),
@@ -155,7 +163,7 @@ function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLE
   );
   row.addEventListener("mouseenter", () => showPlayerCard(ctx, row, p, mine, opponent));
   // Once you are out, clicking a player shows their board.
-  if (!ctx.store.state.view?.me.alive && !mine) row.addEventListener("click", () => ctx.store.set({ spectating: p.id, defeatAck: ctx.store.state.matchId }));
+  if (!ctx.store.state.view?.me.alive && !mine) row.addEventListener("click", () => spectate(ctx, p.id));
   row.addEventListener("mouseleave", hidePlayerCard);
   return row;
 }
@@ -928,7 +936,16 @@ function giantSlot(ctx: Ctx, view: View): HTMLElement {
   const sg = view.me.state.superGattai;
   const extraOnBoard = view.me.state.board.some((u) => ctx.ix.card(u.key)?.colors.includes("EXTRA"));
   return h("div", { class: `giant-slot ${sg && extraOnBoard ? "super" : ""}` }, h("div", { class: "muted small", text: "Giant Robo" }),
-    sg && h("div", { class: `super-tag ${extraOnBoard ? "on" : ""}`, title: tr(`Super Gattai: +${sg.atk}/+${sg.hp} and the Extra Ranger's keywords in fights with an Extra Ranger on your board`, `Super Gattai: +${sg.atk}/+${sg.hp} และ keyword ของ Extra Ranger ในการต่อสู้ที่มี Extra Ranger บนบอร์ด`), text: extraOnBoard ? "SUPER GATTAI" : tr("Super Gattai: needs an Extra Ranger", "Super Gattai: ต้องมี Extra Ranger") }), g ? cardEl(ctx.ix, { key: g.key, small: true, minion: true }) : h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
+    sg && h("div", { class: `super-tag ${extraOnBoard ? "on" : ""}`, title: tr(`Super Gattai: +${sg.atk}/+${sg.hp} and the Extra Ranger's keywords in fights with an Extra Ranger on your board`, `Super Gattai: +${sg.atk}/+${sg.hp} และ keyword ของ Extra Ranger ในการต่อสู้ที่มี Extra Ranger บนบอร์ด`), text: extraOnBoard ? "SUPER GATTAI" : tr("Super Gattai: needs an Extra Ranger", "Super Gattai: ต้องมี Extra Ranger") }), g ? giantCard(ctx, g) : h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
+}
+
+/** The Giant in the slot with what it has picked up: permanent buffs (stats and who gave them) and granted keywords. */
+function giantCard(ctx: Ctx, g: NonNullable<View["me"]["state"]["giant"]>): HTMLElement {
+  const def = ctx.ix.card(g.key);
+  const mult = g.golden ? 2 : 1;
+  const atk = (def?.atk ?? 0) * mult + (g.bonusAtk ?? 0);
+  const hp = (def?.hp ?? 0) * mult + (g.bonusHp ?? 0);
+  return cardEl(ctx.ix, { key: g.key, atk, hp, golden: g.golden, extraKeywords: g.keywords ?? [], buffs: g.buffs ?? [], small: true, minion: true });
 }
 
 function gaugeBars(ctx: Ctx, view: View): HTMLElement {

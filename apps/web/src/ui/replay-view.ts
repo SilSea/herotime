@@ -12,6 +12,8 @@ export interface ReplayOptions {
   onClose: () => void;
   /** "Next turn in 0:07": the shared countdown, shown beside the controls. */
   nextTurnText: () => string;
+  /** Watching someone else's fight: their name stands in for "you". */
+  owner?: string;
 }
 
 /** Plays one fight on screen: enemy on top, you at the bottom. */
@@ -43,7 +45,7 @@ export class ReplayView {
     this.field = h("div", { class: "replay-field" });
     this.logEl = h("div", { class: "replay-log" });
     this.controls = h("div", { class: "replay-controls" });
-    this.root = h("div", { class: "replay-overlay" }, h("div", { class: "replay-box" }, h("h2", { text: tr(`Turn ${record.turn}: you vs ${record.opponentName}`, `เทิร์น ${record.turn}: คุณ vs ${record.opponentName}`) }), this.field, this.logEl, this.controls));
+    this.root = h("div", { class: "replay-overlay" }, h("div", { class: "replay-box" }, h("h2", { text: opts.owner ? tr(`Turn ${record.turn}: ${opts.owner} vs ${record.opponentName}`, `เทิร์น ${record.turn}: ${opts.owner} vs ${record.opponentName}`) : tr(`Turn ${record.turn}: you vs ${record.opponentName}`, `เทิร์น ${record.turn}: คุณ vs ${record.opponentName}`) }), this.field, this.logEl, this.controls));
     host.replaceChildren(this.root);
     this.draw(this.initial, [], undefined);
     this.drawControls();
@@ -146,11 +148,13 @@ export class ReplayView {
   private drawControls(): void {
     const finished = this.done;
     const r = this.record.result;
-    const outcome = r.winner === "DRAW" ? tr("Draw", "เสมอ") : r.winner === this.record.meSide ? tr("You won", "คุณชนะ") : tr("You lost", "คุณแพ้");
+    const who = this.opts.owner;
+    const outcome = r.winner === "DRAW" ? tr("Draw", "เสมอ") : r.winner === this.record.meSide ? (who ? tr(`${who} won`, `${who} ชนะ`) : tr("You won", "คุณชนะ")) : who ? tr(`${who} lost`, `${who} แพ้`) : tr("You lost", "คุณแพ้");
+    const took = who ? tr(` - ${who} took ${this.record.damageTaken} damage`, ` - ${who} โดน ${this.record.damageTaken} ดาเมจ`) : tr(` - you took ${this.record.damageTaken} damage`, ` - โดน ${this.record.damageTaken} ดาเมจ`);
     mount(
       this.controls,
       finished
-        ? h("span", { class: `outcome ${r.winner === this.record.meSide ? "win" : r.winner === "DRAW" ? "draw" : "loss"}`, text: `${outcome}${this.record.damageTaken > 0 ? tr(` - you took ${this.record.damageTaken} damage`, ` - โดน ${this.record.damageTaken} ดาเมจ`) : this.record.damageDealt > 0 ? tr(` - dealt ${this.record.damageDealt} damage`, ` - ทำ ${this.record.damageDealt} ดาเมจ`) : ""}` })
+        ? h("span", { class: `outcome ${r.winner === this.record.meSide ? "win" : r.winner === "DRAW" ? "draw" : "loss"}`, text: `${outcome}${this.record.damageTaken > 0 ? took : this.record.damageDealt > 0 ? tr(` - dealt ${this.record.damageDealt} damage`, ` - ทำ ${this.record.damageDealt} ดาเมจ`) : ""}` })
         : h("span", { class: "muted", text: `${this.index + 1}/${this.steps.length}` }),
       h("span", { class: "next-turn", id: "replay-timer", text: this.opts.nextTurnText() }),
       !finished && h("button", { class: "btn", text: this.paused ? tr("Resume", "เล่นต่อ") : tr("Pause", "หยุด"), on: { click: () => this.togglePause() } }),

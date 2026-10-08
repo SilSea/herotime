@@ -266,6 +266,12 @@ export class Match {
     };
     if (p.placement !== undefined) view.me.placement = p.placement;
     if (p.lastCombat) view.lastCombat = p.lastCombat;
+    // Someone who is out may watch the others fight; a player still in must not see anyone else's boards.
+    if (!p.alive) {
+      const watch: Record<string, CombatRecord> = {};
+      for (const o of this.players) if (o !== p && o.lastCombat?.turn === this.turn) watch[o.id] = o.lastCombat;
+      if (Object.keys(watch).length > 0) view.watch = watch;
+    }
     return view;
   }
 
