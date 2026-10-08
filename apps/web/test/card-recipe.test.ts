@@ -16,6 +16,26 @@ const playable = (card: Record<string, unknown>): string[] => {
 };
 
 describe("card wizard", () => {
+  it("leaves out target filters the current target hides (left over from an earlier choice)", () => {
+    const a = { ...newAbility("UNIT"), when: "START_OF_COMBAT", target: "SELF", targetFaction: "beast", targetCards: ["cub"] };
+    const card = buildCard(recipe({ abilities: [a] }));
+    expect((card.effects as { target: unknown }[])[0]?.target).toEqual({ selector: "SELF" });
+    expect(describeRecipe(recipe({ abilities: [a] }), (k) => k, (k) => k)[0]).not.toContain("beast");
+    const all = buildCard(recipe({ abilities: [{ ...a, target: "ALL_FRIENDLY" }] }));
+    expect((all.effects as { target: unknown }[])[0]?.target).toEqual({ selector: "ALL_FRIENDLY", faction: "beast", cards: ["cub"] });
+  });
+
+  it("asks for the faction a faction-count condition counts (it would silently become 'always')", () => {
+    const a = { ...newAbility("UNIT"), condition: "FACTION_COUNT_GTE", conditionFaction: "" };
+    expect(checkRecipe(recipe({ abilities: [a] }), new Set()).join(" ")).toMatch(/faction|เผ่า/);
+    expect(checkRecipe(recipe({ abilities: [{ ...a, conditionFaction: "beast" }] }), new Set())).toEqual([]);
+  });
+
+  it("names keywords in the preview line, not their ids", () => {
+    const a = { ...newAbility("UNIT"), do: "GIVE_KEYWORD", keyword: "RIDER_KICK" };
+    expect(describeRecipe(recipe({ abilities: [a] }), (k) => k, (k) => k)[0]).toContain("Rider Kick");
+  });
+
   it("only offers real triggers, actions and targets", () => {
     for (const w of WHEN) expect(Trigger.options).toContain(w.key);
     for (const d of DO) expect(Action.options.map((o) => o.shape.type.value)).toContain(d.key);

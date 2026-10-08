@@ -846,6 +846,26 @@ body.dragging .drop-marker.show { display: block; }
 .wz-picked { color: var(--cyan); }
 .wz-cards { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start; }
 .wz-chosen { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 8px; border: 1px solid var(--cyan); border-radius: 999px; font-size: 0.85em; }
+/* Template and card-type buttons: .chip takes its colour from --c, which plain buttons do not set. */
+.wz button.chip { --c: var(--cyan-dim); color: inherit; cursor: pointer; padding: 5px 12px; font-size: 12px; }
+.wz button.chip:hover { --c: var(--cyan); }
+.wz button.chip.active { --c: var(--cyan); }
+.wz-hint { margin: 2px 0 0; font-size: 13px; }
+/* An ability reads as a sentence: when -> do -> who -> how often, one labelled row each. */
+.wz-ability-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.wz-ability-head strong { white-space: nowrap; }
+.wz-sum { flex: 1; min-width: 0; font-size: 13px; color: var(--cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wz-tools { display: inline-flex; gap: 4px; flex: none; }
+.wz-part { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: start; padding: 6px 0; border-top: 1px dashed #ffffff14; }
+.wz-part-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #8fa8d0; padding-top: 22px; }
+.wz-part .wz-grid { margin-bottom: 0; }
+.wz-opts { margin: 2px 0 6px 94px; }
+@media (max-width: 640px) {
+  .wz-part { grid-template-columns: 1fr; gap: 2px; }
+  .wz-part-label { padding-top: 0; }
+  .wz-opts { margin-left: 0; }
+  .wz-sum { white-space: normal; }
+}
 .admin-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
 .admin-filters select { flex: 1 1 45%; min-width: 0; font-size: 12px; }
 .ref-field { display: flex; flex-direction: column; gap: 2px; }

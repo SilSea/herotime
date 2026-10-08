@@ -1,4 +1,4 @@
-import { spaceThai } from "./format.js";
+import { keywordName, spaceThai } from "./format.js";
 import { tr } from "./i18n.js";
 
 /**
@@ -84,6 +84,11 @@ export const TARGET: TargetOption[] = [
   { key: "RANDOM_ENEMY", ok: (_w, p) => p === "fight", label: () => tr("A random enemy", "ศัตรูแบบสุ่ม") },
   { key: "ALL_ENEMY", ok: (_w, p) => p === "fight", label: () => tr("All enemies", "ศัตรูทุกตัว") },
 ];
+
+/** Targets that can be narrowed to a faction (the wizard shows the field only for these). */
+export const factionFilterFits = (target: string): boolean => !["SELF", "SUMMONED", "ADJACENT"].includes(target) && !target.endsWith("_ENEMY");
+/** Targets that can be narrowed to named cards. */
+export const cardsFilterFits = (target: string): boolean => factionFilterFits(target) && target !== "GIANT_SLOT";
 
 export interface Ability {
   when: string;
@@ -244,6 +249,7 @@ export function checkRecipe(r: Recipe, takenKeys: ReadonlySet<string>): string[]
     if (d?.targeted && !c.target.some((x) => x.key === a.target)) out.push(tr(`Ability ${n}: pick who it affects.`, `ความสามารถ ${n}: เลือกเป้าหมาย`));
     if ((a.do === "SUMMON" || a.do === "ADD_TO_HAND" || a.do === "TRANSFORM") && !a.cardKey) out.push(tr(`Ability ${n}: pick the card.`, `ความสามารถ ${n}: เลือกการ์ด`));
     if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Ultimate Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Ultimate (ตั้งในขั้นที่ 4)`));
+    if (a.condition === "FACTION_COUNT_GTE" && !a.conditionFaction) out.push(tr(`Ability ${n}: pick the faction the condition counts.`, `ความสามารถ ${n}: เลือกเผ่าที่เงื่อนไขนับ`));
     if (a.condition === "HAS_CARD" && a.conditionCards.length === 0) out.push(tr(`Ability ${n}: pick the card(s) the condition looks for.`, `ความสามารถ ${n}: เลือกการ์ดที่ต้องมีในเงื่อนไข`));
     if (a.do === "BUFF_GEAR" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the Gear power-up adds nothing.`, `ความสามารถ ${n}: เสริมพลัง Gear เป็น 0`));
     if (a.do === "BUFF" && a.atk === 0 && a.hp === 0 && !(a.fromSelf && r.type !== "GEAR")) out.push(tr(`Ability ${n}: the buff adds nothing.`, `ความสามารถ ${n}: บัฟเป็น 0`));
@@ -301,8 +307,8 @@ function abilityEffect(a: Ability, type: CardType): Record<string, unknown> {
   if (!gear && a.when === "AVENGE") effect.every = Math.max(1, a.every);
   if (a.repeat > 1) effect.repeat = Math.min(5, a.repeat);
   if (a.limitTimes > 0) effect.limit = { times: a.limitTimes, per: a.limitPer };
-  const friendlyPick = !["SELF", "SUMMONED", "ADJACENT", "GIANT_SLOT"].includes(a.target) && !a.target.endsWith("_ENEMY");
-  if (d?.targeted) effect.target = { selector: a.target, ...(a.targetFaction ? { faction: a.targetFaction } : {}), ...(friendlyPick && a.targetCards.length > 0 ? { cards: [...a.targetCards] } : {}) };
+  // Filters left over from an earlier target choice stay off when the current target hides them.
+  if (d?.targeted) effect.target = { selector: a.target, ...(a.targetFaction && factionFilterFits(a.target) ? { faction: a.targetFaction } : {}), ...(cardsFilterFits(a.target) && a.targetCards.length > 0 ? { cards: [...a.targetCards] } : {}) };
   if (a.condition === "HAS_CARD" && a.conditionCards.length > 0) effect.condition = { type: a.condition, cards: [...a.conditionCards] };
   if (a.condition === "TEAM_UP_COLORS_GTE" || a.condition === "ENERGY_GTE") effect.condition = { type: a.condition, value: a.conditionValue };
   if (a.condition === "FACTION_COUNT_GTE" && a.conditionFaction) effect.condition = { type: a.condition, faction: a.conditionFaction, value: a.conditionValue };
@@ -318,7 +324,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
     const when = r.type === "GEAR" ? tr("Use", "ใช้") : a.when === "AVENGE" ? `Avenge (${a.every})` : (WHEN.find((w) => w.key === a.when)?.label() ?? a.when);
     // The labels are written to stand alone ("A unit the player picks"); inside a sentence they start lower case.
     const label = TARGET.find((t) => t.key === a.target)?.label() ?? "";
-    const only = [a.targetFaction ? factionName(a.targetFaction) : "", a.targetCards.map(cardName).join(tr(" or ", " หรือ "))].filter(Boolean).join(", ");
+    const only = [a.targetFaction && factionFilterFits(a.target) ? factionName(a.targetFaction) : "", cardsFilterFits(a.target) ? a.targetCards.map(cardName).join(tr(" or ", " หรือ ")) : ""].filter(Boolean).join(", ");
     const who = label.charAt(0).toLowerCase() + label.slice(1) + (only ? ` (${only})` : "");
     const cond =
       a.condition === "TEAM_UP_COLORS_GTE" ? tr(`if you have ${a.conditionValue}+ Sentai colours, `, `ถ้ามี Sentai ${a.conditionValue} สีขึ้นไป `)
@@ -335,7 +341,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
           ? tr(`add a copy of ${who} to your hand${a.copyBuffs ? " (bonuses included)" : ""}`, `ได้สำเนาของ${who}เข้ามือ${a.copyBuffs ? " (รวมบัฟ)" : ""}`)
           : tr(`summon a copy of ${who}${a.copyBuffs ? " (bonuses included)" : ""}`, `เรียกสำเนาของ${who}${a.copyBuffs ? " (รวมบัฟ)" : ""}`))
       : a.do === "CONSUME_ALLIES" ? tr(`destroy all your other units and give ${who} their total ATK/HP${a.permanent ? " permanently" : ""}`, `ทำลายยูนิตอื่นของเราทั้งหมด แล้วให้${who}ได้ ATK/HP รวมของพวกมัน${a.permanent ? " ถาวร" : ""}`)
-      : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${a.keyword}`, `ให้${who}ได้ ${a.keyword}`)
+      : a.do === "GIVE_KEYWORD" ? tr(`give ${who} ${keywordName(a.keyword)}`, `ให้${who}ได้ ${keywordName(a.keyword)}`)
       : a.do === "SUMMON" ? tr(`summon ${a.count > 1 ? `${a.count} × ` : ""}${cardName(a.cardKey)}`, `เรียก ${cardName(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
       : a.do === "TRANSFORM" ? tr(`transform ${who} into ${cardName(a.cardKey)}`, `แปลง${who}เป็น ${cardName(a.cardKey)}`)
       : a.do === "DESTROY" ? tr(`destroy ${who}`, `ทำลาย${who}`)

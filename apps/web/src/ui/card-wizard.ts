@@ -1,4 +1,4 @@
-import { buildCard, checkRecipe, choicesFor, DO, describeRecipe, keyFromName, newAbility, newRecipe, type Ability, type CardType, type Recipe } from "../card-recipe.js";
+import { buildCard, cardsFilterFits, checkRecipe, choicesFor, DO, describeRecipe, factionFilterFits, keyFromName, newAbility, newRecipe, type Ability, type CardType, type Recipe } from "../card-recipe.js";
 import { ContentIndex } from "../content-index.js";
 import { byName, KEYWORDS, keywordName, keywordText, SENTAI_COLORS } from "../format.js";
 import { tr } from "../i18n.js";
@@ -52,9 +52,14 @@ const field = (label: string, ...control: (Node | string | false | null | undefi
 
 function num(value: number, set: (n: number) => void, min = 0, max = 99): HTMLInputElement {
   const el = h("input", { type: "number", value: String(value), attrs: { min: String(min), max: String(max) } }) as HTMLInputElement;
+  const clamp = (): number => Math.max(min, Math.min(max, Math.trunc(el.valueAsNumber) || 0));
   el.addEventListener("input", () => {
-    set(Math.max(min, Math.min(max, Math.trunc(el.valueAsNumber) || 0)));
+    set(clamp());
     refreshPreview();
+  });
+  // Typing can leave the box out of range or empty: show the value actually used once the field is left.
+  el.addEventListener("change", () => {
+    el.value = String(clamp());
   });
   return el;
 }
@@ -160,6 +165,13 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
     ),
   );
 
+  const typeHint = {
+    UNIT: tr("Sold in the tavern at its rank; three copies make a Final Form.", "ขายในร้านตาม Rank ครบ 3 ใบรวมเป็น Final Form"),
+    TOKEN: tr("Never in the tavern: only other cards summon it, add it to a hand or turn into it.", "ไม่ขายในร้าน ได้มาจากการ์ดอื่นเท่านั้น (เรียก, เข้ามือ, แปลงร่าง)"),
+    GEAR: tr("Bought from the Gear slot and used from the hand; its abilities happen when used.", "ซื้อจากช่อง Gear แล้วใช้จากมือ ความสามารถทำงานตอนใช้"),
+    GIANT: tr("A Giant Robo for the Giant Slot (Mecha Gauge reward), never in the tavern.", "หุ่นยักษ์สำหรับช่อง Giant (รางวัลจาก Mecha Gauge) ไม่ขายในร้าน"),
+  }[wz.type];
+
   // 2. name, stats, tribe
   const keyInput = h("input", { type: "text", value: wz.key, attrs: { maxlength: "40" } }) as HTMLInputElement;
   keyInput.addEventListener("input", () => {
@@ -206,6 +218,7 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
   );
 
   // 3. abilities
+  summaries = [];
   const abilities = h(
     "div",
     { class: "wz-abilities" },
@@ -235,7 +248,7 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
       { class: "wz-form" },
       h("div", { class: "panel" }, h("h3", { text: tr("Card wizard", "ตัวช่วยสร้างการ์ด") }), h("p", { class: "muted", text: tr("Build a card step by step. Only choices that work together are offered; the preview on the right updates as you go. Start from a template if you like.", "สร้างการ์ดทีละขั้น ระบบให้เลือกเฉพาะตัวเลือกที่ใช้ด้วยกันได้ ดูตัวอย่างทางขวาได้ทันที จะเริ่มจากแบบสำเร็จรูปก็ได้") }),
         h("div", { class: "wz-chips" }, ...TEMPLATES.map((t) => h("button", { class: "chip", text: t.label(), on: { click: () => (applyTemplate(t), d.rerender()) } })), h("button", { class: "chip", text: tr("Start over", "เริ่มใหม่"), on: { click: () => (resetWizard(), d.rerender()) } }))),
-      step(1, tr("What kind of card", "การ์ดประเภทไหน"), typeRow),
+      step(1, tr("What kind of card", "การ์ดประเภทไหน"), typeRow, h("p", { class: "muted wz-hint", text: typeHint })),
       step(2, tr("Name, stats and faction", "ชื่อ ค่าพลัง และเผ่า"), basics, tribe),
       step(3, tr("Abilities", "ความสามารถ"), abilities),
       special && step(4, tr("Transformations", "การแปลงร่าง"), special),
@@ -243,6 +256,16 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
     previewHost,
   );
 }
+
+/** The one-line summary in each ability box, kept up to date by refreshPreview. */
+let summaries: HTMLElement[] = [];
+
+type Bit = Node | false | null | undefined | "";
+const nodes = (bits: Bit[]): Node[] => bits.filter((b): b is Node => b instanceof Node);
+
+/** One step of the ability's sentence: a label on the left, its fields on the right (nothing when empty). */
+const part = (label: string, ...fields: Bit[]): HTMLElement | false =>
+  nodes(fields).length > 0 && h("div", { class: "wz-part" }, h("span", { class: "wz-part-label", text: label }), h("div", { class: "wz-grid" }, ...nodes(fields)));
 
 function abilityBox(
   a: Ability,
@@ -255,16 +278,45 @@ function abilityBox(
   if (!c.do.some((x) => x.key === a.do) && c.do[0]) a.do = c.do[0].key;
   if (d?.targeted && !c.target.some((x) => x.key === a.target) && c.target[0]) a.target = c.target[0].key;
   const dd = DO.find((x) => x.key === a.do);
-  const remove = h("button", { class: "mini danger", text: "✕", title: tr("Remove this ability", "ลบความสามารถนี้"), on: { click: () => ((wz.abilities = wz.abilities.filter((_, j) => j !== i)), deps?.rerender()) } });
+  const gear = wz.type === "GEAR";
+  const move = (to: number): void => {
+    const list = [...wz.abilities];
+    const [it] = list.splice(i, 1);
+    if (it) list.splice(to, 0, it);
+    wz.abilities = list;
+    deps?.rerender();
+  };
+  const tool = (text: string, title: string, click: () => void, disabled = false, cls = "mini"): HTMLElement => h("button", { class: cls, type: "button", text, title, disabled, on: { click } });
+  const tools = h(
+    "span",
+    { class: "wz-tools" },
+    tool("↑", tr("Move up", "เลื่อนขึ้น"), () => move(i - 1), i === 0),
+    tool("↓", tr("Move down", "เลื่อนลง"), () => move(i + 1), i === wz.abilities.length - 1),
+    tool("⧉", tr("Duplicate", "ทำซ้ำ"), () => {
+      const copy: Ability = { ...a, conditionCards: [...a.conditionCards], targetCards: [...a.targetCards] };
+      wz.abilities = [...wz.abilities.slice(0, i + 1), copy, ...wz.abilities.slice(i + 1)];
+      deps?.rerender();
+    }),
+    tool("✕", tr("Remove this ability", "ลบความสามารถนี้"), () => ((wz.abilities = wz.abilities.filter((_, j) => j !== i)), deps?.rerender()), false, "mini danger"),
+  );
+  const summary = h("div", { class: "wz-sum" });
+  summaries[i] = summary;
+  const fightOnly = ["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE", "ALLY_SUMMONED"].includes(a.when);
+  const options = nodes([
+    a.do === "BUFF" && !gear && check(tr("+ this card's own ATK/HP", "+ ATK/HP ของการ์ดใบนี้"), a.fromSelf, (v) => (a.fromSelf = v), tr("The targets also get this card's current ATK/HP", "เป้าหมายได้ ATK/HP เท่ากับการ์ดใบนี้ตอนนั้นเพิ่มด้วย")),
+    (a.do === "BUFF" || a.do === "CONSUME_ALLIES") && !gear && fightOnly && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
+    a.do === "COPY" && check(tr("keep its bonuses, keywords and Final Form", "เอาบัฟ keyword และร่าง Final Form ไปด้วย"), a.copyBuffs, (v) => (a.copyBuffs = v), tr("Off: a fresh base card. Copies count for triples.", "ไม่ติ๊ก = การ์ดพื้นฐาน · สำเนานับรวม triple")),
+  ]);
+  const stats = a.do === "BUFF" || a.do === "BUFF_SHOP" || a.do === "BUFF_GEAR";
+
   return h(
     "div",
     { class: "wz-ability" },
-    h("div", { class: "row" }, h("strong", { text: tr(`Ability ${i + 1}`, `ความสามารถ ${i + 1}`) }), h("span", { class: "spacer" }), remove),
-    h(
-      "div",
-      { class: "wz-grid" },
-      wz.type !== "GEAR" && field(tr("When", "เมื่อไหร่"), pick(a.when, c.when.map((w) => ({ value: w.key, label: w.label() })), (v) => (a.when = v), true)),
-      wz.type !== "GEAR" && a.when === "AVENGE" && field(tr("Every N deaths", "ทุกๆ กี่ตัวที่ตาย"), num(a.every, (n) => (a.every = n), 1, 9)),
+    h("div", { class: "wz-ability-head" }, h("strong", { text: tr(`Ability ${i + 1}`, `ความสามารถ ${i + 1}`) }), summary, tools),
+    part(
+      tr("When", "เมื่อไหร่"),
+      !gear && field(tr("Moment", "จังหวะ"), pick(a.when, c.when.map((w) => ({ value: w.key, label: w.label() })), (v) => (a.when = v), true)),
+      !gear && a.when === "AVENGE" && field(tr("Every N deaths", "ทุกๆ กี่ตัวที่ตาย"), num(a.every, (n) => (a.every = n), 1, 9)),
       field(
         tr("Only if", "เงื่อนไข"),
         pick(a.condition, [
@@ -275,37 +327,43 @@ function abilityBox(
           { value: "HAS_CARD", label: tr("one of these cards is on the board", "มีการ์ดใบนี้อยู่บนบอร์ด (ใบใดใบหนึ่ง)") },
         ], (v) => (a.condition = v), true),
       ),
+      a.condition === "FACTION_COUNT_GTE" && field(tr("…of faction", "…เผ่า"), pick(a.conditionFaction, o.factionOptions(tr("— pick —", "— เลือก —")), (v) => (a.conditionFaction = v))),
+      a.condition && a.condition !== "HAS_CARD" && field(tr("…how many", "…จำนวน"), num(a.conditionValue, (n) => (a.conditionValue = n), a.condition === "ENERGY_GTE" ? 0 : 1, 10)),
       a.condition === "HAS_CARD" && field(tr("…cards (any one; later forms count)", "…การ์ด (ใบใดใบหนึ่ง นับร่างที่แปลงแล้วด้วย)"), cardsPick(a.conditionCards, o.units, (v) => (a.conditionCards = v))),
-      a.condition && a.condition !== "HAS_CARD" && field(tr("…how many", "…จำนวน"), num(a.conditionValue, (n) => (a.conditionValue = n), 0, 10)),
-      a.condition === "FACTION_COUNT_GTE" && field(tr("…of faction", "…เผ่า"), pick(a.conditionFaction, o.factionOptions("—"), (v) => (a.conditionFaction = v))),
-      field(tr("Do what", "ทำอะไร"), pick(a.do, c.do.map((x) => ({ value: x.key, label: x.label() })), (v) => (a.do = v), true)),
-      a.do === "BUFF" && field("+ATK", num(a.atk, (n) => (a.atk = n), -20, 50)),
-      a.do === "BUFF" && field("+HP", num(a.hp, (n) => (a.hp = n), -20, 50)),
-      a.do === "BUFF" && wz.type !== "GEAR" && check(tr("+ this card's own ATK/HP", "+ ATK/HP ของการ์ดใบนี้"), a.fromSelf, (v) => (a.fromSelf = v), tr("The targets also get this card's current ATK/HP", "เป้าหมายได้ ATK/HP เท่ากับการ์ดใบนี้ตอนนั้นเพิ่มด้วย")),
-      (a.do === "BUFF" || a.do === "CONSUME_ALLIES") && c.when.length > 0 && ["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE", "ALLY_SUMMONED"].includes(a.when) && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
+    ),
+    part(
+      tr("Do", "ทำอะไร"),
+      field(tr("Action", "การกระทำ"), pick(a.do, c.do.map((x) => ({ value: x.key, label: x.label() })), (v) => (a.do = v), true)),
+      stats && field("+ATK", num(a.atk, (n) => (a.atk = n), -20, 50)),
+      stats && field("+HP", num(a.hp, (n) => (a.hp = n), -20, 50)),
       a.do === "GIVE_KEYWORD" && field("Keyword", pick(a.keyword, Object.keys(KEYWORDS).map((k) => ({ value: k, label: keywordName(k) })), (v) => (a.keyword = v))),
       a.do === "SUMMON" && field(tr("Card", "การ์ด"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
-      a.do === "COPY" && field(tr("Copy to", "ก๊อปปี้ไปที่"), pick(a.copyTo, [{ value: "BOARD", label: tr("the board (right of it)", "บอร์ด (ข้างตัวต้นฉบับ)") }, { value: "HAND", label: tr("your hand", "มือ") }], (v) => (a.copyTo = v as Ability["copyTo"]))),
-      a.do === "COPY" && check(tr("keep its bonuses, keywords and Final Form", "เอาบัฟ keyword และร่าง Final Form ไปด้วย"), a.copyBuffs, (v) => (a.copyBuffs = v), tr("Off: a fresh base card. Copies count for triples.", "ไม่ติ๊ก = การ์ดพื้นฐาน · สำเนานับรวม triple")),
       a.do === "TRANSFORM" && field(tr("…into", "…แปลงเป็น"), cardPick(a.cardKey, o.units, (v) => (a.cardKey = v))),
-      (a.do === "SUMMON" || a.do === "SUMMON_FROM_HAND") && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
       a.do === "ADD_TO_HAND" && field(tr("Card (a Gear or a unit)", "การ์ด (Gear หรือยูนิต)"), cardPick(a.cardKey, o.cards, (v) => (a.cardKey = v))),
+      (a.do === "SUMMON" || a.do === "SUMMON_FROM_HAND") && field(tr("How many", "กี่ตัว"), num(a.count, (n) => (a.count = n), 1, 7)),
+      a.do === "COPY" && field(tr("Copy to", "ก๊อปปี้ไปที่"), pick(a.copyTo, [{ value: "BOARD", label: tr("the board (right of it)", "บอร์ด (ข้างตัวต้นฉบับ)") }, { value: "HAND", label: tr("your hand", "มือ") }], (v) => (a.copyTo = v as Ability["copyTo"]))),
       a.do === "RANDOM_CARD" && field(tr("Random", "สุ่ม"), pick(a.cardKind, [{ value: "GEAR", label: "Gear" }, { value: "UNIT", label: tr("Unit", "ยูนิต") }], (v) => (a.cardKind = v as Ability["cardKind"]))),
       (a.do === "DISCOVER_UNIT" || a.do === "RANDOM_CARD") && field(tr("Faction", "เผ่า"), pick(a.faction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.faction = v))),
-      (a.do === "BUFF_SHOP" || a.do === "BUFF_GEAR") && field("+ATK", num(a.atk, (n) => (a.atk = n), -20, 50)),
-      (a.do === "BUFF_SHOP" || a.do === "BUFF_GEAR") && field("+HP", num(a.hp, (n) => (a.hp = n), -20, 50)),
       (a.do === "DAMAGE" || a.do === "GAIN_ENERGY") && field(tr("Amount", "จำนวน"), num(a.amount, (n) => (a.amount = n), 1, 20)),
       a.do === "DISCARD" && field(tr("How many", "กี่ใบ"), num(a.count, (n) => (a.count = n), 1, 10)),
       a.do === "DISCARD" && field(tr("Which", "ใบไหน"), pick(a.pick, [{ value: "RANDOM", label: tr("random", "สุ่ม") }, { value: "LEFTMOST", label: tr("leftmost", "ซ้ายสุด") }, { value: "RIGHTMOST", label: tr("rightmost", "ขวาสุด") }], (v) => (a.pick = v as Ability["pick"]))),
       a.do === "DISCARD" && field(tr("Kind", "ประเภท"), pick(a.discardKind, [{ value: "ANY", label: tr("any card", "การ์ดอะไรก็ได้") }, { value: "UNIT", label: tr("units only", "เฉพาะยูนิต") }, { value: "GEAR", label: tr("Gear only", "เฉพาะ Gear") }], (v) => (a.discardKind = v as Ability["discardKind"]))),
       a.do === "DEVOUR_SHOP" && field(tr("Eat which", "กินตัวไหน"), pick(a.choose, [{ value: "RANDOM", label: tr("random", "สุ่ม") }, { value: "STRONGEST", label: tr("strongest (most ATK+HP)", "ค่าพลังมากสุด (ATK+HP)") }, { value: "WEAKEST", label: tr("weakest (least ATK+HP)", "ค่าพลังน้อยสุด (ATK+HP)") }], (v) => (a.choose = v as Ability["choose"]))),
       a.do === "DEVOUR_SHOP" && field(tr("Only faction", "เฉพาะเผ่า"), pick(a.faction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.faction = v))),
+    ),
+    options.length > 0 && h("div", { class: "wz-chips wz-opts" }, ...options),
+    dd?.targeted &&
+      part(
+        tr("Who", "กับใคร"),
+        field(tr("Target", "เป้าหมาย"), pick(a.target, c.target.map((t) => ({ value: t.key, label: t.label() })), (v) => (a.target = v), true)),
+        factionFilterFits(a.target) && field(tr("…only faction", "…เฉพาะเผ่า"), pick(a.targetFaction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.targetFaction = v))),
+        cardsFilterFits(a.target) && field(tr("…only these cards (any one; later forms count)", "…เฉพาะการ์ดเหล่านี้ (ใบใดใบหนึ่ง นับร่างที่แปลงแล้วด้วย)"), cardsPick(a.targetCards, o.units, (v) => (a.targetCards = v))),
+      ),
+    part(
+      tr("How often", "กี่ครั้ง"),
       field(tr("Happens N times", "ทำงานกี่ครั้ง"), num(a.repeat, (n) => (a.repeat = n), 1, 5)),
-      field(tr("Limit: at most (0 = no limit)", "จำกัด: ไม่เกินกี่ครั้ง (0 = ไม่จำกัด)"), pick(String(a.limitTimes), [0, 1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: n === 0 ? tr("no limit", "ไม่จำกัด") : String(n) })), (v) => (a.limitTimes = Number(v)), true)),
+      field(tr("At most", "จำกัดไม่เกิน"), pick(String(a.limitTimes), [0, 1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: n === 0 ? tr("no limit", "ไม่จำกัด") : tr(`${n} times`, `${n} ครั้ง`) })), (v) => (a.limitTimes = Number(v)), true)),
       a.limitTimes > 0 && field(tr("…per", "…ต่อ"), pick(a.limitPer, [{ value: "TURN", label: tr("turn", "เทิร์น") }, { value: "GAME", label: tr("game", "เกม") }], (v) => (a.limitPer = v as Ability["limitPer"]))),
-      dd?.targeted && field(tr("Who", "กับใคร"), pick(a.target, c.target.map((t) => ({ value: t.key, label: t.label() })), (v) => (a.target = v), true)),
-      dd?.targeted && !["SELF", "SUMMONED", "ADJACENT"].includes(a.target) && !a.target.endsWith("_ENEMY") && field(tr("…only faction", "…เฉพาะเผ่า"), pick(a.targetFaction, o.factionOptions(tr("any", "ทุกเผ่า")), (v) => (a.targetFaction = v))),
-      dd?.targeted && !["SELF", "SUMMONED", "ADJACENT", "GIANT_SLOT"].includes(a.target) && !a.target.endsWith("_ENEMY") && field(tr("…only these cards (any one; later forms count)", "…เฉพาะการ์ดเหล่านี้ (ใบใดใบหนึ่ง นับร่างที่แปลงแล้วด้วย)"), cardsPick(a.targetCards, o.units, (v) => (a.targetCards = v))),
     ),
   );
 }
@@ -317,6 +375,7 @@ function refreshPreview(): void {
   const ix = d.ix;
   const card = buildCard(wz);
   const lines = describeRecipe(wz, ix.cardName, ix.factionName);
+  lines.forEach((l, i) => summaries[i]?.replaceChildren(l));
   const problems = checkRecipe(wz, d.takenKeys);
   const previewCard = { ...card, key: card.key || "__wizard__", name: wz.name || tr("New card", "การ์ดใหม่"), text: lines.join(" · "), textTh: lines.join(" · ") } as unknown as CardDef;
   const pix = new ContentIndex({ ...ix.snapshot, cards: [...ix.snapshot.cards.filter((c) => c.key !== previewCard.key), previewCard] });
