@@ -1,0 +1,4399 @@
+{
+ "factions": [
+  {
+   "key": "rider",
+   "name": "Kamen Rider",
+   "color": "#F54927"
+  },
+  {
+   "key": "sentai",
+   "name": "Super Sentai",
+   "color": "#0C04EC"
+  },
+  {
+   "key": "mecha",
+   "name": "Mecha",
+   "color": "#23CD2B"
+  },
+  {
+   "key": "kaiju",
+   "name": "Kaiju",
+   "color": "#B30FA2"
+  },
+  {
+   "key": "beast",
+   "name": "Beast",
+   "color": "#ECE71D"
+  },
+  {
+   "key": "human",
+   "name": "Human",
+   "color": "#18D8F2"
+  },
+  {
+   "key": "shonen",
+   "name": "Shonen",
+   "color": "#DCA589"
+  }
+ ],
+ "cards": [
+  {
+   "key": "baku_yorozu",
+   "name": "Baku Yorozu",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "zeztz"
+   }
+  },
+  {
+   "key": "nem",
+   "name": "Nem",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "key": "nasuka",
+   "name": "Nasuka Nagumo",
+   "rank": 1,
+   "atk": 1,
+   "hp": 1,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "GEAR",
+       "faction": "rider"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "kensei_odaka",
+   "name": "Kensei Odaka",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "nox_knight"
+   }
+  },
+  {
+   "key": "five",
+   "name": "Five",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "lord_five"
+   }
+  },
+  {
+   "key": "kureha_miyamoto",
+   "name": "Kureha Miyamoto",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "lord_six"
+   }
+  },
+  {
+   "key": "thirteen",
+   "name": "Thirteen",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "lord_thirteen"
+   }
+  },
+  {
+   "key": "minami_yorozu",
+   "name": "Minami Yorozu",
+   "rank": 3,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "HENSHIN",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "BARRIER"
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     }
+    }
+   ],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "knight_seventeen"
+   }
+  },
+  {
+   "key": "eight",
+   "name": "Eight",
+   "rank": 3,
+   "atk": 2,
+   "hp": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF_GEAR",
+       "atk": 1,
+       "hp": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "fujimi",
+   "name": "Tetsuya Fujimi",
+   "rank": 3,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAUGE_ADD",
+       "gauge": "rider",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "sieg",
+   "name": "Sieg",
+   "rank": 3,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "kamen_rider_dawn"
+   }
+  },
+  {
+   "key": "three",
+   "name": "Three",
+   "rank": 4,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "HENSHIN",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "GEAR",
+       "faction": "rider"
+      }
+     ]
+    }
+   ],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "lord_three"
+   }
+  },
+  {
+   "key": "the_lady",
+   "name": "The Lady",
+   "rank": 5,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "lord_two"
+   }
+  },
+  {
+   "key": "shuma_kumon",
+   "name": "Shuma Kumon",
+   "rank": 6,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "kamen_rider_mugen"
+   }
+  },
+  {
+   "key": "zeztz",
+   "name": "Kamen Rider Zeztz",
+   "rank": 1,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_wing",
+   "name": "Zeztz Physicam Wing",
+   "rank": 1,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     },
+     "repeat": 2
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_transform",
+   "name": "Zeztz Physicam Transform",
+   "rank": 1,
+   "atk": 3,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_ATTACK",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 0
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_stream",
+   "name": "Zeztz Technolom Stream",
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_machinery",
+   "name": "Zeztz Technolom Machinery",
+   "rank": 2,
+   "atk": 4,
+   "hp": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "ultimateInto": "zeztz_exdream",
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "zeztz_projection",
+   "name": "Zeztz Technolom Projection",
+   "rank": 4,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "COPY",
+       "to": "BOARD"
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_recovery",
+   "name": "Zeztz Esprim Recovery",
+   "rank": 2,
+   "atk": 2,
+   "hp": 6,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AFTER_DAMAGED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 0,
+       "hp": 2
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_barrier",
+   "name": "Zeztz Esprim Barrier",
+   "rank": 3,
+   "atk": 3,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "ultimateInto": "zeztz_exdream",
+   "keywords": [
+    "BARRIER",
+    "GUARD"
+   ]
+  },
+  {
+   "key": "zeztz_wonder",
+   "name": "Zeztz Paradigm Wonder",
+   "rank": 3,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 3,
+       "hp": 3
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_gravity",
+   "name": "Zeztz Paradigm Gravity",
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 2
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "zeztz_exdream"
+  },
+  {
+   "key": "zeztz_plasma",
+   "name": "Zeztz Inazuma Plasma",
+   "rank": 4,
+   "atk": 5,
+   "hp": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "ultimateInto": "zeztz_exdream",
+   "keywords": [
+    "RAPID"
+   ]
+  },
+  {
+   "key": "zeztz_booster",
+   "name": "Zeztz Plasma Booster",
+   "rank": 5,
+   "atk": 6,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "ultimateInto": "zeztz_exdream",
+   "keywords": [
+    "RAPID",
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "zeztz_exdream",
+   "name": "Kamen Rider Zeztz Exdream",
+   "rank": 6,
+   "atk": 10,
+   "hp": 10,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY"
+     }
+    }
+   ],
+   "token": true,
+   "keywords": [
+    "RIDER_KICK",
+    "BARRIER"
+   ]
+  },
+  {
+   "key": "nox_knight",
+   "name": "Nox Knight",
+   "rank": 2,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "henshin": {
+    "afterTurns": 2,
+    "into": "nox"
+   }
+  },
+  {
+   "key": "nox",
+   "name": "Kamen Rider Nox",
+   "rank": 3,
+   "atk": 5,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "ultimateInto": "nox_midnight"
+  },
+  {
+   "key": "nox_midnight",
+   "name": "Nox Midnight Shadow",
+   "rank": 6,
+   "atk": 9,
+   "hp": 8,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 2
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "keywords": [
+    "RAPID"
+   ]
+  },
+  {
+   "key": "lord_five",
+   "name": "Lord Five",
+   "rank": 2,
+   "atk": 3,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "lord_six",
+   "name": "Lord Six",
+   "rank": 2,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     },
+     "repeat": 2
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "knight_seventeen",
+   "name": "Knight Seventeen",
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true
+  },
+  {
+   "key": "lord_thirteen",
+   "name": "Lord Thirteen",
+   "rank": 2,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "BARRIER"
+   ]
+  },
+  {
+   "key": "kamen_rider_dawn",
+   "name": "Kamen Rider Dawn",
+   "rank": 3,
+   "atk": 5,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AVENGE",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 0,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "every": 2
+    }
+   ],
+   "token": true,
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "lord_three",
+   "name": "Lord Three",
+   "rank": 4,
+   "atk": 6,
+   "hp": 5,
+   "factions": [
+    "rider"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "BARRIER"
+   ]
+  },
+  {
+   "key": "lord_two",
+   "name": "Lord Two",
+   "rank": 5,
+   "atk": 7,
+   "hp": 7,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": -1,
+       "hp": 0
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "kamen_rider_mugen",
+   "name": "Kamen Rider Mugen",
+   "rank": 6,
+   "atk": 9,
+   "hp": 9,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DESTROY"
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "capsem_wing",
+   "name": "Wing Capsem",
+   "kind": "GEAR",
+   "rank": 1,
+   "atk": 0,
+   "hp": 1,
+   "cost": 1,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_wing"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_transform",
+   "name": "Transform Capsem",
+   "kind": "GEAR",
+   "rank": 1,
+   "atk": 0,
+   "hp": 1,
+   "cost": 1,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_transform"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_stream",
+   "name": "Stream Capsem",
+   "kind": "GEAR",
+   "rank": 2,
+   "atk": 0,
+   "hp": 1,
+   "cost": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_stream"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_recovery",
+   "name": "Recovery Capsem",
+   "kind": "GEAR",
+   "rank": 2,
+   "atk": 0,
+   "hp": 1,
+   "cost": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_recovery"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_machinery",
+   "name": "Machinery Capsem",
+   "kind": "GEAR",
+   "rank": 2,
+   "atk": 0,
+   "hp": 1,
+   "cost": 2,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_machinery"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_wonder",
+   "name": "Wonder Capsem",
+   "kind": "GEAR",
+   "rank": 3,
+   "atk": 0,
+   "hp": 1,
+   "cost": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_wonder"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_barrier",
+   "name": "Barrier Capsem",
+   "kind": "GEAR",
+   "rank": 3,
+   "atk": 0,
+   "hp": 1,
+   "cost": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_barrier"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_projection",
+   "name": "Projection Capsem",
+   "kind": "GEAR",
+   "rank": 4,
+   "atk": 0,
+   "hp": 1,
+   "cost": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_projection"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_gravity",
+   "name": "Gravity Capsem",
+   "kind": "GEAR",
+   "rank": 4,
+   "atk": 0,
+   "hp": 1,
+   "cost": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_gravity"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_plasma",
+   "name": "Plasma Capsem",
+   "kind": "GEAR",
+   "rank": 4,
+   "atk": 0,
+   "hp": 1,
+   "cost": 4,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz",
+       "zeztz_wing",
+       "zeztz_transform",
+       "zeztz_stream",
+       "zeztz_machinery",
+       "zeztz_projection",
+       "zeztz_recovery",
+       "zeztz_barrier",
+       "zeztz_wonder",
+       "zeztz_gravity",
+       "zeztz_plasma",
+       "zeztz_booster"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_plasma"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_booster",
+   "name": "Booster Capsem",
+   "kind": "GEAR",
+   "rank": 5,
+   "atk": 0,
+   "hp": 1,
+   "cost": 3,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "zeztz_plasma"
+      ]
+     },
+     "actions": [
+      {
+       "type": "TRANSFORM",
+       "into": "zeztz_booster"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "capsem_exdreamrise",
+   "name": "Exdreamrise Capsem",
+   "kind": "GEAR",
+   "rank": 6,
+   "atk": 0,
+   "hp": 1,
+   "cost": 0,
+   "token": true,
+   "factions": [
+    "rider"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "faction": "rider"
+     },
+     "actions": [
+      {
+       "type": "ULTIMATE_FORM"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "kuwagata_ohger",
+   "name": "Kuwagata Ohger",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "condition": {
+      "type": "TEAM_UP_COLORS_GTE",
+      "value": 3
+     }
+    }
+   ],
+   "colors": [
+    "RED"
+   ],
+   "ultimateInto": "king_kuwagata"
+  },
+  {
+   "key": "hachi_ohger",
+   "name": "Hachi Ohger",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     }
+    }
+   ],
+   "colors": [
+    "BLACK"
+   ]
+  },
+  {
+   "key": "god_tentou",
+   "name": "God Tentou",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAUGE_ADD",
+       "gauge": "mecha",
+       "amount": 1
+      }
+     ],
+     "limit": {
+      "times": 1,
+      "per": "GAME"
+     }
+    }
+   ]
+  },
+  {
+   "key": "tombo_ohger",
+   "name": "Tombo Ohger",
+   "rank": 2,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "GIANT_SLOT"
+     }
+    }
+   ],
+   "colors": [
+    "BLUE"
+   ]
+  },
+  {
+   "key": "kamakiri_ohger",
+   "name": "Kamakiri Ohger",
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "END_OF_TURN",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 0,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "sentai"
+     }
+    }
+   ],
+   "colors": [
+    "YELLOW"
+   ]
+  },
+  {
+   "key": "god_kumo",
+   "name": "God Kumo",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAUGE_ADD",
+       "gauge": "mecha",
+       "amount": 1
+      }
+     ],
+     "limit": {
+      "times": 1,
+      "per": "GAME"
+     }
+    }
+   ]
+  },
+  {
+   "key": "god_ant",
+   "name": "God Ant",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SUMMONED",
+      "faction": "sentai"
+     }
+    }
+   ]
+  },
+  {
+   "key": "papillon_ohger",
+   "name": "Papillon Ohger",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "sentai"
+     },
+     "condition": {
+      "type": "TEAM_UP_COLORS_GTE",
+      "value": 3
+     }
+    }
+   ],
+   "colors": [
+    "PURPLE"
+   ],
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "spider_kumonos",
+   "name": "Spider Kumonos",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT",
+       "faction": "sentai"
+      }
+     ]
+    }
+   ],
+   "colors": [
+    "WHITE"
+   ]
+  },
+  {
+   "key": "god_kabuto",
+   "name": "God Kabuto",
+   "rank": 3,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 3,
+       "hp": 3,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "GIANT_SLOT"
+     }
+    }
+   ]
+  },
+  {
+   "key": "god_scorpion",
+   "name": "God Scorpion",
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "LETHAL"
+      }
+     ],
+     "target": {
+      "selector": "GIANT_SLOT"
+     }
+    }
+   ]
+  },
+  {
+   "key": "god_hopper",
+   "name": "God Hopper",
+   "rank": 4,
+   "atk": 5,
+   "hp": 4,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "RAPID"
+      }
+     ],
+     "target": {
+      "selector": "GIANT_SLOT"
+     }
+    }
+   ]
+  },
+  {
+   "key": "guardian_hercules",
+   "name": "Guardian Hercules",
+   "rank": 5,
+   "atk": 6,
+   "hp": 8,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAUGE_ADD",
+       "gauge": "mecha",
+       "amount": 2
+      }
+     ]
+    }
+   ],
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "ohkuwagata_ohger",
+   "name": "Ohkuwagata Ohger",
+   "rank": 5,
+   "atk": 6,
+   "hp": 6,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 3,
+       "hp": 3,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "condition": {
+      "type": "TEAM_UP_COLORS_GTE",
+      "value": 3
+     }
+    }
+   ],
+   "colors": [
+    "SILVER"
+   ]
+  },
+  {
+   "key": "god_tarantula",
+   "name": "God Tarantula",
+   "rank": 6,
+   "atk": 9,
+   "hp": 10,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "sentai"
+     },
+     "condition": {
+      "type": "TEAM_UP_COLORS_GTE",
+      "value": 4
+     }
+    }
+   ]
+  },
+  {
+   "key": "king_kuwagata",
+   "name": "King Kuwagata Ohger",
+   "rank": 6,
+   "atk": 8,
+   "hp": 8,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "sentai"
+     },
+     "condition": {
+      "type": "TEAM_UP_COLORS_GTE",
+      "value": 3
+     }
+    }
+   ],
+   "token": true,
+   "colors": [
+    "RED"
+   ],
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "ohger_crown_lance",
+   "name": "Ohger Crown Lance",
+   "kind": "GEAR",
+   "rank": 5,
+   "atk": 0,
+   "hp": 1,
+   "cost": 4,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "ULTIMATE_FORM"
+      }
+     ],
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "kuwagata_ohger"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "key": "kyodai_gattai",
+   "name": "Kyodai Gattai!",
+   "kind": "GEAR",
+   "rank": 6,
+   "atk": 0,
+   "hp": 1,
+   "cost": 0,
+   "factions": [
+    "sentai"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "DISCOVER_GIANT"
+      }
+     ]
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "king_ohger",
+   "name": "King-Ohger",
+   "kind": "GIANT",
+   "rank": 6,
+   "atk": 10,
+   "hp": 12,
+   "token": true,
+   "factions": [
+    "sentai"
+   ],
+   "keywords": [
+    "FINAL_BLOW"
+   ],
+   "effects": [],
+   "ultimateInto": "god_king_ohger"
+  },
+  {
+   "key": "king_caucasus_kabuto",
+   "name": "King Caucasus Kabuto",
+   "kind": "GIANT",
+   "rank": 6,
+   "atk": 12,
+   "hp": 10,
+   "token": true,
+   "factions": [
+    "sentai"
+   ],
+   "keywords": [
+    "FINAL_BLOW",
+    "BARRIER"
+   ],
+   "effects": []
+  },
+  {
+   "key": "tarantula_knight",
+   "name": "Tarantula Knight",
+   "kind": "GIANT",
+   "rank": 6,
+   "atk": 9,
+   "hp": 12,
+   "token": true,
+   "factions": [
+    "sentai"
+   ],
+   "keywords": [
+    "FINAL_BLOW",
+    "GUARD"
+   ],
+   "effects": []
+  },
+  {
+   "key": "king_ohger_zero",
+   "name": "King-Ohger Zero",
+   "kind": "GIANT",
+   "rank": 6,
+   "atk": 11,
+   "hp": 11,
+   "token": true,
+   "factions": [
+    "sentai"
+   ],
+   "keywords": [
+    "FINAL_BLOW",
+    "LETHAL"
+   ],
+   "effects": []
+  },
+  {
+   "key": "god_king_ohger",
+   "name": "God King-Ohger",
+   "kind": "GIANT",
+   "rank": 6,
+   "atk": 18,
+   "hp": 18,
+   "token": true,
+   "factions": [
+    "sentai"
+   ],
+   "keywords": [
+    "FINAL_BLOW",
+    "RAPID"
+   ],
+   "effects": []
+  },
+  {
+   "key": "vector_sol",
+   "name": "Vector Sol",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [],
+   "keywords": [
+    "GATTAI"
+   ],
+   "gattaiInto": "solar_aquarion"
+  },
+  {
+   "key": "vector_luna",
+   "name": "Vector Luna",
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [],
+   "keywords": [
+    "GATTAI"
+   ],
+   "gattaiInto": "aquarion_luna"
+  },
+  {
+   "key": "vector_mars",
+   "name": "Vector Mars",
+   "rank": 1,
+   "atk": 3,
+   "hp": 1,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [],
+   "keywords": [
+    "GATTAI"
+   ],
+   "gattaiInto": "aquarion_mars"
+  },
+  {
+   "key": "apollo",
+   "name": "Apollo",
+   "rank": 2,
+   "atk": 3,
+   "hp": 2,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "vector_sol"
+      ]
+     }
+    }
+   ],
+   "keywords": [
+    "GATTAI"
+   ]
+  },
+  {
+   "key": "silvia",
+   "name": "Silvia de Alisia",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "vector_luna"
+      ]
+     }
+    }
+   ],
+   "keywords": [
+    "GATTAI"
+   ]
+  },
+  {
+   "key": "pierre",
+   "name": "Pierre Vieira",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "vector_mars"
+      ]
+     }
+    }
+   ],
+   "keywords": [
+    "GATTAI"
+   ]
+  },
+  {
+   "key": "sirius",
+   "name": "Sirius de Alisia",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "mecha"
+     }
+    }
+   ],
+   "keywords": [
+    "GATTAI"
+   ]
+  },
+  {
+   "key": "reika",
+   "name": "Reika Kou",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "END_OF_TURN",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "mecha"
+     }
+    }
+   ],
+   "keywords": [
+    "GATTAI"
+   ]
+  },
+  {
+   "key": "deava_hangar",
+   "name": "DEAVA Hangar",
+   "rank": 3,
+   "atk": 1,
+   "hp": 5,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT",
+       "faction": "mecha"
+      }
+     ]
+    }
+   ],
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "cherubim_soldier",
+   "name": "Cherubim Soldier",
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "harvest_beast",
+       "count": 1
+      }
+     ]
+    }
+   ],
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "johannes",
+   "name": "Johannes",
+   "rank": 4,
+   "atk": 4,
+   "hp": 4,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "mecha"
+     }
+    }
+   ]
+  },
+  {
+   "key": "gen_fudo",
+   "name": "Gen Fudo",
+   "rank": 5,
+   "atk": 5,
+   "hp": 7,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "mecha"
+     }
+    },
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "GIANT_SLOT"
+     }
+    }
+   ]
+  },
+  {
+   "key": "toma",
+   "name": "Toma",
+   "rank": 5,
+   "atk": 6,
+   "hp": 6,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "cherubim_soldier",
+       "count": 1
+      }
+     ]
+    }
+   ],
+   "keywords": [
+    "RAPID"
+   ]
+  },
+  {
+   "key": "apollonius",
+   "name": "Apollonius",
+   "rank": 6,
+   "atk": 8,
+   "hp": 8,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 3,
+       "hp": 3,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SUMMONED",
+      "faction": "mecha"
+     }
+    }
+   ],
+   "keywords": [
+    "RAPID"
+   ]
+  },
+  {
+   "key": "solar_aquarion",
+   "name": "Solar Aquarion",
+   "rank": 4,
+   "atk": 4,
+   "hp": 4,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "RIDER_KICK"
+   ],
+   "ultimateInto": "solar_aquarion_wings"
+  },
+  {
+   "key": "aquarion_luna",
+   "name": "Aquarion Luna",
+   "rank": 4,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 2
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     }
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "aquarion_mars",
+   "name": "Aquarion Mars",
+   "rank": 4,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "RAPID"
+   ]
+  },
+  {
+   "key": "solar_aquarion_wings",
+   "name": "Solar Aquarion — Solar Wings",
+   "rank": 6,
+   "atk": 12,
+   "hp": 12,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 3
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "keywords": [
+    "RIDER_KICK",
+    "RAPID"
+   ]
+  },
+  {
+   "key": "harvest_beast",
+   "name": "Harvest Beast",
+   "rank": 2,
+   "atk": 2,
+   "hp": 6,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "sousei_gattai",
+   "name": "Sousei Gattai!",
+   "kind": "GEAR",
+   "rank": 3,
+   "atk": 0,
+   "hp": 1,
+   "cost": 2,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "GATTAI"
+      },
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "faction": "mecha"
+     }
+    }
+   ]
+  },
+  {
+   "key": "solar_wings",
+   "name": "Solar Wings",
+   "kind": "GEAR",
+   "rank": 6,
+   "atk": 0,
+   "hp": 1,
+   "cost": 5,
+   "factions": [
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "ULTIMATE_FORM"
+      }
+     ],
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "cards": [
+       "solar_aquarion"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "key": "minilla",
+   "name": "Minilla",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "kaiju"
+     }
+    }
+   ]
+  },
+  {
+   "key": "mothra_larva",
+   "name": "Mothra (Larva)",
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 2,
+    "into": "mothra"
+   }
+  },
+  {
+   "key": "shin_godzilla_2",
+   "name": "Shin Godzilla (2nd Form)",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "henshin": {
+    "afterTurns": 2,
+    "into": "shin_godzilla_3"
+   }
+  },
+  {
+   "key": "anguirus",
+   "name": "Anguirus",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "keywords": [
+    "GUARD",
+    "REVIVE"
+   ]
+  },
+  {
+   "key": "rodan",
+   "name": "Rodan",
+   "rank": 2,
+   "atk": 3,
+   "hp": 2,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "keywords": [
+    "RAPID"
+   ]
+  },
+  {
+   "key": "hedorah",
+   "name": "Hedorah",
+   "rank": 2,
+   "atk": 1,
+   "hp": 3,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "hedorah_spawn",
+       "count": 1
+      }
+     ]
+    }
+   ],
+   "keywords": [
+    "LETHAL"
+   ]
+  },
+  {
+   "key": "godzilla_junior",
+   "name": "Godzilla Junior",
+   "rank": 3,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AVENGE",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "every": 2
+    }
+   ],
+   "keywords": [
+    "KYODAIKA"
+   ]
+  },
+  {
+   "key": "biollante",
+   "name": "Biollante",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "kaiju"
+     }
+    }
+   ],
+   "keywords": [
+    "REVIVE"
+   ]
+  },
+  {
+   "key": "gigan",
+   "name": "Gigan",
+   "rank": 3,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "destoroyah",
+   "name": "Destoroyah",
+   "rank": 4,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "destoroyah_aggregate",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "scope": "UNIT",
+     "trigger": "AVENGE",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "every": 2
+    }
+   ]
+  },
+  {
+   "key": "mechagodzilla",
+   "name": "Mechagodzilla",
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "factions": [
+    "kaiju",
+    "mecha"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 2
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ],
+   "keywords": [
+    "BARRIER"
+   ]
+  },
+  {
+   "key": "godzilla",
+   "name": "Godzilla",
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AVENGE",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 3,
+       "hp": 3,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "every": 3
+    }
+   ],
+   "keywords": [
+    "KYODAIKA"
+   ]
+  },
+  {
+   "key": "king_ghidorah",
+   "name": "King Ghidorah",
+   "rank": 5,
+   "atk": 6,
+   "hp": 6,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     },
+     "repeat": 3
+    }
+   ]
+  },
+  {
+   "key": "burning_godzilla",
+   "name": "Burning Godzilla",
+   "rank": 6,
+   "atk": 10,
+   "hp": 10,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 4
+      }
+     ],
+     "target": {
+      "selector": "ALL_ENEMY"
+     }
+    }
+   ],
+   "keywords": [
+    "KYODAIKA"
+   ]
+  },
+  {
+   "key": "mothra",
+   "name": "Mothra",
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "BARRIER"
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY"
+     }
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "shin_godzilla_3",
+   "name": "Shin Godzilla (3rd Form)",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "token": true,
+   "henshin": {
+    "afterTurns": 2,
+    "into": "shin_godzilla_4"
+   }
+  },
+  {
+   "key": "shin_godzilla_4",
+   "name": "Shin Godzilla (4th Form)",
+   "rank": 6,
+   "atk": 8,
+   "hp": 8,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 3
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ],
+   "token": true,
+   "keywords": [
+    "KYODAIKA"
+   ]
+  },
+  {
+   "key": "hedorah_spawn",
+   "name": "Hedorah Spawn",
+   "rank": 1,
+   "atk": 1,
+   "hp": 1,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "token": true,
+   "keywords": [
+    "LETHAL"
+   ]
+  },
+  {
+   "key": "destoroyah_aggregate",
+   "name": "Destoroyah (Aggregate)",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "kaiju"
+   ],
+   "effects": [],
+   "token": true
+  },
+  {
+   "key": "haru",
+   "name": "Haru",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 0,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SUMMONED"
+     }
+    }
+   ]
+  },
+  {
+   "key": "jack",
+   "name": "Jack",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "condition": {
+      "type": "HAS_CARD",
+      "cards": [
+       "legoshi"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "key": "tem",
+   "name": "Tem",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "beast"
+     }
+    }
+   ]
+  },
+  {
+   "key": "collot",
+   "name": "Collot",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "durham",
+       "count": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "pina",
+   "name": "Pina",
+   "rank": 2,
+   "atk": 3,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     }
+    }
+   ]
+  },
+  {
+   "key": "els",
+   "name": "Els",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ADJACENT"
+     }
+    }
+   ]
+  },
+  {
+   "key": "kibi",
+   "name": "Kibi",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "dom",
+       "count": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "juno",
+   "name": "Juno",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SUMMONED"
+     }
+    }
+   ]
+  },
+  {
+   "key": "bill",
+   "name": "Bill",
+   "rank": 3,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "beast"
+     }
+    }
+   ]
+  },
+  {
+   "key": "gohin",
+   "name": "Gohin",
+   "rank": 3,
+   "atk": 3,
+   "hp": 5,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      },
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "BARRIER"
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "legoshi"
+      ]
+     }
+    }
+   ],
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "louis",
+   "name": "Louis",
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "shishigumi_lion",
+       "count": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "gosha",
+   "name": "Gosha",
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "LETHAL"
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "legoshi"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "key": "sagwan",
+   "name": "Sagwan",
+   "rank": 4,
+   "atk": 3,
+   "hp": 5,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "limit": {
+      "times": 3,
+      "per": "TURN"
+     }
+    }
+   ]
+  },
+  {
+   "key": "legoshi",
+   "name": "Legoshi",
+   "rank": 5,
+   "atk": 5,
+   "hp": 6,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ALLY_SUMMONED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     }
+    }
+   ]
+  },
+  {
+   "key": "yahya",
+   "name": "Yahya",
+   "rank": 6,
+   "atk": 8,
+   "hp": 9,
+   "factions": [
+    "beast"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "beast"
+     }
+    }
+   ],
+   "keywords": [
+    "ECHO"
+   ]
+  },
+  {
+   "key": "durham",
+   "name": "Durham",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [],
+   "token": true
+  },
+  {
+   "key": "dom",
+   "name": "Dom",
+   "rank": 1,
+   "atk": 1,
+   "hp": 1,
+   "factions": [
+    "beast"
+   ],
+   "effects": [],
+   "token": true
+  },
+  {
+   "key": "shishigumi_lion",
+   "name": "Shishigumi Lion",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "beast"
+   ],
+   "effects": [],
+   "token": true
+  },
+  {
+   "key": "street_vendor",
+   "name": "Street Vendor",
+   "rank": 1,
+   "atk": 1,
+   "hp": 2,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "intern_researcher",
+   "name": "Intern Researcher",
+   "rank": 1,
+   "atk": 1,
+   "hp": 1,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "GEAR"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "volunteer",
+   "name": "Volunteer",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_SELL",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "shop_manager",
+   "name": "Shop Manager",
+   "rank": 2,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF_SHOP",
+       "atk": 1,
+       "hp": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "field_scout",
+   "name": "Field Scout",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "mechanic",
+   "name": "Mechanic",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF_GEAR",
+       "atk": 1,
+       "hp": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "banker",
+   "name": "Banker",
+   "rank": 3,
+   "atk": 2,
+   "hp": 4,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_TURN_START",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "quartermaster",
+   "name": "Quartermaster",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "END_OF_TURN",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY"
+     },
+     "condition": {
+      "type": "ENERGY_GTE",
+      "value": 2
+     }
+    }
+   ]
+  },
+  {
+   "key": "recruiter",
+   "name": "Recruiter",
+   "rank": 3,
+   "atk": 3,
+   "hp": 3,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "UNIT"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "mayor",
+   "name": "Mayor",
+   "rank": 4,
+   "atk": 3,
+   "hp": 5,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF_SHOP",
+       "atk": 2,
+       "hp": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "arms_dealer",
+   "name": "Arms Dealer",
+   "rank": 4,
+   "atk": 4,
+   "hp": 4,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "GEAR"
+      }
+     ],
+     "repeat": 2
+    }
+   ]
+  },
+  {
+   "key": "tycoon",
+   "name": "Tycoon",
+   "rank": 5,
+   "atk": 5,
+   "hp": 6,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "END_OF_TURN",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY"
+     },
+     "condition": {
+      "type": "ENERGY_GTE",
+      "value": 3
+     }
+    }
+   ]
+  },
+  {
+   "key": "defense_commander",
+   "name": "Defense Commander",
+   "rank": 5,
+   "atk": 6,
+   "hp": 6,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "president",
+   "name": "President",
+   "rank": 6,
+   "atk": 8,
+   "hp": 9,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 3
+      },
+      {
+       "type": "BUFF_SHOP",
+       "atk": 3,
+       "hp": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "supply_crate",
+   "name": "Supply Crate",
+   "kind": "GEAR",
+   "rank": 1,
+   "atk": 0,
+   "hp": 1,
+   "cost": 1,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "med_kit",
+   "name": "Med Kit",
+   "kind": "GEAR",
+   "rank": 2,
+   "atk": 0,
+   "hp": 1,
+   "cost": 2,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 3,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "CHOSEN_FRIENDLY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "contract",
+   "name": "Contract",
+   "kind": "GEAR",
+   "rank": 3,
+   "atk": 0,
+   "hp": 1,
+   "cost": 2,
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "naruto",
+   "name": "Naruto Uzumaki",
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "COPY",
+       "to": "BOARD",
+       "withBuffs": false
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     }
+    }
+   ],
+   "henshin": {
+    "afterTurns": 3,
+    "into": "naruto_sage"
+   }
+  },
+  {
+   "key": "sakura",
+   "name": "Sakura Haruno",
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "END_OF_TURN",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 0,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "cards": [
+       "naruto",
+       "sasuke"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "key": "hinata",
+   "name": "Hinata Hyuga",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [],
+   "keywords": [
+    "GUARD"
+   ]
+  },
+  {
+   "key": "rock_lee",
+   "name": "Rock Lee",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AFTER_DAMAGED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 0,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "limit": {
+      "times": 2,
+      "per": "TURN"
+     }
+    }
+   ]
+  },
+  {
+   "key": "neji",
+   "name": "Neji Hyuga",
+   "rank": 2,
+   "atk": 3,
+   "hp": 2,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_ATTACK",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 1
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "shikamaru",
+   "name": "Shikamaru Nara",
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": -2,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "sasuke",
+   "name": "Sasuke Uchiha",
+   "rank": 3,
+   "atk": 4,
+   "hp": 3,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AVENGE",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 0,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "every": 2
+    }
+   ],
+   "keywords": [
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "kakashi",
+   "name": "Kakashi Hatake",
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "COPY",
+       "to": "BOARD"
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "gaara",
+   "name": "Gaara",
+   "rank": 3,
+   "atk": 2,
+   "hp": 4,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [],
+   "keywords": [
+    "GUARD",
+    "BARRIER"
+   ]
+  },
+  {
+   "key": "jiraiya",
+   "name": "Jiraiya",
+   "rank": 4,
+   "atk": 4,
+   "hp": 5,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "SUMMON",
+       "cardKey": "gamabunta",
+       "count": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "tsunade",
+   "name": "Tsunade",
+   "rank": 4,
+   "atk": 3,
+   "hp": 6,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AFTER_DAMAGED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 0,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY"
+     },
+     "limit": {
+      "times": 2,
+      "per": "TURN"
+     }
+    }
+   ]
+  },
+  {
+   "key": "might_guy",
+   "name": "Might Guy",
+   "rank": 5,
+   "atk": 5,
+   "hp": 6,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AFTER_DAMAGED",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 8,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "limit": {
+      "times": 1,
+      "per": "GAME"
+     }
+    }
+   ]
+  },
+  {
+   "key": "itachi",
+   "name": "Itachi Uchiha",
+   "rank": 5,
+   "atk": 6,
+   "hp": 5,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": -4,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "naruto_kurama",
+   "name": "Naruto (Kurama Chakra Mode)",
+   "rank": 6,
+   "atk": 9,
+   "hp": 9,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AVENGE",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "SELF"
+     },
+     "every": 2
+    }
+   ],
+   "keywords": [
+    "RAPID",
+    "RIDER_KICK"
+   ]
+  },
+  {
+   "key": "naruto_sage",
+   "name": "Naruto (Sage Mode)",
+   "rank": 4,
+   "atk": 5,
+   "hp": 5,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_ATTACK",
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 2
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     }
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "gamabunta",
+   "name": "Gamabunta",
+   "rank": 4,
+   "atk": 5,
+   "hp": 5,
+   "factions": [
+    "shonen"
+   ],
+   "effects": [],
+   "token": true
+  }
+ ],
+ "series": [],
+ "gauges": [
+  {
+   "key": "mecha",
+   "name": "Mecha Gauge",
+   "max": 6,
+   "sources": [
+    {
+     "trigger": "ON_ROLL_CALL",
+     "amount": 1
+    },
+    {
+     "trigger": "ON_ROLL_CALL_WIN",
+     "amount": 1
+    }
+   ],
+   "thresholds": [
+    {
+     "at": 3,
+     "once": true,
+     "reward": [
+      {
+       "type": "ADD_TO_HAND",
+       "cardKey": "kyodai_gattai"
+      }
+     ]
+    },
+    {
+     "at": 6,
+     "once": true,
+     "reward": [
+      {
+       "type": "SUPER_GATTAI",
+       "atk": 4,
+       "hp": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rider",
+   "name": "Rider Gauge",
+   "max": 6,
+   "sources": [
+    {
+     "trigger": "HENSHIN",
+     "amount": 1
+    }
+   ],
+   "thresholds": [
+    {
+     "at": 3,
+     "once": false,
+     "reward": [
+      {
+       "type": "ADD_TO_HAND",
+       "cardKey": "capsem_exdreamrise"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "heroes": [
+  {
+   "key": "h_strategist",
+   "name": "Strategist",
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 1,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_quartermaster",
+   "name": "Quartermaster",
+   "power": {
+    "mode": "ONCE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "GAIN_ENERGY",
+        "amount": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_scout",
+   "name": "Scout",
+   "power": {
+    "mode": "ONCE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "DISCOVER_UNIT"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_veteran",
+   "name": "Veteran",
+   "armor": 5,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_ACQUIRE",
+      "actions": [
+       {
+        "type": "MODIFY_RULE",
+        "rule": "handSize",
+        "op": "ADD",
+        "value": 1
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "relics": [],
+ "rules": {
+  "rollCallColors": 3
+ }
+}
