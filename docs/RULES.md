@@ -34,7 +34,7 @@
 | Hand | 10 ใบ |
 
 - **Shared pool** ต่อชนิดยูนิต: R1:16, R2:15, R3:13, R4:11, R5:9, R6:7 — ซื้อแล้ว pool ลด, ขายแล้วคืน pool
-- **Triple → Final Form**: ยูนิตเดียวกัน 3 ตัวรวมเป็น Final Form (stat ×2, effect ×2) + ได้ Discover ยูนิต Rank+1 1 ใบ (ถ้า pool ไม่มี Rank นั้น ใช้ Rank ที่ใกล้ที่สุดที่มีการ์ด เริ่มจาก Rank ที่ต่ำกว่า)
+- **Triple → Final Form**: ยูนิตเดียวกัน 3 ตัวรวมเป็น Final Form (stat ×2, effect ×2) + ได้ Discover ยูนิต Rank+1 1 ใบ (ถ้า pool ไม่มี Rank นั้น ใช้ Rank ที่ใกล้ที่สุดที่มีการ์ด เริ่มจาก Rank ที่ต่ำกว่า). รวมทันทีไม่ว่าใบที่ 3 มาทางไหน: ซื้อ, ลงการ์ด, Discover, Gear, Hero Power, Relic, ขาย (On Sell), ต้นเทิร์น, End of Turn/Henshin (รวมก่อนสู้)
 - ล็อบบี้สุ่มใช้ **5 จาก 7 Faction**
 
 ## 3. Battle Phase

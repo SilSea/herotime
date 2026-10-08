@@ -32,6 +32,7 @@ export function beginTurn(player: PlayerState, turn: number, env: GameEnv): void
     if (player.board.includes(unit)) runTrigger(env.content.card(unit.key).effects, "ON_TURN_START", "UNIT", unit, player, env);
   }
   for (const { effects, origin } of playerEffectSources(player, env)) runTrigger(effects, "ON_TURN_START", "PLAYER", null, player, env, origin);
+  resolveTriples(player, env.pool, env.rng, env.cfg);
 }
 
 /** Buy from the shop; a purchase that completes a triple merges immediately. */
@@ -150,6 +151,8 @@ export function useGear(player: PlayerState, handIndex: number, env: GameEnv, ta
   }
   player.hand.splice(handIndex, 1);
   runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env, { kind: "gear", key: card.key }, chosen);
+  // A Gear can bring in or transform into a third copy.
+  resolveTriples(player, env.pool, env.rng, env.cfg);
 }
 
 /** Whether a gear in hand has something to act on right now (one that has not can be sold instead). */
@@ -170,6 +173,7 @@ export function sellUnit(player: PlayerState, from: "board" | "hand", index: num
   if (unit !== undefined) runTrigger(env.content.card(unit.key).effects, "ON_SELL", "UNIT", unit, player, env);
   const at = (from === "board" ? player.board : player.hand).indexOf(unit as Unit);
   if (at >= 0) sell(player, from, at, env.pool, env.cfg);
+  resolveTriples(player, env.pool, env.rng, env.cfg); // a "when sold" effect may have brought in a third copy
 }
 
 /** Take a Discover pick, then resolve a triple the pick may have completed. */
@@ -201,6 +205,8 @@ export function endTurn(player: PlayerState, env: GameEnv): void {
     runTrigger(before.effects, "HENSHIN", "UNIT", unit, player, env);
     fireGaugeTrigger(player, env, "HENSHIN");
   }
+  // End-of-turn effects and Henshin can complete a triple: it merges before the fight.
+  resolveTriples(player, env.pool, env.rng, env.cfg);
 }
 
 // ------------------------------------------------------------------ hero
@@ -225,6 +231,7 @@ export function useHeroPower(player: PlayerState, env: GameEnv): void {
   if (power.mode === "ACTIVE") player.heroPowerUsed = true;
   else player.heroPowerSpent = true;
   runTrigger(power.effects, "ON_USE", "PLAYER", null, player, env, { kind: "hero", key: hero.key });
+  resolveTriples(player, env.pool, env.rng, env.cfg);
 }
 
 // ----------------------------------------------------------------- relics
@@ -322,6 +329,7 @@ export function chooseRelic(player: PlayerState, index: number, env: GameEnv): s
   player.relics.push(key);
   delete player.relicOffer;
   runTrigger(def.effects, "ON_ACQUIRE", "PLAYER", null, player, env, { kind: "relic", key });
+  resolveTriples(player, env.pool, env.rng, env.cfg);
   return key;
 }
 
