@@ -1,17 +1,17 @@
 # ชุดการ์ด v1 (ร่างแรก รอผู้ใช้ตรวจ)
 
-ร่างการ์ดของทั้ง 7 เผ่า ตามแนวใน `FACTIONS.md` และเรื่องที่กำหนด **ยังไม่ได้ใส่ลง draft** ผู้ใช้จะตรวจและปรับก่อน
+การ์ดของทั้ง 7 เผ่า ตามแนวใน `FACTIONS.md` และเรื่องที่กำหนด · **ใช้งานจริงแล้ว** (publish ล่าสุด version 10; Gear เผ่าอื่นใน Balance pass 3 อยู่ใน draft รอ publish) · Human ปิดอยู่
 ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider มีพระเอกและ**ไรเดอร์ฝ่ายร้าย** (ไม่มีสัตว์ประหลาด) ขายเป็นร่างคนแล้ว Henshin เป็นไรเดอร์ · Sentai มีแต่ฝ่ายเรนเจอร์
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
 | Rider | Kamen Rider ZEZTZ | 14 (ร่างคน + ผู้ช่วย, รวมฝ่ายร้าย 5) | 24 | 11 (+ การ์ด Final Form กลาง) |
-| Sentai | Ohsama Sentai King-Ohger | 15 | 1 | Giant 5 |
-| Mecha | Genesis of Aquarion | 14 | 4 | 1 |
-| Kaiju | Godzilla | 14 | 5 | 0 |
-| Beast | Beastars | 15 | 3 | 0 |
+| Sentai | Ohsama Sentai King-Ohger | 15 | 1 | 3 (+ Giant 5, Kyodai Gattai! จาก gauge) |
+| Mecha | Genesis of Aquarion | 14 | 4 | 3 |
+| Kaiju | Godzilla | 14 | 5 | 3 |
+| Beast | Beastars | 15 | 3 | 3 |
 | Human | ออกแบบเอง (ไม่มีเรื่อง) | 14 | 0 | 3 |
-| Shonen | Naruto | 14 | 2 | 0 |
+| Shonen | Naruto | 14 | 2 | 3 |
 
 **ซีรีส์** (ช่อง `series` ของการ์ดและ Relic): Rider → `zeztz` · Sentai → `king_ohger` · Mecha → `aquarion` · Kaiju → `godzilla` (Mechagodzilla ด้วย) · Beast → `beastars` · Shonen → `naruto` · Human และการ์ด Final Form กลางไม่มีซีรีส์ · ยังไม่มี Series Bond (โบนัสเมื่อมีการ์ดซีรีส์เดียวกันครบ N ใบ)
 
@@ -158,6 +158,15 @@
 | Giant | `king_ohger_zero` | King-Ohger Zero | 11/11 *(Final Blow, Lethal)* | หุ่น Shugod Zero 10 ตัวของ Rcules |
 | Giant (ร่างอัปเกรด) | `god_king_ohger` | God King-Ohger | 18/18 *(Final Blow, Rapid)* | รวม 20 Shugod — ได้จาก Gear Final Form เป้า Giant Robo |
 
+**Gear**
+| R | key | Gear | ราคา | ความสามารถ |
+|---|---|---|---|---|
+| 1 | `royal_sword` | Royal Sword | 1 | ใช้กับ Sentai ที่เลือก: +2/+1 ถาวร |
+| 3 | `royal_decree` | Royal Decree | 2 | Mecha Gauge +1 · ใช้กับ Sentai ที่เลือก: +1/+1 ถาวร |
+| 4 | `shugod_call` | Shugod Call | 3 | ใช้กับ Sentai ที่เลือก: ได้ Barrier และ +2/+2 ถาวร |
+
+Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได้ **Kyodai Gattai!** (`kyodai_gattai`, token Gear ราคา 0: เลือก Giant Robo 1 จาก 3) · ครบ 6 ได้ Super Gattai (+4/+4) และการ์ด Final Form · หุ่นได้ ATK/HP ของ Sentai บนบอร์ด **50%** (`giantSentaiScale` 0.5)
+
 **หมายเหตุ Sentai**
 - ไม่ได้ใส่ (ตัวร้าย): Galactinsects (Dagded Dujardin, Five Jesters), Bug Naraku (Desnaraku, Kaijim)
 - Shugod ไม่มีสี ไม่ช่วย Roll Call แต่ช่วย Giant Robo ทำให้ Sentai เลือกได้ว่าจะเน้นสีหรือหุ่น
@@ -199,7 +208,9 @@
 **Gear**
 | R | key | Gear | ราคา | ความสามารถ |
 |---|---|---|---|---|
+| 1 | `vector_parts` | Vector Parts | 1 | ใช้กับ Mecha ที่เลือก: +1/+2 ถาวร |
 | 3 | `sousei_gattai` | Sousei Gattai! | 2 | ใช้กับ Mecha ที่เลือก: ให้ keyword Gattai และ +1/+1 |
+| 4 | `infinity_punch` | Infinity Punch | 3 | ใช้กับ Mecha ที่เลือก: ได้ Power Strike และ +2/+2 ถาวร |
 
 ---
 
@@ -234,6 +245,13 @@
 | `shin_godzilla_4` | Shin Godzilla (4th Form) | 7/7 | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (atomic breath) |
 | `hedorah_spawn` / `destoroyah_aggregate` | token | 1/1 / 2/2 | — |
 
+**Gear**
+| R | key | Gear | ราคา | ความสามารถ |
+|---|---|---|---|---|
+| 1 | `atomic_charge` | Atomic Charge | 1 | ใช้กับ Kaiju ที่เลือก: +1/+2 ถาวร |
+| 2 | `kaiju_signal` | Kaiju Signal | 2 | เลือกรับยูนิต Kaiju 1 จาก 3 |
+| 4 | `kyodaika_serum` | Kyodaika Serum | 3 | ใช้กับ Kaiju ที่เลือก: ได้ Kyodaika และ +1/+1 ถาวร |
+
 ---
 
 ## 5. Beast — Beastars
@@ -261,6 +279,13 @@
 **Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 4/3
 - ไม่ได้ใส่ (ตัวร้าย): Riz, Melon, Ibuki — Louis เรียก "Shishigumi Lion" เป็น token ทั่วไปแทน
 - Durham และ Dom เป็นตัวละครที่มีในเรื่อง แต่ทำเป็น token เพื่อให้เป็นการ์ดที่ถูกเรียก
+
+**Gear**
+| R | key | Gear | ราคา | ความสามารถ |
+|---|---|---|---|---|
+| 1 | `black_market_meal` | Black Market Meal | 1 | ใช้กับ Beast ที่เลือก: +2/+1 ถาวร |
+| 3 | `shishigumi_call` | Shishigumi Call | 2 | เรียก Shishigumi Lion (4/3) ลงบอร์ด |
+| 4 | `beastar_badge` | Beastar Badge | 3 | ใช้กับ Beast ที่เลือก: ได้ Guard และ +3/+3 ถาวร |
 
 ---
 
@@ -321,6 +346,13 @@
 | `naruto_sage` | Naruto (Sage Mode) | 5/5 | เมื่อโจมตี: ทำดาเมจ 2 ใส่ศัตรูแบบสุ่ม (Rasenshuriken) |
 | `gamabunta` | Gamabunta | 5/5 | — |
 | (สำเนาของ Naruto) | ใช้ action COPY ไม่ต้องสร้างการ์ด | | |
+
+**Gear**
+| R | key | Gear | ราคา | ความสามารถ |
+|---|---|---|---|---|
+| 1 | `kunai` | Kunai | 1 | ใช้กับ Shonen ที่เลือก: +2/+1 ถาวร |
+| 3 | `shadow_clone_scroll` | Shadow Clone Scroll | 3 | ใช้กับ Shonen ที่เลือก: เรียกสำเนาของตัวนั้น |
+| 4 | `rasengan` | Rasengan | 3 | ใช้กับ Shonen ที่เลือก: ได้ Power Strike และ +2/+1 ถาวร |
 
 \* limit มีแค่ "ต่อเทิร์น" กับ "ต่อเกม" 1 เทิร์นมีการสู้ครั้งเดียว "ต่อเทิร์น" จึงเท่ากับต่อการสู้
 \*\* ค่าติดลบใส่ศัตรูหยุดที่ ATK 0 และไม่ทำให้ตาย (ดูข้อ 8)
@@ -487,7 +519,7 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 **นับเผ่าแบบใหม่ (C)**: ไม่นับ token ที่ถูกเรียก Beast ดีขึ้นจาก 5.11 เป็น 4.86 ส่วนหนึ่งของความ "อ่อน" มาจากวิธีวัด · ผลข้างเคียง: Rider แรงขึ้นแล้ว Shonen กับ Sentai ตก (Shonen 4.43 → 4.81)
 
-## Balance pass 1 (2026-10-08, ใส่ใน draft แล้ว ยังไม่ publish)
+## Balance pass 1 (2026-10-08, publish ใน version 9)
 
 ตารางการ์ดข้างบนเป็นค่าหลังปรับแล้ว · ทดสอบชุดละ 2,400 เกม (Human ปิด) · อันดับเฉลี่ย ต่ำ = ดี
 
@@ -505,13 +537,29 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 **ที่ยังต้องดู**: Shonen ตกเป็นอ่อนสุด (4.70) · Kaiju/Mecha ยังนำราว 0.5 · ตัวเลขมาจากบอท ต้องดูจากการเล่นจริงด้วย
 
-## Balance pass 2 (2026-10-08, ใส่ใน draft แล้ว ยังไม่ publish)
+## Balance pass 2 (2026-10-08, publish ใน version 9–10)
 
 - ร้านสุ่มการ์ดของ Hero (ซีรีส์เดียวกัน / ที่ Hero Power ระบุ) บ่อยขึ้น 2 เท่า (`heroCardWeight`) → Sentai, Beast ดีขึ้น · Hero Zeztz แย่ลง (Rider 4.49 → 4.71)
 - **Capsem ใช้กับ Rider ทุกตัว**: +1/+1 ถาวร ส่วนการแปลงร่างยังเฉพาะ Zeztz → Rider 4.71 → **3.77** (2,400 เกม) · Mecha 3.77, Kaiju 4.28, Sentai 4.29, Beast 4.52, Shonen 4.63 (ห่างสุด 0.86)
 - ทางเลือกที่ทดลองแต่ไม่เลือก: ตัวที่ไม่ใช่ Zeztz ได้ +1/+0 (Rider 4.31) · Baku แปลงร่างแล้วได้ Capsem (ไม่ต่าง) · Capsem +2/+2 (Rider 4.60)
 - **Giant Robo ได้ stat Sentai 50%** (`giantSentaiScale` 0.5 จาก 1, version 10): เล่นจริงหุ่นแรงเกิน · Simulate เดิมไม่เห็นเพราะตารางเผ่านับแค่บอร์ด (บอทที่มีหุ่นอันดับเฉลี่ย 1.93, ชนะ 53%) → Sentai 4.29 → 4.46, คนมีหุ่น 1.93 → 2.29 · ไม่มีหุ่นเลย Sentai 5.16
 - **ต้องดูต่อ**: Rider อาจแรงเกินในเกมจริง · Shonen อ่อนสุด
+
+## Balance pass 3: Gear ของทุกเผ่า (2026-10-08, ใส่ใน draft แล้ว ยังไม่ publish)
+
+ก่อนหน้านี้ Gear ในร้านเกือบทั้งหมดเป็น Capsem ของ Rider (ร้านมีช่อง Gear 1 ช่อง สุ่มจาก Gear ของเผ่าในล็อบบี้) → Rider ได้เปรียบ · เพิ่ม Gear เผ่าละ 3 ใบ (Mecha 2 ใบ + Sousei Gattai เดิม) รวม 14 ใบ ดูตารางในแต่ละเผ่า · ทุกใบมีซีรีส์ของเผ่า (ระบบการ์ดของ Hero นับด้วย) · ยังไม่มีรูป
+
+| เผ่า | version 10 | + Gear ใหม่ |
+|---|---|---|
+| Rider | 3.74 | 4.23 |
+| Mecha | 3.74 | 4.04 |
+| Kaiju | 4.23 | 4.05 |
+| Sentai | 4.46 | 4.31 |
+| Shonen | 4.56 | 4.37 |
+| Beast | 4.53 | 4.64 |
+| ห่างสุด | 0.82 | **0.60** |
+
+Simulate 2,400 เกมต่อชุด · Capsem โผล่น้อยลงเพราะมี Gear เผ่าอื่นแทรก Rider จึงลงเอง · **ต้องดูต่อ**: Beast อ่อนสุด
 
 ## 8. สิ่งที่ต้องรู้ก่อนสร้างจริง
 
