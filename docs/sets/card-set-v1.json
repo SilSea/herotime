@@ -4299,11 +4299,284 @@
  ],
  "heroes": [
   {
-   "key": "h_strategist",
-   "name": "Strategist",
+   "key": "h_lord_zero",
+   "name": "Lord Zero",
+   "armor": 0,
    "power": {
     "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "RANDOM_CARD",
+        "cardKind": "GEAR",
+        "faction": "rider"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_baku",
+   "name": "Baku Yorozu",
+   "armor": 0,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_ACQUIRE",
+      "actions": [
+       {
+        "type": "GAUGE_ADD",
+        "gauge": "rider",
+        "amount": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_nem",
+   "name": "Nem",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 0,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "ALL_FRIENDLY",
+       "cards": [
+        "zeztz",
+        "zeztz_wing",
+        "zeztz_transform",
+        "zeztz_stream",
+        "zeztz_machinery",
+        "zeztz_projection",
+        "zeztz_recovery",
+        "zeztz_barrier",
+        "zeztz_wonder",
+        "zeztz_gravity",
+        "zeztz_plasma",
+        "zeztz_booster",
+        "zeztz_exdream"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_kensei",
+   "name": "Kensei Odaka",
+   "armor": 3,
+   "power": {
+    "mode": "ONCE",
     "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "ADD_TO_HAND",
+        "cardKey": "kensei_odaka"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_gira",
+   "name": "Gira Husty",
+   "armor": 0,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_ACQUIRE",
+      "actions": [
+       {
+        "type": "MODIFY_RULE",
+        "rule": "rollCallColors",
+        "op": "SET",
+        "value": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_yanma",
+   "name": "Yanma Gast",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 2,
+        "hp": 2,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "GIANT_SLOT"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_hymeno",
+   "name": "Hymeno Ran",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 0,
+        "hp": 2,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "sentai"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_rita",
+   "name": "Rita Kaniska",
+   "armor": 5,
+   "power": {
+    "mode": "ONCE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "DISCOVER_UNIT",
+        "faction": "sentai"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_gen_fudo",
+   "name": "Gen Fudo",
+   "armor": 0,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_ACQUIRE",
+      "actions": [
+       {
+        "type": "MODIFY_RULE",
+        "rule": "gattaiSize",
+        "op": "SET",
+        "value": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_celiane",
+   "name": "Celiane",
+   "armor": 0,
+   "power": {
+    "mode": "ONCE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "ADD_TO_HAND",
+        "cardKey": "solar_wings"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_sirius",
+   "name": "Sirius de Alisia",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "GIVE_KEYWORD",
+        "keyword": "GATTAI"
+       }
+      ],
+      "target": {
+       "selector": "RIGHTMOST_FRIENDLY",
+       "faction": "mecha"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_apollo",
+   "name": "Apollo",
+   "armor": 3,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
     "effects": [
      {
       "scope": "PLAYER",
@@ -4317,15 +4590,270 @@
        }
       ],
       "target": {
-       "selector": "RANDOM_FRIENDLY"
+       "selector": "LEFTMOST_FRIENDLY",
+       "faction": "mecha"
       }
      }
     ]
    }
   },
   {
-   "key": "h_quartermaster",
-   "name": "Quartermaster",
+   "key": "h_shobijin",
+   "name": "Shobijin",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "GIVE_KEYWORD",
+        "keyword": "REVIVE"
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "kaiju"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_daisuke",
+   "name": "Daisuke Serizawa",
+   "armor": 0,
+   "power": {
+    "mode": "ONCE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "DESTROY"
+       }
+      ],
+      "target": {
+       "selector": "RIGHTMOST_FRIENDLY"
+      }
+     },
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "DISCOVER_UNIT",
+        "faction": "kaiju"
+       }
+      ],
+      "repeat": 2
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_ishiro",
+   "name": "Ishiro Serizawa",
+   "armor": 0,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_TURN_START",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 1,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "kaiju"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_jet_jaguar",
+   "name": "Jet Jaguar",
+   "armor": 2,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 2,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RIGHTMOST_FRIENDLY"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_legoshi",
+   "name": "Legoshi",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "SUMMON",
+        "cardKey": "durham",
+        "count": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_haru",
+   "name": "Haru",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 2,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "beast"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_louis",
+   "name": "Louis",
+   "armor": 0,
+   "power": {
+    "mode": "ONCE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "SUMMON",
+        "cardKey": "shishigumi_lion",
+        "count": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_gohin",
+   "name": "Gohin",
+   "armor": 5,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "GIVE_KEYWORD",
+        "keyword": "GUARD"
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "beast"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_merchant",
+   "name": "Guild Merchant",
+   "armor": 0,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_ACQUIRE",
+      "actions": [
+       {
+        "type": "MODIFY_RULE",
+        "rule": "freeRefreshesPerTurn",
+        "op": "SET",
+        "value": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_mayor",
+   "name": "City Mayor",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF_SHOP",
+        "atk": 1,
+        "hp": 0
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_banker",
+   "name": "Central Banker",
+   "armor": 0,
    "power": {
     "mode": "ONCE",
     "cost": 0,
@@ -4344,10 +4872,37 @@
    }
   },
   {
-   "key": "h_scout",
-   "name": "Scout",
+   "key": "h_general",
+   "name": "Defense General",
+   "armor": 8,
    "power": {
-    "mode": "ONCE",
+    "mode": "ACTIVE",
+    "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 0,
+        "hp": 1,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "ALL_FRIENDLY"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_minato",
+   "name": "Minato Namikaze",
+   "armor": 0,
+   "power": {
+    "mode": "ACTIVE",
     "cost": 1,
     "effects": [
      {
@@ -4355,7 +4910,61 @@
       "trigger": "ON_USE",
       "actions": [
        {
-        "type": "DISCOVER_UNIT"
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 0,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "LEFTMOST_FRIENDLY"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_hiruzen",
+   "name": "Hiruzen Sarutobi",
+   "armor": 0,
+   "power": {
+    "mode": "PASSIVE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_TURN_START",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 1,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "shonen"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "key": "h_iruka",
+   "name": "Iruka Umino",
+   "armor": 3,
+   "power": {
+    "mode": "ONCE",
+    "cost": 0,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "DISCOVER_UNIT",
+        "faction": "shonen"
        }
       ]
      }
@@ -4363,30 +4972,667 @@
    }
   },
   {
-   "key": "h_veteran",
-   "name": "Veteran",
-   "armor": 5,
+   "key": "h_kushina",
+   "name": "Kushina Uzumaki",
+   "armor": 0,
    "power": {
-    "mode": "PASSIVE",
-    "cost": 0,
+    "mode": "ACTIVE",
+    "cost": 1,
     "effects": [
      {
       "scope": "PLAYER",
-      "trigger": "ON_ACQUIRE",
+      "trigger": "ON_USE",
       "actions": [
        {
-        "type": "MODIFY_RULE",
-        "rule": "handSize",
-        "op": "ADD",
-        "value": 1
+        "type": "GIVE_KEYWORD",
+        "keyword": "BARRIER"
        }
-      ]
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "shonen"
+      }
      }
     ]
    }
   }
  ],
- "relics": [],
+ "relics": [
+  {
+   "key": "rl_zeztz_driver",
+   "name": "Zeztz Driver",
+   "tier": "LESSER",
+   "cost": 2,
+   "factions": [
+    "rider"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "rider"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_capsem_case",
+   "name": "Capsem Case",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "rider"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "GEAR",
+       "faction": "rider"
+      }
+     ],
+     "repeat": 2
+    },
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "GAUGE_ADD",
+       "gauge": "rider",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_exdream_driver",
+   "name": "Zeztz Exdream Driver",
+   "tier": "GREATER",
+   "cost": 4,
+   "factions": [
+    "rider"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "ADD_TO_HAND",
+       "cardKey": "capsem_exdreamrise"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_ohger_calibur",
+   "name": "Ohger Calibur",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "sentai"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "sentai"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_shugod_nest",
+   "name": "Shugod Nest",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "sentai"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "GAUGE_ADD",
+       "gauge": "mecha",
+       "amount": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_kings_crown",
+   "name": "Ohger Crown",
+   "tier": "GREATER",
+   "cost": 5,
+   "factions": [
+    "sentai"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 4,
+       "hp": 4,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "GIANT_SLOT"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_vector_engine",
+   "name": "Vector Engine",
+   "tier": "LESSER",
+   "cost": 2,
+   "factions": [
+    "mecha"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_FRIENDLY",
+      "faction": "mecha"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_element_training",
+   "name": "Element Training",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "mecha"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "MODIFY_RULE",
+       "rule": "gattaiSize",
+       "op": "SET",
+       "value": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_tree_of_life",
+   "name": "Tree of Life",
+   "tier": "GREATER",
+   "cost": 5,
+   "factions": [
+    "mecha"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_TURN_START",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "mecha"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_monster_island",
+   "name": "Monster Island",
+   "tier": "LESSER",
+   "cost": 2,
+   "factions": [
+    "kaiju"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "REVIVE"
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "kaiju"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_g_cells",
+   "name": "G-Cells",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "kaiju"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_TURN_START",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": true
+      }
+     ],
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "kaiju"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_oxygen_destroyer",
+   "name": "Oxygen Destroyer",
+   "tier": "GREATER",
+   "cost": 6,
+   "factions": [
+    "kaiju"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "DESTROY"
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_drama_club",
+   "name": "Cherryton Drama Club",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "beast"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "beast"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_black_market",
+   "name": "Black Market",
+   "tier": "LESSER",
+   "cost": 2,
+   "factions": [
+    "beast"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT",
+       "faction": "beast"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_beastar",
+   "name": "Beastar Title",
+   "tier": "GREATER",
+   "cost": 4,
+   "factions": [
+    "beast"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "beast"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_savings_bond",
+   "name": "Savings Bond",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "human"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_TURN_START",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_coupon_book",
+   "name": "Coupon Book",
+   "tier": "LESSER",
+   "cost": 0,
+   "factions": [
+    "human"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_city_grant",
+   "name": "City Grant",
+   "tier": "GREATER",
+   "cost": 3,
+   "factions": [
+    "human"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "BUFF_SHOP",
+       "atk": 2,
+       "hp": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_leaf_headband",
+   "name": "Leaf Headband",
+   "tier": "LESSER",
+   "cost": 1,
+   "factions": [
+    "shonen"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 0,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "shonen"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_ninja_scroll",
+   "name": "Ninja Scroll",
+   "tier": "LESSER",
+   "cost": 2,
+   "factions": [
+    "shonen"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT",
+       "faction": "shonen"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_sage_training",
+   "name": "Sage Training",
+   "tier": "GREATER",
+   "cost": 4,
+   "factions": [
+    "shonen"
+   ],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 1,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "shonen"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_lucky_coin",
+   "name": "Lucky Coin",
+   "tier": "LESSER",
+   "cost": 0,
+   "factions": [],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_ACQUIRE",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rl_training_weights",
+   "name": "Training Weights",
+   "tier": "LESSER",
+   "cost": 2,
+   "factions": [],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "LEFTMOST_FRIENDLY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_war_banner",
+   "name": "War Banner",
+   "tier": "GREATER",
+   "cost": 0,
+   "factions": [],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": false
+      }
+     ],
+     "target": {
+      "selector": "ALL_FRIENDLY"
+     }
+    }
+   ]
+  },
+  {
+   "key": "rl_treasury",
+   "name": "Treasury",
+   "tier": "GREATER",
+   "cost": 3,
+   "factions": [],
+   "weight": 100,
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_TURN_START",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  }
+ ],
  "rules": {
   "rollCallColors": 3
  }
