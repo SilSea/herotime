@@ -218,7 +218,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 - **ลำดับตี**: ใช้ pointer ที่ปรับตามการเพิ่ม/ลบยูนิตทั้งสองฝั่ง ไม่มีตัวไหนถูกข้ามเมื่อยูนิตทางซ้ายตาย
 - **การ์ดที่ effect สร้างและอยู่ใน pool** (`ADD_TO_HAND`, `SUMMON`, `TRANSFORM`, Henshin) ดึง/สลับจาก pool จริง — ถ้า pool ไม่มีให้ ไม่เกิดผล (Henshin รอเทิร์นถัดไป). token/Gear/Giant ไม่อยู่ใน pool จึงไม่กระทบ
 - **combat ที่ effect วนไม่รู้จบ** (ตาย→summon→ตาย…) จบเป็นเสมอ ไม่ crash แมตช์
-- **Content validation** (ตอน publish): reference ที่ไม่มีอยู่, `MODIFY_RULE` ชื่อกฎที่ไม่มี, Series Bond ที่ไม่ใช่ player-scope `START_OF_COMBAT`, Gear ที่ effect ไม่ใช่ player-scope `ON_PLAY`, การ์ดยูนิตที่มี player-scope effect, รางวัล Gauge ที่ต้องมีเป้าหมาย
+- **Content validation** (ตอน publish): reference ที่ไม่มีอยู่, `MODIFY_RULE` ชื่อกฎที่ไม่มี, Series Bond ที่ไม่ใช่ player-scope `START_OF_COMBAT`, Gear ที่ effect ไม่ใช่ player-scope `ON_PLAY`, การ์ดยูนิตที่มี player-scope effect, รางวัล Gauge ที่ต้องมีเป้าหมาย, ปิด (`enabled: false`) ทุก Hero หรือทุกเผ่า, `formOf` / `series` ของ Hero ที่ชี้ไปยังของที่ไม่มี
 - **`MODIFY_RULE`**: กฎที่ปรับได้ = `startEnergy`, `energyPerTurn`, `maxEnergy`, `buyCost`, `sellValue`, `refreshCost`, `boardSize`, `handSize`, `maxRank`, `freeRefreshesPerTurn`, `rollCallColors`, `rollCallBuff`, `gattaiSize`, `giantEntryThreshold`, `giantSentaiScale`, `kyodaikaMultiplier`. Engine อ่านผ่านกฎของผู้เล่นเสมอ ห้าม hardcode
 - **Content versioning**: draft → Publish = snapshot ที่ไม่เปลี่ยน, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
 

@@ -86,6 +86,8 @@ export interface SimRow {
   name: string;
   count: number;
   avgPlacement: number;
+  /** ± range of avgPlacement (95%); absent from older servers. */
+  margin?: number;
   winRate: number;
 }
 
@@ -98,6 +100,8 @@ export interface SimulationReport {
   heroes: SimRow[];
   cards: SimRow[];
   factions: SimRow[];
+  /** Final boards that belong to no faction. */
+  unassigned?: number;
   relics: SimRow[];
   forced?: SimRow;
   neverUsed: string[];

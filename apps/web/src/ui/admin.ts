@@ -80,8 +80,29 @@ export function adminHasFocus(): boolean {
   return !!a && !!a.closest(".admin") && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
 }
 
+let drawnFor: string | undefined;
+
+/**
+ * Draw the admin again, keeping where each scrolling part was: the list on the left (so picking a card does not
+ * jump back to the top) and the page. The form and preview keep theirs too, unless another entry was picked.
+ */
 function redraw(): void {
-  if (host && live) renderAdmin(host, live);
+  if (!host || !live) return;
+  const at = (sel: string): number => host?.querySelector<HTMLElement>(sel)?.scrollTop ?? 0;
+  const kept = { list: at(".admin-list"), middle: at(".admin-middle"), right: at(".admin-right"), page: window.scrollY };
+  const same = drawnFor === `${ed.kind}:${ed.index}`;
+  renderAdmin(host, live);
+  drawnFor = `${ed.kind}:${ed.index}`;
+  const put = (sel: string, top: number): void => {
+    const el = host?.querySelector<HTMLElement>(sel);
+    if (el) el.scrollTop = top;
+  };
+  put(".admin-list", kept.list);
+  if (same) {
+    put(".admin-middle", kept.middle);
+    put(".admin-right", kept.right);
+  }
+  window.scrollTo({ top: kept.page });
 }
 
 async function guarded<T>(ctx: Ctx, work: () => Promise<T>): Promise<T | undefined> {
@@ -362,13 +383,31 @@ async function runSimulation(ctx: Ctx): Promise<void> {
   }
 }
 
-function simTable(title: string, rows: SimRow[], expected: number, limit = 15): HTMLElement {
+/**
+ * Green / red only when a row is well off the average and the gap is bigger than its ± range (so a handful of
+ * lucky matches does not light up).
+ */
+function simClass(r: SimRow, expected: number): string {
+  const gap = r.avgPlacement - expected;
+  if (Math.abs(gap) < 0.7 || (r.margin !== undefined && Math.abs(gap) <= r.margin)) return "";
+  return gap < 0 ? "sim-good" : "sim-bad";
+}
+
+function simTable(title: string, rows: SimRow[], expected: number, limit = 15, note?: string): HTMLElement {
   const shown = rows.slice(0, limit);
   return h(
     "div",
     { class: "panel sim-table" },
     h("h3", { text: title }),
-    shown.length === 0 ? h("p", { class: "muted", text: "Nothing to show." }) : h("table", { class: "admin-table" }, h("tr", null, ...["", "Seen", "Avg place", "Win %"].map((t) => h("th", { text: t }))), ...shown.map((r) => h("tr", { class: r.avgPlacement <= expected - 0.7 ? "sim-good" : r.avgPlacement >= expected + 0.7 ? "sim-bad" : "" }, h("td", { text: r.name }), h("td", { text: String(r.count) }), h("td", { text: r.avgPlacement.toFixed(2) }), h("td", { text: `${(r.winRate * 100).toFixed(0)}%` })))),
+    shown.length === 0
+      ? h("p", { class: "muted", text: "Nothing to show." })
+      : h(
+          "table",
+          { class: "admin-table" },
+          h("tr", null, ...["", "Seen", "Avg place", "±", "Win %"].map((t) => h("th", { text: t, title: t === "±" ? "95% range: run more matches and the average very likely stays within this" : "" }))),
+          ...shown.map((r) => h("tr", { class: simClass(r, expected) }, h("td", { text: r.name }), h("td", { text: String(r.count) }), h("td", { text: r.avgPlacement.toFixed(2) }), h("td", { class: "muted", text: r.margin !== undefined ? r.margin.toFixed(2) : "" }), h("td", { text: `${(r.winRate * 100).toFixed(0)}%` }))),
+        ),
+    note && h("p", { class: "muted small", text: note }),
   );
 }
 
@@ -385,7 +424,7 @@ function simulatePanel(ctx: Ctx): HTMLElement {
   return h(
     "div",
     null,
-    h("div", { class: "panel" }, h("h3", { text: "Sandbox: bots play full matches" }), h("p", { class: "muted", text: "Eight bots per match. Read it as 'does anything stand out' rather than a verdict: the bots play simply. Green = places well, red = places badly, against the average." }), h("div", { class: "row" }, matches, "matches on", target, relic, h("button", { class: "btn primary", text: ed.busy ? "Running..." : "Run", disabled: ed.busy, on: { click: () => void runSimulation(ctx) } }))),
+    h("div", { class: "panel" }, h("h3", { text: "Sandbox: bots play full matches" }), h("p", { class: "muted", text: "Eight bots per match. Read it as 'does anything stand out' rather than a verdict: the bots play simply. Green = places well, red = places badly, against the average, only when the gap is bigger than its ± range. ± shrinks with more matches: 300 matches gives about ±0.2 for a faction." }), h("div", { class: "row" }, matches, "matches on", target, relic, h("button", { class: "btn primary", text: ed.busy ? "Running..." : "Run", disabled: ed.busy, on: { click: () => void runSimulation(ctx) } }))),
     r &&
       h(
         "div",
@@ -394,7 +433,7 @@ function simulatePanel(ctx: Ctx): HTMLElement {
         r.forced && h("div", { class: "panel" }, h("strong", { text: `Bot 1 with ${r.forced.name}` }), h("p", { text: `Average place ${r.forced.avgPlacement.toFixed(2)} (expected ${r.expected}), wins ${(r.forced.winRate * 100).toFixed(0)}% over ${r.forced.count} matches.` })),
         simTable("Heroes", r.heroes, r.expected),
         simTable("Relics (held at the end)", r.relics ?? [], r.expected),
-        simTable("Factions (3+ units on the final board)", r.factions, r.expected),
+        simTable("Factions (3+ units on the final board, summoned tokens not counted)", r.factions, r.expected, 15, r.unassigned ? `${r.unassigned} final boards had no faction with 3+ units, so they are in no faction row.` : undefined),
         simTable("Best cards", cards, r.expected),
         simTable("Worst cards", [...cards].reverse(), r.expected),
       ),

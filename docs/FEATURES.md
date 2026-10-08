@@ -20,10 +20,10 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F1.14** (P0) ปุ่มยอมแพ้ (Surrender): ออกทันที ได้อันดับล่างสุดของคนที่ยังอยู่ ใช้ได้ทุก phase
 
 ## F2. Faction & Keyword
-- [x] **F2.1** (P0) 7 Faction: Rider, Sentai, Mecha, Kaijin, Grunt, Ally, Dark Rider — สุ่ม 5 ต่อล็อบบี้
+- [x] **F2.1** (P0) Faction เก็บใน DB สุ่ม 5 ต่อล็อบบี้ · ชุดการ์ดแรก (card-set-v1) มี 7 เผ่า: Rider, Sentai, Mecha, Kaiju, Beast, Human, Shonen (ดู [FACTIONS.md](FACTIONS.md)) · ชุด prototype ยังเป็นเผ่าทดสอบเดิม · เปิด/ปิดเผ่าได้ใน Admin (F6.20)
 - [x] **F2.2** (P0) Keyword มาตรฐาน: Guard, Barrier, Last Stand, Henshin Call, Rapid, Lethal, Revive, Start of Combat, End of Turn, Avenge(N)
 - [x] **F2.3** (P0) Keyword ธีม: Henshin(N), Team-Up(k), Gattai, Kyodaika, Power Strike (บน Rider = Rider Kick)
-- [x] **F2.4** (P0) Sentai color (Red/Blue/Yellow/Green/Pink) + Extra = wildcard
+- [x] **F2.4** (P0) Sentai color: Red/Blue/Yellow/Green/Pink/Black/White/Purple/Silver/Gold/Orange + Extra = wildcard
 
 ## F3. Series & Giant Robo
 - [x] **F3.1** (P0) ลำดับชั้น Universe → Franchise → Series
@@ -66,6 +66,10 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F5.21** (P1) หนังสือการ์ดแท็บ **ร่างแปลง & พิเศษ** แสดงการ์ดที่ร้านไม่ขายครบ: ร่าง Henshin / Final Form / Gattai, Token ที่ถูกเรียก/ได้เข้ามือ/แปลงเป็น (ตามต่อเป็นทอดๆ), การ์ดจาก gauge, Giant Robo และ Token อื่นของเผ่าในเกม พร้อมบอกว่าได้มาจากการ์ดไหน
 - [x] **F5.20** (P1) ลากยูนิตลงบอร์ดมี**กรอบตำแหน่งที่จะวาง** (ขนาดเท่าการ์ด ยูนิตข้างๆ ขยับให้) · ลาก Gear ที่ต้องเลือกยูนิตจากมือมี**เป้าเล็ง** (เส้นจากการ์ดไปเป้า ล็อกเป็นสีเขียวเมื่ออยู่บนยูนิตที่ใช้ได้ ยูนิตที่ใช้ไม่ได้จางลง) และตอนกด "ใช้" แล้วรอเลือกยูนิตก็มีเป้าตามเมาส์ · ลาก Gear จากร้าน (ซื้อ) ไม่มีเป้า
 - [x] **F5.19** (P1) ร่าง Final Form ไม่อยู่ในข้อความการ์ดแล้ว: แสดงเป็นไอคอน ★ และกล่องคำอธิบายข้าง preview แบบ keyword/Henshin
+- [x] **F6.22** (P1) Simulate อ่านง่ายขึ้น: คอลัมน์ ± (ช่วง 95% ของอันดับเฉลี่ย), เขียว/แดงเฉพาะเมื่อห่างค่ากลางเกิน ± · เผ่าของบอร์ดไม่นับ token ที่ถูกเรียก (ร่างแปลงยังนับ) และบอกจำนวนบอร์ดที่ไม่มีเผ่า · "ไม่เคยอยู่บนบอร์ดสุดท้าย" นับร่างที่แปลงไปแล้วและข้ามการ์ดของเผ่าที่ปิด · รายการด้านซ้ายใน Admin ไม่เด้งกลับบนสุดตอนเลือก
+- [x] **F6.21** (P1) คำอธิบายที่สร้างอัตโนมัติ: Hero/Relic/Gear ไม่มีคำว่า "อื่น" กับเป้าหมายสุ่ม, หลาย action ที่เป้าหมายเดียวกันรวมเป็นประโยคเดียว, ชื่อ Gauge แทน key, ช่อง text ที่ว่างโชว์ข้อความที่สร้างเป็นตัวจาง, Preview Hero/Relic โชว์ 2 ภาษา · keyword `RIDER_KICK` ชื่อ **Power Strike** (บน Rider = Rider Kick)
+- [x] **F6.20** (P1) เปิด/ปิดให้เล่น (`enabled`) เผ่า / Hero / Relic: ปุ่ม ●/○ ในรายการ Admin หรือช่อง in play · เผ่าที่ปิดไม่ถูกสุ่ม (การ์ดเผ่านั้นไม่ขึ้นร้าน) · Hero/Relic ที่ปิดไม่ถูกเสนอ · ซ่อนจากหนังสือการ์ดและตัวเลือกเผ่าใน Practice · ปิดทั้งหมดไม่ได้
+- [x] **F6.19** (P1) ปรับภาพ (ลาก/ซูม, `artCrop`) ของการ์ด, Hero และ Relic · Hero มี `series` · `formOf` บอกว่าร่างนี้เป็นร่างของการ์ดไหน (ตัวกรองการ์ดนับให้ ไม่ต้องใส่ทุกร่าง)
 - [x] **F6.18** (P1) แก้ตามรีวิวการ์ด Rider: เมื่อแปลงร่างรัน effect ของใบที่แปลง, ยูนิตใช้ "ตอนเริ่มเทิร์น" ได้, เตือน trigger ที่ยูนิตไม่มีวันได้, สุ่มเผ่าเฉพาะที่มีการ์ดในร้าน
 - [x] **F6.17** (P1) `COPY` ก๊อปปี้ยูนิต (ลงบอร์ด/เข้ามือ, การ์ดพื้นฐานหรือรวมบัฟ, ก๊อปปี้ศัตรูตอนต่อสู้) นับรวม triple + ตัวกันเนื้อหาวน (เพดานค่าพลัง/จำนวนยูนิตต่อการต่อสู้/ความลึกการเรียก)
 - [x] **F6.16** (P1) บัฟด้วย ATK/HP ของการ์ดใบนี้ (`BUFF.fromSelf`) และ `CONSUME_ALLIES` ทำลายยูนิตอื่นทั้งหมดแล้วมอบค่าพลังรวม ใช้ได้ทั้งช่วงซื้อและช่วงต่อสู้ (effect builder + Card wizard)
@@ -89,7 +93,7 @@ Priority: **P0** = MVP ต้องมี · **P1** = หลัง MVP · **P2**
 - [x] **F6.2** (P0) Effect builder (form จาก descriptor ที่มี test ตรวจว่าตรงกับ zod) + โหมด raw JSON
 - [x] **F6.3** (P0) Live card preview (ข้อความกฎที่สร้างจาก effect อัพเดตตอน Save)
 - [x] **F6.4** (P0) Draft → Publish ContentVersion, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
-- [x] **F6.5** (P0) Upload รูป (PNG/JPEG/GIF/WebP ≤ ~1.4 MB, ตรวจชนิดจาก bytes ไม่รับ SVG, ตั้งชื่อไฟล์จาก hash, เก็บใน `UPLOAD_DIR`, เสิร์ฟที่ `/art/`)
+- [x] **F6.5** (P0) Upload รูป (PNG/JPEG/GIF/WebP ≤ ~15 MB, ตรวจชนิดจาก bytes ไม่รับ SVG, ตั้งชื่อไฟล์จาก hash, เก็บใน `UPLOAD_DIR`, เสิร์ฟที่ `/art/`)
 - [x] **F6.6** (P1) Sandbox: bot 8 ตัวเล่นเต็มแมตช์บน draft หรือชุดที่ publish (สูงสุด 300 แมตช์) สรุป hero/faction/การ์ดที่ชนะมากหรือน้อยผิดปกติ (ยังไม่ใช่การเลือกบอร์ด 2 ฝั่งเอง)
 - [~] **F6.7** (P1) Rollback (restore เวอร์ชันเก่าเข้า draft แล้ว publish) + Audit log ทำแล้ว; Diff ยังไม่ทำ
 - [x] **F6.11** (P1) จำกัดจำนวนครั้งของความสามารถ (`limit` ต่อเทิร์น/ต่อเกม), ทิ้งการ์ด (`DISCARD` + trigger `ON_DISCARD`), กลืนกินเลือกตัวแรงสุด/อ่อนสุด/สุ่ม; Admin → Sounds; fuzz test ด้วยการ์ดจริง (prototype/production) ตรวจว่าการ์ดในกองกลางไม่รั่ว

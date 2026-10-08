@@ -17,7 +17,10 @@ export function renderLibrary(root: HTMLElement, ctx: Ctx): void {
     const list = h("div", { class: "library-grid" });
 
     if (tab === "cards") {
+      // Cards whose every faction is switched off never reach a match, so the book leaves them out.
+      const off = new Set([...ix.factions.values()].filter((f) => f.enabled === false).map((f) => f.key));
       const cards = [...ix.cards.values()]
+        .filter((c) => c.factions.length === 0 || c.factions.some((f) => !off.has(f)))
         .filter((c) => (faction ? (faction === "_neutral" ? c.factions.length === 0 : c.factions.includes(faction)) : true))
         .filter((c) => (rank ? c.rank === rank : true))
         .filter((c) => (query ? `${c.name} ${c.text} ${c.textTh ?? ""}`.toLowerCase().includes(query.toLowerCase()) : true))

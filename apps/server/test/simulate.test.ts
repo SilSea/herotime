@@ -71,3 +71,30 @@ describe("summonedTokens", () => {
     expect([...summonedTokens(content)]).toEqual(["pup"]);
   });
 });
+
+describe("simulate margins", () => {
+  it("gives every row a ± range and accounts for every final board", () => {
+    const r = simulate(starterContent(), { matches: 6, seed: 5, match: { maxTurns: 8 } });
+    for (const row of [...r.factions, ...r.heroes, ...r.cards]) {
+      expect(row.margin).toBeGreaterThanOrEqual(0);
+      expect(row.margin).toBeLessThanOrEqual(8);
+    }
+    expect(r.factions.reduce((n, f) => n + f.count, 0) + r.unassigned).toBe(6 * 8);
+  });
+});
+
+describe("never used", () => {
+  it("does not list a card whose Henshin form was seen, or a card of a faction that is off", async () => {
+    const { Content } = await import("@herotime/engine");
+    const { CardDef, FactionDef, HeroDef } = await import("@herotime/shared");
+    const card = (key: string, o: Record<string, unknown> = {}) => CardDef.parse({ key, name: key, rank: 1, atk: 1, hp: 1, ...o });
+    const content = new Content({
+      factions: [FactionDef.parse({ key: "on", name: "On" }), FactionDef.parse({ key: "off", name: "Off", enabled: false })],
+      heroes: [HeroDef.parse({ key: "h", name: "h" })],
+      cards: [card("civ", { factions: ["on"], henshin: { afterTurns: 1, into: "form" } }), card("form", { factions: ["on"], token: true, atk: 5, hp: 5 }), card("ghost", { factions: ["off"] })],
+    });
+    const r = simulate(content, { matches: 2, seed: 1, match: { maxTurns: 6 } });
+    expect(r.neverUsed).not.toContain("ghost");
+    if (r.cards.some((c) => c.key === "form")) expect(r.neverUsed).not.toContain("civ");
+  });
+});
