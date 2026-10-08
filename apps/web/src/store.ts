@@ -96,33 +96,26 @@ export function applyView(state: AppState, msg: ViewMessage, clock: ServerClock,
   }
   if (prev && (prev.phase !== view.phase || prev.turn !== view.turn)) next = { ...next, hideOffers: false, selected: undefined };
 
-  const lost = unitsLostToPlay(state, view, newMatch);
+  const lost = unitsDestroyed(state, view, newMatch);
   if (lost.length > 0) {
     const names = lost.map((k) => state.content?.cardName(k) ?? k).join(", ");
-    const text = `${names} was destroyed by the card you just played`;
-    next = addToast({ ...next, log: push(next.log, text) }, text, "error");
+    const text = `${names} was destroyed by a card effect`;
+    next = addToast({ ...next, log: push(next.log, text) }, text, "info");
   }
   return next;
 }
 
 /**
- * Units that left the board because of a card just played from hand (a Deploy that destroys an ally).
- * Selling and triples do not count: selling does not shrink the hand, and a triple adds a Final Form.
+ * Own units an effect destroyed since the last view (a Deploy or Gear that destroys or consumes allies).
+ * The server counts them, so transforms, triples, sales and Gattai never show up here.
  */
-export function unitsLostToPlay(state: AppState, view: ViewMessage["view"], newMatch: boolean): string[] {
+export function unitsDestroyed(state: AppState, view: ViewMessage["view"], newMatch: boolean): string[] {
   const prev = state.view;
-  if (newMatch || !prev || prev.phase !== "RECRUIT" || view.phase !== "RECRUIT" || prev.turn !== view.turn) return [];
-  const before = prev.me?.state;
-  const after = view.me?.state;
-  if (!before || !after) return [];
-  if (after.hand.length >= before.hand.length) return [];
-  if (after.board.length > before.board.length) return [];
-  const golden = (b: readonly { golden?: boolean }[]): number => b.filter((u) => u.golden).length;
-  if (golden(after.board) > golden(before.board)) return [];
-  const left = new Map<string, number>();
-  for (const u of before.board) left.set(u.key, (left.get(u.key) ?? 0) + 1);
-  for (const u of after.board) left.set(u.key, (left.get(u.key) ?? 0) - 1);
-  return [...left].flatMap(([k, n]) => (n > 0 ? Array<string>(n).fill(k) : []));
+  if (newMatch || !prev) return [];
+  const before = prev.me?.state?.moments?.destroyed ?? 0;
+  const now = view.me?.state?.moments;
+  const n = (now?.destroyed ?? 0) - before;
+  return n > 0 ? (now?.lastDestroyed ?? []).slice(-n) : [];
 }
 
 export function applyEvent(state: AppState, msg: EventMessage, content?: ContentIndex): AppState {

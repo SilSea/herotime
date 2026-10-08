@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ServerClock } from "../src/clock.js";
 import { Api, ApiError, Net, type SocketLike } from "../src/net.js";
 import type { CombatRecord, QueueStatus, ViewMessage } from "../src/protocol.js";
-import { addToast, applyEvent, applyStatus, applyView, initialState, removeToast, Store, type AppState , unitsLostToPlay } from "../src/store.js";
+import { addToast, applyEvent, applyStatus, applyView, initialState, removeToast, Store, type AppState , unitsDestroyed } from "../src/store.js";
 
 const record = (turn: number, over: Partial<CombatRecord> = {}): CombatRecord =>
   ({ turn, opponentName: "Bot 1", meSide: "A", damageTaken: 0, damageDealt: 4, result: { winner: "A", events: [{ type: "ATTACK" }] }, ...over }) as unknown as CombatRecord;
@@ -292,32 +292,32 @@ describe("Api", () => {
   });
 });
 
-describe("unitsLostToPlay", () => {
-  const withMe = (hand: string[], board: { key: string; golden?: boolean }[], turn = 1, phase = "RECRUIT") =>
-    ({ matchId: "m1", serverNow: 1, view: { phase, turn, deadline: 9, factions: [], players: [], me: { state: { hand: hand.map((key) => ({ key })), board } } } }) as unknown as ViewMessage;
+describe("unitsDestroyed", () => {
+  type Moments = { destroyed?: number; lastDestroyed?: string[] };
+  const withMe = (hand: string[], board: { key: string; golden?: boolean }[], moments?: Moments, matchId = "m1") =>
+    ({ matchId, serverNow: 1, view: { phase: "RECRUIT", turn: 1, deadline: 9, factions: [], players: [], me: { state: { hand: hand.map((key) => ({ key })), board, moments } } } }) as unknown as ViewMessage;
   const fold = (a: ViewMessage, b: ViewMessage) => {
-    const c = new ServerClock();
-    const s = applyView(initialState(), a, c);
-    return unitsLostToPlay(s, b.view, false);
+    const s = applyView(initialState(), a, new ServerClock());
+    return unitsDestroyed(s, b.view, a.matchId !== b.matchId);
   };
 
-  it("names the unit a played card destroyed", () => {
-    expect(fold(withMe(["dr1"], [{ key: "a" }, { key: "b" }, { key: "c" }]), withMe([], [{ key: "a" }, { key: "c" }, { key: "dr1" }]))).toEqual(["b"]);
+  it("names the units the server says an effect destroyed", () => {
+    const before = withMe(["dr1"], [{ key: "a" }, { key: "b" }], { destroyed: 1, lastDestroyed: ["x"] });
+    const after = withMe([], [{ key: "a" }, { key: "dr1" }], { destroyed: 2, lastDestroyed: ["x", "b"] });
+    expect(fold(before, after)).toEqual(["b"]);
   });
-  it("a normal play, a sale, a gear and a triple lose nothing", () => {
-    expect(fold(withMe(["x"], [{ key: "a" }]), withMe([], [{ key: "a" }, { key: "x" }]))).toEqual([]);
-    expect(fold(withMe([], [{ key: "a" }, { key: "b" }]), withMe([], [{ key: "a" }]))).toEqual([]); // sold: the hand did not shrink
-    expect(fold(withMe(["gear"], [{ key: "a" }]), withMe([], [{ key: "a" }]))).toEqual([]);
+  it("a transform from a played Gear, a sale, a triple or a new match name nothing", () => {
+    // the Gear turned Nox into another form: the board lost the key but nothing was destroyed
+    expect(fold(withMe(["capsem"], [{ key: "nox" }]), withMe([], [{ key: "nox_ultimate" }]))).toEqual([]);
     expect(fold(withMe(["a"], [{ key: "a" }, { key: "a" }]), withMe([], [{ key: "a", golden: true }]))).toEqual([]);
+    expect(fold(withMe([], [{ key: "a" }], { destroyed: 3 }), withMe([], [], { destroyed: 4, lastDestroyed: ["a"] }, "m2"))).toEqual([]);
   });
-  it("ignores a new turn", () => {
-    expect(fold(withMe(["dr1"], [{ key: "a" }]), withMe([], [{ key: "dr1" }], 2))).toEqual([]);
-  });
-  it("applyView raises a toast and a log line", () => {
+  it("applyView raises an info toast and a log line", () => {
     const c = new ServerClock();
     let s = applyView(initialState(), withMe(["dr1"], [{ key: "a" }, { key: "b" }]), c);
-    s = applyView(s, withMe([], [{ key: "b" }, { key: "dr1" }]), c);
+    s = applyView(s, withMe([], [{ key: "b" }, { key: "dr1" }], { destroyed: 1, lastDestroyed: ["a"] }), c);
+    expect(s.toasts.at(-1)).toMatchObject({ kind: "info" });
     expect(s.toasts.at(-1)?.text).toContain("a was destroyed");
-    expect(s.log.at(-1)).toContain("destroyed by the card you just played");
+    expect(s.log.at(-1)).toContain("destroyed by a card effect");
   });
 });

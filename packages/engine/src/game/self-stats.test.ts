@@ -72,6 +72,17 @@ describe("CONSUME_ALLIES", () => {
     expect(e.pool.count("pup")).toBe(before + 1); // back to the pool, like any destroyed unit
   });
 
+  it("counts the destroyed units for the client's notice (and nothing else does)", () => {
+    const e = env();
+    const p = newPlayer();
+    p.board = [u("pup"), u("bear")];
+    p.hand = [u("pup"), u("eater")];
+    playUnit(p, 0, 2, e); // an ordinary play destroys nothing
+    expect(p.moments?.destroyed ?? 0).toBe(0);
+    playUnit(p, 0, 3, e);
+    expect(p.moments).toMatchObject({ destroyed: 3, lastDestroyed: ["pup", "bear", "pup"] });
+  });
+
   it("fight: destroys the others (their Last Stands fire), the target keeps the total for the fight, or for good", () => {
     const e = env();
     for (const permanent of [false, true]) {

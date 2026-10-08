@@ -51,9 +51,10 @@ export interface PlayerState {
   superGattai?: { atk: number; hp: number };
   /**
    * Running counts of moments the client plays a sound for (it compares them between views): triples made,
-   * units transformed (with the last form), cards discarded.
+   * units transformed (with the last form), cards discarded, own units an effect destroyed (with the most
+   * recent ones' keys, newest last).
    */
-  moments?: { triples: number; transforms: number; lastForm?: string; discards: number };
+  moments?: { triples: number; transforms: number; lastForm?: string; discards: number; destroyed?: number; lastDestroyed?: string[] };
   /** Earned in the last fight (Energy, cards, Gauge...); given at the start of the next turn. */
   fightRewards?: FightReward[];
   /** BUFF_GEAR: how much more every stat-giving Gear this player uses gives (each unit it buffs). */
@@ -268,4 +269,14 @@ export function noteMoment(player: PlayerState, kind: "triples" | "transforms" |
   const m = (player.moments ??= { triples: 0, transforms: 0, discards: 0 });
   m[kind]++;
   if (form) m.lastForm = form;
+}
+
+/** How many destroyed keys the moments keep (enough for one effect clearing a full board). */
+const KEEP_DESTROYED = 10;
+
+/** Count one of the player's own units an effect destroyed during recruit (see PlayerState.moments). */
+export function noteDestroyed(player: PlayerState, key: string): void {
+  const m = (player.moments ??= { triples: 0, transforms: 0, discards: 0 });
+  m.destroyed = (m.destroyed ?? 0) + 1;
+  m.lastDestroyed = [...(m.lastDestroyed ?? []), key].slice(-KEEP_DESTROYED);
 }

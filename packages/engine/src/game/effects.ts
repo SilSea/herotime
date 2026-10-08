@@ -3,7 +3,7 @@ import { checkCondition, isOneOf, type UnitView } from "../conditions.js";
 import { recordBuff, type BuffRecord, type Unit } from "../content.js";
 import { capStat } from "../config.js";
 import { modifyRule, withRules } from "../rules.js";
-import { copiesOf, noteMoment, type PlayerState, returnToPool } from "../shop/economy.js";
+import { copiesOf, noteDestroyed, noteMoment, type PlayerState, returnToPool } from "../shop/economy.js";
 import { resolveTriples } from "../shop/triple.js";
 import type { FightReward } from "../types.js";
 import type { GameEnv } from "./env.js";
@@ -116,6 +116,7 @@ function removeFromBoard(player: PlayerState, unit: Unit, env: GameEnv): void {
   if (i < 0) return;
   player.board.splice(i, 1);
   returnToPool(unit, env.pool);
+  noteDestroyed(player, unit.key);
 }
 
 function offerGiants(player: PlayerState, env: GameEnv): void {
