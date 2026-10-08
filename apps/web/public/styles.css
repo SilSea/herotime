@@ -937,3 +937,27 @@ body.dragging .drop-marker.show { display: block; }
 .sounds-table td { vertical-align: middle; }
 .sounds-table input[type=file] { max-width: 190px; font-size: 11px; }
 .sounds-table input[type=range] { width: 100px; }
+
+/* ---- placing a unit: a card-sized frame where it will land */
+.drop-ghost { flex: none; border: 3px dashed var(--cyan); border-radius: 50% / 46%; background: repeating-linear-gradient(135deg, #2fe4ff10 0 10px, #2fe4ff1f 10px 20px); box-shadow: 0 0 18px #2fe4ff55, inset 0 0 18px #2fe4ff33; animation: ghost-in .15s ease-out, aim-pulse 1.2s ease-in-out infinite; pointer-events: none; min-width: 80px; min-height: 110px; }
+@keyframes ghost-in { from { transform: scale(.85); opacity: 0; } }
+.slot.drag-source { opacity: .35; }
+.board-cards > .slot { transition: transform .12s ease; }
+
+/* ---- aiming a gear: a line from the card to a reticle that locks onto a valid unit */
+.aim-layer { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 80; pointer-events: none; overflow: visible; }
+.aim-path { fill: none; stroke: var(--cyan); stroke-width: 4; stroke-dasharray: 10 8; stroke-linecap: round; filter: drop-shadow(0 0 6px var(--cyan)); animation: aim-flow .5s linear infinite; }
+.aim-reticle circle { fill: none; stroke: var(--cyan); stroke-width: 3; }
+.aim-reticle .aim-dot { fill: var(--cyan); stroke: none; }
+.aim-reticle path { stroke: var(--cyan); stroke-width: 3; stroke-linecap: round; }
+.aim-reticle { filter: drop-shadow(0 0 8px var(--cyan)); }
+.aim-layer.locked .aim-path { stroke: #69f0ae; filter: drop-shadow(0 0 8px #69f0ae); }
+.aim-layer.locked .aim-reticle circle, .aim-layer.locked .aim-reticle path { stroke: #69f0ae; }
+.aim-layer.locked .aim-reticle .aim-dot { fill: #69f0ae; }
+.aim-layer.locked .aim-reticle { animation: reticle-lock .6s ease-in-out infinite; }
+.slot.aim-hot > :first-child { filter: drop-shadow(0 0 14px #69f0ae) brightness(1.15); }
+body.aiming .slot.aim-no > :first-child { opacity: .4; filter: grayscale(.6); }
+@keyframes aim-flow { to { stroke-dashoffset: -18; } }
+@keyframes reticle-lock { 50% { filter: drop-shadow(0 0 16px #69f0ae); } }
+/* Aiming a gear: the tavern is not where it goes, so no "drop here to sell" over it. */
+body.aiming .tavern::after { display: none !important; }

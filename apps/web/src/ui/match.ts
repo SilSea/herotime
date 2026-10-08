@@ -13,6 +13,8 @@ import { h, mount, type Child } from "./dom.js";
 type View = NonNullable<AppState["view"]>;
 type Player = MatchView["players"][number];
 
+import { aimMode, hideDragImage, startAim, stopAim } from "./aim.js";
+
 /** Marks that a drag is in progress, so the app does not redraw underneath the player's hand. */
 export const DRAGGING = "dragging";
 
@@ -501,15 +503,22 @@ function table(ctx: Ctx, view: View): HTMLElement {
 
   board.addEventListener("dragover", (e) => {
     allowDrop(e);
-    placeMarker(board, e.clientX);
+    placeGhost(board, e.clientX, s.board.length >= me.limits.boardSize);
   });
   board.addEventListener("dragleave", (e) => {
-    if (!board.contains(e.relatedTarget as Node | null)) board.querySelector(".drop-marker")?.classList.remove("show");
+    if (!board.contains(e.relatedTarget as Node | null)) board.querySelector(".drop-ghost")?.remove();
   });
   board.addEventListener("drop", (e) => void warbandDrop(ctx, view, board)(e));
   const bottom = bottomBar(ctx, view, hand);
   bottom.addEventListener("dragover", allowDrop);
   bottom.addEventListener("drop", buyDrop(ctx, view));
+  // Waiting for a click on a unit: keep the reticle on screen across redraws (it is drawn over the page).
+  if (aim !== undefined) {
+    setTimeout(() => {
+      const src = document.querySelector<HTMLElement>(`.hand .slot[data-hand="${aim}"]`);
+      if (src && aimedGear(ctx, ctx.store.state.view ?? view) === aim) startAim(src, gearSlots(ctx, view, aim) ?? [], "click");
+    }, 0);
+  } else if (aimMode() === "click") stopAim();
   return h("div", { class: "stage table" }, tavern, board, bottom, offersModal(ctx, view));
 }
 
@@ -595,42 +604,67 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
   return h("div", { class: "bottom" }, h("div", { class: "hero-zone" }, portrait, info), hand, gold);
 }
 
-function dragData(e: DragEvent, zone: string, index: number): void {
+function dragData(e: DragEvent, zone: string, index: number, kind: "unit" | "gear" = "unit"): void {
   e.dataTransfer?.setData("text/plain", JSON.stringify({ zone, index }));
   e.dataTransfer && (e.dataTransfer.effectAllowed = "move");
   document.body.classList.add(DRAGGING);
   // Lets CSS light up the places this card can go (sell, buy, board).
   document.body.dataset.drag = zone;
+  // A unit gets a frame where it would land on the board; a gear does not (it goes on a unit).
+  document.body.dataset.dragKind = kind;
+  if (zone === "board") (e.currentTarget as HTMLElement | null)?.classList.add("drag-source");
 }
 
 function endDrag(): void {
   document.body.classList.remove(DRAGGING);
   delete document.body.dataset.drag;
+  delete document.body.dataset.dragKind;
+  for (const g of document.querySelectorAll(".drop-ghost")) g.remove();
+  for (const el of document.querySelectorAll(".drag-source")) el.classList.remove("drag-source");
+  if (aimMode() === "drag") stopAim();
 }
 
 /** Where on the board a drop at `x` lands: the number of units whose middle is left of it. */
 function boardIndexAt(board: HTMLElement, x: number): number {
   const slots = [...board.querySelectorAll<HTMLElement>(".board-cards > .slot")];
+  // The landing frame pushes the units after it to the right; measure them where they were without it.
+  const ghost = board.querySelector<HTMLElement>(".drop-ghost");
+  const shift = ghost ? ghost.getBoundingClientRect().width + 16 : 0;
   return slots.filter((s) => {
     const r = s.getBoundingClientRect();
-    return r.left + r.width / 2 < x;
+    const pushed = ghost !== null && (ghost.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    return r.left + r.width / 2 - (pushed ? shift : 0) < x;
   }).length;
 }
 
-/** Move the glowing marker to where a drop at `x` would land on the board. */
-function placeMarker(board: HTMLElement, x: number): void {
+/**
+ * Show a card-sized frame where a dragged unit would land (the units around it make room). Gear gets no
+ * frame: it goes on a unit, and the aim reticle shows which. A full board shows none (except reordering).
+ */
+function placeGhost(board: HTMLElement, x: number, full: boolean): void {
   const row = board.querySelector<HTMLElement>(".board-cards");
-  const marker = board.querySelector<HTMLElement>(".drop-marker");
-  if (!row || !marker) return;
-  const slots = [...row.querySelectorAll<HTMLElement>(":scope > .slot")];
+  if (!row) return;
+  const kind = document.body.dataset.dragKind;
+  const zone = document.body.dataset.drag;
+  let ghost = row.querySelector<HTMLElement>(".drop-ghost");
+  if (kind === "gear" || (full && zone !== "board")) {
+    ghost?.remove();
+    return;
+  }
   const at = boardIndexAt(board, x);
-  const rowBox = row.getBoundingClientRect();
-  let left: number;
-  if (slots.length === 0) left = rowBox.width / 2;
-  else if (at >= slots.length) left = (slots[slots.length - 1] as HTMLElement).getBoundingClientRect().right - rowBox.left + 8;
-  else left = (slots[at] as HTMLElement).getBoundingClientRect().left - rowBox.left - 8;
-  marker.style.left = `${left}px`;
-  marker.classList.add("show");
+  const slots = [...row.querySelectorAll<HTMLElement>(":scope > .slot")];
+  if (!ghost) {
+    ghost = document.createElement("div");
+    ghost.className = "drop-ghost";
+    const sample = slots.find((el) => !el.classList.contains("drag-source"))?.querySelector(".card") ?? slots[0]?.querySelector(".card");
+    if (sample) {
+      const r = sample.getBoundingClientRect();
+      ghost.style.width = `${r.width}px`;
+      ghost.style.height = `${r.height}px`;
+    }
+  }
+  const before = slots[at] ?? row.querySelector(":scope > .drop-marker");
+  if (ghost.parentElement !== row || ghost.nextElementSibling !== before) row.insertBefore(ghost, before);
 }
 
 /** The whole warband takes drops: play from hand, reorder, or buy straight from the tavern and play. */
@@ -790,7 +824,23 @@ function handCard(ctx: Ctx, view: View, i: number): HTMLElement {
   const full = view.me.state.board.length >= view.me.limits.boardSize;
   return h(
     "div",
-    { class: "slot", draggable: recruiting, on: { dragstart: (e) => dragData(e, "hand", i), dragend: endDrag } },
+    {
+      class: "slot",
+      draggable: recruiting,
+      attrs: { "data-hand": String(i) },
+      on: {
+        dragstart: (e) => {
+          dragData(e, "hand", i, gear ? "gear" : "unit");
+          // A gear that goes on a chosen unit: drag a reticle instead of the card.
+          const slots = gear ? gearSlots(ctx, view, i) : null;
+          if (slots && slots.length > 0) {
+            hideDragImage(e);
+            startAim(e.currentTarget as HTMLElement, slots, "drag");
+          }
+        },
+        dragend: endDrag,
+      },
+    },
     cardEl(ctx.ix, { key: u.key, atk: st.atk, hp: st.hp, golden: u.golden, extraKeywords: u.keywords ?? [], small: true, buffs: u.buffs ?? [], ...gearNote(ctx, view, u.key) }),
     recruiting && h("div", { class: "slot-actions" },
       h("button", { class: "mini primary", text: gear ? (aimedGear(ctx, view) === i ? tr("Cancel", "ยกเลิก") : tr("Use", "ใช้")) : tr("Play", "ลงบอร์ด"), disabled: !gear && full, on: { click: () => (gear ? (aimedGear(ctx, view) === i ? ctx.store.set({ selected: undefined }) : useGearFromHand(ctx, view, i)) : void ctx.act({ type: "PLAY", handIndex: i, position: view.me.state.board.length })) } }),
