@@ -242,7 +242,7 @@ function formsOf(src: CardDef): { key: string; how: string }[] {
     if (key && key !== src.key) out.push({ key, how });
   };
   add(src.henshin?.into, tr(`Henshin of ${src.name} (after ${src.henshin?.afterTurns} turns)`, `ร่าง Henshin ของ ${src.name} (หลัง ${src.henshin?.afterTurns} เทิร์น)`));
-  add(src.ultimateInto, tr(`Ultimate Form of ${src.name}`, `ร่าง Ultimate ของ ${src.name}`));
+  add(src.ultimateInto, tr(`Final Form of ${src.name}`, `ร่าง Final Form ของ ${src.name}`));
   add(src.gattaiInto, tr(`Gattai form of ${src.name}'s group`, `ร่าง Gattai ของกลุ่ม ${src.name}`));
   for (const e of src.effects) {
     for (const a of e.actions) {
@@ -270,7 +270,7 @@ function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
   const giants = [...ctx.ix.cards.values()].filter((c) => c.kind === "GIANT" && (c.series === undefined || series.has(c.series))).sort((a, b) => a.name.localeCompare(b.name));
   for (const c of giants) out.push({ key: c.key, how: tr("Giant Robo: chosen with Kyodai Gattai!, waits in the Giant Slot", "Giant Robo: เลือกได้จาก Kyodai Gattai! แล้วรออยู่ในช่อง Giant") });
 
-  // Forms and tokens: Henshin / Ultimate / Gattai forms, and what cards summon, hand out or turn into,
+  // Forms and tokens: Henshin / Final Form / Gattai forms, and what cards summon, hand out or turn into,
   // followed from the cards of this match (a form's own form too). Each says where it comes from.
   const hows = new Map<string, string[]>();
   const note = (key: string, how: string): void => {

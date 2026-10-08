@@ -388,7 +388,7 @@ export function runReward(r: FightReward, player: PlayerState, env: GameEnv): vo
   runAction(r.action, r.mult, null, [], player, env, { kind: "card", key: r.from });
 }
 
-/** A new card like `u` (COPY): the base card, or with its Final Form, bonuses and keywords. Never from the pool. */
+/** A new card like `u` (COPY): the base card, or Golden with its bonuses and keywords. Never from the pool. */
 export function copyOf(u: Unit, withBuffs: boolean): Unit {
   const copy: Unit = { key: u.key, golden: withBuffs && u.golden };
   if (withBuffs) {

@@ -15,7 +15,7 @@ export interface ContentData {
   sounds?: unknown;
 }
 
-/** A unit the player owns. `golden` = Final Form (made by a triple). */
+/** A unit the player owns. `golden` = Golden (made by a triple). */
 export interface Unit {
   key: string;
   golden: boolean;
@@ -103,8 +103,8 @@ export class Content {
   private lineageCache = new Map<string, readonly string[]>();
 
   /**
-   * The card key plus every card that turns into it through Henshin or Ultimate Form
-   * (Zeztz Ultimate -> [zeztz_ultimate, zeztz]), so a filter naming a card also finds its later forms.
+   * The card key plus every card that turns into it through Henshin or its Final Form (ultimateInto)
+   * (a Final Form: zeztz_ultimate -> [zeztz_ultimate, zeztz]), so a filter naming a card also finds its later forms.
    */
   lineage(key: string): readonly string[] {
     const hit = this.lineageCache.get(key);

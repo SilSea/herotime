@@ -329,7 +329,7 @@ export function startApp(root: HTMLElement): void {
       ...triggers.map((t) => box(triggerInfo(t)?.icon ?? "•", triggerInfo(t)?.name ?? t, triggerInfo(t)?.text ?? "")),
       ...(turns ? [box("✧", `Henshin (${turns})`, tr(`After ${turns} turn${turns === "1" ? "" : "s"} on your board, transforms into ${form}.`, `อยู่บนบอร์ดครบ ${turns} เทิร์น จะแปลงร่างเป็น ${form}`))] : []),
       ...(card.dataset.core ? [box("◈", "Gattai core", tr(`Put it leftmost of enough adjacent Gattai units and press Combine: the group becomes ${card.dataset.core} for good.`, `วางไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันให้ครบจำนวน แล้วกด Combine ทั้งกลุ่มจะรวมเป็น ${card.dataset.core} ถาวร`))] : []),
-      ...(card.dataset.ultimate ? [box("★", "Ultimate Form", tr(`An Ultimate Form card (Gear, or a Gauge reward) can turn this into ${card.dataset.ultimate}. It keeps its bonuses and keywords.`, `การ์ด Ultimate Form (Gear หรือรางวัลจาก Gauge) เปลี่ยนการ์ดนี้เป็น ${card.dataset.ultimate} ได้ บัฟและ keyword เดิมติดไปด้วย`))] : []),
+      ...(card.dataset.ultimate ? [box("★", "Final Form", tr(`A Final Form card (Gear, or a Gauge reward) can turn this into ${card.dataset.ultimate}. It keeps its bonuses and keywords.`, `การ์ด Final Form (Gear หรือรางวัลจาก Gauge) เปลี่ยนการ์ดนี้เป็นร่าง Final Form ${card.dataset.ultimate} ได้ บัฟและ keyword เดิมติดไปด้วย`))] : []),
       ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k), keywordText(k))),
     ];
     // The cards it brings in (summons, adds to hand, its forms...) or points at, so a player sees them before choosing.

@@ -37,7 +37,7 @@ interface Game {
 
 const pooledKeys = (env: GameEnv): string[] => [...env.content.cards.keys()].filter((k) => env.pool.has(k));
 
-/** Every card copy must be in exactly one place: pool, a shop, a hand/board (Final Form = 3), or a pending Discover. */
+/** Every card copy must be in exactly one place: pool, a shop, a hand/board (Golden = 3), or a pending Discover. */
 function checkInvariants(g: Game, label: string): void {
   const { env, players, initial, problems } = g;
   const bad = (msg: string): void => void problems.push(`${label}: ${msg}`);

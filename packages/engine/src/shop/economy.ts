@@ -91,8 +91,8 @@ export function newPlayer(): PlayerState {
   };
 }
 
-/** Pool copies a unit is worth: a Final Form consumed 3 copies. */
-/** Pool copies a unit stands for: 3 for a Final Form, 1 otherwise, less any that were made by COPY. */
+/** Pool copies a unit is worth: a Golden unit consumed 3 copies. */
+/** Pool copies a unit stands for: 3 for a Golden unit, 1 otherwise, less any that were made by COPY. */
 export function copiesOf(unit: Unit): number {
   return Math.max(0, (unit.golden ? 3 : 1) - (unit.unpooled ?? 0));
 }

@@ -34,7 +34,7 @@
 | Hand | 10 ใบ |
 
 - **Shared pool** ต่อชนิดยูนิต: R1:16, R2:15, R3:13, R4:11, R5:9, R6:7 — ซื้อแล้ว pool ลด, ขายแล้วคืน pool
-- **Triple → Final Form**: ยูนิตเดียวกัน 3 ตัวรวมเป็น Final Form (stat ×2, effect ×2) + ได้ Discover ยูนิต Rank+1 1 ใบ (ถ้า pool ไม่มี Rank นั้น ใช้ Rank ที่ใกล้ที่สุดที่มีการ์ด เริ่มจาก Rank ที่ต่ำกว่า). รวมทันทีไม่ว่าใบที่ 3 มาทางไหน: ซื้อ, ลงการ์ด, Discover, Gear, Hero Power, Relic, ขาย (On Sell), ต้นเทิร์น, End of Turn/Henshin (รวมก่อนสู้)
+- **Triple → Golden (ร่างทอง)**: (ชื่อ "Final Form" ใช้กับร่างสุดท้ายของ Rider ที่ได้จากการ์ด Final Form / `ultimateInto`)  ยูนิตเดียวกัน 3 ตัวรวมเป็นร่างทอง (stat ×2, effect ×2) + ได้ Discover ยูนิต Rank+1 1 ใบ (ถ้า pool ไม่มี Rank นั้น ใช้ Rank ที่ใกล้ที่สุดที่มีการ์ด เริ่มจาก Rank ที่ต่ำกว่า). รวมทันทีไม่ว่าใบที่ 3 มาทางไหน: ซื้อ, ลงการ์ด, Discover, Gear, Hero Power, Relic, ขาย (On Sell), ต้นเทิร์น, End of Turn/Henshin (รวมก่อนสู้)
 - ล็อบบี้สุ่มใช้ **5 จาก 7 Faction**
 
 ## 3. Battle Phase
@@ -95,7 +95,7 @@
 ### 6.1 Gauge system กลาง
 Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amount), thresholds[] (value → reward action)}`
 - Sentai → **Mecha Gauge** → Giant Robo
-- Rider → **Rider Gauge** (ได้แต้มตอน Henshin) → การ์ด **Ultimate Form**
+- Rider → **Rider Gauge** (ได้แต้มตอน Henshin) → การ์ด **Final Form**
 - Anime (อนาคต) → เช่น **Power-Up Gauge** → ปลดร่าง/ท่าไม้ตาย
 
 ## 7. Keywords
@@ -134,7 +134,7 @@ Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amo
 - Refresh สุ่ม Gear ใหม่, Freeze เก็บไว้, ซื้อแล้วช่องว่างจน Refresh/เทิร์นหน้า
 - **ราคาเป็นทองหรือเลือด** (`costType`): `ENERGY` จ่าย Energy, `HEALTH` จ่ายจาก HP ของ Hero (เกราะไม่ช่วยจ่าย, ต้องเหลือ HP อย่างน้อย 1 ซื้อจนตายไม่ได้). ป้ายราคาสีแดง ♥ = จ่ายด้วยเลือด. ตัวอย่าง: Blood Oath (3 HP), Venom Edge (4 HP), Overclock Chip (5 HP). bot ซื้อของราคาเลือดเฉพาะตอน HP เหลือ ≥ 15 หลังจ่าย
 - Gear ไม่อยู่ใน shared pool: หลายคนได้ชิ้นเดียวกันได้. ขาย Gear ไม่ได้
-- Gear ที่ได้จาก Gauge (Kyodai Gattai!, Ultimate Form) ไม่ขายในร้าน — ดูได้ใน Book แท็บ **Special** (พร้อม Giant Robo)
+- Gear ที่ได้จาก Gauge (Kyodai Gattai!, Final Form) ไม่ขายในร้าน — ดูได้ใน Book แท็บ **ร่างแปลง & พิเศษ** (พร้อม Giant Robo)
 - ร้านมี Gear 1 ใบเสมอ: ทุก Refresh สุ่มใหม่; Freeze แล้วซื้อ Gear ไป เทิร์นหน้าเติมใหม่ให้
 - **เลือกเป้าหมาย**: Gear ที่ใช้ selector `CHOSEN_FRIENDLY` ต้องเลือกยูนิต — ลาก Gear ไปวางบนยูนิต หรือกด Use แล้วคลิกยูนิต (Esc ยกเลิก). มียูนิตเข้าเงื่อนไขตัวเดียว = เลือกให้เอง; ไม่มีเลย = ใช้ไม่ได้ (การ์ดยังอยู่ในมือ). นอกจาก Gear (เช่นในการต่อสู้) `CHOSEN_FRIENDLY` = ซ้ายสุดที่เข้าเงื่อนไข
 - **ให้ keyword**: Guard Shield (Guard), Barrier Emitter (Barrier), Venom Edge (Lethal), Overclock Chip (Rapid), Revive Chip (Revive)

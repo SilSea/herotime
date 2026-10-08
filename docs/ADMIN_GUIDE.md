@@ -97,7 +97,7 @@
    - ทำอะไรได้มีทั้ง "แปลงร่างเป็นการ์ดอื่น" (TRANSFORM) และรางวัลหลังการต่อสู้ (ได้ Energy / การ์ด / Gauge ในเทิร์นหน้า) ใน trigger ช่วงต่อสู้
    - **กับใคร** (+ กรองเฉพาะเผ่าได้ + **เฉพาะการ์ดเหล่านี้**: พิมพ์ค้นหาแล้วเพิ่มได้หลายใบ กด ✕ เพื่อเอาออก)
    - ตัวอย่าง: เมื่อลงจากมือ (Deploy) · กับใคร = พวกเราทุกตัว · เฉพาะการ์ด = Agent Number 7, Kamen Rider Zeztz → "Deploy: ให้ยูนิต Agent Number 7 หรือ Kamen Rider Zeztz ทุกตัว +2/+2"
-   - การกรองชื่อการ์ดและเงื่อนไขชื่อการ์ด**นับร่างที่แปลงแล้ว** (Henshin / Ultimate Form) ด้วย เช่น เลือก Zeztz แล้ว Zeztz ร่าง Ultimate ก็โดน
+   - การกรองชื่อการ์ดและเงื่อนไขชื่อการ์ด**นับร่างที่แปลงแล้ว** (Henshin / Final Form) ด้วย เช่น เลือก Zeztz แล้ว Zeztz ร่าง Final Form ก็โดน
    - ระบบ**ให้เลือกเฉพาะตัวเลือกที่ใช้ด้วยกันได้** เช่น "เมื่อตาย" จะไม่มี "ได้ Energy", "เมื่อเรียกยูนิตอื่น" จะมีเป้าหมาย "ตัวที่เพิ่งถูกเรียก"
 4. **การแปลงร่าง** (ยูนิต): Henshin หลังกี่เทิร์น → แปลงเป็นการ์ดไหน · Gattai core → กลุ่มรวมเป็นการ์ดไหน
 
@@ -131,7 +131,7 @@
 **Delete** ในฟอร์ม — ถ้าการ์ดนี้ถูกอ้างจากที่อื่น (เช่น เป็นร่าง Henshin ของการ์ดอื่น, ถูก SUMMON) จะขึ้นปัญหาในกล่องแดงตอน Save ให้แก้ที่อ้างถึงก่อน
 
 ### 4.4.1 ช่องที่ต้องเลือกการ์ด (ค้นหาได้)
-ช่องที่อ้างถึงการ์ดอื่น เช่น "ได้การ์ดใบไหน" (ADD_TO_HAND), "เรียกใคร" (SUMMON), "แปลงร่างเป็นอะไร" (henshin / ultimate form / gattai form):
+ช่องที่อ้างถึงการ์ดอื่น เช่น "ได้การ์ดใบไหน" (ADD_TO_HAND), "เรียกใคร" (SUMMON), "แปลงร่างเป็นอะไร" (henshin / final form / gattai form):
 พิมพ์ส่วนหนึ่งของ**ชื่อ**หรือ key แล้วเลือกจากรายการที่ขึ้นมา (บอกชื่อ, ATK/HP หรือ Gear, token, rank) ใต้ช่องจะแสดงชื่อการ์ดที่เลือก ถ้าพิมพ์ผิดจะขึ้นกรอบแดง / "not found"
 ใน Card wizard ช่องเหล่านี้ก็ค้นหาแบบเดียวกัน
 
@@ -152,7 +152,7 @@
 | `costType` | `ENERGY` = จ่ายทอง, `HEALTH` = จ่ายเลือด Hero (ซื้อจนเหลือ 0 ไม่ได้, เกราะไม่ช่วย) |
 | `GIANT` | Giant Robo อยู่ในช่อง Giant ได้จาก Kyodai Gattai! (ใส่ `series` เพื่อให้ขบวนการที่มีบนบอร์ดเยอะได้หุ่นของตัวเองแน่นอน) |
 | `henshin` | `afterTurns` = อยู่บนบอร์ดครบกี่เทิร์นแล้วแปลงร่าง, `into` = การ์ดร่างใหม่ (ปกติเป็น token) |
-| `ultimateInto` (ultimate form) | ร่างที่ action `ULTIMATE_FORM` เปลี่ยนให้ ใช้ได้**ทุกเผ่า**: ร่างสุดท้ายของ Rider แต่ละซีรีส์, หุ่น Sentai ร่างอัปเกรด, หรือ gimmick ของซีรีส์ไหนก็ได้ (ค่าบัฟที่สะสมไว้ติดไปด้วย) |
+| `ultimateInto` (final form) | ร่างที่ action `ULTIMATE_FORM` เปลี่ยนให้ ใช้ได้**ทุกเผ่า**: ร่างสุดท้ายของ Rider แต่ละซีรีส์, หุ่น Sentai ร่างอัปเกรด, หรือ gimmick ของซีรีส์ไหนก็ได้ (ค่าบัฟที่สะสมไว้ติดไปด้วย) |
 | `gattaiInto` | ทำให้การ์ดนี้เป็น **Gattai core**: เมื่ออยู่ซ้ายสุดของกลุ่มยูนิต Gattai ที่ติดกันครบ แล้วผู้เล่นกด Combine กลุ่มจะรวมเป็นการ์ดนี้ (ต้องมี keyword `GATTAI` ด้วย) |
 | `colors` | สี Sentai: RED BLUE YELLOW GREEN PINK, `EXTRA` = นับเป็นสีอะไรก็ได้ (และใช้กับ Super Gattai) |
 | `text` / `text (Thai)` | คำอธิบายบนการ์ด เว้นว่าง = สร้างจาก effect อัตโนมัติ ถ้าเขียน `text` เอง ภาษาไทยจะแสดงอังกฤษจนกว่าจะเขียน `text (Thai)` ด้วย |
@@ -171,7 +171,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `condition` | เงื่อนไข เช่น มี Sentai ≥ 3 สี, มียูนิตเผ่า X ≥ N ตัว, มี Energy ≥ N, `HAS_CARD` = มีการ์ดใบใดใบหนึ่งในรายการบนบอร์ด (นับร่างที่แปลงแล้ว) |
 | `target.selector` | กับใคร (ตารางด้านล่าง) + กรอง `faction` / `series` / `cards` (เฉพาะการ์ดเหล่านี้ ใบใดใบหนึ่ง นับร่างที่แปลงแล้ว) ได้ |
 | `actions` | ทำอะไร (ตารางด้านล่าง) |
-| `golden multiplier` | ตัวคูณตอนการ์ดเป็น Final Form (ค่าปกติ ×2) |
+| `golden multiplier` | ตัวคูณตอนการ์ดเป็นร่างทอง (Golden, จาก triple) (ค่าปกติ ×2) |
 | `limit` | **จำกัดจำนวนครั้ง**: ทำงานได้ไม่เกิน `at most` ครั้งต่อ `TURN` (เทิร์น) หรือ `GAME` (ทั้งเกม) — นับแยกต่อยูนิตแต่ละตัว (หรือต่อ Relic/Hero/Gear) · ตอนต่อสู้นับต่อการต่อสู้ · ครั้งที่เงื่อนไขไม่ผ่านไม่นับ |
 | `happens N times` (`repeat`) | ความสามารถนี้ทำงานกี่ครั้งต่อการเกิด 1 ครั้ง (1–5) เช่น "ถูกขาย: ได้ Gear สุ่ม (2 ครั้ง)" |
 
@@ -213,7 +213,7 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | `BUFF` | +atk/+hp (`permanent` ✔ = ช่วงต่อสู้แล้วติดตัวถาวร; ช่วงซื้อของถาวรอยู่แล้ว) | ทั้งคู่ |
 | `BUFF` + `fromSelf` | ติ๊ก "+ this card's ATK/HP" = เป้าหมายได้ ATK/HP **เท่ากับการ์ดใบนี้ตอนนั้น** (บวกกับ atk/hp ที่ใส่) · ไม่บัฟตัวมันเอง · Last Stand ใช้ค่าก่อนตาย (HP สูงสุด) · ไม่มีผลกับ Relic/Hero/Gear (ไม่มีการ์ดเจ้าของ) | ทั้งสองช่วง |
 | `CONSUME_ALLIES` | **ทำลายยูนิตอื่นของเราทั้งหมด** (ยกเว้นใบนี้และ Giant Robo) แล้วให้เป้าหมายได้ ATK/HP **รวม**ของตัวที่ถูกทำลาย · ช่วงซื้อของ: ทำลายถาวร (คืนกองกลาง) บัฟถาวร · ช่วงต่อสู้: ทำลายในการต่อสู้นั้น (Last Stand ทำงาน) บัฟถึงจบการต่อสู้ หรือถาวรถ้าติ๊ก `permanent` | ทั้งสองช่วง |
-| `COPY` | **ก๊อปปี้ยูนิตเป้าหมาย** · `to`: `BOARD` (ลงบอร์ดข้างตัวต้นฉบับ) / `HAND` (เข้ามือ) · `withBuffs`: เอาบัฟ keyword และร่าง Final Form ไปด้วย (ไม่ติ๊ก = การ์ดพื้นฐาน) · สำเนาเป็นการ์ดใหม่ ไม่ดึงจากกองกลาง และ**นับรวม triple** (ขาย/รวมแล้วไม่คืนกองกลางเกินจริง) · ช่วงต่อสู้: `BOARD` = ก๊อปปี้ลงสนามในการต่อสู้นั้น ก๊อปปี้**ศัตรู**มาเป็นพวกเราได้ · `HAND` = ได้การ์ดพื้นฐานเทิร์นหน้า · Giant Robo ก๊อปปี้ไม่ได้ | ทั้งสองช่วง |
+| `COPY` | **ก๊อปปี้ยูนิตเป้าหมาย** · `to`: `BOARD` (ลงบอร์ดข้างตัวต้นฉบับ) / `HAND` (เข้ามือ) · `withBuffs`: เอาบัฟ keyword และร่างทอง (Golden) ไปด้วย (ไม่ติ๊ก = การ์ดพื้นฐาน) · สำเนาเป็นการ์ดใหม่ ไม่ดึงจากกองกลาง และ**นับรวม triple** (ขาย/รวมแล้วไม่คืนกองกลางเกินจริง) · ช่วงต่อสู้: `BOARD` = ก๊อปปี้ลงสนามในการต่อสู้นั้น ก๊อปปี้**ศัตรู**มาเป็นพวกเราได้ · `HAND` = ได้การ์ดพื้นฐานเทิร์นหน้า · Giant Robo ก๊อปปี้ไม่ได้ | ทั้งสองช่วง |
 | `GIVE_KEYWORD` | ให้ keyword | ทั้งคู่ |
 | `SUMMON` | เรียกการ์ด (`count` ตัว) | ทั้งคู่ |
 | `TRANSFORM` | เปลี่ยนเป้าหมายเป็นการ์ดอื่น | ทั้งคู่ |
@@ -258,8 +258,8 @@ effect 1 อัน = **เมื่อไหร่** (trigger) + **ถ้า** (
 | ถูกทิ้งแล้วมีผล 2 ครั้ง | `ON_DISCARD` · target `ALL_FRIENDLY` · `BUFF` 2/2 · happens 2 times |
 | จบเทิร์นกินตัวแรงสุดในร้าน เทิร์นละครั้ง | `END_OF_TURN` · target `SELF` · `DEVOUR_SHOP` choose=STRONGEST · limit at most 1 per TURN |
 | Deploy ของทุกใบทำงาน 2 ครั้ง | ใส่ keyword `ECHO` (ระหว่างมันอยู่บนบอร์ด) |
-| Gear เปลี่ยนร่าง Rider เป็นร่างของซีรีส์ | Gear · target `CHOSEN_FRIENDLY` faction=rider · `ULTIMATE_FORM` (+ BUFF) และตั้ง `ultimate form` ให้การ์ด Rider แต่ละใบ |
-| Gear อัปเกรดหุ่น Sentai | Gear · target `GIANT_SLOT` · `ULTIMATE_FORM` และตั้ง `ultimate form` ให้การ์ดหุ่น (kind GIANT) |
+| Gear เปลี่ยนร่าง Rider เป็นร่างของซีรีส์ | Gear · target `CHOSEN_FRIENDLY` faction=rider · `ULTIMATE_FORM` (+ BUFF) และตั้ง `final form` ให้การ์ด Rider แต่ละใบ |
+| Gear อัปเกรดหุ่น Sentai | Gear · target `GIANT_SLOT` · `ULTIMATE_FORM` และตั้ง `final form` ให้การ์ดหุ่น (kind GIANT) |
 | ตีแล้วเรียก Cub | trigger `ON_ATTACK` · action `SUMMON` cardKey=beast_cub |
 | ตีแล้วโตถาวร +1/+0 | trigger `ON_ATTACK` · target `SELF` · action `BUFF` 1/0 ✔permanent |
 | เริ่มสู้ ถ้ามี Sentai ≥ 3 สี ให้ Sentai ทุกตัว +1/+1 | trigger `START_OF_COMBAT` · condition `TEAM_UP_COLORS_GTE` 3 · target `ALL_FRIENDLY` faction=sentai · `BUFF` 1/1 |
@@ -361,7 +361,7 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 | `X only works in the recruit phase, not on LAST_STAND` | action ช่วงซื้อของถูกใส่ใน trigger ช่วงต่อสู้ (ดูตาราง action ข้อ 6) |
 | `DAMAGE only works in a fight` / `enemies can only be targeted in a fight` | ดาเมจ/เป้าหมายศัตรูใช้ได้เฉพาะ trigger ช่วงต่อสู้ |
 | `target SUMMONED only works with ALLY_SUMMONED` | เป้าหมาย "ตัวที่ถูกเรียก" ต้องใช้กับ trigger ALLY_SUMMONED |
-| `references unknown card` ใน ultimateInto | ร่าง ultimate ที่ตั้งไว้ไม่มีอยู่ |
+| `references unknown card` ใน ultimateInto | ร่าง Final Form ที่ตั้งไว้ไม่มีอยู่ |
 | `X cannot be used on ALLY_SUMMONED` | ALLY_SUMMONED ใช้ได้แค่ action ที่ทำงานทั้งช่วงซื้อของและต่อสู้ |
 | `duplicate card key` | key ซ้ำ เปลี่ยน key ของอันใหม่ |
 
@@ -400,7 +400,7 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 | กลุ่ม | ช่อง |
 |---|---|
 | Tavern | ซื้อยูนิต, ซื้อ Gear, ขาย, รีเฟรช, แช่ร้าน, อัปเกรดร้าน, ทำไม่ได้/เงินไม่พอ |
-| Board | ลงยูนิต, ใช้ Gear, รวม 3 ใบ, Gattai/Combine, แปลงร่าง (Henshin/Ultimate), เลือก Discover, เลือก Relic, Hero Power, ทิ้งการ์ด |
+| Board | ลงยูนิต, ใช้ Gear, รวม 3 ใบ, Gattai/Combine, แปลงร่าง (Henshin / Final Form), เลือก Discover, เลือก Relic, Hero Power, ทิ้งการ์ด |
 | Fight | ตี, โดนตี, Barrier แตก, ตาย, เรียกยูนิต, Kyodaika, หุ่นลงสนาม, Roll Call |
 | Results | ชนะรอบ, แพ้รอบ, ตกรอบ, จบเกมอันดับ 1, ท็อป 4, อันดับ 5–8 |
 | General | เริ่มเทิร์น, เหลือ 5 วินาที, กดปุ่ม (มีเสียงเฉพาะเมื่ออัปโหลด) |

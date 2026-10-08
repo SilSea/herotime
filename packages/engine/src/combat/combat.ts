@@ -344,7 +344,7 @@ export function simulateCombat(
           for (let n = 0; n < mult; n++) {
             if (action.to === "HAND") {
               if (!options.content?.cards.has(t.cardKey)) continue; // nothing real to put in a hand
-              // Arrives next turn, as the base card (or its Final Form with withBuffs).
+              // Arrives next turn, as the base card (or Golden, with withBuffs).
               s.rewards.push({ action, mult: 1, from: source?.cardKey ?? null, copy: { key: t.cardKey, golden: action.withBuffs && t.golden, unpooled: action.withBuffs && t.golden ? 3 : 1 } });
               events.push({ type: "REWARD", side: s.id, unit: source?.uid ?? null, action: action.type });
               continue;

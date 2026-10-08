@@ -357,7 +357,7 @@ describe("ghosts", () => {
     const h1 = m.player("h1");
     h1.hp = 1;
     h1.state.rank = 4;
-    // two plain copies and a Final Form: three plain ones would merge at the end of the turn
+    // two plain copies and a Golden one: three plain ones would merge at the end of the turn
     h1.state.board = [{ key: "scout", golden: false }, { key: "scout", golden: false }, { key: "scout", golden: true }];
     toBattle(m);
     const fallen = m.players.filter((p) => !p.alive);

@@ -45,7 +45,7 @@ describe("COPY", () => {
     expect(p.board[1]).toMatchObject({ bonusAtk: 3, keywords: ["GUARD"], unpooled: 1 });
   });
 
-  it("copies count for a triple, and the Final Form only gives back the pool copies", () => {
+  it("copies count for a triple, and the Golden unit only gives back the pool copies", () => {
     const e = env();
     const p = newPlayer();
     p.board = [u("pup"), u("pup")];
@@ -56,13 +56,13 @@ describe("COPY", () => {
     const golden = [...p.board, ...p.hand].find((x) => x.golden)!;
     const from = p.board.includes(golden) ? "board" : "hand";
     sell(p, from, (from === "board" ? p.board : p.hand).indexOf(golden), e.pool, e.cfg);
-    expect(e.pool.count("pup")).toBe(before + 2); // 3 in the Final Form, 1 of them a copy
+    expect(e.pool.count("pup")).toBe(before + 2); // 3 in the Golden unit, 1 of them a copy
   });
 
   it("does nothing on a full board / hand", () => {
     const e = env();
     const p = newPlayer();
-    p.board = Array.from({ length: 7 }, () => u("pup", { golden: true })); // Final Forms: no triple to clear space
+    p.board = Array.from({ length: 7 }, () => u("pup", { golden: true })); // Golden units: no triple to clear space
     runEffect(effect({ scope: "PLAYER", trigger: "ON_TURN_START", target: { selector: "LEFTMOST_FRIENDLY" }, actions: [{ type: "COPY", to: "BOARD" }] }), null, p, e);
     expect(p.board).toHaveLength(7);
   });

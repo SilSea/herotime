@@ -166,7 +166,7 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
   );
 
   const typeHint = {
-    UNIT: tr("Sold in the tavern at its rank; three copies make a Final Form.", "ขายในร้านตาม Rank ครบ 3 ใบรวมเป็น Final Form"),
+    UNIT: tr("Sold in the tavern at its rank; three copies make a Golden one.", "ขายในร้านตาม Rank ครบ 3 ใบรวมเป็นร่างทอง (Golden)"),
     TOKEN: tr("Never in the tavern: only other cards summon it, add it to a hand or turn into it.", "ไม่ขายในร้าน ได้มาจากการ์ดอื่นเท่านั้น (เรียก, เข้ามือ, แปลงร่าง)"),
     GEAR: tr("Bought from the Gear slot and used from the hand; its abilities happen when used.", "ซื้อจากช่อง Gear แล้วใช้จากมือ ความสามารถทำงานตอนใช้"),
     GIANT: tr("A Giant Robo for the Giant Slot (Mecha Gauge reward), never in the tavern.", "หุ่นยักษ์สำหรับช่อง Giant (รางวัลจาก Mecha Gauge) ไม่ขายในร้าน"),
@@ -233,7 +233,7 @@ export function wizardPanel(d: WizardDeps): HTMLElement {
     field(tr("Henshin after N turns (0 = never)", "Henshin หลัง N เทิร์น (0 = ไม่แปลง)"), num(wz.henshinTurns, (n) => (wz.henshinTurns = n), 0, 9)),
     field(tr("…into", "…แปลงเป็น"), cardPick(wz.henshinInto, units, (v) => (wz.henshinInto = v))),
     field(tr("Gattai core: the group becomes (empty = not a core)", "Gattai core: กลุ่มรวมเป็น (ว่าง = ไม่ใช่ core)"), cardPick(wz.gattaiInto, units, (v) => (wz.gattaiInto = v))),
-    field(tr("Ultimate Form (what Ultimate Form gear turns it into)", "ร่าง Ultimate (ที่ Gear Ultimate Form เปลี่ยนให้)"), cardPick(wz.ultimateInto, units, (v) => (wz.ultimateInto = v))),
+    field(tr("Final Form (what a Final Form card turns it into)", "ร่าง Final Form (ที่การ์ด Final Form เปลี่ยนให้)"), cardPick(wz.ultimateInto, units, (v) => (wz.ultimateInto = v))),
   );
 
   previewHost = h("div", { class: "wz-preview" });
@@ -305,7 +305,7 @@ function abilityBox(
   const options = nodes([
     a.do === "BUFF" && !gear && check(tr("+ this card's own ATK/HP", "+ ATK/HP ของการ์ดใบนี้"), a.fromSelf, (v) => (a.fromSelf = v), tr("The targets also get this card's current ATK/HP", "เป้าหมายได้ ATK/HP เท่ากับการ์ดใบนี้ตอนนั้นเพิ่มด้วย")),
     (a.do === "BUFF" || a.do === "CONSUME_ALLIES") && !gear && fightOnly && check(tr("keep after the fight (permanent)", "ติดตัวถาวรหลังจบการต่อสู้"), a.permanent, (v) => (a.permanent = v)),
-    a.do === "COPY" && check(tr("keep its bonuses, keywords and Final Form", "เอาบัฟ keyword และร่าง Final Form ไปด้วย"), a.copyBuffs, (v) => (a.copyBuffs = v), tr("Off: a fresh base card. Copies count for triples.", "ไม่ติ๊ก = การ์ดพื้นฐาน · สำเนานับรวม triple")),
+    a.do === "COPY" && check(tr("keep its bonuses, keywords and Golden", "เอาบัฟ keyword และร่างทองไปด้วย"), a.copyBuffs, (v) => (a.copyBuffs = v), tr("Off: a fresh base card. Copies count for triples.", "ไม่ติ๊ก = การ์ดพื้นฐาน · สำเนานับรวม triple")),
   ]);
   const stats = a.do === "BUFF" || a.do === "BUFF_SHOP" || a.do === "BUFF_GEAR";
 

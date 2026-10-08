@@ -28,7 +28,7 @@ function findTripleKey(player: PlayerState): string | undefined {
   return undefined;
 }
 
-/** The Final Form keeps everything the copies earned: their permanent stats, granted keywords and Henshin progress. */
+/** The Golden unit keeps everything the copies earned: their permanent stats, granted keywords and Henshin progress. */
 function mergeCopies(key: string, copies: readonly Unit[]): Unit {
   const golden: Unit = { key, golden: true };
   const atk = copies.reduce((n, u) => n + (u.bonusAtk ?? 0), 0);
@@ -82,7 +82,7 @@ function rewardOffer(pool: Pool, rng: Rng, target: number, maxRank: number): str
 }
 
 /**
- * Merge every set of 3 plain copies into one Final Form (golden) and queue a
+ * Merge every set of 3 plain copies into one Golden unit and queue a
  * Discover of rank+1 (or the nearest rank with cards). The golden takes the slot of the first merged copy, so a
  * merge never needs extra hand space. Call after anything that adds a unit.
  */

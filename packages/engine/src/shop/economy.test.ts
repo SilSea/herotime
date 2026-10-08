@@ -164,7 +164,7 @@ describe("buy / play / sell", () => {
     expect(p.energy).toBe(10);
   });
 
-  it("selling a Final Form returns all 3 copies to the pool", () => {
+  it("selling a Golden unit returns all 3 copies to the pool", () => {
     p.hand = [u("r1_0", true)];
     const before = pool.count("r1_0");
     sell(p, "hand", 0, pool);

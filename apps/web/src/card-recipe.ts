@@ -59,7 +59,7 @@ export const DO: DoOption[] = [
   { key: "BUFF_GEAR", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Power up your Gear (+ATK/+HP more, for good)", "เสริมพลัง Gear (ให้ค่าพลังเพิ่ม ถาวร)") },
   { key: "DEVOUR_SHOP", phases: ["recruit"], targeted: true, label: () => tr("Devour a tavern unit (gain its stats)", "กลืนกินยูนิตในร้าน (ได้ค่าพลังของมัน)") },
   { key: "DISCARD", phases: ["recruit"], targeted: false, label: () => tr("Discard cards from your hand", "ทิ้งการ์ดในมือ") },
-  { key: "ULTIMATE_FORM", phases: ["recruit"], targeted: true, label: () => tr("Change into its upgraded form (Rider final form, upgraded robo…)", "เปลี่ยน/อัปเกรดร่าง (ร่างสุดท้าย Rider, หุ่นร่างอัปเกรด…)") },
+  { key: "ULTIMATE_FORM", phases: ["recruit"], targeted: true, label: () => tr("Change into its Final Form (the Rider's last form, an upgraded robo…)", "เปลี่ยนเป็นร่าง Final Form (ร่างสุดท้ายของ Rider, หุ่นร่างอัปเกรด…)") },
 ];
 
 export interface TargetOption {
@@ -248,7 +248,7 @@ export function checkRecipe(r: Recipe, takenKeys: ReadonlySet<string>): string[]
     if (!c.do.some((x) => x.key === a.do)) out.push(tr(`Ability ${n}: "${d?.label() ?? a.do}" does not work at that moment.`, `ความสามารถ ${n}: "${d?.label() ?? a.do}" ใช้ในจังหวะนั้นไม่ได้`));
     if (d?.targeted && !c.target.some((x) => x.key === a.target)) out.push(tr(`Ability ${n}: pick who it affects.`, `ความสามารถ ${n}: เลือกเป้าหมาย`));
     if ((a.do === "SUMMON" || a.do === "ADD_TO_HAND" || a.do === "TRANSFORM") && !a.cardKey) out.push(tr(`Ability ${n}: pick the card.`, `ความสามารถ ${n}: เลือกการ์ด`));
-    if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Ultimate Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Ultimate (ตั้งในขั้นที่ 4)`));
+    if (a.do === "ULTIMATE_FORM" && r.type !== "GEAR" && a.target === "SELF" && !r.ultimateInto) out.push(tr(`Ability ${n}: this card has no Final Form (set it in step 4).`, `ความสามารถ ${n}: การ์ดนี้ยังไม่มีร่าง Final Form (ตั้งในขั้นที่ 4)`));
     if (a.condition === "FACTION_COUNT_GTE" && !a.conditionFaction) out.push(tr(`Ability ${n}: pick the faction the condition counts.`, `ความสามารถ ${n}: เลือกเผ่าที่เงื่อนไขนับ`));
     if (a.condition === "HAS_CARD" && a.conditionCards.length === 0) out.push(tr(`Ability ${n}: pick the card(s) the condition looks for.`, `ความสามารถ ${n}: เลือกการ์ดที่ต้องมีในเงื่อนไข`));
     if (a.do === "BUFF_GEAR" && a.atk === 0 && a.hp === 0) out.push(tr(`Ability ${n}: the Gear power-up adds nothing.`, `ความสามารถ ${n}: เสริมพลัง Gear เป็น 0`));
@@ -354,7 +354,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.do === "BUFF_GEAR" ? tr(`your Gear give ${sign(a.atk)}/${sign(a.hp)} more for the rest of the game`, `Gear ที่ให้ค่าพลังให้เพิ่มอีก ${sign(a.atk)}/${sign(a.hp)} จนจบเกม`)
       : a.do === "DEVOUR_SHOP" ? tr(`devour ${a.choose === "STRONGEST" ? "the strongest" : a.choose === "WEAKEST" ? "the weakest" : "a random"} tavern unit; ${who} gains its stats`, `กลืนกินยูนิตในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"} ${who}ได้ค่าพลังของมัน`)
       : a.do === "DISCARD" ? tr(`discard ${a.count} ${a.pick === "RANDOM" ? "random" : a.pick.toLowerCase()} ${a.discardKind === "ANY" ? "card" : a.discardKind === "GEAR" ? "Gear" : "unit"}${a.count > 1 ? "s" : ""} from your hand`, `ทิ้ง${a.discardKind === "ANY" ? "การ์ด" : a.discardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.pick === "RANDOM" ? "แบบสุ่ม" : a.pick === "LEFTMOST" ? "ซ้ายสุด" : "ขวาสุด"}ในมือ ${a.count} ใบ`)
-      : a.do === "ULTIMATE_FORM" ? tr(`turn ${who} into its Ultimate Form`, `เปลี่ยน${who}เป็นร่าง Ultimate`)
+      : a.do === "ULTIMATE_FORM" ? tr(`turn ${who} into its Final Form`, `เปลี่ยน${who}เป็นร่าง Final Form`)
       : a.do === "DISCOVER_UNIT" ? tr(`discover a ${a.faction ? `${factionName(a.faction)} ` : ""}unit`, `เลือกรับยูนิต${a.faction ? ` ${factionName(a.faction)}` : ""} 1 จาก 3`)
       : a.do;
     const limit = a.limitTimes > 0 ? tr(` (at most ${a.limitTimes} per ${a.limitPer === "TURN" ? "turn" : "game"})`, ` (ไม่เกิน ${a.limitTimes} ครั้งต่อ${a.limitPer === "TURN" ? "เทิร์น" : "เกม"})`) : "";

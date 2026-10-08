@@ -22,7 +22,7 @@ export function gearTargetSlots(gear: CardDef | undefined, board: readonly (Card
 }
 
 /**
- * Cards a card brings into play or points at, for the hover preview: its Henshin / Ultimate / Gattai forms,
+ * Cards a card brings into play or points at, for the hover preview: its Henshin / Final Form / Gattai forms,
  * what it summons, adds to the hand or transforms into, and the named cards its targets or conditions need.
  * At most `max`, each once, never the card itself.
  */
@@ -33,7 +33,7 @@ export function relatedCards(def: CardDef | undefined, max = 4): { key: string; 
     if (key && key !== def.key && !out.some((o) => o.key === key)) out.push({ key, label });
   };
   add(def.henshin?.into, tr("Henshin into", "Henshin เป็น"));
-  add(def.ultimateInto, tr("Ultimate Form", "ร่าง Ultimate"));
+  add(def.ultimateInto, tr("Final Form", "ร่าง Final Form"));
   add(def.gattaiInto, tr("Gattai into", "Gattai รวมเป็น"));
   for (const e of def.effects) {
     for (const a of e.actions) {

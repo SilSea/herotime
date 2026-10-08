@@ -113,8 +113,8 @@ const cards = [
   token("rider_form", "Rider Form", { atk: 4, hp: 4, factions: ["rider"], keywords: ["RIDER_KICK"] }),
   token("super_form", "Super Form", { atk: 9, hp: 9, factions: ["rider"], keywords: ["RIDER_KICK", "RAPID"] }),
   gear("kyodai_gattai", "Kyodai Gattai!", [player("ON_PLAY", discoverGiant())]),
-  // Ultimate Form (Rider Gauge): the chosen Rider becomes its series' final form, and grows.
-  gear("ultimate_form", "Ultimate Form", [player("ON_PLAY", [ultimateForm(), buff(2, 2, true)], { target: chosen({ faction: "rider" }) })]),
+  // Final Form (Rider Gauge): the chosen Rider becomes its series' last form, and grows.
+  gear("ultimate_form", "Final Form", [player("ON_PLAY", [ultimateForm(), buff(2, 2, true)], { target: chosen({ faction: "rider" }) })]),
   token("w_xtreme", "Kamen Rider W CycloneJokerXtreme", { rank: 6, atk: 10, hp: 10, factions: ["rider"], series: "w", keywords: ["RAPID", "BARRIER"] }),
   token("den_o_liner", "Kamen Rider Den-O Liner Form", { rank: 6, atk: 11, hp: 9, factions: ["rider"], series: "den_o", keywords: ["RIDER_KICK", "RAPID"] }),
   token("ooo_putotyra", "Kamen Rider OOO Putotyra Combo", { rank: 6, atk: 12, hp: 12, factions: ["rider"], series: "ooo", keywords: ["RIDER_KICK", "GUARD"] }),

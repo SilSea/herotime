@@ -103,7 +103,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
   const art = ix.artUrl(o.key);
   const buffs = (o.buffs ?? []).filter((b) => b.atk !== 0 || b.hp !== 0 || (b.keywords?.length ?? 0) > 0);
   const tooltip = [
-    `${ix.cardName(o.key)}${def ? ` (rank ${def.rank})` : ""}${o.golden ? " - Final Form" : ""}`,
+    `${ix.cardName(o.key)}${def ? ` (rank ${def.rank})` : ""}${o.golden ? " - Golden" : ""}`,
     factions.join(", "),
     keywords.map((k) => `${keywordName(k)}: ${keywordText(k)}`).join("\n"),
     ix.cardText(o.key),
@@ -117,7 +117,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
     ...triggers.map((t) => ({ icon: triggerInfo(t)?.icon ?? "•", tip: triggerInfo(t)?.name ?? t })),
     ...(def?.henshin ? [{ icon: "✧", tip: `Henshin (${def.henshin.afterTurns})` }] : []),
     ...(def?.gattaiInto ? [{ icon: "◈", tip: `Gattai core → ${ix.cardName(def.gattaiInto)}` }] : []),
-    ...(def?.ultimateInto ? [{ icon: "★", tip: `Ultimate Form → ${ix.cardName(def.ultimateInto)}` }] : []),
+    ...(def?.ultimateInto ? [{ icon: "★", tip: `Final Form → ${ix.cardName(def.ultimateInto)}` }] : []),
   ];
   const faction = factions[0];
 

@@ -394,7 +394,7 @@ describe("effects that create pooled cards draw from the shared pool", () => {
       expect(env.pool.count("elder")).toBe(e - 1);
     });
 
-    it("a Final Form moves 3 copies", () => {
+    it("a Golden unit moves 3 copies", () => {
       const { env, p } = setup();
       const t = u("grunt", true);
       p.board = [t];

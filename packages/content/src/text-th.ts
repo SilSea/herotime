@@ -105,7 +105,7 @@ function action(a: Action, target: Target | undefined, names: Names): string {
     case "DISCOVER_GIANT": return "เลือกรับ Giant Robo";
     case "SUPER_GATTAI": return `Super Gattai: การต่อสู้ที่มี Extra Ranger บนบอร์ด Giant Robo ได้ +${a.atk}/+${a.hp} และ keyword ของ Extra Ranger`;
     case "RANDOM_CARD": return `ได้${a.cardKind === "GEAR" ? " Gear" : "ยูนิต"}${a.faction ? ` ${names(a.faction)}` : ""}แบบสุ่มเข้ามือ`;
-    case "ULTIMATE_FORM": return `เปลี่ยน${t}เป็นร่าง Ultimate`;
+    case "ULTIMATE_FORM": return `เปลี่ยน${t}เป็นร่าง Final Form`;
     case "BUFF_SHOP": return `ยูนิตในร้านได้ ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
     case "BUFF_GEAR": return `Gear ที่ให้ค่าพลังให้เพิ่มอีก ${signed(a.atk)}/${signed(a.hp)} จนจบเกม`;
     case "DEVOUR_SHOP": return `กลืนกินยูนิต${a.faction ? ` ${names(a.faction)}` : ""}ในร้าน${a.choose === "STRONGEST" ? "ที่ค่าพลังมากสุด" : a.choose === "WEAKEST" ? "ที่ค่าพลังน้อยสุด" : "แบบสุ่ม"} แล้วให้ค่าพลังของมันกับ${t}`;
@@ -179,7 +179,7 @@ export function cardTextTh(c: CardDef, names: Names): string {
   const lines: string[] = [];
   if (c.henshin) lines.push(`Henshin (${c.henshin.afterTurns}): แปลงร่างเป็น ${names(c.henshin.into)}`);
   if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
-  // ร่าง Ultimate ไม่อยู่ในข้อความการ์ด: หน้าเว็บอธิบายในกล่องข้างการ์ดแบบ keyword
+  // ร่าง Final Form (ultimateInto) ไม่อยู่ในข้อความการ์ด: หน้าเว็บอธิบายในกล่องข้างการ์ดแบบ keyword
   if (c.keywords.includes("ECHO")) lines.push("Echo: Deploy ของเราทำงาน 2 ครั้ง");
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names));
   return lines.join(" · ");

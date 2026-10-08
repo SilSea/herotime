@@ -25,7 +25,7 @@ export class ContentIndex {
     return this.cards.get(key);
   }
 
-  /** The card key plus every card that turns into it by Henshin or Ultimate Form (same as the engine's Content.lineage). */
+  /** The card key plus every card that turns into it by Henshin or Final Form (ultimateInto) (same as the engine's Content.lineage). */
   lineage = (key: string): string[] => {
     const out = [key];
     for (let i = 0; i < out.length; i++) {

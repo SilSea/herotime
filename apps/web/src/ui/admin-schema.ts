@@ -78,7 +78,7 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
   ],
   COPY: [
     { key: "to", field: { kind: "enum", options: ["BOARD", "HAND"] }, hint: "BOARD: right of the target. HAND: into your hand (from a fight: next turn). Copies are new cards and count for triples" },
-    { key: "withBuffs", label: "with bonuses", field: { kind: "bool" }, hint: "Keep its Final Form, bonuses and keywords (off: the base card)" },
+    { key: "withBuffs", label: "with bonuses", field: { kind: "bool" }, hint: "Keep it Golden, with its bonuses and keywords (off: the base card)" },
   ],
   CONSUME_ALLIES: [{ key: "permanent", field: { kind: "bool" }, hint: "Destroys all your other units, the targets get their total ATK/HP. In combat, keep it after the fight" }],
   SUMMON: [
@@ -192,7 +192,7 @@ export const TARGET: Field = {
     { key: "selector", field: { kind: "enum", options: SELECTORS } },
     { key: "faction", field: { kind: "ref", to: "factions" }, optional: true, hint: "only units of this faction" },
     { key: "series", field: { kind: "ref", to: "series" }, optional: true, hint: "only units of this series" },
-    { key: "cards", field: CARD_LIST, optional: true, hint: "only these cards (or their later forms: Henshin / Ultimate)" },
+    { key: "cards", field: CARD_LIST, optional: true, hint: "only these cards (or their later forms: Henshin / Final Form)" },
   ],
 };
 
@@ -260,7 +260,7 @@ const CARD_ROWS: Row[] = [
   { key: "cost", label: "gear price", field: int(0), optional: true, hint: "GEAR that is not a token is sold in the tavern at this price (from its rank up)" },
   { key: "costType", label: "paid with", field: { kind: "enum", options: ["ENERGY", "HEALTH"] }, hint: "HEALTH: the price comes off the hero's Health (never down to 0)" },
   CARD_SOUNDS,
-  { key: "ultimateInto", label: "ultimate form", field: { kind: "ref", to: "cards" }, optional: true, hint: "What ULTIMATE_FORM turns this unit into (e.g. its series' final Rider form)" },
+  { key: "ultimateInto", label: "final form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Its Final Form: what a Final Form card (action ULTIMATE_FORM) turns this unit into, e.g. the Rider's last form" },
   { key: "gattaiInto", label: "gattai form", field: { kind: "ref", to: "cards" }, optional: true, hint: "Gattai core: when this is the leftmost of a Gattai group, the group becomes this card (needs the GATTAI keyword)" },
   { key: "henshin", field: { kind: "object", rows: [{ key: "afterTurns", field: int(1) }, { key: "into", label: "into card", field: { kind: "ref", to: "cards" } }], make: () => ({ afterTurns: 2, into: "" }) }, optional: true },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
