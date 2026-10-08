@@ -373,6 +373,7 @@ body.dragging .idle-hint { display: none; }
 .gold { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .gold-num { display: flex; align-items: baseline; gap: 4px; }
 .gold-max { color: var(--muted); font-weight: 700; }
+.next-energy { color: var(--muted); font-size: 12px; font-weight: 700; }
 .pips { display: flex; gap: 2px; }
 .pip { width: 9px; height: 14px; background: #050a18; border: 1px solid var(--line); }
 .pip.full { background: linear-gradient(180deg, #9cf6ff, var(--energy)); border-color: #9cf6ff; box-shadow: 0 0 6px var(--energy); }

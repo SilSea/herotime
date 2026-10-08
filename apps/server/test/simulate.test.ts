@@ -38,6 +38,12 @@ describe("simulate", () => {
     expect(() => simulate(content, { ...quick, relic: "nope" })).toThrow(/unknown relic/);
   });
 
+  it("lists the Giant Robos held at the end, each a Giant card counted once per holder", () => {
+    const r = simulate(content, { matches: 20, seed: 5 });
+    for (const row of r.giants) expect(content.card(row.key).kind).toBe("GIANT");
+    expect(r.giants.reduce((n, g) => n + g.count, 0)).toBeLessThanOrEqual(20 * 8);
+  });
+
   it("is deterministic for a seed, and different seeds differ", () => {
     const a = simulate(content, quick);
     expect(simulate(content, quick)).toEqual(a);

@@ -36,6 +36,8 @@ export interface SimulationReport {
   unassigned: number;
   /** Relics held at the end, by the players who held them. */
   relics: Row[];
+  /** Giant Robos in the Giant Slot at the end, by the players who had them (the faction table never shows them). */
+  giants: Row[];
   /** With options.relic: how the bot that started with it placed. */
   forced?: Row;
   /** Tavern cards never seen on a final board in any match, themselves or as a form they turn into. */
@@ -104,6 +106,7 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
   const cards = new Map<string, Acc>();
   const factions = new Map<string, Acc>();
   const relics = new Map<string, Acc>();
+  const giants = new Map<string, Acc>();
   const forced = new Map<string, Acc>();
   if (opts.relic !== undefined && !content.relics.has(opts.relic)) throw new Error(`unknown relic: ${opts.relic}`);
   const summonedOnly = summonedTokens(content);
@@ -127,6 +130,7 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
       const place = p.placement as number;
       if (p.state.hero) bump(heroes, p.state.hero, place);
       for (const r of p.state.relics) bump(relics, r, place);
+      if (p.state.giant) bump(giants, p.state.giant.key, place);
       if (opts.relic !== undefined && p.id === "b0") bump(forced, opts.relic, place);
       const seen = new Set<string>();
       const tally = new Map<string, number>();
@@ -157,6 +161,7 @@ export function simulate(content: Content, opts: SimulateOptions): SimulationRep
     factions: rows(factions, (k) => content.factions.get(k)?.name ?? k),
     unassigned,
     relics: rows(relics, (k) => content.relics.get(k)?.name ?? k),
+    giants: rows(giants, (k) => content.cards.get(k)?.name ?? k),
     ...(opts.relic !== undefined ? { forced: rows(forced, (k) => content.relics.get(k)?.name ?? k)[0] } : {}),
     neverUsed: [...content.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && playable(c) && !used.has(c.key)).map((c) => c.key),
   };

@@ -136,6 +136,8 @@ export interface MatchView {
     heroOptions: string[];
     ready: boolean;
     upgradeCost: number | null;
+    /** Energy the next turn starts with (its base: extra Energy from relics, wins or effects comes on top). */
+    nextTurnEnergy: number;
     /** What things cost for this player right now, after their relics and hero changed the rules. */
     limits: { buyCost: number; refreshCost: number; sellValue: number; maxEnergy: number; boardSize: number; handSize: number };
     /** The hero power, or null if the hero has none. */

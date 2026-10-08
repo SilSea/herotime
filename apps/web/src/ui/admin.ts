@@ -433,6 +433,7 @@ function simulatePanel(ctx: Ctx): HTMLElement {
         r.forced && h("div", { class: "panel" }, h("strong", { text: `Bot 1 with ${r.forced.name}` }), h("p", { text: `Average place ${r.forced.avgPlacement.toFixed(2)} (expected ${r.expected}), wins ${(r.forced.winRate * 100).toFixed(0)}% over ${r.forced.count} matches.` })),
         simTable("Heroes", r.heroes, r.expected),
         simTable("Relics (held at the end)", r.relics ?? [], r.expected),
+        (r.giants?.length ?? 0) > 0 && simTable("Giant Robos (in the Giant Slot at the end)", r.giants ?? [], r.expected),
         simTable("Factions (3+ units on the final board, summoned tokens not counted)", r.factions, r.expected, 15, r.unassigned ? `${r.unassigned} final boards had no faction with 3+ units, so they are in no faction row.` : undefined),
         simTable("Best cards", cards, r.expected),
         simTable("Worst cards", [...cards].reverse(), r.expected),

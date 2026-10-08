@@ -32,6 +32,7 @@ import {
   toggleFreeze,
   upgrade,
   upgradeCost,
+  energyForTurn,
 } from "../shop/economy.js";
 import { Pool } from "../shop/pool.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Side } from "../types.js";
@@ -239,6 +240,8 @@ export class Match {
         heroOptions: p.heroOptions,
         ready: p.ready,
         upgradeCost: upgradeCost(p.state, withRules(p.state, this.env.cfg)) ?? null,
+        // The Energy next turn starts with, before anything that gives extra (relics, wins, effects).
+        nextTurnEnergy: energyForTurn(this.turn + 1, withRules(p.state, this.env.cfg)),
         limits: this.limitsOf(p),
         heroPower: this.heroPowerOf(p),
         handStats: statsOf(p.state.hand),

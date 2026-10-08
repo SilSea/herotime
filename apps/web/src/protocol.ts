@@ -103,6 +103,8 @@ export interface SimulationReport {
   /** Final boards that belong to no faction. */
   unassigned?: number;
   relics: SimRow[];
+  /** Giant Robos held at the end (absent from older servers). */
+  giants?: SimRow[];
   forced?: SimRow;
   neverUsed: string[];
 }

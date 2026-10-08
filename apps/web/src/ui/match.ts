@@ -663,6 +663,7 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
     { class: "gold", title: `Energy ${me.state.energy}/${me.limits.maxEnergy}` },
     h("div", { class: "gold-num" }, h("span", { class: "coin big-coin", text: String(me.state.energy) }), h("span", { class: "gold-max", text: `/${me.limits.maxEnergy}` })),
     h("div", { class: "pips" }, ...Array.from({ length: me.limits.maxEnergy }, (_, i) => h("span", { class: `pip ${i < me.state.energy ? "full" : ""}` }))),
+    me.alive && view.phase !== "ENDED" && h("div", { class: "next-energy", title: tr("Energy you start next turn with (left-over Energy does not carry over). Relics, wins and card effects can add more.", "Energy ที่ได้ตอนเริ่มเทิร์นหน้า (Energy ที่เหลือไม่ทบ) Relic, การชนะ และ effect การ์ดเพิ่มให้ได้อีก") }, tr(`Next turn: ${me.nextTurnEnergy}`, `เทิร์นหน้า: ${me.nextTurnEnergy}`)),
     // No Ready button: every turn runs its full clock so everyone starts the next one together.
     h("div", { class: "next-turn-box" }, h("div", { class: "muted", text: view.phase === "RECRUIT" ? tr("Battle in", "ต่อสู้ใน") : tr("Next turn in", "เทิร์นถัดไปใน") }), h("div", { class: "countdown-big", id: "timer-big", text: formatClock(ctx.clock.remaining(view.deadline)) })),
   );
