@@ -82,4 +82,21 @@ export class ContentIndex {
   relicArt(key: string): string | undefined {
     return resolveArt(this.relics.get(key)?.art);
   }
+
+  seriesName(key: string | undefined): string | undefined {
+    return key ? (this.snapshot.series.find((s) => s.key === key)?.name ?? key) : undefined;
+  }
+
+  /** Factions, heroes and relics the admin left in play (a missing "enabled" means in play). */
+  inPlay<T extends { enabled?: boolean | undefined }>(items: Iterable<T>): T[] {
+    return [...items].filter((x) => x.enabled !== false);
+  }
+
+  heroCrop(key: string | undefined): ArtCrop | undefined {
+    return key ? this.heroes.get(key)?.artCrop : undefined;
+  }
+
+  relicCrop(key: string): ArtCrop | undefined {
+    return this.relics.get(key)?.artCrop;
+  }
 }

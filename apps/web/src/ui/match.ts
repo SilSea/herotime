@@ -7,7 +7,7 @@ import type { CardDef, MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
-import { artBox, bg, initialsOf } from "./art.js";
+import { artBox, artLayer, initialsOf } from "./art.js";
 import { h, mount, type Child } from "./dom.js";
 
 type View = NonNullable<AppState["view"]>;
@@ -28,6 +28,12 @@ export function renderMatch(root: HTMLElement, ctx: Ctx): void {
 }
 
 /** Shown once when you are knocked out: your place, then watch or leave. */
+/** A hero's framed picture to put inside a portrait (an "art-frame"), or null when the hero has none. */
+function heroPic(ctx: Ctx, hero: string | undefined): HTMLElement | null {
+  const art = ctx.ix.heroArt(hero);
+  return art ? artLayer(art, ctx.ix.heroCrop(hero)) : null;
+}
+
 function defeatNotice(ctx: Ctx, view: View): HTMLElement | null {
   const state = ctx.store.state;
   if (view.me.alive || view.phase === "ENDED" || state.defeatAck === state.matchId) return null;
@@ -71,7 +77,7 @@ function spectateStage(ctx: Ctx, view: View): HTMLElement {
     target
       ? h("div", { class: "spectate-body" },
           h("div", { class: "spectate-hero" },
-            artBox("pc-portrait", ctx.ix.heroArt(target.hero), heroDef?.name ?? target.name),
+            artBox("pc-portrait", ctx.ix.heroArt(target.hero), heroDef?.name ?? target.name, ctx.ix.heroCrop(target.hero)),
             h("div", null, h("div", { class: "pc-name", text: target.name }), h("div", { class: "pc-hero", text: heroDef?.name ?? "" }), h("div", { class: "pc-stats", text: `${Math.max(0, target.hp)} HP${target.armor ? ` + ${target.armor} ${tr("armor", "เกราะ")}` : ""} · ${tr("Tavern rank", "rank ร้าน")} ${target.rank}` }))),
           h("div", { class: "pc-label", text: target.lastBoard ? `${tr("Board in their last fight", "บอร์ดในการต่อสู้ล่าสุด")} (${tr("turn", "เทิร์น")} ${target.lastBoard.turn})${label ? ` · ${label.headline}` : ""}` : tr("No fight seen yet", "ยังไม่เห็นการต่อสู้") }),
           h("div", { class: "cards board-cards spectate-board" }, ...units.map((u) => cardEl(ctx.ix, { key: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden, extraKeywords: u.keywords, small: true, minion: true })), units.length === 0 && h("p", { class: "muted", text: target.lastBoard ? tr("They fought with an empty board.", "สู้ด้วยบอร์ดว่าง") : tr("Boards appear after a fight.", "บอร์ดจะแสดงหลังการต่อสู้") })),
@@ -143,7 +149,7 @@ function playerRow(ctx: Ctx, p: Player, mine: boolean, opponent: boolean): HTMLE
   const row = h(
     "div",
     { class: `player ${mine ? "me" : ""} ${p.alive ? "" : "dead"} ${opponent ? "opponent" : ""}` },
-    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(p.hero)) }, !ctx.ix.heroArt(p.hero) && h("span", { text: initialsOf(hero) }), h("span", { class: "tier-badge", title: `${tr("Tavern rank", "rank ร้าน")} ${p.rank}`, text: String(p.rank) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
+    h("div", { class: `portrait small-portrait ${ctx.ix.heroArt(p.hero) ? "has-art art-frame" : ""}` }, heroPic(ctx, p.hero) ?? h("span", { text: initialsOf(hero) }), h("span", { class: "tier-badge", title: `${tr("Tavern rank", "rank ร้าน")} ${p.rank}`, text: String(p.rank) }), h("span", { class: "hpgem", text: String(Math.max(0, p.hp)) }), p.armor > 0 && h("span", { class: "armorgem", text: String(p.armor) })),
     h("div", { class: "pname" }, h("span", { class: "pname-text", text: p.name }), !p.alive && p.placement !== undefined && h("span", { class: "tag", text: ordinal(p.placement) })),
     h("div", { class: "pmeta", text: `${stars(p.rank)}${p.lastBoard ? ` · ${boardLabel(p.lastBoard, ctx.ix.factionName).headline}` : ""}` }),
   );
@@ -189,7 +195,7 @@ function relicList(ctx: Ctx, keys: readonly string[]): HTMLElement {
     { class: "relic-list" },
     ...keys.map((k) => {
       const r = ctx.ix.relics.get(k);
-      return h("div", { class: "relic-entry" }, artBox("relic-thumb", ctx.ix.relicArt(k), ctx.ix.relicName(k)), h("div", null, h("div", { class: "relic-name", text: `${ctx.ix.relicName(k)}${r ? ` · ${r.tier === "GREATER" ? "Greater" : "Lesser"}` : ""}` }), h("div", { class: "relic-text", text: ctx.ix.relicText(k) })));
+      return h("div", { class: "relic-entry" }, artBox("relic-thumb", ctx.ix.relicArt(k), ctx.ix.relicName(k), ctx.ix.relicCrop(k)), h("div", null, h("div", { class: "relic-name", text: `${ctx.ix.relicName(k)}${r ? ` · ${r.tier === "GREATER" ? "Greater" : "Lesser"}` : ""}` }), h("div", { class: "relic-text", text: ctx.ix.relicText(k) })));
     }),
   );
 }
@@ -201,7 +207,7 @@ function showPlayerCard(ctx: Ctx, row: HTMLElement, p: Player, mine: boolean, op
   const card = h(
     "div",
     { class: "player-card" },
-    h("div", { class: "pc-head" }, artBox("pc-portrait", ctx.ix.heroArt(p.hero), heroDef?.name ?? p.name), h("div", null, h("div", { class: "pc-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${mine ? tr(" (you)", " (คุณ)") : ""}` }), h("div", { class: "pc-hero", text: heroDef?.name ?? tr("Choosing a hero...", "กำลังเลือก Hero...") }), h("div", { class: "pc-stats", text: `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} ${tr("armor", "เกราะ")}` : ""} · ${tr("Tavern", "ร้าน")} ${stars(p.rank)}` }))),
+    h("div", { class: "pc-head" }, artBox("pc-portrait", ctx.ix.heroArt(p.hero), heroDef?.name ?? p.name, ctx.ix.heroCrop(p.hero)), h("div", null, h("div", { class: "pc-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${mine ? tr(" (you)", " (คุณ)") : ""}` }), h("div", { class: "pc-hero", text: heroDef?.name ?? tr("Choosing a hero...", "กำลังเลือก Hero...") }), h("div", { class: "pc-stats", text: `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} ${tr("armor", "เกราะ")}` : ""} · ${tr("Tavern", "ร้าน")} ${stars(p.rank)}` }))),
     !p.alive && p.placement !== undefined && h("div", { class: "pc-out", text: tr(`Out in ${ordinal(p.placement)} place`, `ตกรอบ อันดับ${ordinal(p.placement)}`) }),
     opponent && h("div", { class: "pc-note", text: tr("Your last opponent", "คู่ต่อสู้ล่าสุดของคุณ") }),
     h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: board ? `${tr("Board in their last fight", "บอร์ดในการต่อสู้ล่าสุด")} (${tr("turn", "เทิร์น")} ${p.lastBoard?.turn}) · ${p.lastBoard?.units} ${tr(`unit${p.lastBoard?.units === 1 ? "" : "s"}`, "ตัว")}` : tr("Board", "บอร์ด") }),
@@ -392,7 +398,7 @@ function heroSelect(ctx: Ctx, view: View): HTMLElement {
     h("h2", { text: chosen ? tr("Waiting for the other players...", "รอผู้เล่นคนอื่น...") : tr("Choose your hero", "เลือก Hero") }),
     h("div", { class: "hero-options" }, ...view.me.heroOptions.map((key, i) => {
       const def = ctx.ix.heroes.get(key);
-      return h("div", { class: `hero-card ${chosen === key ? "picked" : ""} ${chosen ? "locked" : ""}`, on: { click: () => !chosen && void ctx.act({ type: "CHOOSE_HERO", index: i }) } }, artBox("hero-art", ctx.ix.heroArt(key), def?.name ?? key), h("h3", { text: def?.name ?? key }), h("p", { text: ctx.ix.heroText(key) || tr("No hero power.", "ไม่มีพลัง Hero") }), def?.power && (def?.armor ?? 0) > 0 && h("p", { class: "muted", text: `${tr("Armor", "เกราะ")} ${def?.armor}` }));
+      return h("div", { class: `hero-card ${chosen === key ? "picked" : ""} ${chosen ? "locked" : ""}`, on: { click: () => !chosen && void ctx.act({ type: "CHOOSE_HERO", index: i }) } }, artBox("hero-art", ctx.ix.heroArt(key), def?.name ?? key, ctx.ix.heroCrop(key)), h("h3", { text: def?.name ?? key }), h("p", { text: ctx.ix.heroText(key) || tr("No hero power.", "ไม่มีพลัง Hero") }), def?.power && (def?.armor ?? 0) > 0 && h("p", { class: "muted", text: `${tr("Armor", "เกราะ")} ${def?.armor}` }));
     })),
     view.factions.length > 0 && h("p", { class: "muted", text: `${tr("Factions this game", "เผ่าในเกมนี้")}: ${view.factions.map(ctx.ix.factionName).join(", ")}` }),
   );
@@ -434,7 +440,7 @@ function endScreen(ctx: Ctx, view: View): HTMLElement {
   const portrait = (p: Player, cls: string): HTMLElement => {
     const art = ctx.ix.heroArt(p.hero);
     const name = p.hero ? ctx.ix.heroName(p.hero) : p.name;
-    return h("div", { class: `${cls} ${art ? "has-art" : ""}`, style: bg(art) }, !art && h("span", { text: initialsOf(name) }));
+    return h("div", { class: `${cls} ${art ? "has-art art-frame" : ""}` }, heroPic(ctx, p.hero) ?? h("span", { text: initialsOf(name) }));
   };
   const miniBoard = (p: Player): HTMLElement =>
     h("div", { class: "end-board" }, ...(p.lastFightBoard ?? []).map((u) => cardEl(ctx.ix, { key: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden, extraKeywords: u.keywords, small: true, minion: true, hideText: true })));
@@ -625,7 +631,7 @@ function bottomBar(ctx: Ctx, view: View, hand: HTMLElement): HTMLElement {
   const portrait = h(
     "div",
     { class: "hero-box" },
-    h("div", { class: `portrait ${ctx.ix.heroArt(hero) ? "has-art" : ""}`, style: bg(ctx.ix.heroArt(hero)), title: `${name}${heroText ? `\n${heroText}` : ""}` }, !ctx.ix.heroArt(hero) && h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
+    h("div", { class: `portrait ${ctx.ix.heroArt(hero) ? "has-art art-frame" : ""}`, title: `${name}${heroText ? `\n${heroText}` : ""}` }, heroPic(ctx, hero) ?? h("span", { text: initialsOf(name) }), h("span", { class: "hpgem", text: String(Math.max(0, self?.hp ?? 0)) }), (self?.armor ?? 0) > 0 && h("span", { class: "armorgem", text: String(self?.armor) })),
     h("div", { class: "hero-name", text: name }),
   );
 
@@ -996,7 +1002,7 @@ function offersModal(ctx: Ctx, view: View): HTMLElement | null {
         h("div", { class: "cards" }, ...offer.options.map((key, i) => {
           const r = ctx.ix.relics.get(key);
           const cost = r?.cost ?? 0;
-          return h("div", { class: `relic-card ${cost > s.energy ? "unaffordable" : ""}`, title: ctx.ix.relicText(key), on: { click: () => cost <= s.energy && void ctx.act({ type: "CHOOSE_RELIC", index: i }) } }, h("div", { class: "cost", text: String(cost) }), artBox("relic-art", ctx.ix.relicArt(key), r?.name ?? key), h("h3", { text: r?.name ?? key }), h("p", { text: ctx.ix.relicText(key) }), (r?.factions.length ?? 0) > 0 && h("p", { class: "muted small", text: r?.factions.map(ctx.ix.factionName).join(", ") }));
+          return h("div", { class: `relic-card ${cost > s.energy ? "unaffordable" : ""}`, title: ctx.ix.relicText(key), on: { click: () => cost <= s.energy && void ctx.act({ type: "CHOOSE_RELIC", index: i }) } }, h("div", { class: "cost", text: String(cost) }), artBox("relic-art", ctx.ix.relicArt(key), r?.name ?? key, ctx.ix.relicCrop(key)), h("h3", { text: r?.name ?? key }), h("p", { text: ctx.ix.relicText(key) }), (r?.factions.length ?? 0) > 0 && h("p", { class: "muted small", text: r?.factions.map(ctx.ix.factionName).join(", ") }));
         })), hide),
     );
   }

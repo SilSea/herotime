@@ -41,6 +41,13 @@ export type CardSounds = z.infer<typeof CardSounds>;
 export const CardKind = z.enum(["UNIT", "GEAR", "GIANT"]);
 export type CardKind = z.infer<typeof CardKind>;
 
+/**
+ * How a picture sits in its frame: the point (0-100 % across / down) kept in view, and the zoom (1 = fill the
+ * frame). Only the client reads it.
+ */
+export const ArtCrop = z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100), zoom: z.number().min(1).max(4) });
+export type ArtCrop = z.infer<typeof ArtCrop>;
+
 export const CardDef = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
@@ -64,11 +71,8 @@ export const CardDef = z.object({
   textTh: z.string().default(""),
   /** Image path or URL, resolved by the client. */
   art: z.string().optional(),
-  /**
-   * How the picture sits in the card's frame: the point (0-100 % across / down) kept in view, and the zoom
-   * (1 = fill the frame). Only the client reads it.
-   */
-  artCrop: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100), zoom: z.number().min(1).max(4) }).optional(),
+  /** How the picture sits in the card's frame. */
+  artCrop: ArtCrop.optional(),
   /**
    * Gattai core: when this unit is the leftmost of a Gattai group, the group becomes this card (in combat, or
    * for good with COMBINE). The result has this card's stats plus the parts' stats, its effects, and all keywords.
@@ -98,6 +102,8 @@ export const FactionDef = z.object({
   color: z.string().default("#888888"),
   text: z.string().default(""),
   textTh: z.string().default(""),
+  /** false: matches never use this faction, so its cards stay out of the tavern (neutral cards still play). */
+  enabled: z.boolean().optional(),
   /** Sounds for every card of this faction that has none of its own. */
   sounds: CardSounds.optional(),
 });
@@ -155,6 +161,9 @@ export const RelicDef = z.object({
   text: z.string().default(""),
   textTh: z.string().default(""),
   art: z.string().optional(),
+  artCrop: ArtCrop.optional(),
+  /** false: never offered (missing = in play). */
+  enabled: z.boolean().optional(),
 });
 export type RelicDef = z.infer<typeof RelicDef>;
 
@@ -162,9 +171,14 @@ export const HeroDef = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
   armor: z.number().int().min(0).default(0),
+  /** The series this hero comes from (shown with the hero; it does not change what the power does). */
+  series: z.string().optional(),
   text: z.string().default(""),
   textTh: z.string().default(""),
   art: z.string().optional(),
+  artCrop: ArtCrop.optional(),
+  /** false: never offered at hero select (missing = in play). */
+  enabled: z.boolean().optional(),
   power: z
     .object({
       /** ACTIVE: once per turn. ONCE: once per game. PASSIVE: only ON_ACQUIRE effects. */

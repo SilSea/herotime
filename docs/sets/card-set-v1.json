@@ -4324,7 +4324,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "zeztz"
   },
   {
    "key": "h_baku",
@@ -4346,7 +4347,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "zeztz"
   },
   {
    "key": "h_nem",
@@ -4375,7 +4377,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "zeztz"
   },
   {
    "key": "h_kensei",
@@ -4396,7 +4399,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "zeztz"
   },
   {
    "key": "h_gira",
@@ -4419,7 +4423,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "king_ohger"
   },
   {
    "key": "h_yanma",
@@ -4460,7 +4465,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "king_ohger"
   },
   {
    "key": "h_hymeno",
@@ -4487,7 +4493,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "king_ohger"
   },
   {
    "key": "h_rita",
@@ -4508,7 +4515,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "king_ohger"
   },
   {
    "key": "h_gen_fudo",
@@ -4531,7 +4539,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "aquarion"
   },
   {
    "key": "h_celiane",
@@ -4552,7 +4561,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "aquarion"
   },
   {
    "key": "h_sirius",
@@ -4583,7 +4593,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "aquarion"
   },
   {
    "key": "h_apollo",
@@ -4610,7 +4621,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "aquarion"
   },
   {
    "key": "h_shobijin",
@@ -4635,7 +4647,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "godzilla"
   },
   {
    "key": "h_daisuke",
@@ -4669,7 +4682,8 @@
       "repeat": 2
      }
     ]
-   }
+   },
+   "series": "godzilla"
   },
   {
    "key": "h_ishiro",
@@ -4696,7 +4710,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "godzilla"
   },
   {
    "key": "h_jet_jaguar",
@@ -4722,7 +4737,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "godzilla"
   },
   {
    "key": "h_legoshi",
@@ -4744,7 +4760,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "beastars"
   },
   {
    "key": "h_haru",
@@ -4771,7 +4788,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "beastars"
   },
   {
    "key": "h_louis",
@@ -4793,7 +4811,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "beastars"
   },
   {
    "key": "h_gohin",
@@ -4818,7 +4837,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "beastars"
   },
   {
    "key": "h_merchant",
@@ -4936,7 +4956,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "naruto"
   },
   {
    "key": "h_hiruzen",
@@ -4963,7 +4984,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "naruto"
   },
   {
    "key": "h_iruka",
@@ -4984,7 +5006,8 @@
       ]
      }
     ]
-   }
+   },
+   "series": "naruto"
   },
   {
    "key": "h_kushina",
@@ -5015,7 +5038,8 @@
       }
      }
     ]
-   }
+   },
+   "series": "naruto"
   }
  ],
  "relics": [

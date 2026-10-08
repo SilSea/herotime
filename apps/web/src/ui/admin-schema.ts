@@ -19,7 +19,7 @@ export type Field =
   | { kind: "text"; area?: boolean; placeholder?: string; /** Offer a file picker that uploads an image (or, with audio, a sound) and fills in its name. */ upload?: boolean; audio?: boolean }
   | { kind: "int"; min?: number; max?: number }
   | { kind: "num" }
-  | { kind: "bool" }
+  | { kind: "bool"; /** Value when the data has none (default false). */ default?: boolean }
   | { kind: "enum"; options: readonly string[] }
   /** A key of another thing; typing suggests the keys that exist. */
   | { kind: "ref"; to: RefKind }
@@ -229,6 +229,13 @@ const effects = (): Field => ({ kind: "list", of: EFFECT, make: () => (EFFECT as
 
 /** A card's or faction's own sounds: uploaded files (mp3 / ogg / wav). */
 const sound = (hint: string): Row["field"] => ({ kind: "text", placeholder: "upload a sound", upload: true, audio: true });
+const ART_CROP: Row = { key: "artCrop", label: "picture framing", field: { kind: "object", rows: [{ key: "x", label: "left/right %", field: int(0, 100) }, { key: "y", label: "up/down %", field: int(0, 100) }, { key: "zoom", field: { kind: "num" }, hint: "1 to 4" }], make: () => ({ x: 50, y: 50, zoom: 1 }) }, optional: true, hint: "Easier: drag / scroll the picture on the big preview, or use the sliders under it" };
+
+/** Whether a faction / hero / relic is in play (also switchable from the list on the left). */
+function enabledRow(hint: string): Row {
+  return { key: "enabled", label: "in play", field: { kind: "bool", default: true }, hint };
+}
+
 export const CARD_SOUNDS: Row = {
   key: "sounds",
   label: "sounds",
@@ -268,17 +275,20 @@ const CARD_ROWS: Row[] = [
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
   { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
-  { key: "artCrop", label: "picture framing", field: { kind: "object", rows: [{ key: "x", label: "left/right %", field: int(0, 100) }, { key: "y", label: "up/down %", field: int(0, 100) }, { key: "zoom", field: { kind: "num" }, hint: "1 to 4" }], make: () => ({ x: 50, y: 50, zoom: 1 }) }, optional: true, hint: "Easier: drag / scroll the picture on the big preview card, or use the sliders under it" },
+  ART_CROP,
   { key: "effects", field: effects() },
 ];
 
 const HERO_ROWS: Row[] = [
   { key: "key", field: text },
   { key: "name", field: text },
+  enabledRow("Off: never offered at hero select"),
   { key: "armor", field: int(0) },
+  { key: "series", field: { kind: "ref", to: "series" }, optional: true, hint: "Where the hero comes from (shown with the hero, the power works the same)" },
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the power" },
   { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
+  ART_CROP,
   {
     key: "power",
     field: {
@@ -297,6 +307,7 @@ const HERO_ROWS: Row[] = [
 const RELIC_ROWS: Row[] = [
   { key: "key", field: text },
   { key: "name", field: text },
+  enabledRow("Off: never offered"),
   { key: "tier", field: { kind: "enum", options: TIERS } },
   { key: "cost", field: int(0) },
   { key: "weight", field: int(0), hint: "How often it is offered" },
@@ -305,12 +316,14 @@ const RELIC_ROWS: Row[] = [
   { key: "text", field: { kind: "text", area: true }, hint: "Leave empty to generate it from the effects" },
   { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true }, hint: "Empty = generated Thai, or the English text when that was written by hand" },
   { key: "art", field: { kind: "text", placeholder: "pick an image, or a path/URL", upload: true }, optional: true },
+  ART_CROP,
   { key: "effects", field: effects() },
 ];
 
 const FACTION_ROWS: Row[] = [
   { key: "key", field: text },
   { key: "name", field: text },
+  enabledRow("Off: matches never use this faction, so its cards stay out of the tavern (neutral cards still play)"),
   { key: "color", field: { kind: "text", placeholder: "#e53935" } },
   { key: "text", field: { kind: "text", area: true } },
   { key: "textTh", label: "text (Thai)", field: { kind: "text", area: true } },

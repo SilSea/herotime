@@ -971,3 +971,13 @@ body.aiming .tavern::after { display: none !important; }
 .crop-tools .crop-val { font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; color: var(--cyan); }
 .crop-tools .crop-row { grid-column: 1 / -1; display: flex; gap: 6px; justify-content: space-between; align-items: center; }
 .crop-scope { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+/* Hero / relic pictures: a framed layer (pan + zoom from artCrop) clipped to the box's own shape. */
+.art-frame { position: relative; }
+.art-clip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.art-clip .art-img { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; background-position: 50% 50%; }
+.art-frame.adjustable { cursor: grab; touch-action: none; outline: 2px dashed #2fe4ffaa; outline-offset: 2px; }
+.art-frame.adjustable:active { cursor: grabbing; }
+.admin-off { opacity: .5; }
+.play-toggle { display: inline-block; width: 1.2em; margin-right: 4px; color: #888; cursor: pointer; }
+.play-toggle.on { color: #4cd964; }

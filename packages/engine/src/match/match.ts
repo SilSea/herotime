@@ -137,7 +137,7 @@ export class Match {
     if (factions || benched.size > 0) this.env.activeSeries = new Set(poolDefs.flatMap((c) => (c.series === undefined ? [] : [c.series])));
     this.combatRng = new Rng((opts.seed ^ 0x9e3779b9) >>> 0);
 
-    const heroKeys = [...opts.content.heroes.keys()];
+    const heroKeys = [...opts.content.heroes.values()].filter((h) => h.enabled !== false).map((h) => h.key);
     this.players = opts.entrants.map((e) => ({
       id: e.id,
       name: e.name,
@@ -160,11 +160,13 @@ export class Match {
   /** The factions this match plays with, or undefined when the content declares none. */
   private pickFactions(content: Content, rng: Rng): Set<string> | undefined {
     if (content.factions.size === 0) return undefined;
-    const all = [...content.factions.keys()];
+    // A faction switched off in the admin never plays, even when asked for.
+    const all = [...content.factions.values()].filter((f) => f.enabled !== false).map((f) => f.key);
     const fixed = this.config.fixedFactions;
     if (fixed) {
       for (const f of fixed) if (!content.factions.has(f)) throw new Error(`unknown faction in fixedFactions: ${f}`);
-      return new Set(fixed);
+      const on = fixed.filter((f) => all.includes(f));
+      if (on.length > 0) return new Set(on);
     }
     // Only factions with units in the tavern: a faction with no cards yet would leave the tavern short (or empty).
     const stocked = all.filter((f) => [...content.cards.values()].some((c) => c.kind === "UNIT" && !c.token && c.factions.includes(f)));

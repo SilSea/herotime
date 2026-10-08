@@ -27,16 +27,16 @@ export function renderLibrary(root: HTMLElement, ctx: Ctx): void {
       }
       if (cards.length === 0) list.append(h("p", { class: "muted", text: tr("No cards match.", "ไม่มีการ์ดที่ตรง") }));
     } else if (tab === "heroes") {
-      for (const hero of ix.heroes.values()) {
-        list.append(h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(hero.key), hero.name), h("h3", { text: hero.name }), h("p", { text: ix.heroText(hero.key) || tr("No hero power.", "ไม่มีพลัง Hero") }), hero.power && hero.armor > 0 && h("p", { class: "muted", text: `${tr("Armor", "เกราะ")} ${hero.armor}` })));
+      for (const hero of ix.inPlay(ix.heroes.values())) {
+        list.append(h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(hero.key), hero.name, hero.artCrop), h("h3", { text: hero.name }), hero.series && h("p", { class: "muted", text: ix.seriesName(hero.series) }), h("p", { text: ix.heroText(hero.key) || tr("No hero power.", "ไม่มีพลัง Hero") }), hero.power && hero.armor > 0 && h("p", { class: "muted", text: `${tr("Armor", "เกราะ")} ${hero.armor}` })));
       }
     } else {
-      for (const r of ix.relics.values()) {
+      for (const r of ix.inPlay(ix.relics.values())) {
         list.append(
           h(
             "div",
             { class: "info-card" },
-            artBox("relic-art", ix.relicArt(r.key), r.name),
+            artBox("relic-art", ix.relicArt(r.key), r.name, r.artCrop),
             h("h3", { text: r.name }),
             h("p", { class: "muted", text: `${r.tier === "LESSER" ? "Lesser" : "Greater"} relic - ${r.cost} Energy${r.factions.length ? ` - ${r.factions.map(ix.factionName).join(", ")}` : ""}` }),
             h("p", { text: ix.relicText(r.key) }),
@@ -50,7 +50,7 @@ export function renderLibrary(root: HTMLElement, ctx: Ctx): void {
       "select",
       { on: { change: (e) => ((faction = (e.target as HTMLSelectElement).value), draw()) } },
       h("option", { value: "", text: tr("All factions", "ทุกเผ่า") }),
-      ...[...ix.factions.values()].map((f) => h("option", { value: f.key, text: f.name, selected: faction === f.key })),
+      ...ix.inPlay(ix.factions.values()).map((f) => h("option", { value: f.key, text: f.name, selected: faction === f.key })),
       h("option", { value: "_neutral", text: tr("Neutral", "ไม่มีเผ่า"), selected: faction === "_neutral" }),
     );
     const rankSelect = h(

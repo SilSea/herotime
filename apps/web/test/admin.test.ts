@@ -93,6 +93,12 @@ describe("defaults", () => {
   it("a list with a minimum starts with that many items", () => {
     expect(defaultFor({ kind: "list", of: { kind: "int" }, make: () => 7, min: 2 })).toEqual([7, 7]);
   });
+  it("opening a faction, hero or relic with no 'in play' value keeps it in play", () => {
+    for (const kind of ["factions", "heroes", "relics"] as const) {
+      const row = ENTITIES.find((e) => e.kind === kind)?.rows.find((r) => r.key === "enabled");
+      expect(row && defaultFor(row.field)).toBe(true);
+    }
+  });
 });
 
 describe("the rules tab matches the engine and the schema", () => {

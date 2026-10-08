@@ -530,6 +530,23 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
       (!f.keyword || kws.includes(f.keyword) || JSON.stringify(it.effects ?? []).includes(`"${f.keyword}"`))
     );
   };
+  // Factions, heroes and relics can be taken out of play straight from the list.
+  const switchable = ed.kind === "factions" || ed.kind === "heroes" || ed.kind === "relics";
+  const playToggle = (it: Record<string, any>): HTMLElement =>
+    h("span", {
+      class: `play-toggle ${it.enabled === false ? "" : "on"}`,
+      text: it.enabled === false ? "○" : "●",
+      title: it.enabled === false ? "Off - click to put it in play" : "In play - click to take it out",
+      on: {
+        click: (e) => {
+          e.stopPropagation();
+          if (it.enabled === false) delete it.enabled;
+          else it.enabled = false;
+          setDirty();
+          redraw();
+        },
+      },
+    });
   const fillList = (): void => {
     const q = ed.query.toLowerCase();
     listEl.replaceChildren(
@@ -538,7 +555,15 @@ function editorBody(ctx: Ctx, refs: (k: RefKind) => string[]): HTMLElement {
         .sort((a, b) => byName(a.it, b.it))
         .filter(({ it }) => passes(it))
         .filter(({ it }) => !q || `${it.key} ${it.name} ${it.text ?? ""} ${it.textTh ?? ""}`.toLowerCase().includes(q))
-        .map(({ it, i }) => h("button", { class: `admin-item ${i === ed.index ? "active" : ""}`, on: { click: () => ((ed.index = i), redraw()) } }, h("strong", { text: String(it.name ?? it.key) }), h("span", { class: "muted", text: ` ${it.key ?? ""}${typeof it.rank === "number" ? ` · rank ${it.rank}` : ""}` }))),
+        .map(({ it, i }) =>
+          h(
+            "button",
+            { class: `admin-item ${i === ed.index ? "active" : ""} ${it.enabled === false ? "admin-off" : ""}`, on: { click: () => ((ed.index = i), redraw()) } },
+            switchable && playToggle(it),
+            h("strong", { text: String(it.name ?? it.key) }),
+            h("span", { class: "muted", text: ` ${it.key ?? ""}${typeof it.rank === "number" ? ` · rank ${it.rank}` : ""}${it.enabled === false ? " · off" : ""}` }),
+          ),
+        ),
     );
     if (listEl.childElementCount === 0) listEl.append(h("p", { class: "muted", text: "Nothing here." }));
   };
@@ -721,10 +746,40 @@ function updatePreview(): void {
       });
     return mount(previewEl, h("h3", { text: "Preview" }), cards, framing, note);
   }
-  if (ed.kind === "heroes") return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(String(entity.key)), String(entity.name ?? "")), h("h3", { text: String(entity.name ?? "") }), h("p", { text: ix.heroes.get(String(entity.key))?.text || "No hero power." }), Number(entity.armor) > 0 && h("p", { class: "muted", text: `${entity.armor} armor` })), note);
+  // A hero or relic picture is framed like a card's: on the big picture, with the small ones following.
+  const framed = (pics: HTMLElement, extra: HTMLElement | false): void => {
+    const framing =
+      entity.art &&
+      artCropTools(pics, entity.artCrop, (c) => {
+        if (c) entity.artCrop = c;
+        else delete entity.artCrop;
+        setDirty();
+        redraw();
+      });
+    mount(previewEl as HTMLElement, h("h3", { text: "Preview" }), pics, extra, framing, note);
+  };
+  const key = String(entity.key);
+  const name = String(entity.name ?? "");
+  const off = entity.enabled === false && h("p", { class: "muted", text: "Off: not in play" });
+  if (ed.kind === "heroes") {
+    const seriesName = entity.series ? String(list("series").find((s) => s.key === entity.series)?.name ?? entity.series) : "";
+    const pics = h(
+      "div",
+      { class: "crop-scope" },
+      h("div", { class: "info-card" }, artBox("hero-art", ix.heroArt(key), name, entity.artCrop), h("h3", { text: name }), seriesName && h("p", { class: "muted", text: seriesName }), h("p", { text: ix.heroes.get(key)?.text || "No hero power." }), Number(entity.armor) > 0 && h("p", { class: "muted", text: `${entity.armor} armor` })),
+      h("div", { class: "row" }, artBox("pc-portrait", ix.heroArt(key), name, entity.artCrop), artBox("portrait", ix.heroArt(key), name, entity.artCrop)),
+    );
+    return framed(pics, off);
+  }
   if (ed.kind === "relics") {
-    const r = ix.relics.get(String(entity.key));
-    return mount(previewEl, h("h3", { text: "Preview" }), h("div", { class: "info-card" }, artBox("relic-art", ix.relicArt(String(entity.key)), String(entity.name ?? "")), h("h3", { text: String(entity.name ?? "") }), h("p", { class: "muted", text: `${entity.tier === "GREATER" ? "Greater" : "Lesser"} relic - ${entity.cost} Energy` }), h("p", { text: r?.text ?? "" })), note);
+    const r = ix.relics.get(key);
+    const pics = h(
+      "div",
+      { class: "crop-scope" },
+      h("div", { class: "info-card" }, artBox("relic-art", ix.relicArt(key), name, entity.artCrop), h("h3", { text: name }), h("p", { class: "muted", text: `${entity.tier === "GREATER" ? "Greater" : "Lesser"} relic - ${entity.cost} Energy` }), h("p", { text: r?.text ?? "" })),
+      h("div", { class: "row" }, artBox("relic-thumb", ix.relicArt(key), name, entity.artCrop)),
+    );
+    return framed(pics, off);
   }
   if (ed.kind === "factions") return mount(previewEl, h("h3", { text: "Preview" }), h("span", { class: "chip", style: `--c:${String(entity.color ?? "#888")}`, text: String(entity.name ?? entity.key) }));
   mount(previewEl);

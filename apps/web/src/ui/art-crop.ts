@@ -6,9 +6,9 @@ const clamp = (n: number, lo: number, hi: number): number => Math.min(hi, Math.m
 const round = (c: ArtCrop): ArtCrop => ({ x: Math.round(c.x), y: Math.round(c.y), zoom: Math.round(c.zoom * 100) / 100 });
 const same = (a: ArtCrop, b: ArtCrop): boolean => a.x === b.x && a.y === b.y && a.zoom === b.zoom;
 
-/** Show a framing on every picture of this card on the page without redrawing anything. */
+/** Show a framing on every picture of this card (or hero / relic) in `root` without redrawing anything. */
 function paint(root: ParentNode, c: ArtCrop): void {
-  for (const img of root.querySelectorAll<HTMLElement>(".card .art .art-img")) {
+  for (const img of root.querySelectorAll<HTMLElement>(".card .art .art-img, .art-frame .art-img")) {
     img.style.backgroundPosition = `${c.x}% ${c.y}%`;
     img.style.transformOrigin = `${c.x}% ${c.y}%`;
     img.style.transform = `scale(${c.zoom})`;
@@ -55,7 +55,7 @@ export function artCropTools(scope: HTMLElement, crop: ArtCrop | undefined, save
   hint.hidden = true;
 
   // The big preview picture: drag to move, scroll to zoom.
-  const frame = scope.querySelector<HTMLElement>(".card .art");
+  const frame = scope.querySelector<HTMLElement>(".card .art, .art-frame");
   const pic = frame?.querySelector<HTMLElement>(".art-img");
   if (frame && pic) {
     // Which side the picture fits exactly: compare its shape with the frame's.

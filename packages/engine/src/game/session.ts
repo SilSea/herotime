@@ -286,7 +286,7 @@ export function offerRelics(
   const usable = (r: { factions: readonly string[]; series?: string | undefined }): boolean =>
     (r.factions.length === 0 || !env.activeFactions || r.factions.some((f) => env.activeFactions?.has(f))) &&
     (r.series === undefined || !env.activeSeries || env.activeSeries.has(r.series));
-  let pool = [...env.content.relics.values()].filter((r) => r.tier === tier && usable(r));
+  let pool = [...env.content.relics.values()].filter((r) => r.enabled !== false && r.tier === tier && usable(r));
   const chosen: typeof pool = [];
   const take = (r: (typeof pool)[number] | undefined): void => {
     if (!r) return;

@@ -22,7 +22,7 @@ export function defaultFor(field: Field): unknown {
     case "num":
       return 0;
     case "bool":
-      return false;
+      return field.default ?? false;
     case "enum":
       return field.options[0];
     case "tags":

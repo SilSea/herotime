@@ -27,7 +27,15 @@ export function initialsOf(name: string): string {
   return ((words[0]?.[0] ?? "?") + (words[1]?.[0] ?? "")).toUpperCase();
 }
 
+/**
+ * A framed picture filling its parent (give the parent the "art-frame" class): the clip follows the parent's
+ * rounded corners, so badges on the parent can still stick out past its edge.
+ */
+export function artLayer(url: string, crop: ArtCrop | undefined): HTMLElement {
+  return h("div", { class: "art-clip" }, h("div", { class: "art-img", style: artStyle(url, crop) }));
+}
+
 /** A box showing the picture, or the initials when there is none. `cls` sizes and shapes it. */
-export function artBox(cls: string, url: string | undefined, name: string): HTMLElement {
-  return h("div", { class: `${cls} ${url ? "has-art" : ""}`, style: bg(url) }, url ? null : h("span", { class: "art-initials", text: initialsOf(name) }));
+export function artBox(cls: string, url: string | undefined, name: string, crop?: ArtCrop): HTMLElement {
+  return h("div", { class: `${cls} ${url ? "has-art art-frame" : ""}` }, url ? artLayer(url, crop) : h("span", { class: "art-initials", text: initialsOf(name) }));
 }

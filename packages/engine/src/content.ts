@@ -244,7 +244,10 @@ export class Content {
       checkFilters(r.effects, `relic "${r.key}"`);
       checkActions(actionsOf(r.effects), `relic "${r.key}"`);
     }
+    if (this.heroes.size > 0 && ![...this.heroes.values()].some((h) => h.enabled !== false)) problems.push("every hero is switched off");
+    if (this.factions.size > 0 && ![...this.factions.values()].some((f) => f.enabled !== false)) problems.push("every faction is switched off");
     for (const h of this.heroes.values()) {
+      needSeries(h.series, `hero "${h.key}"`);
       checkActions(actionsOf(h.power?.effects), `hero "${h.key}"`);
       checkFilters(h.power?.effects ?? [], `hero "${h.key}"`);
     }

@@ -103,7 +103,7 @@ export function renderLobby(root: HTMLElement, ctx: Ctx): void {
   const state = store.state;
   const form = loadForm();
 
-  const factionBoxes = [...ix.factions.values()].map((f) => {
+  const factionBoxes = ix.inPlay(ix.factions.values()).map((f) => {
     const box = h("input", { type: "checkbox", checked: form.factions.includes(f.key), attrs: { "data-faction": f.key } });
     box.addEventListener("change", () => {
       form.factions = [...root.querySelectorAll<HTMLInputElement>("input[data-faction]")].filter((b) => b.checked).map((b) => b.dataset.faction as string);
