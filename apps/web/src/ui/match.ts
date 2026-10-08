@@ -1,9 +1,9 @@
 import { formatClock } from "../clock.js";
-import { boardLabel, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars } from "../format.js";
+import { boardLabel, byName, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars } from "../format.js";
 import { tr } from "../i18n.js";
 import { play, slotForPlace } from "../sound.js";
 import { langToggle, muteToggle } from "./lang.js";
-import type { MatchView } from "../protocol.js";
+import type { CardDef, MatchView } from "../protocol.js";
 import type { AppState } from "../store.js";
 import { cardEl } from "./card.js";
 import type { Ctx } from "./ctx.js";
@@ -232,10 +232,29 @@ const inMatchOf =
 
 /** Book tab for tavern gear (ranks are 1-6, so 7 cannot clash). */
 const GEAR_TAB = 7;
-/** Book tab for cards that never come from the tavern: gauge rewards and the Giant Robos. */
+/** Book tab for cards that never come from the tavern: forms, tokens, gauge rewards and the Giant Robos. */
 const SPECIAL_TAB = 8;
 
-/** Gauge rewards and Giants of this match, each with a line saying how you get it. */
+/** The cards `src` turns into or brings in, each with a line saying so from that card's side ("Henshin of X"). */
+function formsOf(src: CardDef): { key: string; how: string }[] {
+  const out: { key: string; how: string }[] = [];
+  const add = (key: string | undefined, how: string): void => {
+    if (key && key !== src.key) out.push({ key, how });
+  };
+  add(src.henshin?.into, tr(`Henshin of ${src.name} (after ${src.henshin?.afterTurns} turns)`, `ร่าง Henshin ของ ${src.name} (หลัง ${src.henshin?.afterTurns} เทิร์น)`));
+  add(src.ultimateInto, tr(`Ultimate Form of ${src.name}`, `ร่าง Ultimate ของ ${src.name}`));
+  add(src.gattaiInto, tr(`Gattai form of ${src.name}'s group`, `ร่าง Gattai ของกลุ่ม ${src.name}`));
+  for (const e of src.effects) {
+    for (const a of e.actions) {
+      if (a.type === "SUMMON") add(a.cardKey, tr(`Summoned by ${src.name}`, `${src.name} เรียกออกมา`));
+      if (a.type === "ADD_TO_HAND") add(a.cardKey, tr(`Given by ${src.name}`, `ได้เข้ามือจาก ${src.name}`));
+      if (a.type === "TRANSFORM") add(a.into, tr(`${src.name} transforms into it`, `${src.name} แปลงร่างเป็นใบนี้`));
+    }
+  }
+  return out;
+}
+
+/** Cards of this match the tavern never sells (gauge rewards, Giants, forms, tokens), each with a line saying how you get it. */
 function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
   const out: { key: string; how: string }[] = [];
   for (const g of ctx.ix.snapshot.gauges) {
@@ -250,7 +269,37 @@ function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
   const series = new Set([...ctx.ix.cards.values()].filter((c) => c.kind === "UNIT" && !c.token && inMatchOf(view)(c)).flatMap((c) => (c.series ? [c.series] : [])));
   const giants = [...ctx.ix.cards.values()].filter((c) => c.kind === "GIANT" && (c.series === undefined || series.has(c.series))).sort((a, b) => a.name.localeCompare(b.name));
   for (const c of giants) out.push({ key: c.key, how: tr("Giant Robo: chosen with Kyodai Gattai!, waits in the Giant Slot", "Giant Robo: เลือกได้จาก Kyodai Gattai! แล้วรออยู่ในช่อง Giant") });
-  return out;
+
+  // Forms and tokens: Henshin / Ultimate / Gattai forms, and what cards summon, hand out or turn into,
+  // followed from the cards of this match (a form's own form too). Each says where it comes from.
+  const hows = new Map<string, string[]>();
+  const note = (key: string, how: string): void => {
+    const list = hows.get(key) ?? [];
+    if (!list.includes(how)) list.push(how);
+    hows.set(key, list);
+  };
+  for (const o of out) note(o.key, o.how);
+  const queue = [...ctx.ix.cards.values()].filter((c) => !c.token && c.kind !== "GIANT" && inMatchOf(view)(c)).sort(byName);
+  const seen = new Set(queue.map((c) => c.key));
+  for (let i = 0; i < queue.length; i++) {
+    const src = queue[i] as CardDef;
+    for (const r of formsOf(src)) {
+      const def = ctx.ix.card(r.key);
+      // Only cards the tavern never sells need explaining here.
+      if (!def || (!def.token && def.kind !== "GIANT")) continue;
+      note(r.key, r.how);
+      if (!seen.has(r.key)) {
+        seen.add(r.key);
+        queue.push(def);
+      }
+    }
+  }
+  // Tokens of this match's factions that nothing above leads to still belong in the book.
+  for (const c of [...ctx.ix.cards.values()].filter((x) => x.token && x.kind !== "GIANT" && inMatchOf(view)(x)).sort(byName)) {
+    if (!hows.has(c.key)) note(c.key, tr("Token: only other cards bring it in", "Token: ได้จากการ์ดอื่นเท่านั้น"));
+  }
+  const order = [...out.map((o) => o.key), ...[...hows.keys()].filter((k) => !out.some((o) => o.key === k))];
+  return order.map((key) => ({ key, how: (hows.get(key) ?? []).join(" · ") }));
 }
 
 /** Every shop card this match can offer, by rank: only this match's factions, plus neutrals. */
@@ -277,7 +326,7 @@ function bookModal(ctx: Ctx, view: View): HTMLElement {
       h("div", { class: "row" }, h("h2", { text: tr("Card book", "หนังสือการ์ด") }), h("span", { class: "spacer" }), h("span", { class: "muted", text: `${tr("Factions this match", "เผ่าในเกมนี้")}: ${view.factions.map(ctx.ix.factionName).join(", ") || tr("all", "ทั้งหมด")} · ${tr("your tavern is rank", "ร้านของคุณ rank")} ${view.me.state.rank}`, title: view.series ? `${tr("Series this match", "ซีรีส์ในเกมนี้")}: ${view.series.map((k) => ctx.ix.snapshot.series.find((s) => s.key === k)?.name ?? k).join(", ")}` : "" }), h("button", { class: "btn", text: tr("Close", "ปิด"), on: { click: close } })),
       h("div", { class: "book-tabs" }, ...[1, 2, 3, 4, 5, 6].map((r) => h("button", { class: `tab ${r === rank ? "active" : ""} ${r > view.me.state.rank ? "locked" : ""}`, title: r > view.me.state.rank ? tr("Upgrade your tavern to be offered these", "อัปเกรดร้านเพื่อให้สุ่มเจอการ์ดเหล่านี้") : "", on: { click: () => ctx.store.set({ bookRank: r }) } }, `${stars(r)} Rank ${r}`, h("span", { class: "book-count", text: String(pool.filter((c) => c.rank === r).length) }))),
         gear.length > 0 && h("button", { class: `tab ${rank === GEAR_TAB ? "active" : ""}`, title: tr("Gear the tavern can offer (from the rank shown on each card)", "Gear ที่ร้านสุ่มให้ได้ (ตั้งแต่ rank ที่เขียนบนการ์ด)"), on: { click: () => ctx.store.set({ bookRank: GEAR_TAB }) } }, "Gear", h("span", { class: "book-count", text: String(gear.length) })),
-        special.length > 0 && h("button", { class: `tab ${rank === SPECIAL_TAB ? "active" : ""}`, title: tr("Cards from the gauges, and the Giant Robos", "การ์ดจาก gauge และ Giant Robo"), on: { click: () => ctx.store.set({ bookRank: SPECIAL_TAB }) } }, tr("Special", "พิเศษ"), h("span", { class: "book-count", text: String(special.length) }))),
+        special.length > 0 && h("button", { class: `tab ${rank === SPECIAL_TAB ? "active" : ""}`, title: tr("Cards the tavern never sells: transformed forms, tokens, gauge cards and the Giant Robos, each with where it comes from", "การ์ดที่ร้านไม่ขาย: ร่างแปลง, Token, การ์ดจาก gauge และ Giant Robo พร้อมบอกว่าได้มาจากไหน"), on: { click: () => ctx.store.set({ bookRank: SPECIAL_TAB }) } }, tr("Forms & special", "ร่างแปลง & พิเศษ"), h("span", { class: "book-count", text: String(special.length) }))),
       h(
         "div",
         { class: "book-filters" },
@@ -499,7 +548,7 @@ function table(ctx: Ctx, view: View): HTMLElement {
     h("div", { class: "board-row" }, h("div", { class: "cards board-cards" }, ...boardSlots, h("div", { class: "drop-marker" })), giantSlot(ctx, view)),
   );
 
-  const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)), s.hand.length === 0 && h("p", { class: "muted hand-empty", text: tr("Buy a card from the tavern, then drag it onto your warband.", "ซื้อการ์ดจากร้าน แล้วลากลงบอร์ด") }));
+  const hand = h("div", { class: "hand" }, ...s.hand.map((_u, i) => handCard(ctx, view, i)));
 
   board.addEventListener("dragover", (e) => {
     allowDrop(e);
