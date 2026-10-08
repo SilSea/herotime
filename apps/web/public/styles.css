@@ -231,6 +231,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .player:hover { border-color: var(--cyan-dim); background: #102044; }
 .player.me { border-color: var(--cyan); box-shadow: inset 0 0 12px #2fe4ff44; }
 .player.opponent { border-color: var(--magenta); }
+.next-opp { color: var(--magenta); font-weight: 700; margin-left: 10px; white-space: nowrap; }
 .player.dead { opacity: .4; filter: grayscale(.85); }
 .portrait { position: relative; width: 74px; height: 74px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #3b5a9a, #0b1430 70%); border: 2px solid var(--cyan); box-shadow: 0 0 14px #2fe4ff66, inset 0 0 14px #000a; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: #e7f1ff; text-shadow: 0 0 8px #2fe4ff; }
 .portrait.small-portrait { width: 54px; height: 54px; font-size: 18px; }

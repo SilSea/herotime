@@ -148,6 +148,8 @@ export interface MatchView {
   };
   players: PublicPlayer[];
   lastCombat?: CombatRecord;
+  /** Recruit phase: who you fight at the end of this turn (id null = a Ghost). */
+  nextOpponent?: { id: string | null; name: string };
   /** Knocked-out viewers only: this turn's fight of every other player, by player id, from that player's side. */
   watch?: Record<string, CombatRecord>;
 }

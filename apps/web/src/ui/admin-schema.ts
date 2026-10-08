@@ -409,6 +409,7 @@ export const RULE_DEFAULTS: Record<string, number> = {
   giantEntryThreshold: 2,
   giantSentaiScale: 1,
   kyodaikaMultiplier: 2,
+  heroCardWeight: 2,
 };
 
 const RULE_HELP: Record<string, string> = {
@@ -428,12 +429,13 @@ const RULE_HELP: Record<string, string> = {
   giantEntryThreshold: "The Giant Robo joins when this many of your units (or fewer) are left",
   giantSentaiScale: "Share of your Sentai's total ATK/HP the Giant Robo gets (1 = all of it)",
   kyodaikaMultiplier: "Stat multiplier when a Kyodaika unit rises",
+  heroCardWeight: "How many times likelier the tavern offers cards of your hero's series (or named by its power); 1 = no boost",
 };
 
 /** One row per rule: switch it on to override the default for this content version. */
 export const RULE_ROWS: Row[] = Object.keys(RULE_DEFAULTS).map((key) => ({
   key,
-  field: key === "giantSentaiScale" || key === "kyodaikaMultiplier" ? { kind: "num" as const } : { kind: "int" as const, min: 0 },
+  field: key === "giantSentaiScale" || key === "kyodaikaMultiplier" || key === "heroCardWeight" ? { kind: "num" as const } : { kind: "int" as const, min: 0 },
   optional: true,
   hint: `${RULE_HELP[key] ?? ""} (default ${RULE_DEFAULTS[key]})`,
 }));

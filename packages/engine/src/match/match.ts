@@ -37,7 +37,7 @@ import { Pool } from "../shop/pool.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Side } from "../types.js";
 import { runBot } from "./bot.js";
 import { DEFAULT_MATCH_CONFIG, recruitDuration, type MatchConfig } from "./config.js";
-import { pairPlayers } from "./pairing.js";
+import { pairPlayers, type Pairing } from "./pairing.js";
 import type {
   BoardSummary,
   SeenUnit,
@@ -96,6 +96,8 @@ export class Match {
   /** Boards of eliminated players, oldest first. */
   private readonly ghosts: GhostBoard[] = [];
   private lastGhostFor: string | undefined;
+  /** This turn's pairing, drawn when the recruit phase starts so everyone can see who they will face. */
+  private planned: { alive: string; pairing: Pairing } | undefined;
 
   /** Pay a Health price (Health gear). Armor does not pay it, and it can never knock the hero out. */
   private payHealth(p: MatchPlayer, amount: number): void {
@@ -266,6 +268,8 @@ export class Match {
     };
     if (p.placement !== undefined) view.me.placement = p.placement;
     if (p.lastCombat) view.lastCombat = p.lastCombat;
+    const next = p.alive && this.phase === "RECRUIT" ? this.nextOpponentOf(p.id) : undefined;
+    if (next !== undefined) view.nextOpponent = { id: next, name: next === null ? "Ghost" : this.player(next).name };
     // Someone who is out may watch the others fight; a player still in must not see anyone else's boards.
     if (!p.alive) {
       const watch: Record<string, CombatRecord> = {};
@@ -384,7 +388,8 @@ export class Match {
       return;
     }
     if (this.phase === "HERO_SELECT") this.maybeStartRecruit(now);
-    else if (this.phase === "RECRUIT" && this.players.filter((x) => x.alive && !x.isBot).every((x) => x.ready)) this.finishRecruit(now);
+    else if (this.phase === "RECRUIT") this.planPairing(); // their opponent needs someone else
+    if (this.phase === "RECRUIT" && this.players.filter((x) => x.alive && !x.isBot).every((x) => x.ready)) this.finishRecruit(now);
   }
 
   /** Advance every phase whose deadline has passed (catching up if the caller was late). */
@@ -448,7 +453,28 @@ export class Match {
       }
       if (p.isBot) runBot(p.state, turn, this.env, (amount) => { if (p.hp - amount < 15) throw new RuleError("bots keep their health"); this.payHealth(p, amount); });
     }
+    this.planPairing();
     this.emitPhase();
+  }
+
+  private aliveKey(): string {
+    return this.players.filter((p) => p.alive).map((p) => p.id).join(",");
+  }
+
+  /** Draw who fights whom this turn. Done again if someone leaves before the fight. */
+  private planPairing(): void {
+    const alive = this.players.filter((p) => p.alive);
+    const history = new Map(alive.map((p) => [p.id, p.opponents] as const));
+    this.planned = { alive: this.aliveKey(), pairing: pairPlayers(alive.map((p) => p.id), history, this.combatRng, this.config.noRepeatRounds, this.lastGhostFor) };
+  }
+
+  /** Who `id` fights this turn: a player id, null for a Ghost, undefined when not drawn yet. */
+  private nextOpponentOf(id: string): string | null | undefined {
+    const pairing = this.planned?.pairing;
+    if (!pairing) return undefined;
+    if (pairing.ghostFor === id) return null;
+    const pair = pairing.pairs.find(([a, b]) => a === id || b === id);
+    return pair ? (pair[0] === id ? pair[1] : pair[0]) : undefined;
   }
 
   private finishRecruit(at: number): void {
@@ -474,8 +500,9 @@ export class Match {
       p.lastFightBoard = units.map((u) => ({ cardKey: u.cardKey, atk: u.atk, hp: u.hp, golden: u.golden ?? false, keywords: [...(u.keywords ?? [])] }));
     }
 
-    const history = new Map(alive.map((p) => [p.id, p.opponents] as const));
-    const pairing = pairPlayers(alive.map((p) => p.id), history, this.combatRng, this.config.noRepeatRounds, this.lastGhostFor);
+    if (this.planned?.alive !== this.aliveKey()) this.planPairing();
+    const pairing = (this.planned as { pairing: Pairing }).pairing;
+    this.planned = undefined;
     this.lastGhostFor = pairing.ghostFor;
 
     interface Fight {

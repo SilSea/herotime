@@ -277,6 +277,27 @@ describe("every trigger fires", () => {
     expect(w.p.gauges.g).toBe(3);
   });
 
+  it("a hero's tied tavern cards: the pool cards its power names", () => {
+    const w = world([], { heroes: [
+      { key: "h", name: "H", power: { mode: "ACTIVE", cost: 1, effects: [{ scope: "PLAYER", trigger: "ON_USE", actions: [{ type: "SUMMON", cardKey: "elk" }, { type: "SUMMON", cardKey: "cub" }] }] } },
+      { key: "plain", name: "P" },
+    ] });
+    assignHero(w.p, "h", w.e);
+    expect(w.p.heroCards).toEqual(["elk"]); // cub is a token, not in the tavern
+    const s = world([], { series: [{ key: "zz", name: "ZZ" }], heroes: [{ key: "sh", name: "S", series: "zz" }] });
+    const owl = s.e.content.card("owl") as { series?: string }; // BASE is shared by every test: put it back
+    owl.series = "zz";
+    try {
+      assignHero(s.p, "sh", s.e);
+    } finally {
+      delete owl.series;
+    }
+    expect(s.p.heroCards).toEqual(["owl"]); // the cards of the hero's series
+    const q = world([], { heroes: [{ key: "plain", name: "P" }] });
+    assignHero(q.p, "plain", q.e);
+    expect(q.p.heroCards).toBeUndefined();
+  });
+
   it("ON_USE (hero power)", () => {
     const w = world([], { heroes: [{ key: "h", name: "H", power: { mode: "ACTIVE", cost: 1, effects: [{ scope: "PLAYER", trigger: "ON_USE", actions: [{ type: "GAUGE_ADD", gauge: "g", amount: 2 }] }] } }] });
     assignHero(w.p, "h", w.e);

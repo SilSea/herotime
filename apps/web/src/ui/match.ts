@@ -122,7 +122,7 @@ function topBar(ctx: Ctx, view: View): HTMLElement {
   return h(
     "div",
     { class: "topbar" },
-    h("div", { class: "phase" }, h("strong", { text: phaseLabel(view.phase) }), view.turn > 0 && h("span", { class: "turn", text: `${tr("Turn", "เทิร์น")} ${view.turn}` }), timer),
+    h("div", { class: "phase" }, h("strong", { text: phaseLabel(view.phase) }), view.turn > 0 && h("span", { class: "turn", text: `${tr("Turn", "เทิร์น")} ${view.turn}` }), timer, view.nextOpponent && h("span", { class: "next-opp", title: view.nextOpponent.id === null ? tr("An odd number of players: you fight the board of someone who is out (or a copy of a player's)", "ผู้เล่นเหลือเลขคี่: สู้กับบอร์ดของคนที่ตกรอบไปแล้ว (หรือสำเนาบอร์ดของผู้เล่น)") : tr("Who you fight when this turn ends", "คนที่จะสู้ด้วยตอนจบเทิร์นนี้"), text: `vs ${view.nextOpponent.name}` })),
     h("div", { class: "factions" }, ...view.factions.map((f) => h("span", { class: "chip", style: `--c:${ctx.ix.factionColor(f)}`, title: ctx.ix.factionText(f), text: ctx.ix.factionName(f) }))),
     h(
       "div",
@@ -147,7 +147,8 @@ async function surrender(ctx: Ctx, view: View): Promise<void> {
 
 /** A column of portraits, best on top, like the sidebar in Battlegrounds. */
 function leaderboard(ctx: Ctx, view: View): HTMLElement {
-  const opp = ctx.store.state.combat?.opponentId;
+  // While recruiting: who you are about to fight; otherwise who you fought last.
+  const opp = view.phase === "RECRUIT" ? view.nextOpponent?.id : ctx.store.state.combat?.opponentId;
   const sorted = [...view.players].sort((a, b) => Number(b.alive) - Number(a.alive) || (a.placement ?? 0) - (b.placement ?? 0) || b.hp - a.hp);
   return h("div", { class: "leaderboard" }, ...sorted.map((p) => playerRow(ctx, p, p.id === view.me.id, p.id === opp)));
 }
@@ -217,7 +218,7 @@ function showPlayerCard(ctx: Ctx, row: HTMLElement, p: Player, mine: boolean, op
     { class: "player-card" },
     h("div", { class: "pc-head" }, artBox("pc-portrait", ctx.ix.heroArt(p.hero), heroDef?.name ?? p.name, ctx.ix.heroCrop(p.hero)), h("div", null, h("div", { class: "pc-name", text: `${p.name}${p.isBot ? " (bot)" : ""}${mine ? tr(" (you)", " (คุณ)") : ""}` }), h("div", { class: "pc-hero", text: heroDef?.name ?? tr("Choosing a hero...", "กำลังเลือก Hero...") }), h("div", { class: "pc-stats", text: `${Math.max(0, p.hp)} HP${p.armor ? ` + ${p.armor} ${tr("armor", "เกราะ")}` : ""} · ${tr("Tavern", "ร้าน")} ${stars(p.rank)}` }))),
     !p.alive && p.placement !== undefined && h("div", { class: "pc-out", text: tr(`Out in ${ordinal(p.placement)} place`, `ตกรอบ อันดับ${ordinal(p.placement)}`) }),
-    opponent && h("div", { class: "pc-note", text: tr("Your last opponent", "คู่ต่อสู้ล่าสุดของคุณ") }),
+    opponent && h("div", { class: "pc-note", text: ctx.store.state.view?.phase === "RECRUIT" ? tr("Your opponent this turn", "คู่ต่อสู้ของคุณเทิร์นนี้") : tr("Your last opponent", "คู่ต่อสู้ล่าสุดของคุณ") }),
     h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: board ? `${tr("Board in their last fight", "บอร์ดในการต่อสู้ล่าสุด")} (${tr("turn", "เทิร์น")} ${p.lastBoard?.turn}) · ${p.lastBoard?.units} ${tr(`unit${p.lastBoard?.units === 1 ? "" : "s"}`, "ตัว")}` : tr("Board", "บอร์ด") }),
       board ? h("div", null, h("div", { class: "pc-headline", text: board.headline }), board.parts.length > 0 && h("div", { class: "pc-parts" }, ...board.parts.map((t) => h("span", { class: "pc-part", text: t })))) : h("div", { class: "muted", text: tr("Not seen yet: boards show up after the first fight.", "ยังไม่เห็น: บอร์ดจะแสดงหลังการต่อสู้ครั้งแรก") })),
     h("div", { class: "pc-section" }, h("div", { class: "pc-label", text: powerHeader(heroDef?.power?.mode, heroDef?.power?.cost) }), h("div", { class: "pc-text", text: heroDef ? powerBody(ctx.ix.heroText(heroDef.key)) || tr("No hero power.", "ไม่มีพลัง Hero") : "-" })),

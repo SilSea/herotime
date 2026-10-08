@@ -322,6 +322,7 @@ Relic/Hero/การ์ดยังเปลี่ยนกฎให้ผู้
 | gattaiSize | ยูนิตติดกันกี่ตัวถึงรวมร่างได้ |
 | giantEntryThreshold / giantSentaiScale | หุ่นลงสนามเมื่อเหลือ ≤ กี่ตัว / สัดส่วน stat Sentai ที่หุ่นได้ |
 | kyodaikaMultiplier | ตัวคูณ stat ตอน Kyodaika |
+| heroCardWeight | ร้านสุ่มการ์ดของ Hero (ซีรีส์เดียวกับ Hero หรือที่ Hero Power ระบุ) บ่อยขึ้นกี่เท่า (ค่าเริ่ม 2, 1 = ไม่เพิ่ม) · ตั้งได้เฉพาะแท็บ Rules ใช้กับ `MODIFY_RULE` ไม่ได้ |
 
 ---
 

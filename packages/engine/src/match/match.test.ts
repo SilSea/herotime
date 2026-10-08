@@ -691,6 +691,28 @@ describe("surrender", () => {
     expect(() => m.dispatch("h1", { type: "BUY", index: 0 }, T0 + 1500)).toThrow(RuleError);
   });
 
+  it("the recruit phase shows who you fight this turn, and that is who you fight", () => {
+    const m = recruiting(humans(4));
+    const next = Object.fromEntries(["h0", "h1", "h2", "h3"].map((id) => [id, m.view(id).nextOpponent?.id]));
+    for (const [id, opp] of Object.entries(next)) expect(next[opp as string]).toBe(id);
+    for (const id of ["h0", "h1", "h2", "h3"]) m.dispatch(id, { type: "READY" }, T0 + 1000);
+    expect(m.phase).toBe("BATTLE");
+    for (const id of ["h0", "h1", "h2", "h3"]) expect(m.player(id).lastCombat?.opponentId).toBe(next[id]);
+    expect(m.view("h0").nextOpponent).toBeUndefined(); // only while recruiting
+  });
+
+  it("with an odd count one player is told they face a Ghost; a surrender redraws the pairs", () => {
+    const m = recruiting(humans(4));
+    const victim = m.view("h0").nextOpponent?.id as string;
+    m.dispatch(victim, { type: "SURRENDER" }, T0 + 500);
+    const left = ["h0", "h1", "h2", "h3"].filter((id) => id !== victim);
+    const seen = left.map((id) => m.view(id).nextOpponent);
+    expect(seen.filter((o) => o?.id === null).map((o) => o?.name)).toEqual(["Ghost"]);
+    expect(seen.every((o) => o !== undefined && o.id !== victim)).toBe(true);
+    for (const id of left) m.dispatch(id, { type: "READY" }, T0 + 1000);
+    for (const [i, id] of left.entries()) expect(m.player(id).lastCombat?.opponentId).toBe(seen[i]?.id);
+  });
+
   it("a player who is out sees the others' fights of this turn; one still in sees none", () => {
     const m = recruiting(humans(3));
     m.dispatch("h0", { type: "READY" }, T0 + 1000);

@@ -221,6 +221,9 @@ export function assignHero(player: PlayerState, heroKey: string, env: GameEnv): 
   const hero = env.content.heroes.get(heroKey);
   if (!hero) throw new RuleError(`unknown hero: ${heroKey}`);
   player.hero = heroKey;
+  const named = new Set(JSON.stringify(hero.power?.effects ?? []).match(/"(?:cardKey|into)":"[^"]+"|"cards":\[[^\]]*\]/g)?.flatMap((m) => m.match(/"[^"]+"/g)?.slice(1).map((q) => q.slice(1, -1)) ?? []) ?? []);
+  const tied = [...env.content.cards.values()].filter((c) => env.pool.has(c.key) && ((hero.series !== undefined && c.series === hero.series) || named.has(c.key))).map((c) => c.key);
+  if (tied.length > 0) player.heroCards = tied;
   runTrigger(hero.power?.effects ?? [], "ON_ACQUIRE", "PLAYER", null, player, env, { kind: "hero", key: heroKey });
 }
 

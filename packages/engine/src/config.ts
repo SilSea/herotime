@@ -15,6 +15,8 @@ export interface GameConfig {
   handSize: number;
   /** Copies of each card in the shared pool, by rank. */
   poolCopies: Readonly<Record<number, number>>;
+  /** How many times likelier the tavern offers each copy of a card tied to your hero (its series, or a card its power names). 1 = no boost. */
+  heroCardWeight: number;
   damageCap: number;
   damageCapUntilTurn: number;
   /** Safety valve so combat always terminates. */
@@ -80,6 +82,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   boardSize: 7,
   handSize: 10,
   poolCopies: { 1: 16, 2: 15, 3: 13, 4: 11, 5: 9, 6: 7 },
+  heroCardWeight: 2,
   damageCap: 15,
   damageCapUntilTurn: 8,
   maxAttacksPerCombat: 500,

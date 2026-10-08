@@ -213,6 +213,7 @@ export const ContentRules = z
     giantEntryThreshold: count.max(7),
     giantSentaiScale: z.number().min(0).max(3),
     kyodaikaMultiplier: z.number().min(1).max(5),
+    heroCardWeight: z.number().min(1).max(10),
   })
   .partial()
   .strict();

@@ -65,6 +65,8 @@ export interface PlayerState {
   uses?: Record<string, number>;
   usesTurn?: Record<string, number>;
   hero?: string;
+  /** Pool cards tied to the hero (its series, or named by its power): the tavern offers them more often. */
+  heroCards?: string[];
   heroPowerUsed: boolean;
   heroPowerSpent: boolean;
   relics: string[];
@@ -132,12 +134,18 @@ export interface GearChoice {
   rank: number;
 }
 
+/** The tavern's lean towards the player's hero cards, or undefined when there is none. */
+function heroFavor(player: PlayerState, cfg: GameConfig): { keys: ReadonlySet<string>; weight: number } | undefined {
+  return player.heroCards && player.heroCards.length > 0 ? { keys: new Set(player.heroCards), weight: cfg.heroCardWeight } : undefined;
+}
+
 function rollShop(player: PlayerState, pool: Pool, rng: Rng, cfg: GameConfig, gear: readonly GearChoice[]): void {
   for (const key of player.shop) pool.give(key);
   player.shop = [];
   const size = shopSizeFor(player.rank, cfg);
+  const favor = heroFavor(player, cfg);
   for (let i = 0; i < size; i++) {
-    const key = pool.draw(rng, player.rank);
+    const key = pool.draw(rng, player.rank, 1, undefined, favor);
     if (key === undefined) break;
     player.shop.push(key);
   }
@@ -169,8 +177,9 @@ export function startTurn(
     player.frozen = false;
     // The frozen cards stay; slots emptied by buying (or added by an upgrade) are filled with new ones.
     const size = shopSizeFor(player.rank, cfg);
+    const favor = heroFavor(player, cfg);
     while (player.shop.length < size) {
-      const key = pool.draw(rng, player.rank);
+      const key = pool.draw(rng, player.rank, 1, undefined, favor);
       if (key === undefined) break;
       player.shop.push(key);
     }

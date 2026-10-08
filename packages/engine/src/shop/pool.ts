@@ -44,14 +44,18 @@ export class Pool {
    * Draw one copy at random (weighted by copies left) from cards with
    * minRank <= rank <= maxRank. Shops use the default minRank; Discover pins both.
    */
-  draw(rng: Rng, maxRank: number, minRank = 1, accept?: (key: string) => boolean): string | undefined {
+  draw(rng: Rng, maxRank: number, minRank = 1, accept?: (key: string) => boolean, favored?: { keys: ReadonlySet<string>; weight: number }): string | undefined {
     const eligible = (key: string): boolean => {
       const r = this.rankOf(key);
       return r >= minRank && r <= maxRank && (accept === undefined || accept(key));
     };
+    // Favored cards count `weight` times per copy (in hundredths, so 1.5 works); without any, odds are the copies left.
+    const boost = favored && favored.weight !== 1 && favored.keys.size > 0 ? favored : undefined;
+    const scale = boost ? 100 : 1;
+    const weightOf = (key: string): number => this.count(key) * (boost?.keys.has(key) ? Math.round(boost.weight * 100) : scale);
     let total = 0;
     for (const key of this.order) {
-      if (eligible(key)) total += this.count(key);
+      if (eligible(key)) total += weightOf(key);
     }
     if (total === 0) return undefined;
 
@@ -59,11 +63,12 @@ export class Pool {
     for (const key of this.order) {
       if (!eligible(key)) continue;
       const n = this.count(key);
-      if (roll < n) {
+      const w = weightOf(key);
+      if (roll < w) {
         this.remaining.set(key, n - 1);
         return key;
       }
-      roll -= n;
+      roll -= w;
     }
     return undefined; // unreachable: total > 0 guarantees a hit above
   }

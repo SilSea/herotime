@@ -119,3 +119,30 @@ describe("Pool.take", () => {
     expect(() => new Pool([], {}).take("ghost")).toThrow(/unknown/);
   });
 });
+
+describe("Pool.draw with favored cards", () => {
+  const cards = [
+    { key: "a", rank: 1 },
+    { key: "b", rank: 1 },
+  ];
+
+  it("a favored card comes up about `weight` times as often per copy", () => {
+    const pool = new Pool(cards, { 1: 1000 });
+    const rng = new Rng(7);
+    let a = 0;
+    for (let i = 0; i < 4000; i++) {
+      const key = pool.draw(rng, 1, 1, undefined, { keys: new Set(["a"]), weight: 3 });
+      if (key === "a") a++;
+      pool.give(key as string);
+    }
+    expect(a / 4000).toBeGreaterThan(0.7); // 3 / (3 + 1) = 0.75
+    expect(a / 4000).toBeLessThan(0.8);
+  });
+
+  it("weight 1 or no favored cards draws exactly as before", () => {
+    const plain = new Pool(cards, { 1: 5 });
+    const same = new Pool(cards, { 1: 5 });
+    const [r1, r2] = [new Rng(3), new Rng(3)];
+    for (let i = 0; i < 8; i++) expect(same.draw(r2, 1, 1, undefined, { keys: new Set(["a"]), weight: 1 })).toBe(plain.draw(r1, 1));
+  });
+});
