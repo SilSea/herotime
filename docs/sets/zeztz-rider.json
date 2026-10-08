@@ -60,7 +60,7 @@
    "key": "nasuka",
    "name": "Nasuka Nagumo",
    "rank": 1,
-   "atk": 1,
+   "atk": 2,
    "hp": 2,
    "factions": [
     "rider"
@@ -186,7 +186,7 @@
    "key": "eight",
    "name": "Eight",
    "rank": 3,
-   "atk": 2,
+   "atk": 3,
    "hp": 4,
    "factions": [
     "rider"
@@ -304,8 +304,8 @@
    "key": "zeztz",
    "name": "Kamen Rider Zeztz",
    "rank": 1,
-   "atk": 3,
-   "hp": 4,
+   "atk": 4,
+   "hp": 5,
    "factions": [
     "rider"
    ],
@@ -679,7 +679,7 @@
    "key": "lord_five",
    "name": "Lord Five",
    "rank": 2,
-   "atk": 3,
+   "atk": 4,
    "hp": 5,
    "factions": [
     "rider"
@@ -721,7 +721,7 @@
    "key": "knight_seventeen",
    "name": "Knight Seventeen",
    "rank": 3,
-   "atk": 4,
+   "atk": 5,
    "hp": 5,
    "factions": [
     "rider"

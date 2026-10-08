@@ -34,12 +34,12 @@
 | 1 | `baku_yorozu` | Baku Yorozu | 1/2 | Henshin (1) → Kamen Rider Zeztz | ตัวเอก |
 | 1 | `kensei_odaka` | Kensei Odaka | 1/2 | Henshin (1) → Nox Knight | ใช้ Knight Invoker แล้วต่อด้วย Nox Driver |
 | 1 | `nem` | Nem | 1/3 | Deploy: ให้ Zeztz (ทุกร่าง) +1/+1 ถาวร | คนดังที่เป็นครอบครัวบุญธรรมของ Baku |
-| 1 | `nasuka` | Nasuka Nagumo | 1/2 | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | นักสืบ |
+| 1 | `nasuka` | Nasuka Nagumo | 2/2 | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | นักสืบ |
 | 2 | `five` | Five | 2/2 | Henshin (1) → Lord Five | CODE 5 |
 | 2 | `kureha_miyamoto` | Kureha Miyamoto | 2/2 | Henshin (1) → Lord Six | CODE 6 |
 | 2 | `thirteen` | Thirteen *(ฝ่ายร้าย)* | 2/2 | Henshin (1) → Lord Thirteen | CODE ที่หลงเหลือ |
 | 3 | `minami_yorozu` | Minami Yorozu | 2/3 | Henshin (1) → Knight Seventeen · เมื่อแปลงร่าง: ให้ Zeztz (ทุกร่าง) ได้ Barrier | CODE 17 |
-| 3 | `eight` | Eight | 2/4 | Deploy: เสริมพลัง Gear +1/+1 จนจบเกม | CODE 8 |
+| 3 | `eight` | Eight | 3/4 | Deploy: เสริมพลัง Gear +1/+1 จนจบเกม | CODE 8 |
 | 3 | `fujimi` | Tetsuya Fujimi | 3/3 | Deploy: Rider Gauge +1 | ผู้บัญชาการตำรวจ |
 | 3 | `sieg` | Sieg *(ฝ่ายร้าย)* | 2/3 | Henshin (1) → Kamen Rider Dawn | ผู้ก่อการร้ายในความฝัน |
 | 4 | `three` | Three *(ฝ่ายร้าย)* | 3/4 | Henshin (1) → Lord Three · เมื่อแปลงร่าง: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 |
@@ -49,13 +49,13 @@
 **ร่างไรเดอร์** (token ทั้งหมด)
 | key | ร่าง | ATK/HP | ความสามารถ |
 |---|---|---|---|
-| `zeztz` | Kamen Rider Zeztz (Physicam Impact) | 3/4 | — · Final Form → Zeztz Exdream |
+| `zeztz` | Kamen Rider Zeztz (Physicam Impact) | 4/5 | — · Final Form → Zeztz Exdream |
 | `nox_knight` | Nox Knight | 3/3 | Henshin (2) → Kamen Rider Nox |
 | `nox` | Kamen Rider Nox | 5/5 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว · Final Form → Nox Midnight Shadow |
 | `nox_midnight` | Nox Midnight Shadow (Final Form) | 9/8 *(Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูทุกตัว |
-| `lord_five` | Lord Five | 3/5 *(Rider Kick)* | — |
+| `lord_five` | Lord Five | 4/5 *(Rider Kick)* | — |
 | `lord_six` | Lord Six | 4/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) |
-| `knight_seventeen` | Knight Seventeen | 4/5 | — |
+| `knight_seventeen` | Knight Seventeen | 5/5 | — |
 | `lord_thirteen` | Lord Thirteen *(ฝ่ายร้าย)* | 4/3 *(Barrier)* | — |
 | `kamen_rider_dawn` | Kamen Rider Dawn *(ฝ่ายร้าย)* | 5/5 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร |
 | `lord_three` | Lord Three *(ฝ่ายร้าย)* | 6/5 *(Barrier)* | — |
@@ -133,7 +133,7 @@
 | 1 | `god_tentou` | God Tentou | — | 1/3 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod เต่าทอง (เสริม) |
 | 2 | `tombo_ohger` | Tombo Ohger | BLUE | 3/3 | Deploy: ให้ Giant Robo +2/+2 ถาวร | Yanma Gast วิศวกรผู้สร้าง Shugod |
 | 2 | `kamakiri_ohger` | Kamakiri Ohger | YELLOW | 2/4 | จบเทิร์น: ให้ Sentai ตัวอื่นแบบสุ่ม +0/+2 | Hymeno Ran หมอ ราชินีแห่ง Ishabana |
-| 2 | `god_kumo` | God Kumo | — | 2/3 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod แมงมุม (เสริม) |
+| 2 | `god_kumo` | God Kumo | — | 2/4 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod แมงมุม (เสริม) |
 | 2 | `god_ant` | God Ant | — | 2/2 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ถ้าเป็น Sentai ให้ตัวนั้น +1/+0 | Shugod มด (เสริม) |
 | 3 | `papillon_ohger` | Papillon Ohger | PURPLE | 3/4 *(Guard)* | Team-Up (3): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +1/+0 | Rita Kaniska ประธานศาล ใช้ Ice Seal |
 | 3 | `spider_kumonos` | Spider Kumonos | WHITE | 3/4 | Deploy: เลือกรับยูนิต Sentai 1 จาก 3 | Jeramie Brasieri นักประวัติศาสตร์ (กลายเป็นพวก) |
@@ -141,7 +141,7 @@
 | 4 | `god_scorpion` | God Scorpion | — | 4/5 | Deploy: ให้ Giant Robo ได้ Lethal | Shugod แมงป่อง (Scorpion King-Ohger) |
 | 4 | `god_hopper` | God Hopper | — | 5/4 | Deploy: ให้ Giant Robo ได้ Rapid | Shugod ตั๊กแตน (Hopper King-Ohger) |
 | 5 | `guardian_hercules` | Guardian Hercules | — | 6/8 *(Guard)* | Deploy: Mecha Gauge +2 | Guardian Weapon ด้วงเฮอร์คิวลีส |
-| 5 | `ohkuwagata_ohger` | Ohkuwagata Ohger | SILVER | 6/6 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +3/+3 | Rcules อดีตราชา Shugodom เคยเป็นศัตรูแล้วกลับมาเป็นพวก, Ohger Calibur Zero |
+| 5 | `ohkuwagata_ohger` | Ohkuwagata Ohger | SILVER | 7/7 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +3/+3 | Rcules อดีตราชา Shugodom เคยเป็นศัตรูแล้วกลับมาเป็นพวก, Ohger Calibur Zero |
 | 6 | `god_tarantula` | God Tarantula | — | 9/10 | Team-Up (4): เริ่มการต่อสู้: ให้ Sentai ทุกตัว +2/+2 | Shugod ของ Jeramie, ร่างยักษ์ Tarantula Knight |
 
 สีตรงกับในเรื่องแล้ว (เกมเพิ่มสี BLACK, WHITE, PURPLE, SILVER, GOLD, ORANGE) · King-Ohger ไม่มีสีเขียวและชมพู · Extra (นับเป็นสีใดก็ได้) ไม่มีในเรื่องนี้
@@ -171,13 +171,13 @@
 |---|---|---|---|---|---|
 | 1 | `vector_sol` | Vector Sol | 2/3 *(Gattai)* | Gattai core → Solar Aquarion | เครื่องบินสีแดง |
 | 1 | `vector_luna` | Vector Luna | 1/4 *(Gattai)* | Gattai core → Aquarion Luna | เครื่องบินสีเขียว |
-| 1 | `vector_mars` | Vector Mars | 3/2 *(Gattai)* | Gattai core → Aquarion Mars | เครื่องบินสีน้ำเงิน |
+| 1 | `vector_mars` | Vector Mars | 2/2 *(Gattai)* | Gattai core → Aquarion Mars | เครื่องบินสีน้ำเงิน |
 | 2 | `apollo` | Apollo | 3/2 *(Gattai)* | Deploy: ให้ Vector Sol +2/+1 ถาวร | นักบิน Vector Sol |
 | 2 | `silvia` | Silvia de Alisia | 2/3 *(Gattai)* | Deploy: ให้ Vector Luna +1/+2 ถาวร | นักบิน Luna |
 | 2 | `pierre` | Pierre Vieira | 2/3 *(Gattai)* | Deploy: ให้ Vector Mars +2/+1 ถาวร | นักบิน Mars |
 | 3 | `sirius` | Sirius de Alisia | 3/4 *(Gattai)* | Deploy: ให้ Mecha ทุกตัวที่มี Gattai +1/+1 ถาวร | นักบิน Mars |
 | 3 | `reika` | Reika Kou | 3/4 *(Gattai)* | จบเทิร์น: ให้ Mecha ตัวอื่นแบบสุ่ม +1/+1 | นักบิน Luna |
-| 3 | `deava_hangar` | DEAVA Hangar | 1/5 *(Guard)* | Deploy: เลือกรับยูนิต Mecha 1 จาก 3 | องค์กรที่วิจัย Vector |
+| 3 | `deava_hangar` | DEAVA Hangar | 2/5 *(Guard)* | Deploy: เลือกรับยูนิต Mecha 1 จาก 3 | องค์กรที่วิจัย Vector |
 | 4 | `cherubim_soldier` | Cherubim Soldier | 4/5 *(Guard)* | Last Stand: เรียก Harvest Beast | หุ่นยักษ์ของ Shadow Angel ที่คุ้มกันเครื่องเก็บเกี่ยว (ฝ่ายศัตรู) |
 | 4 | `johannes` | Johannes | 4/4 | Deploy: ให้ Mecha ทุกตัว +1/+1 ถาวร | ผู้นำ Shadow Angel ในนาม (ฝ่ายศัตรู) |
 | 5 | `gen_fudo` | Gen Fudo | 5/7 | Deploy: ให้ Mecha ทุกตัว +2/+2 ถาวร และ Giant Robo +2/+2 ถาวร | ผู้นำคณะสำรวจที่ขุดพบ Vector |
@@ -213,13 +213,13 @@
 | 1 | `shin_godzilla_2` | Shin Godzilla (2nd Form) | 1/2 | Henshin (3) → Shin Godzilla (3rd Form) | ร่าง 2 เลื้อยขึ้นบก (Kamata-kun) |
 | 2 | `anguirus` | Anguirus | 2/3 *(Guard, Revive)* | — | ตัวหนามม้วนตัว บาดเจ็บง่ายแต่ไม่ยอมแพ้ |
 | 2 | `rodan` | Rodan | 3/2 *(Rapid)* | — | บินเร็ว คลื่นกระแทก |
-| 2 | `hedorah` | Hedorah | 1/3 *(Lethal)* | Last Stand: เรียก Hedorah Spawn 1/1 *(Lethal)* | สัตว์ประหลาดมลพิษ |
-| 3 | `godzilla_junior` | Godzilla Junior | 2/3 *(Kyodaika)* | Avenge (3): ตัวนี้ +1/+1 ถาวร | ลูกที่โตขึ้น |
+| 2 | `hedorah` | Hedorah | 1/2 *(Lethal)* | Last Stand: เรียก Hedorah Spawn 1/1 | สัตว์ประหลาดมลพิษ |
+| 3 | `godzilla_junior` | Godzilla Junior | 2/2 *(Kyodaika)* | — | ลูกที่โตขึ้น |
 | 3 | `biollante` | Biollante | 3/4 *(Revive)* | Last Stand: ให้ Kaiju ทุกตัว +1/+0 (จนจบการสู้) | ไฮบริดพืช-Godzilla |
 | 3 | `gigan` | Gigan | 4/3 *(Rider Kick)* | — | ไซบอร์กใบเลื่อย |
-| 4 | `destoroyah` | Destoroyah | 3/4 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 ×2 · Avenge (2): ตัวนี้ +2/+2 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
-| 4 | `mechagodzilla` | Mechagodzilla | 4/6 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
-| 5 | `godzilla` | Godzilla | 5/6 *(Kyodaika)* | Avenge (3): ตัวนี้ +2/+2 ถาวร | ราชาแห่งสัตว์ประหลาด |
+| 4 | `destoroyah` | Destoroyah | 3/3 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 · Avenge (3): ตัวนี้ +2/+2 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
+| 4 | `mechagodzilla` | Mechagodzilla | 4/5 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
+| 5 | `godzilla` | Godzilla | 5/5 *(Kyodaika)* | Avenge (4): ตัวนี้ +1/+1 ถาวร | ราชาแห่งสัตว์ประหลาด |
 | 5 | `king_ghidorah` | King Ghidorah | 6/6 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว (3 ครั้ง, 3 หัว) | มังกรสามหัว |
 | 6 | `burning_godzilla` | Burning Godzilla | 9/9 | Last Stand: ทำดาเมจ 4 ใส่ศัตรูทุกตัว (meltdown) | ความร้อนในตัวพุ่งจนใกล้หลอมละลาย |
 
@@ -230,7 +230,7 @@
 | `mothra` | Mothra | 4/5 | เริ่มการต่อสู้: ให้พวกเราตัวอื่นแบบสุ่มได้ Barrier (เกล็ดสะท้อนการโจมตี) |
 | `shin_godzilla_3` | Shin Godzilla (3rd Form) | 3/4 | Henshin (3) → Shin Godzilla (4th Form) |
 | `shin_godzilla_4` | Shin Godzilla (4th Form) | 7/7 | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (atomic breath) |
-| `hedorah_spawn` / `destoroyah_aggregate` | token | 1/1 Lethal / 2/2 | — |
+| `hedorah_spawn` / `destoroyah_aggregate` | token | 1/1 / 2/2 | — |
 
 ---
 
@@ -245,18 +245,18 @@
 | 1 | `tem` | Tem | 1/3 | Last Stand: ให้ Beast แบบสุ่ม +1/+1 ถาวร | อัลปากา สมาชิกชมรมการละคร |
 | 2 | `collot` | Collot | 3/2 | Deploy: เรียก Durham 2/2 | Old English Sheepdog เพื่อนร่วมหอ |
 | 2 | `pina` | Pina | 3/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | แกะ Dall ปีหนึ่ง ชมรมการละคร |
-| 2 | `els` | Els | 2/3 | Deploy: ให้ Beast ที่อยู่ข้างๆ +1/+1 | แพะแองโกรา |
+| 2 | `els` | Els | 2/3 | Deploy: ให้ตัวที่อยู่ข้างๆ +2/+1 | แพะแองโกรา |
 | 2 | `kibi` | Kibi | 3/3 | Deploy: เรียก Dom 2/1 | ตัวกินมด ทีมเวที |
-| 3 | `juno` | Juno | 3/4 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +1/+1 | หมาป่าเทา ปีหนึ่ง |
+| 3 | `juno` | Juno | 3/4 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +2/+1 | หมาป่าเทา ปีหนึ่ง |
 | 3 | `bill` | Bill | 4/3 | Deploy: ให้ Beast ทุกตัว +1/+0 | เสือเบงกอล อยากเป็น Beastar |
 | 3 | `gohin` | Gohin | 3/5 *(Guard)* | Deploy: ให้ Legoshi +2/+2 ถาวร และ Barrier | แพนด้า หมอใต้ดิน อาจารย์ของ Legoshi |
-| 4 | `louis` | Louis | 4/5 | Deploy: เรียก Shishigumi Lion 2/2 ×2 | กวางแดง ดาวชมรมการละคร เคยนำกลุ่มสิงโต |
+| 4 | `louis` | Louis | 4/6 | Deploy: เรียก Shishigumi Lion 2/2 ×2 | กวางแดง ดาวชมรมการละคร เคยนำกลุ่มสิงโต |
 | 4 | `gosha` | Gosha | 4/6 | Deploy: ให้ Legoshi ได้ Lethal | มังกรโคโมโด ปู่ของ Legoshi |
 | 4 | `sagwan` | Sagwan | 3/5 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ได้ +1/+1 ถาวร (ไม่เกิน 3 ครั้งต่อเทิร์น) | แมวน้ำ เพื่อนบ้านที่ Beast Apartments |
-| 5 | `legoshi` | Legoshi | 5/6 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | หมาป่าเทา ตัวเอก |
+| 5 | `legoshi` | Legoshi | 7/8 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | หมาป่าเทา ตัวเอก |
 | 6 | `yahya` | Yahya | 8/9 *(Echo)* | Deploy: ให้ Beast ทุกตัว +2/+2 ถาวร | ม้า Beastar คนปัจจุบัน |
 
-**Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 2/2
+**Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 3/2
 - ไม่ได้ใส่ (ตัวร้าย): Riz, Melon, Ibuki — Louis เรียก "Shishigumi Lion" เป็น token ทั่วไปแทน
 - Durham และ Dom เป็นตัวละครที่มีในเรื่อง แต่ทำเป็น token เพื่อให้เป็นการ์ดที่ถูกเรียก
 
@@ -269,18 +269,18 @@
 | R | key | การ์ด | ATK/HP | ความสามารถ |
 |---|---|---|---|---|
 | 1 | `street_vendor` | Street Vendor | 1/3 | Deploy: ได้ 1 Energy |
-| 1 | `intern_researcher` | Intern Researcher | 1/2 | Deploy: ได้ Gear แบบสุ่มเข้ามือ |
+| 1 | `intern_researcher` | Intern Researcher | 2/2 | Deploy: ได้ Gear แบบสุ่มเข้ามือ |
 | 1 | `volunteer` | Volunteer | 2/3 | เมื่อถูกขาย: ได้ 1 Energy |
-| 2 | `shop_manager` | Shop Manager | 2/2 | Deploy: ยูนิตในร้านได้ +1/+1 จนจบเกม |
-| 2 | `field_scout` | Field Scout | 2/3 | Deploy: เลือกรับยูนิต 1 จาก 3 |
-| 2 | `mechanic` | Mechanic | 2/3 | Deploy: เสริมพลัง Gear +1/+0 จนจบเกม |
-| 3 | `banker` | Banker | 2/4 | ต้นทุกเทิร์น: ได้ 1 Energy |
+| 2 | `shop_manager` | Shop Manager | 2/3 | Deploy: ยูนิตในร้านได้ +1/+1 จนจบเกม |
+| 2 | `field_scout` | Field Scout | 3/3 | Deploy: เลือกรับยูนิต 1 จาก 3 |
+| 2 | `mechanic` | Mechanic | 3/3 | Deploy: เสริมพลัง Gear +1/+0 จนจบเกม |
+| 3 | `banker` | Banker | 3/4 | ต้นทุกเทิร์น: ได้ 1 Energy |
 | 3 | `quartermaster` | Quartermaster | 3/4 | จบเทิร์น: ถ้ามี Energy เหลือ ≥ 2 ให้พวกเราตัวอื่นแบบสุ่ม +2/+2 |
 | 3 | `recruiter` | Recruiter | 3/3 | Deploy: ได้ยูนิตแบบสุ่มเข้ามือ |
 | 4 | `mayor` | Mayor | 3/5 | Deploy: ยูนิตในร้านได้ +2/+2 จนจบเกม |
-| 4 | `arms_dealer` | Arms Dealer | 4/4 | Deploy: ได้ Gear แบบสุ่มเข้ามือ (2 ครั้ง) |
-| 5 | `tycoon` | Tycoon | 5/6 | จบเทิร์น: ถ้ามี Energy เหลือ ≥ 3 ให้พวกเราทุกตัว +1/+1 |
-| 5 | `defense_commander` | Defense Commander | 6/6 | Deploy: ให้พวกเราทุกตัว +1/+2 ถาวร |
+| 4 | `arms_dealer` | Arms Dealer | 4/5 | Deploy: ได้ Gear แบบสุ่มเข้ามือ (2 ครั้ง) |
+| 5 | `tycoon` | Tycoon | 6/6 | จบเทิร์น: ถ้ามี Energy เหลือ ≥ 3 ให้พวกเราทุกตัว +1/+1 |
+| 5 | `defense_commander` | Defense Commander | 5/6 | Deploy: ให้พวกเราทุกตัว +1/+2 ถาวร |
 | 6 | `president` | President | 8/9 | Deploy: ได้ 3 Energy และยูนิตในร้านได้ +3/+3 จนจบเกม |
 
 **Gear**
@@ -304,7 +304,7 @@
 | 2 | `rock_lee` | Rock Lee | 2/3 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +2/+0 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น*) | Eight Gates (เปิดได้บางประตู) |
 | 2 | `neji` | Neji Hyuga | 3/2 | เมื่อโจมตี: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | หมัดอ่อน |
 | 2 | `shikamaru` | Shikamaru Nara | 2/3 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/+0 (จนจบการสู้)** | Shadow Possession |
-| 3 | `sasuke` | Sasuke Uchiha | 4/3 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Chidori — แทงเร็ว |
+| 3 | `sasuke` | Sasuke Uchiha | 4/4 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Chidori — แทงเร็ว |
 | 3 | `kakashi` | Kakashi Hatake | 3/4 | เริ่มการต่อสู้: เรียกสำเนาของศัตรูซ้ายสุด | Copy Ninja, Sharingan |
 | 3 | `gaara` | Gaara | 2/4 *(Guard, Barrier)* | — | โล่ทราย |
 | 4 | `jiraiya` | Jiraiya | 4/5 | เริ่มการต่อสู้: เรียก Gamabunta 5/5 | อัญเชิญคางคก |
@@ -331,34 +331,34 @@
 
 | เผ่า | key | Hero | Armor | พลัง | อ้างอิง |
 |---|---|---|---|---|---|
-| Rider | `h_lord_zero` | Lord Zero | 0 | กดใช้ (1): ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | ผู้บัญชาการ CODE พ่อของ Baku |
+| Rider | `h_lord_zero` | Lord Zero | 0 | กดใช้ (1): ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ และ Rider แบบสุ่ม +1/+1 ถาวร | ผู้บัญชาการ CODE พ่อของ Baku |
 | Rider | `h_baku` | Baku Yorozu | 0 | ติดตัว: เริ่มเกมด้วย Rider Gauge +2 | ตัวเอก |
-| Rider | `h_nem` | Nem | 0 | กดใช้ (1): Zeztz (ทุกร่าง) +1/+0 ถาวร | ครอบครัวบุญธรรมของ Baku |
-| Rider | `h_kensei` | Kensei Odaka | 3 | ครั้งเดียว (2): ได้การ์ด Kensei Odaka เข้ามือ (สาย Nox) | Kamen Rider Nox |
+| Rider | `h_nem` | Nem | 0 | กดใช้ (1): Zeztz (ทุกร่าง) +1/+1 ถาวร | ครอบครัวบุญธรรมของ Baku |
+| Rider | `h_kensei` | Kensei Odaka | 3 | ครั้งเดียว (3): ได้การ์ด Kensei Odaka เข้ามือ (สาย Nox) | Kamen Rider Nox |
 | Sentai | `h_gira` | Gira Husty | 0 | ติดตัว: Roll Call ใช้แค่ 2 สี | ราชาแห่ง Shugodom |
-| Sentai | `h_yanma` | Yanma Gast | 0 | กดใช้ (1): Giant Robo +2/+2 ถาวร | วิศวกรผู้สร้าง Shugod |
+| Sentai | `h_yanma` | Yanma Gast | 0 | กดใช้ (2): Giant Robo +2/+2 ถาวร และ Mecha Gauge +1 (Gauge ได้ไม่เกิน 2 ครั้งต่อเกม) | วิศวกรผู้สร้าง Shugod |
 | Sentai | `h_hymeno` | Hymeno Ran | 0 | กดใช้ (1): Sentai แบบสุ่ม +0/+2 ถาวร | หมอ ราชินีแห่ง Ishabana |
 | Sentai | `h_rita` | Rita Kaniska | 5 | ครั้งเดียว (1): เลือกรับยูนิต Sentai 1 จาก 3 | ประธานศาลแห่ง Gokkan |
 | Mecha | `h_gen_fudo` | Gen Fudo | 0 | ติดตัว: Gattai ใช้แค่ 2 ตัว | ผู้บัญชาการ DEAVA |
 | Mecha | `h_celiane` | Celiane | 0 | ครั้งเดียว (2): ได้การ์ด Final Form เข้ามือ | คนรักของ Apollonius |
-| Mecha | `h_sirius` | Sirius de Alisia | 0 | กดใช้ (1): Mecha ขวาสุดได้ keyword Gattai | นักบิน Element |
+| Mecha | `h_sirius` | Sirius de Alisia | 0 | กดใช้ (1): Mecha ขวาสุดได้ keyword Gattai และ +1/+1 ถาวร | นักบิน Element |
 | Mecha | `h_apollo` | Apollo | 3 | กดใช้ (1): Mecha ซ้ายสุด (core) +1/+1 ถาวร | นักบิน Vector Sol |
-| Kaiju | `h_shobijin` | Shobijin | 0 | กดใช้ (2): Kaiju แบบสุ่มได้ Revive | คู่แฝดตัวจิ๋วของ Mothra |
+| Kaiju | `h_shobijin` | Shobijin | 0 | กดใช้ (1): Kaiju แบบสุ่มได้ Revive | คู่แฝดตัวจิ๋วของ Mothra |
 | Kaiju | `h_daisuke` | Daisuke Serizawa | 0 | ครั้งเดียว (0): ทำลายพวกขวาสุด แล้วเลือกรับยูนิต Kaiju 2 ครั้ง | ผู้สร้าง Oxygen Destroyer |
 | Kaiju | `h_ishiro` | Ishiro Serizawa | 0 | ติดตัว: ต้นทุกเทิร์น Kaiju แบบสุ่ม +1/+1 ถาวร | นักวิทยาศาสตร์ Monarch |
-| Kaiju | `h_jet_jaguar` | Jet Jaguar | 2 | กดใช้ (1): พวกขวาสุด +1/+2 ถาวร | หุ่นยนต์ที่ขยายร่างได้ |
+| Kaiju | `h_jet_jaguar` | Jet Jaguar | 0 | กดใช้ (1): พวกขวาสุด +1/+1 ถาวร | หุ่นยนต์ที่ขยายร่างได้ |
 | Beast | `h_legoshi` | Legoshi | 0 | กดใช้ (2): เรียก Durham | ตัวเอก |
 | Beast | `h_haru` | Haru | 0 | กดใช้ (1): Beast แบบสุ่ม +1/+2 ถาวร | กระต่ายขาว |
 | Beast | `h_louis` | Louis | 0 | ครั้งเดียว (0): เรียก Shishigumi Lion ×2 | หัวหน้ากลุ่มสิงโต |
 | Beast | `h_gohin` | Gohin | 5 | กดใช้ (1): Beast แบบสุ่มได้ Guard | หมอใต้ดิน |
-| Human | `h_merchant` | Guild Merchant | 0 | ติดตัว: Refresh ฟรีเทิร์นละ 1 ครั้ง | ออกแบบเอง |
+| Human | `h_merchant` | Guild Merchant | 0 | ติดตัว: Refresh ฟรีเทิร์นละ 2 ครั้ง | ออกแบบเอง |
 | Human | `h_mayor` | City Mayor | 0 | กดใช้ (2): ยูนิตในร้าน +1/+0 จนจบเกม | ออกแบบเอง |
 | Human | `h_banker` | Central Banker | 0 | ครั้งเดียว (0): ได้ 3 Energy | ออกแบบเอง |
-| Human | `h_general` | Defense General | 8 | กดใช้ (2): พวกเราทุกตัว +0/+1 ถาวร | ออกแบบเอง |
+| Human | `h_general` | Defense General | 5 | กดใช้ (2): พวกเราทุกตัว +0/+1 ถาวร | ออกแบบเอง |
 | Shonen | `h_minato` | Minato Namikaze | 0 | กดใช้ (1): พวกซ้ายสุด +1/+0 ถาวร | โฮคาเงะรุ่นที่ 4 |
 | Shonen | `h_hiruzen` | Hiruzen Sarutobi | 0 | ติดตัว: ต้นทุกเทิร์น Shonen แบบสุ่ม +1/+1 ถาวร | โฮคาเงะรุ่นที่ 3 |
 | Shonen | `h_iruka` | Iruka Umino | 3 | ครั้งเดียว (0): เลือกรับยูนิต Shonen 1 จาก 3 | ครูของ Naruto |
-| Shonen | `h_kushina` | Kushina Uzumaki | 0 | กดใช้ (1): Shonen แบบสุ่มได้ Barrier | แม่ของ Naruto |
+| Shonen | `h_kushina` | Kushina Uzumaki | 0 | กดใช้ (1): Shonen แบบสุ่มได้ Barrier และ +1/+1 ถาวร | แม่ของ Naruto |
 
 ## Relic (ไอเท็มจากเรื่อง)
 
@@ -367,29 +367,29 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 | เผ่า | key | Relic | ระดับ | ราคา | ผล |
 |---|---|---|---|---|---|
 | Rider | `rl_zeztz_driver` | Zeztz Driver | Lesser | 2 | เริ่มการต่อสู้: Rider ทุกตัว +1/+1 |
-| Rider | `rl_capsem_case` | Capsem Case | Lesser | 1 | ได้ทันที: Gear Rider แบบสุ่ม 2 ใบ และ Rider Gauge +1 |
-| ทุกเผ่า | `rl_final_form_belt` | Final Form Belt | Greater | 3 | ได้ทันที: การ์ด Final Form เข้ามือ |
+| Rider | `rl_capsem_case` | Capsem Case | Lesser | 0 | ได้ทันที: Gear Rider แบบสุ่ม 2 ใบ และ Rider Gauge +1 |
+| ทุกเผ่า | `rl_final_form_belt` | Final Form Belt | Greater | 4 | ได้ทันที: การ์ด Final Form เข้ามือ |
 | Sentai | `rl_ohger_calibur` | Ohger Calibur | Lesser | 1 | เริ่มการต่อสู้: Sentai ทุกตัว +1/+1 |
 | Sentai | `rl_shugod_nest` | Shugod Nest | Lesser | 1 | ได้ทันที: Mecha Gauge +2 |
 | Sentai | `rl_kings_crown` | Ohger Crown | Greater | 5 | เริ่มการต่อสู้: Giant Robo +4/+4 |
-| Mecha | `rl_vector_engine` | Vector Engine | Lesser | 2 | เริ่มการต่อสู้: Mecha ซ้ายสุด +2/+2 |
+| Mecha | `rl_vector_engine` | Vector Engine | Lesser | 1 | เริ่มการต่อสู้: Mecha ซ้ายสุด +2/+2 |
 | Mecha | `rl_element_training` | Element Training | Lesser | 1 | ได้ทันที: Gattai ใช้แค่ 2 ตัว |
 | Mecha | `rl_tree_of_life` | Tree of Life | Greater | 5 | ต้นทุกเทิร์น: Mecha ทุกตัว +1/+1 ถาวร |
 | Kaiju | `rl_monster_island` | Monster Island | Lesser | 2 | เริ่มการต่อสู้: Kaiju แบบสุ่มได้ Revive |
 | Kaiju | `rl_g_cells` | G-Cells | Lesser | 1 | ต้นทุกเทิร์น: Kaiju แบบสุ่ม +1/+0 ถาวร |
-| Kaiju | `rl_oxygen_destroyer` | Oxygen Destroyer | Greater | 6 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด |
+| Kaiju | `rl_oxygen_destroyer` | Oxygen Destroyer | Greater | 5 | เริ่มการต่อสู้: ทำดาเมจ 5 ใส่ศัตรูซ้ายสุด |
 | Beast | `rl_drama_club` | Cherryton Drama Club | Lesser | 1 | เริ่มการต่อสู้: Beast ทุกตัว +1/+0 |
 | Beast | `rl_black_market` | Black Market | Lesser | 2 | ได้ทันที: เลือกรับยูนิต Beast 1 จาก 3 |
 | Beast | `rl_beastar` | Beastar Title | Greater | 4 | เริ่มการต่อสู้: Beast ทุกตัว +2/+2 |
-| Human | `rl_savings_bond` | Savings Bond | Lesser | 1 | ต้นทุกเทิร์น: ได้ 1 Energy |
-| Human | `rl_coupon_book` | Coupon Book | Lesser | 0 | ได้ทันที: 3 Energy |
+| Human | `rl_savings_bond` | Savings Bond | Lesser | 0 | ต้นทุกเทิร์น: ได้ 1 Energy |
+| Human | `rl_coupon_book` | Coupon Book | Lesser | 0 | ได้ทันที: 4 Energy |
 | Human | `rl_city_grant` | City Grant | Greater | 3 | ได้ทันที: ยูนิตในร้าน +2/+2 จนจบเกม |
 | Shonen | `rl_leaf_headband` | Leaf Headband | Lesser | 1 | เริ่มการต่อสู้: Shonen ทุกตัว +0/+2 |
 | Shonen | `rl_ninja_scroll` | Ninja Scroll | Lesser | 2 | ได้ทันที: เลือกรับยูนิต Shonen 1 จาก 3 |
 | Shonen | `rl_sage_training` | Sage Training | Greater | 4 | เริ่มการต่อสู้: Shonen ทุกตัว +2/+1 |
 | ทุกเผ่า | `rl_lucky_coin` | Lucky Coin | Lesser | 0 | ได้ทันที: 2 Energy |
 | ทุกเผ่า | `rl_training_weights` | Training Weights | Lesser | 2 | เริ่มการต่อสู้: พวกซ้ายสุด +2/+2 |
-| ทุกเผ่า | `rl_war_banner` | War Banner | Greater | 0 | เริ่มการต่อสู้: พวกเราทุกตัว +1/+0 |
+| ทุกเผ่า | `rl_war_banner` | War Banner | Greater | 3 | เริ่มการต่อสู้: พวกเราทุกตัว +1/+0 |
 | ทุกเผ่า | `rl_treasury` | Treasury | Greater | 3 | ต้นทุกเทิร์น: ได้ 1 Energy |
 
 **ผล Simulate (1,200 เกม, หลังปรับ 1 รอบ)**
@@ -449,6 +449,23 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 | Beast | **5.12** / 5.2% |
 
 การ์ดที่ห่างจากค่าเฉลี่ยของ Rank เดียวกันมาก (ติดลบ = แรงกว่า): Godzilla Junior R3 −1.4, Hedorah R2 −0.8, Godzilla R5 −0.7, Destoroyah R4 −0.7, Haru R1 −0.6, Vector Mars R1 −0.5, Pina R2 −0.5 · อ่อนสุด: Intern Researcher +0.5, Mechanic +0.4, Eight +0.4
+
+**ปรับสมดุล 3 รอบ (2026-10-08, รอบละ 1,800 เกม)**
+| เผ่า | ก่อน | รอบ 1 | รอบ 2 | รอบ 3 (ปัจจุบัน) |
+|---|---|---|---|---|
+| Kaiju | 3.29 | 3.49 | 3.91 | **3.87** |
+| Mecha | 3.69 | 3.67 | 3.75 | **3.87** |
+| Shonen | 4.38 | 4.45 | 4.45 | **4.36** |
+| Sentai | 4.60 | 4.64 | 4.55 | **4.50** |
+| Human | 4.68 | 4.81 | 4.52 | **4.58** |
+| Rider | 4.94 | 4.91 | 4.81 | **4.82** |
+| Beast | 5.12 | 4.89 | 4.89 | **4.93** |
+
+ช่วงห่างระหว่างเผ่าแรงสุดกับอ่อนสุด 1.83 → 1.06 · ผลแต่ละรอบแกว่งได้ราว ±0.1 · ตารางการ์ด Hero และ Relic ด้านบนเป็นค่าหลังรอบ 3 แล้ว
+- รอบ 1: ลด Godzilla Junior (ตัด Avenge), Hedorah, Godzilla, Destoroyah, Vector Mars · เพิ่ม Beast (Legoshi, Louis, Juno, Els, สิงโต), Human ตัวเล็ก, Ohkuwagata, God Kumo, Eight, Nasuka, Zeztz, Lord Five · ปรับ Hero 8 ตัว และ Relic 7 ชิ้น
+- รอบ 2: Yanma แรงเกิน (ชาร์จ Mecha Gauge เร็ว) จึงลดลง · ลด Kaiju อีก (Destoroyah, Godzilla, Hedorah Spawn ไม่มี Lethal, Mechagodzilla) · เพิ่ม Human, DEAVA Hangar, Sasuke
+- รอบ 3: ลด Vector Mars, Godzilla, Defense Commander, War Banner · เพิ่ม Legoshi, Zeztz, Knight Seventeen, Nem
+- ยังห่างจากค่าเฉลี่ยของ Rank: Destoroyah −0.6, King Ghidorah −0.4 (แรง) · Arms Dealer +0.4, Neji +0.3 (อ่อน) · Hero: Defense General 3.49 แรง, Nem 5.25 อ่อน · Relic เศรษฐกิจ (Savings Bond, Capsem Case) ยังอ่อน เพราะบอทใช้ Energy ส่วนเกินไม่เก่ง
 
 **Kaiju ยังแรงเกิน**: ลองตัด Kyodaika ทั้งเผ่า หรือตัด Avenge ทั้งเผ่า ก็ยังอยู่ที่ 3.3 ความแรงกระจายอยู่ที่ Godzilla, King Ghidorah, Destoroyah (อันดับดีกว่าค่าเฉลี่ยของ Rank เดียวกันชัดเจน) ต้องปรับทีละใบในรอบหน้า
 

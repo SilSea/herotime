@@ -97,7 +97,7 @@
    "key": "nasuka",
    "name": "Nasuka Nagumo",
    "rank": 1,
-   "atk": 1,
+   "atk": 2,
    "hp": 2,
    "factions": [
     "rider"
@@ -223,7 +223,7 @@
    "key": "eight",
    "name": "Eight",
    "rank": 3,
-   "atk": 2,
+   "atk": 3,
    "hp": 4,
    "factions": [
     "rider"
@@ -341,8 +341,8 @@
    "key": "zeztz",
    "name": "Kamen Rider Zeztz",
    "rank": 1,
-   "atk": 3,
-   "hp": 4,
+   "atk": 4,
+   "hp": 5,
    "factions": [
     "rider"
    ],
@@ -716,7 +716,7 @@
    "key": "lord_five",
    "name": "Lord Five",
    "rank": 2,
-   "atk": 3,
+   "atk": 4,
    "hp": 5,
    "factions": [
     "rider"
@@ -758,7 +758,7 @@
    "key": "knight_seventeen",
    "name": "Knight Seventeen",
    "rank": 3,
-   "atk": 4,
+   "atk": 5,
    "hp": 5,
    "factions": [
     "rider"
@@ -1503,7 +1503,7 @@
    "name": "God Kumo",
    "rank": 2,
    "atk": 2,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "sentai"
    ],
@@ -1723,8 +1723,8 @@
    "key": "ohkuwagata_ohger",
    "name": "Ohkuwagata Ohger",
    "rank": 5,
-   "atk": 6,
-   "hp": 6,
+   "atk": 7,
+   "hp": 7,
    "factions": [
     "sentai"
    ],
@@ -1967,7 +1967,7 @@
    "key": "vector_mars",
    "name": "Vector Mars",
    "rank": 1,
-   "atk": 3,
+   "atk": 2,
    "hp": 2,
    "factions": [
     "mecha"
@@ -2143,7 +2143,7 @@
    "key": "deava_hangar",
    "name": "DEAVA Hangar",
    "rank": 3,
-   "atk": 1,
+   "atk": 2,
    "hp": 5,
    "factions": [
     "mecha"
@@ -2546,7 +2546,7 @@
    "name": "Hedorah",
    "rank": 2,
    "atk": 1,
-   "hp": 3,
+   "hp": 2,
    "factions": [
     "kaiju"
    ],
@@ -2572,28 +2572,11 @@
    "name": "Godzilla Junior",
    "rank": 3,
    "atk": 2,
-   "hp": 3,
+   "hp": 2,
    "factions": [
     "kaiju"
    ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "AVENGE",
-     "actions": [
-      {
-       "type": "BUFF",
-       "atk": 1,
-       "hp": 1,
-       "permanent": true
-      }
-     ],
-     "target": {
-      "selector": "SELF"
-     },
-     "every": 3
-    }
-   ],
+   "effects": [],
    "keywords": [
     "KYODAIKA"
    ]
@@ -2648,7 +2631,7 @@
    "name": "Destoroyah",
    "rank": 4,
    "atk": 3,
-   "hp": 4,
+   "hp": 3,
    "factions": [
     "kaiju"
    ],
@@ -2660,7 +2643,7 @@
       {
        "type": "SUMMON",
        "cardKey": "destoroyah_aggregate",
-       "count": 2
+       "count": 1
       }
      ]
     },
@@ -2678,7 +2661,7 @@
      "target": {
       "selector": "SELF"
      },
-     "every": 2
+     "every": 3
     }
    ]
   },
@@ -2687,7 +2670,7 @@
    "name": "Mechagodzilla",
    "rank": 4,
    "atk": 4,
-   "hp": 6,
+   "hp": 5,
    "factions": [
     "kaiju",
     "mecha"
@@ -2716,7 +2699,7 @@
    "name": "Godzilla",
    "rank": 5,
    "atk": 5,
-   "hp": 6,
+   "hp": 5,
    "factions": [
     "kaiju"
    ],
@@ -2727,15 +2710,15 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 2,
-       "hp": 2,
+       "atk": 1,
+       "hp": 1,
        "permanent": true
       }
      ],
      "target": {
       "selector": "SELF"
      },
-     "every": 3
+     "every": 4
     }
    ],
    "keywords": [
@@ -2871,10 +2854,7 @@
     "kaiju"
    ],
    "effects": [],
-   "token": true,
-   "keywords": [
-    "LETHAL"
-   ]
+   "token": true
   },
   {
    "key": "destoroyah_aggregate",
@@ -3042,7 +3022,7 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 1,
+       "atk": 2,
        "hp": 1,
        "permanent": false
       }
@@ -3092,7 +3072,7 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 1,
+       "atk": 2,
        "hp": 1,
        "permanent": false
       }
@@ -3173,7 +3153,7 @@
    "name": "Louis",
    "rank": 4,
    "atk": 4,
-   "hp": 5,
+   "hp": 6,
    "factions": [
     "beast"
    ],
@@ -3254,8 +3234,8 @@
    "key": "legoshi",
    "name": "Legoshi",
    "rank": 5,
-   "atk": 5,
-   "hp": 6,
+   "atk": 7,
+   "hp": 8,
    "factions": [
     "beast"
    ],
@@ -3336,7 +3316,7 @@
    "key": "shishigumi_lion",
    "name": "Shishigumi Lion",
    "rank": 2,
-   "atk": 2,
+   "atk": 3,
    "hp": 2,
    "factions": [
     "beast"
@@ -3370,7 +3350,7 @@
    "key": "intern_researcher",
    "name": "Intern Researcher",
    "rank": 1,
-   "atk": 1,
+   "atk": 2,
    "hp": 2,
    "factions": [
     "human"
@@ -3415,7 +3395,7 @@
    "name": "Shop Manager",
    "rank": 2,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "human"
    ],
@@ -3437,7 +3417,7 @@
    "key": "field_scout",
    "name": "Field Scout",
    "rank": 2,
-   "atk": 2,
+   "atk": 3,
    "hp": 3,
    "factions": [
     "human"
@@ -3458,7 +3438,7 @@
    "key": "mechanic",
    "name": "Mechanic",
    "rank": 2,
-   "atk": 2,
+   "atk": 3,
    "hp": 3,
    "factions": [
     "human"
@@ -3481,7 +3461,7 @@
    "key": "banker",
    "name": "Banker",
    "rank": 3,
-   "atk": 2,
+   "atk": 3,
    "hp": 4,
    "factions": [
     "human"
@@ -3580,7 +3560,7 @@
    "name": "Arms Dealer",
    "rank": 4,
    "atk": 4,
-   "hp": 4,
+   "hp": 5,
    "factions": [
     "human"
    ],
@@ -3602,7 +3582,7 @@
    "key": "tycoon",
    "name": "Tycoon",
    "rank": 5,
-   "atk": 5,
+   "atk": 6,
    "hp": 6,
    "factions": [
     "human"
@@ -3633,7 +3613,7 @@
    "key": "defense_commander",
    "name": "Defense Commander",
    "rank": 5,
-   "atk": 6,
+   "atk": 5,
    "hp": 6,
    "factions": [
     "human"
@@ -3922,7 +3902,7 @@
    "name": "Sasuke Uchiha",
    "rank": 3,
    "atk": 4,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "shonen"
    ],
@@ -4254,6 +4234,22 @@
         "faction": "rider"
        }
       ]
+     },
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 1,
+        "permanent": true
+       }
+      ],
+      "target": {
+       "selector": "RANDOM_FRIENDLY",
+       "faction": "rider"
+      }
      }
     ]
    }
@@ -4295,7 +4291,7 @@
        {
         "type": "BUFF",
         "atk": 1,
-        "hp": 0,
+        "hp": 1,
         "permanent": true
        }
       ],
@@ -4327,7 +4323,7 @@
    "armor": 3,
    "power": {
     "mode": "ONCE",
-    "cost": 2,
+    "cost": 3,
     "effects": [
      {
       "scope": "PLAYER",
@@ -4371,7 +4367,7 @@
    "armor": 0,
    "power": {
     "mode": "ACTIVE",
-    "cost": 1,
+    "cost": 2,
     "effects": [
      {
       "scope": "PLAYER",
@@ -4386,6 +4382,21 @@
       ],
       "target": {
        "selector": "GIANT_SLOT"
+      }
+     },
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "GAUGE_ADD",
+        "gauge": "mecha",
+        "amount": 1
+       }
+      ],
+      "limit": {
+       "times": 2,
+       "per": "GAME"
       }
      }
     ]
@@ -4498,6 +4509,12 @@
        {
         "type": "GIVE_KEYWORD",
         "keyword": "GATTAI"
+       },
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 1,
+        "permanent": true
        }
       ],
       "target": {
@@ -4541,7 +4558,7 @@
    "armor": 0,
    "power": {
     "mode": "ACTIVE",
-    "cost": 2,
+    "cost": 1,
     "effects": [
      {
       "scope": "PLAYER",
@@ -4624,7 +4641,7 @@
   {
    "key": "h_jet_jaguar",
    "name": "Jet Jaguar",
-   "armor": 2,
+   "armor": 0,
    "power": {
     "mode": "ACTIVE",
     "cost": 1,
@@ -4636,7 +4653,7 @@
        {
         "type": "BUFF",
         "atk": 1,
-        "hp": 2,
+        "hp": 1,
         "permanent": true
        }
       ],
@@ -4759,7 +4776,7 @@
         "type": "MODIFY_RULE",
         "rule": "freeRefreshesPerTurn",
         "op": "SET",
-        "value": 1
+        "value": 2
        }
       ]
      }
@@ -4812,7 +4829,7 @@
   {
    "key": "h_general",
    "name": "Defense General",
-   "armor": 8,
+   "armor": 5,
    "power": {
     "mode": "ACTIVE",
     "cost": 2,
@@ -4924,6 +4941,12 @@
        {
         "type": "GIVE_KEYWORD",
         "keyword": "BARRIER"
+       },
+       {
+        "type": "BUFF",
+        "atk": 1,
+        "hp": 1,
+        "permanent": true
        }
       ],
       "target": {
@@ -4968,7 +4991,7 @@
    "key": "rl_capsem_case",
    "name": "Capsem Case",
    "tier": "LESSER",
-   "cost": 1,
+   "cost": 0,
    "factions": [
     "rider"
    ],
@@ -5003,7 +5026,7 @@
    "key": "rl_final_form_belt",
    "name": "Final Form Belt",
    "tier": "GREATER",
-   "cost": 3,
+   "cost": 4,
    "factions": [],
    "weight": 100,
    "effects": [
@@ -5101,7 +5124,7 @@
    "key": "rl_vector_engine",
    "name": "Vector Engine",
    "tier": "LESSER",
-   "cost": 2,
+   "cost": 1,
    "factions": [
     "mecha"
    ],
@@ -5235,7 +5258,7 @@
    "key": "rl_oxygen_destroyer",
    "name": "Oxygen Destroyer",
    "tier": "GREATER",
-   "cost": 6,
+   "cost": 5,
    "factions": [
     "kaiju"
    ],
@@ -5246,7 +5269,8 @@
      "trigger": "START_OF_COMBAT",
      "actions": [
       {
-       "type": "DESTROY"
+       "type": "DAMAGE",
+       "amount": 5
       }
      ],
      "target": {
@@ -5337,7 +5361,7 @@
    "key": "rl_savings_bond",
    "name": "Savings Bond",
    "tier": "LESSER",
-   "cost": 1,
+   "cost": 0,
    "factions": [
     "human"
    ],
@@ -5371,7 +5395,7 @@
      "actions": [
       {
        "type": "GAIN_ENERGY",
-       "amount": 3
+       "amount": 4
       }
      ]
     }
@@ -5527,7 +5551,7 @@
    "key": "rl_war_banner",
    "name": "War Banner",
    "tier": "GREATER",
-   "cost": 0,
+   "cost": 3,
    "factions": [],
    "weight": 100,
    "effects": [
