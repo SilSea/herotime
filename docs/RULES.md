@@ -190,7 +190,7 @@ Effect เก็บเป็น JSON ใน DB, engine ตีความ — ad
 ### 12.1 Triggers
 | ระดับ | Trigger |
 |---|---|
-| ยูนิต | `ON_PLAY` (Deploy), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย), `ALLY_SUMMONED` (มียูนิตตัวอื่นถูกเรียกเข้าฝั่งเรา ทั้งสองช่วง), `ON_SELL` (ถูกขาย), `ON_DISCARD` (ถูกการ์ดอื่นทิ้งจากมือ; Gear ก็มีได้) |
+| ยูนิต | `ON_PLAY` (Deploy), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย), `ALLY_SUMMONED` (มียูนิตตัวอื่นถูกเรียกเข้าฝั่งเรา ทั้งสองช่วง), `ON_SELL` (ถูกขาย), `ON_DISCARD` (ถูกการ์ดอื่นทิ้งจากมือ; Gear ก็มีได้) · `ALLY_SUMMONED` ทำงานทั้งตอนลงการ์ดจากมือ (ก่อน Deploy ของมัน) และตอนถูกเรียกด้วยความสามารถ |
 | ผู้เล่น | `ON_ACQUIRE` (เลือก Relic/Hero), `ON_TURN_START`, `ON_USE` (Hero Power), `START_OF_COMBAT` (Relic/Series Bond), `ON_PLAY` (Gear) |
 | แหล่ง Gauge | `ON_ROLL_CALL`, `ON_ROLL_CALL_WIN`, `HENSHIN` |
 

@@ -78,7 +78,7 @@ const MAX_SUMMON_DEPTH = 8;
 let summonDepth = 0;
 
 /** Units already on the board react to a newcomer (their buffs stick: this is the recruit phase). */
-function announceSummon(player: PlayerState, env: GameEnv, newcomer: Unit): void {
+export function announceSummon(player: PlayerState, env: GameEnv, newcomer: Unit): void {
   if (summonDepth >= MAX_SUMMON_DEPTH) return;
   summonDepth++;
   try {

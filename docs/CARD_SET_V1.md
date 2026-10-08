@@ -33,8 +33,8 @@
 |---|---|---|---|---|---|
 | 1 | `baku_yorozu` | Baku Yorozu | 1/2 | Henshin (1) → Kamen Rider Zeztz | ตัวเอก |
 | 1 | `kensei_odaka` | Kensei Odaka | 1/2 | Henshin (1) → Nox Knight | ใช้ Knight Invoker แล้วต่อด้วย Nox Driver |
-| 1 | `nem` | Nem | 1/2 | Deploy: ให้ Zeztz (ทุกร่าง) +1/+1 ถาวร | คนดังที่เป็นครอบครัวบุญธรรมของ Baku |
-| 1 | `nasuka` | Nasuka Nagumo | 1/1 | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | นักสืบ |
+| 1 | `nem` | Nem | 1/3 | Deploy: ให้ Zeztz (ทุกร่าง) +1/+1 ถาวร | คนดังที่เป็นครอบครัวบุญธรรมของ Baku |
+| 1 | `nasuka` | Nasuka Nagumo | 1/2 | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | นักสืบ |
 | 2 | `five` | Five | 2/2 | Henshin (1) → Lord Five | CODE 5 |
 | 2 | `kureha_miyamoto` | Kureha Miyamoto | 2/2 | Henshin (1) → Lord Six | CODE 6 |
 | 2 | `thirteen` | Thirteen *(ฝ่ายร้าย)* | 2/2 | Henshin (1) → Lord Thirteen | CODE ที่หลงเหลือ |
@@ -127,9 +127,9 @@
 **การ์ดในร้าน**
 | R | key | การ์ด | สี | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|---|
-| 1 | `kuwagata_ohger` | Kuwagata Ohger | RED | 2/2 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +2/+2 · Final Form → `king_kuwagata` | Gira Husty กษัตริย์ Shugodom |
-| 1 | `hachi_ohger` | Hachi Ohger | BLACK | 2/2 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | Kaguragi Dybowski แห่ง Tofu |
-| 1 | `god_tentou` | God Tentou | — | 1/2 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod เต่าทอง (เสริม) |
+| 1 | `kuwagata_ohger` | Kuwagata Ohger | RED | 2/3 | Team-Up (3): เริ่มการต่อสู้: ตัวนี้ +2/+2 · Final Form → `king_kuwagata` | Gira Husty กษัตริย์ Shugodom |
+| 1 | `hachi_ohger` | Hachi Ohger | BLACK | 2/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | Kaguragi Dybowski แห่ง Tofu |
+| 1 | `god_tentou` | God Tentou | — | 1/3 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod เต่าทอง (เสริม) |
 | 2 | `tombo_ohger` | Tombo Ohger | BLUE | 3/3 | Deploy: ให้ Giant Robo +2/+2 ถาวร | Yanma Gast วิศวกรผู้สร้าง Shugod |
 | 2 | `kamakiri_ohger` | Kamakiri Ohger | YELLOW | 2/4 | จบเทิร์น: ให้ Sentai ตัวอื่นแบบสุ่ม +0/+2 | Hymeno Ran หมอ ราชินีแห่ง Ishabana |
 | 2 | `god_kumo` | God Kumo | — | 2/3 | Deploy: Mecha Gauge +1 (ไม่เกิน 1 ครั้งต่อเกม) | Shugod แมงมุม (เสริม) |
@@ -169,9 +169,9 @@
 **การ์ดในร้าน**
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `vector_sol` | Vector Sol | 2/2 *(Gattai)* | Gattai core → Solar Aquarion | เครื่องบินสีแดง |
-| 1 | `vector_luna` | Vector Luna | 1/3 *(Gattai)* | Gattai core → Aquarion Luna | เครื่องบินสีเขียว |
-| 1 | `vector_mars` | Vector Mars | 3/1 *(Gattai)* | Gattai core → Aquarion Mars | เครื่องบินสีน้ำเงิน |
+| 1 | `vector_sol` | Vector Sol | 2/3 *(Gattai)* | Gattai core → Solar Aquarion | เครื่องบินสีแดง |
+| 1 | `vector_luna` | Vector Luna | 1/4 *(Gattai)* | Gattai core → Aquarion Luna | เครื่องบินสีเขียว |
+| 1 | `vector_mars` | Vector Mars | 3/2 *(Gattai)* | Gattai core → Aquarion Mars | เครื่องบินสีน้ำเงิน |
 | 2 | `apollo` | Apollo | 3/2 *(Gattai)* | Deploy: ให้ Vector Sol +2/+1 ถาวร | นักบิน Vector Sol |
 | 2 | `silvia` | Silvia de Alisia | 2/3 *(Gattai)* | Deploy: ให้ Vector Luna +1/+2 ถาวร | นักบิน Luna |
 | 2 | `pierre` | Pierre Vieira | 2/3 *(Gattai)* | Deploy: ให้ Vector Mars +2/+1 ถาวร | นักบิน Mars |
@@ -209,28 +209,28 @@
 **การ์ดในร้าน**
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `minilla` | Minilla | 1/2 | Last Stand: ให้ Kaiju แบบสุ่ม +2/+2 ถาวร | ลูกของ Godzilla |
+| 1 | `minilla` | Minilla | 1/3 | Last Stand: ให้ Kaiju แบบสุ่ม +2/+2 ถาวร | ลูกของ Godzilla |
 | 1 | `mothra_larva` | Mothra (Larva) | 1/3 | Henshin (2) → Mothra | ตัวอ่อน พ่นใย |
-| 1 | `shin_godzilla_2` | Shin Godzilla (2nd Form) | 1/2 | Henshin (2) → Shin Godzilla (3rd Form) | ร่าง 2 เลื้อยขึ้นบก (Kamata-kun) |
+| 1 | `shin_godzilla_2` | Shin Godzilla (2nd Form) | 1/2 | Henshin (3) → Shin Godzilla (3rd Form) | ร่าง 2 เลื้อยขึ้นบก (Kamata-kun) |
 | 2 | `anguirus` | Anguirus | 2/3 *(Guard, Revive)* | — | ตัวหนามม้วนตัว บาดเจ็บง่ายแต่ไม่ยอมแพ้ |
 | 2 | `rodan` | Rodan | 3/2 *(Rapid)* | — | บินเร็ว คลื่นกระแทก |
 | 2 | `hedorah` | Hedorah | 1/3 *(Lethal)* | Last Stand: เรียก Hedorah Spawn 1/1 *(Lethal)* | สัตว์ประหลาดมลพิษ |
-| 3 | `godzilla_junior` | Godzilla Junior | 2/3 *(Kyodaika)* | Avenge (2): ตัวนี้ +1/+1 ถาวร | ลูกที่โตขึ้น |
+| 3 | `godzilla_junior` | Godzilla Junior | 2/3 *(Kyodaika)* | Avenge (3): ตัวนี้ +1/+1 ถาวร | ลูกที่โตขึ้น |
 | 3 | `biollante` | Biollante | 3/4 *(Revive)* | Last Stand: ให้ Kaiju ทุกตัว +1/+0 (จนจบการสู้) | ไฮบริดพืช-Godzilla |
 | 3 | `gigan` | Gigan | 4/3 *(Rider Kick)* | — | ไซบอร์กใบเลื่อย |
 | 4 | `destoroyah` | Destoroyah | 3/4 | Last Stand: เรียก Destoroyah (Aggregate) 2/2 ×2 · Avenge (2): ตัวนี้ +2/+2 ถาวร | เริ่มเป็นตัวเล็กจำนวนมาก แล้วรวมเป็นร่างปีศาจ |
 | 4 | `mechagodzilla` | Mechagodzilla | 4/6 *(Barrier)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด · เผ่า Kaiju + Mecha | หุ่น Godzilla ที่มนุษย์สร้าง |
-| 5 | `godzilla` | Godzilla | 6/7 *(Kyodaika)* | Avenge (3): ตัวนี้ +3/+3 ถาวร | ราชาแห่งสัตว์ประหลาด |
+| 5 | `godzilla` | Godzilla | 5/6 *(Kyodaika)* | Avenge (3): ตัวนี้ +2/+2 ถาวร | ราชาแห่งสัตว์ประหลาด |
 | 5 | `king_ghidorah` | King Ghidorah | 6/6 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว (3 ครั้ง, 3 หัว) | มังกรสามหัว |
-| 6 | `burning_godzilla` | Burning Godzilla | 10/10 *(Kyodaika)* | Last Stand: ทำดาเมจ 4 ใส่ศัตรูทุกตัว (meltdown) | ความร้อนในตัวพุ่งจนใกล้หลอมละลาย |
+| 6 | `burning_godzilla` | Burning Godzilla | 9/9 | Last Stand: ทำดาเมจ 4 ใส่ศัตรูทุกตัว (meltdown) | ความร้อนในตัวพุ่งจนใกล้หลอมละลาย |
 
 
 **ร่าง / Token**
 | key | ร่าง | ATK/HP | ความสามารถ |
 |---|---|---|---|
 | `mothra` | Mothra | 4/5 | เริ่มการต่อสู้: ให้พวกเราตัวอื่นแบบสุ่มได้ Barrier (เกล็ดสะท้อนการโจมตี) |
-| `shin_godzilla_3` | Shin Godzilla (3rd Form) | 3/4 | Henshin (2) → Shin Godzilla (4th Form) |
-| `shin_godzilla_4` | Shin Godzilla (4th Form) | 8/8 *(Kyodaika)* | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (atomic breath) |
+| `shin_godzilla_3` | Shin Godzilla (3rd Form) | 3/4 | Henshin (3) → Shin Godzilla (4th Form) |
+| `shin_godzilla_4` | Shin Godzilla (4th Form) | 7/7 | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (atomic breath) |
 | `hedorah_spawn` / `destoroyah_aggregate` | token | 1/1 Lethal / 2/2 | — |
 
 ---
@@ -241,13 +241,13 @@
 
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `haru` | Haru | 1/2 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +0/+1 | กระต่ายขาว ชมรมจัดสวน |
-| 1 | `jack` | Jack | 2/2 | Deploy: ถ้ามี Legoshi บนบอร์ด ตัวนี้ +2/+2 ถาวร | ลาบราดอร์ เพื่อนสนิทของ Legoshi |
-| 1 | `tem` | Tem | 1/2 | Last Stand: ให้ Beast แบบสุ่ม +1/+1 ถาวร | อัลปากา สมาชิกชมรมการละคร |
-| 2 | `collot` | Collot | 2/2 | Deploy: เรียก Durham 1/2 | Old English Sheepdog เพื่อนร่วมหอ |
-| 2 | `pina` | Pina | 3/2 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+0 ถาวร | แกะ Dall ปีหนึ่ง ชมรมการละคร |
+| 1 | `haru` | Haru | 1/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +1/+1 | กระต่ายขาว ชมรมจัดสวน |
+| 1 | `jack` | Jack | 2/3 | Deploy: ถ้ามี Legoshi บนบอร์ด ตัวนี้ +2/+2 ถาวร | ลาบราดอร์ เพื่อนสนิทของ Legoshi |
+| 1 | `tem` | Tem | 1/3 | Last Stand: ให้ Beast แบบสุ่ม +1/+1 ถาวร | อัลปากา สมาชิกชมรมการละคร |
+| 2 | `collot` | Collot | 3/2 | Deploy: เรียก Durham 2/2 | Old English Sheepdog เพื่อนร่วมหอ |
+| 2 | `pina` | Pina | 3/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | แกะ Dall ปีหนึ่ง ชมรมการละคร |
 | 2 | `els` | Els | 2/3 | Deploy: ให้ Beast ที่อยู่ข้างๆ +1/+1 | แพะแองโกรา |
-| 2 | `kibi` | Kibi | 2/3 | Deploy: เรียก Dom 1/1 | ตัวกินมด ทีมเวที |
+| 2 | `kibi` | Kibi | 3/3 | Deploy: เรียก Dom 2/1 | ตัวกินมด ทีมเวที |
 | 3 | `juno` | Juno | 3/4 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +1/+1 | หมาป่าเทา ปีหนึ่ง |
 | 3 | `bill` | Bill | 4/3 | Deploy: ให้ Beast ทุกตัว +1/+0 | เสือเบงกอล อยากเป็น Beastar |
 | 3 | `gohin` | Gohin | 3/5 *(Guard)* | Deploy: ให้ Legoshi +2/+2 ถาวร และ Barrier | แพนด้า หมอใต้ดิน อาจารย์ของ Legoshi |
@@ -257,7 +257,7 @@
 | 5 | `legoshi` | Legoshi | 5/6 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | หมาป่าเทา ตัวเอก |
 | 6 | `yahya` | Yahya | 8/9 *(Echo)* | Deploy: ให้ Beast ทุกตัว +2/+2 ถาวร | ม้า Beastar คนปัจจุบัน |
 
-**Token**: `durham` Durham 1/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 1/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 2/2
+**Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 2/2
 - ไม่ได้ใส่ (ตัวร้าย): Riz, Melon, Ibuki — Louis เรียก "Shishigumi Lion" เป็น token ทั่วไปแทน
 - Durham และ Dom เป็นตัวละครที่มีในเรื่อง แต่ทำเป็น token เพื่อให้เป็นการ์ดที่ถูกเรียก
 
@@ -269,9 +269,9 @@
 
 | R | key | การ์ด | ATK/HP | ความสามารถ |
 |---|---|---|---|---|
-| 1 | `street_vendor` | Street Vendor | 1/2 | Deploy: ได้ 1 Energy |
-| 1 | `intern_researcher` | Intern Researcher | 1/1 | Deploy: ได้ Gear แบบสุ่มเข้ามือ |
-| 1 | `volunteer` | Volunteer | 2/2 | เมื่อถูกขาย: ได้ 1 Energy |
+| 1 | `street_vendor` | Street Vendor | 1/3 | Deploy: ได้ 1 Energy |
+| 1 | `intern_researcher` | Intern Researcher | 1/2 | Deploy: ได้ Gear แบบสุ่มเข้ามือ |
+| 1 | `volunteer` | Volunteer | 2/3 | เมื่อถูกขาย: ได้ 1 Energy |
 | 2 | `shop_manager` | Shop Manager | 2/2 | Deploy: ยูนิตในร้านได้ +1/+1 จนจบเกม |
 | 2 | `field_scout` | Field Scout | 2/3 | Deploy: เลือกรับยูนิต 1 จาก 3 |
 | 2 | `mechanic` | Mechanic | 2/3 | Deploy: เสริมพลัง Gear +1/+0 จนจบเกม |
@@ -299,9 +299,9 @@
 
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `naruto` | Naruto Uzumaki | 1/3 | เริ่มการต่อสู้: เรียกสำเนาของตัวนี้ (การ์ดพื้นฐาน) · Henshin (3) → Naruto (Sage Mode) | Shadow Clone |
-| 1 | `sakura` | Sakura Haruno | 1/3 | จบเทิร์น: ให้ Naruto หรือ Sasuke +0/+2 ถาวร | นินจาแพทย์ |
-| 1 | `hinata` | Hinata Hyuga | 2/2 *(Guard)* | — | ปกป้อง Naruto |
+| 1 | `naruto` | Naruto Uzumaki | 1/4 | เริ่มการต่อสู้: เรียกสำเนาของตัวนี้ (การ์ดพื้นฐาน) · Henshin (3) → Naruto (Sage Mode) | Shadow Clone |
+| 1 | `sakura` | Sakura Haruno | 1/4 | จบเทิร์น: ให้ Naruto หรือ Sasuke +0/+2 ถาวร | นินจาแพทย์ |
+| 1 | `hinata` | Hinata Hyuga | 2/3 *(Guard)* | — | ปกป้อง Naruto |
 | 2 | `rock_lee` | Rock Lee | 2/3 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +2/+0 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น*) | Eight Gates (เปิดได้บางประตู) |
 | 2 | `neji` | Neji Hyuga | 3/2 | เมื่อโจมตี: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | หมัดอ่อน |
 | 2 | `shikamaru` | Shikamaru Nara | 2/3 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/+0 (จนจบการสู้)** | Shadow Possession |
@@ -330,15 +330,25 @@
 
 ทั้ง 7 เผ่าเป็นข้อมูลจริงที่ `docs/sets/card-set-v1.json` (Hero ทดสอบ 4 ตัวแบบไม่มีเผ่า, ไม่มี Relic, Roll Call 3 สี) · บอทเล่น **1,200 เกม** บน server ทดสอบ ไม่มี error · เฉลี่ย 13.1 เทิร์น
 
-| เผ่า | อันดับเฉลี่ย (1 ดีสุด, 8 แย่สุด, กลาง 4.5) | ชนะ | สรุป |
-|---|---|---|---|
-| Kaiju | **2.95** | **37.8%** | แรงเกินมาก |
-| Mecha | 4.23 | 9.7% | ดี |
-| Shonen | 4.42 | 8.9% | สมดุล |
-| Sentai | 4.71 | 8.6% | สมดุล |
-| Rider | 4.84 | 8.1% | อ่อนนิดหน่อย |
-| Human | 4.89 | 8.6% | อ่อนนิดหน่อย |
-| Beast | **5.37** | 5.0% | อ่อนสุด |
+| เผ่า | รอบ 1: อันดับ / ชนะ | รอบสุดท้าย: อันดับ / ชนะ |
+|---|---|---|
+| Kaiju | **2.95** / 37.8% | **3.16** / 31.4% |
+| Mecha | 4.23 / 9.7% | 4.30 / 9.7% |
+| Shonen | 4.42 / 8.9% | 4.41 / 12.4% |
+| Rider | 4.84 / 8.1% | 4.81 / 7.8% |
+| Human | 4.89 / 8.6% | 4.83 / 11.5% |
+| Sentai | 4.71 / 8.6% | 4.97 / 8.7% |
+| Beast | **5.37** / 5.0% | **5.13** / 5.0% |
+
+อันดับเฉลี่ย 1 = ดีสุด, 8 = แย่สุด, กลาง 4.5 · รอบละ 1,200 เกม
+
+**ที่ปรับระหว่างรอบ** (ตารางการ์ดด้านบนเป็นค่าล่าสุดแล้ว)
+- engine: ลงการ์ดจากมือนับเป็น "เรียกยูนิตเข้าสนาม" (Beast)
+- การ์ด R1 ที่อ่อนเกิน +1 HP ทุกเผ่า
+- Kaiju: Shin Godzilla แปลงร่างช้าลง (3 เทิร์นต่อขั้น) ร่าง 4 เหลือ 7/7 ไม่มี Kyodaika · Godzilla 5/6 Avenge +2/+2 · Godzilla Junior Avenge (3) · Burning Godzilla 9/9 ไม่มี Kyodaika
+- Beast: token 2/2 และ 2/1 · Haru ให้ +1/+1 · Pina, Collot, Kibi แรงขึ้น
+
+**Kaiju ยังแรงเกิน**: ลองตัด Kyodaika ทั้งเผ่า หรือตัด Avenge ทั้งเผ่า ก็ยังอยู่ที่ 3.3 ความแรงกระจายอยู่ที่ Godzilla, King Ghidorah, Destoroyah (อันดับดีกว่าค่าเฉลี่ยของ Rank เดียวกันชัดเจน) ต้องปรับทีละใบในรอบหน้า
 
 อันดับรายการ์ดดูได้จากหน้า Admin → Simulate หลังใส่ชุดนี้ใน draft · การ์ด Rank สูงจะมีอันดับดีกว่าเสมอ เพราะอยู่บนบอร์ดของผู้ชนะตอนท้ายเกม ให้เทียบกับการ์ด Rank เดียวกัน
 

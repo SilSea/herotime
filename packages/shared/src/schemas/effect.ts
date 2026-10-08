@@ -34,7 +34,7 @@ export const Trigger = z.enum([
   "AFTER_DAMAGED",
   "LAST_STAND",
   "AVENGE",
-  "ALLY_SUMMONED", // another friendly unit was summoned (recruit or fight); target SUMMONED is that unit
+  "ALLY_SUMMONED", // another friendly unit entered the board: played from the hand, or summoned (recruit or fight); target SUMMONED is that unit
   "ON_SELL", // the unit is sold (from the board or the hand), just before it leaves
   "ON_DISCARD", // the card was discarded from the hand by another card's DISCARD
   // player effects

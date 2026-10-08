@@ -15,7 +15,7 @@ import {
 } from "../shop/economy.js";
 import { chooseDiscover, resolveTriples, type TripleResult } from "../shop/triple.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput, Keyword, Side } from "../types.js";
-import { fireGaugeTrigger, matchesTarget, needsTargets, resetTurnUses, runReward, runTrigger, swapKey, type Origin } from "./effects.js";
+import { announceSummon, fireGaugeTrigger, matchesTarget, needsTargets, resetTurnUses, runReward, runTrigger, swapKey, type Origin } from "./effects.js";
 import type { GameEnv } from "./env.js";
 
 // ------------------------------------------------------------ recruit intents
@@ -49,6 +49,8 @@ export function playUnit(player: PlayerState, handIndex: number, position: numbe
   if (def.kind !== "UNIT") throw new RuleError(`${def.name} is not a unit${def.kind === "GEAR" ? " (use it instead)" : ""}`);
 
   play(player, handIndex, position, env.cfg);
+  // Playing a unit from the hand summons it: the units already there react first ("when you summon"), then its Deploy.
+  announceSummon(player, env, card);
   // ECHO: while another unit with it is on the board, Deploy happens twice.
   const echo = player.board.some((u) => u !== card && (env.content.card(u.key).keywords.includes("ECHO") || (u.keywords ?? []).includes("ECHO")));
   for (let n = 0; n < (echo ? 2 : 1); n++) runTrigger(def.effects, "ON_PLAY", "UNIT", card, player, env);

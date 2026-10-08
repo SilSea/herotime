@@ -218,6 +218,19 @@ describe("every trigger fires", () => {
     expect(bonus(w.p.board.find((x) => x.key === "cub"))).toEqual([1, 1]);
   });
 
+  it("ALLY_SUMMONED also fires for a unit played from the hand, before its Deploy", () => {
+    const w = world([
+      unitX({ scope: "UNIT", trigger: "ALLY_SUMMONED", target: { selector: "SUMMONED" }, actions: [{ type: "BUFF", atk: 1, hp: 1 }] }),
+      // its Deploy copies its own ATK onto x: it already has the +1 when Deploy runs
+      { key: "pal", atk: 2, hp: 2, effects: [{ scope: "UNIT", trigger: "ON_PLAY", target: { selector: "LEFTMOST_FRIENDLY" }, actions: [{ type: "BUFF", atk: 0, hp: 0, fromSelf: true }] }] },
+    ]);
+    w.p.board = [u("x")];
+    w.p.hand = [u("pal")];
+    playUnit(w.p, 0, 1, w.e);
+    expect(bonus(w.p.board[1])).toEqual([1, 1]);
+    expect(bonus(w.p.board[0])).toEqual([3, 3]);
+  });
+
   it("ON_SELL", () => {
     const w = world([unitX({ scope: "UNIT", trigger: "ON_SELL", actions: [{ type: "ADD_TO_HAND", cardKey: "owl" }] })]);
     w.p.board = [u("x")];

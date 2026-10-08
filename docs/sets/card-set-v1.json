@@ -57,7 +57,7 @@
    "name": "Nem",
    "rank": 1,
    "atk": 1,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "rider"
    ],
@@ -98,7 +98,7 @@
    "name": "Nasuka Nagumo",
    "rank": 1,
    "atk": 1,
-   "hp": 1,
+   "hp": 2,
    "factions": [
     "rider"
    ],
@@ -1356,7 +1356,7 @@
    "name": "Kuwagata Ohger",
    "rank": 1,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "sentai"
    ],
@@ -1391,7 +1391,7 @@
    "name": "Hachi Ohger",
    "rank": 1,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "sentai"
    ],
@@ -1419,7 +1419,7 @@
    "name": "God Tentou",
    "rank": 1,
    "atk": 1,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "sentai"
    ],
@@ -1971,7 +1971,7 @@
    "name": "Vector Sol",
    "rank": 1,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "mecha"
    ],
@@ -1986,7 +1986,7 @@
    "name": "Vector Luna",
    "rank": 1,
    "atk": 1,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "mecha"
    ],
@@ -2001,7 +2001,7 @@
    "name": "Vector Mars",
    "rank": 1,
    "atk": 3,
-   "hp": 1,
+   "hp": 2,
    "factions": [
     "mecha"
    ],
@@ -2521,7 +2521,7 @@
    "name": "Minilla",
    "rank": 1,
    "atk": 1,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "kaiju"
    ],
@@ -2570,7 +2570,7 @@
    ],
    "effects": [],
    "henshin": {
-    "afterTurns": 2,
+    "afterTurns": 3,
     "into": "shin_godzilla_3"
    }
   },
@@ -2653,7 +2653,7 @@
      "target": {
       "selector": "SELF"
      },
-     "every": 2
+     "every": 3
     }
    ],
    "keywords": [
@@ -2777,8 +2777,8 @@
    "key": "godzilla",
    "name": "Godzilla",
    "rank": 5,
-   "atk": 6,
-   "hp": 7,
+   "atk": 5,
+   "hp": 6,
    "factions": [
     "kaiju"
    ],
@@ -2789,8 +2789,8 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 3,
-       "hp": 3,
+       "atk": 2,
+       "hp": 2,
        "permanent": true
       }
      ],
@@ -2834,8 +2834,8 @@
    "key": "burning_godzilla",
    "name": "Burning Godzilla",
    "rank": 6,
-   "atk": 10,
-   "hp": 10,
+   "atk": 9,
+   "hp": 9,
    "factions": [
     "kaiju"
    ],
@@ -2853,9 +2853,6 @@
       "selector": "ALL_ENEMY"
      }
     }
-   ],
-   "keywords": [
-    "KYODAIKA"
    ]
   },
   {
@@ -2896,7 +2893,7 @@
    "effects": [],
    "token": true,
    "henshin": {
-    "afterTurns": 2,
+    "afterTurns": 3,
     "into": "shin_godzilla_4"
    }
   },
@@ -2904,8 +2901,8 @@
    "key": "shin_godzilla_4",
    "name": "Shin Godzilla (4th Form)",
    "rank": 6,
-   "atk": 8,
-   "hp": 8,
+   "atk": 7,
+   "hp": 7,
    "factions": [
     "kaiju"
    ],
@@ -2924,10 +2921,7 @@
      }
     }
    ],
-   "token": true,
-   "keywords": [
-    "KYODAIKA"
-   ]
+   "token": true
   },
   {
    "key": "hedorah_spawn",
@@ -2961,7 +2955,7 @@
    "name": "Haru",
    "rank": 1,
    "atk": 1,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "beast"
    ],
@@ -2972,7 +2966,7 @@
      "actions": [
       {
        "type": "BUFF",
-       "atk": 0,
+       "atk": 1,
        "hp": 1,
        "permanent": false
       }
@@ -2988,7 +2982,7 @@
    "name": "Jack",
    "rank": 1,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "beast"
    ],
@@ -3021,7 +3015,7 @@
    "name": "Tem",
    "rank": 1,
    "atk": 1,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "beast"
    ],
@@ -3048,7 +3042,7 @@
    "key": "collot",
    "name": "Collot",
    "rank": 2,
-   "atk": 2,
+   "atk": 3,
    "hp": 2,
    "factions": [
     "beast"
@@ -3072,7 +3066,7 @@
    "name": "Pina",
    "rank": 2,
    "atk": 3,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "beast"
    ],
@@ -3084,7 +3078,7 @@
       {
        "type": "BUFF",
        "atk": 1,
-       "hp": 0,
+       "hp": 1,
        "permanent": true
       }
      ],
@@ -3125,7 +3119,7 @@
    "key": "kibi",
    "name": "Kibi",
    "rank": 2,
-   "atk": 2,
+   "atk": 3,
    "hp": 3,
    "factions": [
     "beast"
@@ -3380,7 +3374,7 @@
    "key": "durham",
    "name": "Durham",
    "rank": 1,
-   "atk": 1,
+   "atk": 2,
    "hp": 2,
    "factions": [
     "beast"
@@ -3392,7 +3386,7 @@
    "key": "dom",
    "name": "Dom",
    "rank": 1,
-   "atk": 1,
+   "atk": 2,
    "hp": 1,
    "factions": [
     "beast"
@@ -3417,7 +3411,7 @@
    "name": "Street Vendor",
    "rank": 1,
    "atk": 1,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "human"
    ],
@@ -3439,7 +3433,7 @@
    "name": "Intern Researcher",
    "rank": 1,
    "atk": 1,
-   "hp": 1,
+   "hp": 2,
    "factions": [
     "human"
    ],
@@ -3461,7 +3455,7 @@
    "name": "Volunteer",
    "rank": 1,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "human"
    ],
@@ -3832,7 +3826,7 @@
    "name": "Naruto Uzumaki",
    "rank": 1,
    "atk": 1,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "shonen"
    ],
@@ -3862,7 +3856,7 @@
    "name": "Sakura Haruno",
    "rank": 1,
    "atk": 1,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "shonen"
    ],
@@ -3893,7 +3887,7 @@
    "name": "Hinata Hyuga",
    "rank": 1,
    "atk": 2,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "shonen"
    ],
