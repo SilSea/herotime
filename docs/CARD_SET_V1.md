@@ -437,6 +437,19 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 **หลังเปลี่ยนเป็นการ์ด Final Form กลาง** (1,200 เกม): Kaiju 3.30 · Mecha 3.68 · Shonen 4.39 · Sentai 4.60 · Human 4.69 · Rider 4.94 · Beast 5.13 · ร่าง Final Form เกิดครบทุกเรื่อง: King Kuwagata 38 → 129 ครั้ง, Solar Wings 32 → 63, Zeztz Exdream 0 → 18, Nox Midnight 546
 
+**รอบล่าสุด (1,800 เกม, ชุดเต็ม: Hero + Relic + การ์ด Final Form กลาง)**
+| เผ่า | อันดับ / ชนะ |
+|---|---|
+| Kaiju | **3.29** / 28.3% |
+| Mecha | 3.69 / 14.3% |
+| Shonen | 4.38 / 13.5% |
+| Sentai | 4.60 / 9.8% |
+| Human | 4.68 / 16.6% |
+| Rider | 4.94 / 7.1% |
+| Beast | **5.12** / 5.2% |
+
+การ์ดที่ห่างจากค่าเฉลี่ยของ Rank เดียวกันมาก (ติดลบ = แรงกว่า): Godzilla Junior R3 −1.4, Hedorah R2 −0.8, Godzilla R5 −0.7, Destoroyah R4 −0.7, Haru R1 −0.6, Vector Mars R1 −0.5, Pina R2 −0.5 · อ่อนสุด: Intern Researcher +0.5, Mechanic +0.4, Eight +0.4
+
 **Kaiju ยังแรงเกิน**: ลองตัด Kyodaika ทั้งเผ่า หรือตัด Avenge ทั้งเผ่า ก็ยังอยู่ที่ 3.3 ความแรงกระจายอยู่ที่ Godzilla, King Ghidorah, Destoroyah (อันดับดีกว่าค่าเฉลี่ยของ Rank เดียวกันชัดเจน) ต้องปรับทีละใบในรอบหน้า
 
 อันดับรายการ์ดดูได้จากหน้า Admin → Simulate หลังใส่ชุดนี้ใน draft · การ์ด Rank สูงจะมีอันดับดีกว่าเสมอ เพราะอยู่บนบอร์ดของผู้ชนะตอนท้ายเกม ให้เทียบกับการ์ด Rank เดียวกัน
