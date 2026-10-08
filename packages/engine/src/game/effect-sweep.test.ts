@@ -304,6 +304,15 @@ describe("every friendly target in the tavern", () => {
   });
 });
 
+describe("weakening an enemy (a negative buff)", () => {
+  it("stops at 0 ATK and 1 HP, and a 'permanent' one never sticks to the opponent's unit", () => {
+    const w = fight({ trigger: "START_OF_COMBAT", target: { selector: "LEFTMOST_ENEMY" }, actions: [{ type: "BUFF", atk: -5, hp: -50, permanent: true }] }, [fighter("bat", 2, 30, { sourceId: "0" })]);
+    expect(w.r.events.find((x) => x.type === "BUFF")).toEqual({ type: "BUFF", unit: "B0", atk: -2, hp: -29 });
+    // The enemy's side keeps no permanent change (it would be applied to that player's board after the fight).
+    expect(w.r.permanent.B).toEqual({});
+  });
+});
+
 describe("every enemy target in a fight", () => {
   const dmg = (selector: string) => fight({ trigger: "START_OF_COMBAT", target: { selector }, actions: [{ type: "DAMAGE", amount: 1 }] }, [fighter("bat", 1, 30), fighter("bat", 1, 30), fighter("bat", 1, 30)]);
   const hits = (r: CombatResult) => r.events.filter((x) => x.type === "EFFECT_DAMAGE").length;

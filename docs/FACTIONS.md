@@ -5,6 +5,17 @@
 
 > สถานะ: แนวของ Beast, Kaiju, Mecha ผู้ใช้กำหนดเอง · Rider, Sentai มาจากระบบที่มีในเกม · Human, Shonen ตกลงตามข้อเสนอ (2026-10-08)
 
+**เรื่องที่ใช้ทำการ์ดแต่ละเผ่า** (ร่างการ์ดอยู่ใน `CARD_SET_V1.md`)
+| เผ่า | เรื่อง | หมายเหตุ |
+|---|---|---|
+| Rider | Kamen Rider ZEZTZ | ฝ่ายพระเอกเท่านั้น |
+| Sentai | Ohsama Sentai King-Ohger | ฝ่ายพระเอกเท่านั้น |
+| Mecha | Genesis of Aquarion | |
+| Kaiju | Godzilla | |
+| Beast | Beastars | |
+| Human | ไม่มี (ออกแบบเอง) | |
+| Shonen | Naruto | |
+
 ---
 
 ## 1. ภาพรวม

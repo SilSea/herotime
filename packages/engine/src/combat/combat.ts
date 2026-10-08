@@ -271,12 +271,14 @@ export function simulateCombat(
         for (const t of targets) {
           if (action.fromSelf && t === source) continue; // it passes its stats on to the others
           // What it really gained (stats stop at the cap), so the replay adds up to the same numbers.
+          // A negative "buff" (weakening an enemy) stops at 0 ATK and 1 HP: it is not damage and never kills.
           const before = { atk: t.atk, hp: t.hp };
-          t.atk = capStat(t.atk + atk);
-          t.hp = capStat(t.hp + hp);
-          t.maxHp = capStat(t.maxHp + hp);
+          t.atk = Math.max(0, capStat(t.atk + atk));
+          t.hp = Math.max(1, capStat(t.hp + hp));
+          t.maxHp = Math.max(1, capStat(t.maxHp + hp));
           events.push({ type: "BUFF", unit: t.uid, atk: t.atk - before.atk, hp: t.hp - before.hp });
-          if (action.permanent && t.sourceId !== undefined) {
+          // Only your own units keep a buff after the fight: a "permanent" debuff must not change the opponent's board.
+          if (action.permanent && t.sourceId !== undefined && t.side === s.id) {
             const book = sides[t.side].permanent;
             const prev = book.get(t.sourceId) ?? { atk: 0, hp: 0 };
             book.set(t.sourceId, { atk: prev.atk + atk, hp: prev.hp + hp });
@@ -386,7 +388,7 @@ export function simulateCombat(
           t.hp = capStat(t.hp + hp);
           t.maxHp = capStat(t.maxHp + hp);
           events.push({ type: "BUFF", unit: t.uid, atk: t.atk - before.atk, hp: t.hp - before.hp });
-          if (action.permanent && t.sourceId !== undefined) {
+          if (action.permanent && t.sourceId !== undefined && t.side === s.id) {
             const book = sides[t.side].permanent;
             const prev = book.get(t.sourceId) ?? { atk: 0, hp: 0 };
             book.set(t.sourceId, { atk: prev.atk + atk, hp: prev.hp + hp });
