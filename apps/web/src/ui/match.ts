@@ -299,7 +299,9 @@ function specialCards(ctx: Ctx, view: View): { key: string; how: string }[] {
     if (!hows.has(c.key)) note(c.key, tr("Token: only other cards bring it in", "Token: ได้จากการ์ดอื่นเท่านั้น"));
   }
   const order = [...out.map((o) => o.key), ...[...hows.keys()].filter((k) => !out.some((o) => o.key === k))];
-  return order.map((key) => ({ key, how: (hows.get(key) ?? []).join(" · ") }));
+  // A form many cards lead to (every Zeztz form has the same Final Form) names two and counts the rest.
+  const line = (list: string[]): string => (list.length > 3 ? `${list.slice(0, 2).join(" · ")} · ${tr(`and ${list.length - 2} more`, `และอีก ${list.length - 2} ใบ`)}` : list.join(" · "));
+  return order.map((key) => ({ key, how: line(hows.get(key) ?? []) }));
 }
 
 /** Every shop card this match can offer, by rank: only this match's factions, plus neutrals. */

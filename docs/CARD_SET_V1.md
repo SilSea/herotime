@@ -1,11 +1,11 @@
 # ชุดการ์ด v1 (ร่างแรก รอผู้ใช้ตรวจ)
 
 ร่างการ์ดของทั้ง 7 เผ่า ตามแนวใน `FACTIONS.md` และเรื่องที่กำหนด **ยังไม่ได้ใส่ลง draft** ผู้ใช้จะตรวจและปรับก่อน
-ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider มีพระเอกและ**ไรเดอร์ฝ่ายร้าย** (ไม่มีสัตว์ประหลาด) · Sentai มีแต่ฝ่ายเรนเจอร์
+ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider มีพระเอกและ**ไรเดอร์ฝ่ายร้าย** (ไม่มีสัตว์ประหลาด) ขายเป็นร่างคนแล้ว Henshin เป็นไรเดอร์ · Sentai มีแต่ฝ่ายเรนเจอร์
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
-| Rider | Kamen Rider ZEZTZ | 14 (พระเอก 9 + ไรเดอร์ฝ่ายร้าย 5) | 14 | 12 |
+| Rider | Kamen Rider ZEZTZ | 14 (ร่างคน + ผู้ช่วย, รวมฝ่ายร้าย 5) | 24 | 12 |
 | Sentai | Ohsama Sentai King-Ohger | 15 | 1 | 1 + Giant 5 |
 | Mecha | Genesis of Aquarion | 14 | 4 | 2 |
 | Kaiju | Godzilla | 14 | 5 | 0 |
@@ -24,40 +24,61 @@
 
 ## 1. Rider — Kamen Rider ZEZTZ
 
-**แนว**: Zeztz ตัวเดียวสะสมพลัง แล้วใช้ **Capsem** (Gear) เปลี่ยนร่างไปมา บัฟติดตัวไปทุกร่าง แล้วไปจบที่ **Final Form: Zeztz Exdream**
+**แนว**: ในร้านขาย**ร่างคน** ซึ่ง Henshin เป็นร่างไรเดอร์ตอนจบเทิร์น (ร่างไรเดอร์เป็น token ไม่ขายในร้าน) · Zeztz ใช้ **Capsem** (Gear) เปลี่ยนร่างไปมา บัฟติดไปทุกร่าง · Henshin ทุกครั้งเติม **Rider Gauge** ครบ 3 ได้ Exdreamrise Capsem → **Final Form: Zeztz Exdream**
 
-**การ์ดในร้าน**
+> ชุดนี้ทดสอบแล้ว (ดู "ผลทดสอบ" ท้ายหัวข้อ) ข้อมูลการ์ดที่ใช้ทดสอบเป็น JSON อยู่ที่ `docs/sets/zeztz-rider.json` (`cards` + `riderGauge`) คัดลอกแต่ละใบไปวางในแท็บ JSON ของการ์ดใน Admin ได้
+
+**การ์ดในร้าน: ร่างคนและผู้ช่วย** (14 ใบ · ร่างคนมีค่าพลังน้อย เพราะแปลงร่างก่อนเข้าสู้)
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
-| 1 | `zeztz` | Kamen Rider Zeztz (Physicam Impact) | 2/3 | — · Final Form → `zeztz_exdream` | Baku Yorozu ร่างพื้นฐาน (พละกำลัง) |
+| 1 | `baku_yorozu` | Baku Yorozu | 1/2 | Henshin (1) → Kamen Rider Zeztz | ตัวเอก |
+| 1 | `kensei_odaka` | Kensei Odaka | 1/2 | Henshin (1) → Nox Knight | ใช้ Knight Invoker แล้วต่อด้วย Nox Driver |
 | 1 | `nem` | Nem | 1/2 | Deploy: ให้ Zeztz (ทุกร่าง) +1/+1 ถาวร | คนดังที่เป็นครอบครัวบุญธรรมของ Baku |
 | 1 | `nasuka` | Nasuka Nagumo | 1/1 | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | นักสืบ |
-| 2 | `nox_knight` | Nox Knight | 3/3 | Henshin (2) → Kamen Rider Nox | Kensei Odaka ใช้ Knight Invoker |
-| 2 | `lord_five` | Lord Five (Knuckle Mode) | 2/4 *(Rider Kick)* | — | CODE 5 ฝ่ายเดียวกัน, Knuckle Mode |
-| 2 | `lord_six` | Lord Six (Shoot Mode) | 3/2 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (ทำงาน 2 ครั้ง) | Kureha Miyamoto CODE 6, Shoot Mode |
-| 3 | `knight_seventeen` | Knight Seventeen | 3/4 | Deploy: ให้ Zeztz (ทุกร่าง) ได้ Barrier | Minami Yorozu CODE 17 |
-| 3 | `eight` | Eight | 2/4 | Deploy: เสริมพลัง Gear +1/+1 จนจบเกม | CODE 8 เข้าร่วมทีม ZEZTZ |
+| 2 | `five` | Five | 2/2 | Henshin (1) → Lord Five | CODE 5 |
+| 2 | `kureha_miyamoto` | Kureha Miyamoto | 2/2 | Henshin (1) → Lord Six | CODE 6 |
+| 2 | `thirteen` | Thirteen *(ฝ่ายร้าย)* | 2/2 | Henshin (1) → Lord Thirteen | CODE ที่หลงเหลือ |
+| 3 | `minami_yorozu` | Minami Yorozu | 2/3 | Henshin (1) → Knight Seventeen · เมื่อแปลงร่าง: ให้ Zeztz (ทุกร่าง) ได้ Barrier | CODE 17 |
+| 3 | `eight` | Eight | 2/4 | Deploy: เสริมพลัง Gear +1/+1 จนจบเกม | CODE 8 |
 | 3 | `fujimi` | Tetsuya Fujimi | 3/3 | Deploy: Rider Gauge +1 | ผู้บัญชาการตำรวจ |
+| 3 | `sieg` | Sieg *(ฝ่ายร้าย)* | 2/3 | Henshin (1) → Kamen Rider Dawn | ผู้ก่อการร้ายในความฝัน |
+| 4 | `three` | Three *(ฝ่ายร้าย)* | 3/4 | Henshin (1) → Lord Three · เมื่อแปลงร่าง: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 |
+| 5 | `the_lady` | The Lady *(ฝ่ายร้าย)* | 4/5 | Henshin (1) → Lord Two | CODE 2 |
+| 6 | `shuma_kumon` | Shuma Kumon *(ฝ่ายร้าย)* | 4/5 | Henshin (1) → Kamen Rider Mugen | ใช้ Mugen Driver |
 
-**ร่างของ Zeztz** (token ทั้งหมด, ทุกร่างตั้ง Final Form → `zeztz_exdream` ให้ใช้การ์ด Final Form ได้จากทุกร่าง)
-| key | ร่าง | ATK/HP | ความสามารถ | อ้างอิง |
-|---|---|---|---|---|
-| `zeztz_wing` | Physicam Wing | 4/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) | ปีกค้างคาว ยิงพลังรูปใบมีด |
-| `zeztz_transform` | Physicam Transform | 3/5 | เมื่อโจมตี: ตัวนี้ +2/+0 (จนจบการสู้) | แขนขาเปลี่ยนรูปได้ |
-| `zeztz_stream` | Technolom Stream | 3/4 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว | ควบคุมลมและน้ำ |
-| `zeztz_machinery` | Technolom Machinery | 4/4 *(Rider Kick)* | — | ถุงมือกรงเล็บ ตะขอเกี่ยว |
-| `zeztz_projection` | Technolom Projection | 3/3 | เริ่มการต่อสู้: เรียกสำเนาของตัวนี้ (การ์ดพื้นฐาน) | สร้างร่างแยก |
-| `zeztz_recovery` | Esprim Recovery | 2/6 | เมื่อโดนดาเมจแล้วยังรอด: ให้พวกเราตัวอื่นแบบสุ่ม +0/+2 | ซ่อมแซม รักษา |
-| `zeztz_barrier` | Esprim Barrier | 3/5 *(Barrier, Guard)* | — | สนามพลัง |
-| `zeztz_wonder` | Paradigm Wonder | 3/3 | เริ่มการต่อสู้: ตัวนี้ +3/+3 (จนจบการสู้) | ย่อ/ขยายขนาด |
-| `zeztz_gravity` | Paradigm Gravity | 4/5 | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด | ถุงมือควบคุมแรงโน้มถ่วง |
-| `zeztz_plasma` | Inazuma Plasma | 5/4 *(Rapid)* | — | สายฟ้า + ความเร็ว (ร่างอัปเกรด) |
-| `zeztz_booster` | Plasma Booster | 6/5 *(Rapid, Rider Kick)* | — | Plasma วิ่งเร็วขึ้นอีก |
-| `zeztz_exdream` | **Kamen Rider Zeztz Exdream** (Final Form) | 10/10 *(Rider Kick, Barrier)* | เริ่มการต่อสู้: ให้พวกเราตัวอื่นทุกตัว +2/+2 (จนจบการสู้) | ร่างสุดท้าย รวมพลัง Capsem ก่อนหน้า |
-| `nox` | Kamen Rider Nox | 5/5 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว · Final Form → `nox_midnight` | Nox Driver, ควบคุมเงา |
-| `nox_midnight` | Nox Midnight Shadow (Final Form) | 9/8 *(Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูทุกตัว | แสง + เงา + ภาพลวง |
+**ร่างไรเดอร์** (token ทั้งหมด)
+| key | ร่าง | ATK/HP | ความสามารถ |
+|---|---|---|---|
+| `zeztz` | Kamen Rider Zeztz (Physicam Impact) | 3/4 | — · Final Form → Zeztz Exdream |
+| `nox_knight` | Nox Knight | 3/3 | Henshin (2) → Kamen Rider Nox |
+| `nox` | Kamen Rider Nox | 5/5 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว · Final Form → Nox Midnight Shadow |
+| `nox_midnight` | Nox Midnight Shadow (Final Form) | 9/8 *(Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูทุกตัว |
+| `lord_five` | Lord Five | 3/5 *(Rider Kick)* | — |
+| `lord_six` | Lord Six | 4/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) |
+| `knight_seventeen` | Knight Seventeen | 4/5 | — |
+| `lord_thirteen` | Lord Thirteen *(ฝ่ายร้าย)* | 4/3 *(Barrier)* | — |
+| `kamen_rider_dawn` | Kamen Rider Dawn *(ฝ่ายร้าย)* | 5/5 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร |
+| `lord_three` | Lord Three *(ฝ่ายร้าย)* | 6/5 *(Barrier)* | — |
+| `lord_two` | Lord Two *(ฝ่ายร้าย)* | 7/7 *(Rider Kick)* | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −1/−0 |
+| `kamen_rider_mugen` | Kamen Rider Mugen *(ฝ่ายร้าย)* | 9/9 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด |
 
-**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz และทุกร่าง · ทำ: แปลงร่างเป็น…)
+**ร่างของ Zeztz จาก Capsem** (token · ทุกร่างตั้ง Final Form → `zeztz_exdream`)
+| key | ร่าง | ATK/HP | ความสามารถ |
+|---|---|---|---|
+| `zeztz_wing` | Physicam Wing | 4/3 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม (2 ครั้ง) |
+| `zeztz_transform` | Physicam Transform | 3/5 | เมื่อโจมตี: ตัวนี้ +2/+0 (จนจบการสู้) |
+| `zeztz_stream` | Technolom Stream | 3/4 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว |
+| `zeztz_machinery` | Technolom Machinery | 4/4 *(Rider Kick)* | — |
+| `zeztz_projection` | Technolom Projection | 3/3 | เริ่มการต่อสู้: เรียกสำเนาของตัวนี้ (การ์ดพื้นฐาน) |
+| `zeztz_recovery` | Esprim Recovery | 2/6 | เมื่อโดนดาเมจแล้วยังรอด: ให้พวกเราตัวอื่นแบบสุ่ม +0/+2 |
+| `zeztz_barrier` | Esprim Barrier | 3/5 *(Barrier, Guard)* | — |
+| `zeztz_wonder` | Paradigm Wonder | 3/3 | เริ่มการต่อสู้: ตัวนี้ +3/+3 (จนจบการสู้) |
+| `zeztz_gravity` | Paradigm Gravity | 4/5 | เริ่มการต่อสู้: ทำดาเมจ 2 ใส่ศัตรูซ้ายสุด |
+| `zeztz_plasma` | Inazuma Plasma | 5/4 *(Rapid)* | — |
+| `zeztz_booster` | Plasma Booster | 6/5 *(Rapid, Rider Kick)* | — |
+| `zeztz_exdream` | **Kamen Rider Zeztz Exdream** (Final Form) | 10/10 *(Rider Kick, Barrier)* | เริ่มการต่อสู้: ให้พวกเราทุกตัว +2/+2 (จนจบการสู้) |
+
+**Capsem** (Gear เผ่า Rider · ใช้กับ: ยูนิตที่เลือก · เฉพาะการ์ด: Zeztz และทุกร่างในตารางบน · ทำ: แปลงร่างเป็น…)
 | R | key | Gear | ราคา | แปลงเป็น |
 |---|---|---|---|---|
 | 1 | `capsem_wing` | Wing Capsem | 1 | Physicam Wing |
@@ -71,22 +92,31 @@
 | 4 | `capsem_gravity` | Gravity Capsem | 4 | Paradigm Gravity |
 | 4 | `capsem_plasma` | Plasma Capsem | 4 | Inazuma Plasma |
 | 5 | `capsem_booster` | Booster Capsem | 3 | Plasma Booster · **เฉพาะการ์ด: Inazuma Plasma** |
-| — | `capsem_exdreamrise` | Exdreamrise Capsem (token, รางวัล Rider Gauge) | 0 | **เปลี่ยนเป็นร่าง Final Form** (`ULTIMATE_FORM`) · ใช้กับ Rider ที่เลือก |
+| — | `capsem_exdreamrise` | Exdreamrise Capsem (token) | 0 | **เปลี่ยนเป็นร่าง Final Form** · ใช้กับ: Rider ที่เลือก |
 
-**ไรเดอร์ฝ่ายร้าย** (เผ่า Rider · แผนรอง: ทำให้ศัตรูอ่อนแอก่อนสู้ และกำจัดศัตรูตัวสำคัญ)
-| R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
-|---|---|---|---|---|---|
-| 2 | `lord_thirteen` | Lord Thirteen | 3/2 *(Barrier)* | — | กลุ่ม CODE ที่หลงเหลือ ใช้ Clear Capsem (ล่องหน), Breakam Breaker โหมดดาบ |
-| 3 | `kamen_rider_dawn` | Kamen Rider Dawn | 4/4 *(Rider Kick)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Sieg ผู้ก่อการร้ายในความฝัน ใช้ Punish Capsem และดาบ Breakam Dawn |
-| 4 | `lord_three` | Lord Three | 5/4 *(Barrier)* | Deploy: ได้ Gear เผ่า Rider แบบสุ่มเข้ามือ | CODE 3 ผู้บริหารโหดเหี้ยม ใช้ Extra Capsem, Clear Capsem ล่องหน |
-| 5 | `lord_two` | Lord Two | 6/6 *(Rider Kick)* | เริ่มการต่อสู้: ให้ศัตรูทุกตัว −1/−0 (จนจบการสู้) | ร่าง Lord ของ The Lady (หนัง Farewell Mission), Breakam Breaker โหมดหมัด |
-| 6 | `kamen_rider_mugen` | Kamen Rider Mugen | 8/8 | เริ่มการต่อสู้: ทำลายศัตรูซ้ายสุด | Shuma Kumon ใช้ Daydream Capsem บิดเบือนความจริง ถือคาตานะ |
+**Rider Gauge**: ได้ +1 ทุกครั้งที่ Henshin · ทุกๆ 3 → ได้ Exdreamrise Capsem เข้ามือ (ตั้งในแท็บ Gauges)
 
 **หมายเหตุ Rider**
-- ตัวกรอง "เฉพาะการ์ด" นับร่างที่มาจาก Henshin / Final Form แต่**ไม่นับร่างที่มาจาก Capsem (TRANSFORM)** ดังนั้นต้องใส่ทุกร่างของ Zeztz ในตัวกรองของ Capsem, Nem และ Knight Seventeen
-- Rider Gauge: ตั้งรางวัลเป็น ADD_TO_HAND `capsem_exdreamrise` (เช่น ครบ 2 ครั้งต่อเกม)
-- ไม่ได้ใส่: สัตว์ประหลาด Nightmare / Gore Nightmare / The Lady (ร่างคน) ตามที่กำหนด, Lord Zero (มีแค่ในหนัง)
-- "−2/−0" กับศัตรู: ลดได้ต่ำสุด ATK 0 ไม่ทำให้ตาย และไม่ติดถาวร
+- Henshin (1) = ลงสนามแล้ว แปลงร่างตอนจบเทิร์นนั้นเลย จึงเข้าสู้เป็นร่างไรเดอร์ทันที ความสามารถ "เมื่อแปลงร่าง" ใส่ที่ร่างคน (Minami, Three)
+- ตัวกรอง "เฉพาะการ์ด" นับร่างจาก Henshin แต่**ไม่นับร่างจาก Capsem** ต้องใส่ทุกร่างของ Zeztz ในตัวกรองของ Capsem, Nem และ Minami
+- "−1/−0" ใส่ศัตรู: ลดได้ต่ำสุด ATK 0 ไม่ทำให้ตาย และไม่ติดถาวร
+- ไม่ได้ใส่: สัตว์ประหลาด Nightmare / Gore Nightmare (ตามที่กำหนด), Lord Zero (มีแค่ในหนัง)
+
+**ผลทดสอบ (2026-10-08)**
+- เล่นทีละขั้นผ่าน engine จริง ผ่าน 18/18 ข้อ:
+  - Baku แปลงร่างเป็น Zeztz และ Gauge +1
+  - Nem บัฟ Zeztz ได้
+  - Capsem เปลี่ยนร่างแล้วบัฟติดไป
+  - Booster Capsem ใช้ได้เฉพาะกับ Plasma
+  - Minami แปลงร่างแล้วให้ Barrier กับ Zeztz
+  - Henshin ครบ 3 ครั้งได้ Exdreamrise Capsem
+  - Final Form ยังมีบัฟและ Barrier เดิม
+  - Nox Knight รอ 2 เทิร์นแล้วเป็น Nox
+  - Three แปลงร่างแล้วได้ Gear
+  - Mugen ทำลายศัตรูซ้ายสุด และ Lord Two ลด ATK ศัตรู
+- บอทเล่น 150 เกม (server ทดสอบ, ชุด prototype + ชุดนี้): ไม่มี error · ร่างจาก Capsem และ Exdream เกิดในเกมจริง · Rider อันดับเฉลี่ย 4.66
+- เล่นในเบราว์เซอร์: Baku แปลงร่างเป็น Zeztz ในเกมจริง · หนังสือการ์ดแท็บ "ร่างแปลง & พิเศษ" แสดงทุกร่างพร้อมบอกที่มา
+- **ข้อสังเกตเรื่องสมดุล** (จาก Simulate, บอทใช้ Capsem น้อย): Mugen (2.0), Lord Two (2.3), Nox Midnight (2.3) แรง · Zeztz ร่างพื้นฐาน (6.3), Nem (6.7), Nasuka (7.3) อ่อน — ปรับหลังลองเล่นจริง
 
 ---
 
