@@ -47,6 +47,7 @@ prisma/schema.prisma · docker-compose.yml · docs/sets/*.json (ชุดกา�
 ## งานที่ยังไม่ทำ / ความเสี่ยง
 | เรื่อง | หมายเหตุ |
 |---|---|
+| 1 ซีรีส์ต่อเผ่าต่อเกม (ยูนิต, Gear, Hero, Relic) | ตัดสินใจแล้ว ยังไม่ทำ · ต้องมีก่อนเพิ่มซีรีส์ที่ 2 ดู [CARD_SET_V2.md](CARD_SET_V2.md) |
 | Redis scale หลาย instance | รอสั่ง |
 | Deploy cloud | ตอนนี้รัน local / LAN เท่านั้น |
 | Diff ระหว่างเวอร์ชันใน Admin | มี rollback แล้ว ยังไม่มี diff |
