@@ -5,7 +5,7 @@ import type { AuthResult, Intent, MatchView, PracticeOptions } from "./protocol.
 import { addToast, applyEvent, applyStatus, applyView, removeToast, Store } from "./store.js";
 import { adminHasFocus, renderAdmin, resetAdmin } from "./ui/admin.js";
 import { cardEl, KEYWORD_ICON_OF, triggerInfo } from "./ui/card.js";
-import { keywordName, keywordText, relatedCards } from "./format.js";
+import { grantedKeywords, keywordName, keywordText, relatedCards } from "./format.js";
 import { serverText, tr } from "./i18n.js";
 import { cardSound, hasUploaded, play, playMusic, setContentSounds, slotForIntent } from "./sound.js";
 import { langToggle, muteToggle } from "./ui/lang.js";
@@ -334,6 +334,10 @@ export function startApp(root: HTMLElement): void {
       ...(card.dataset.core ? [box("◈", "Gattai core", tr(`Put it leftmost of enough adjacent Gattai units and press Combine: the group becomes ${card.dataset.core} for good.`, `วางไว้ซ้ายสุดของยูนิต Gattai ที่ติดกันให้ครบจำนวน แล้วกด Combine ทั้งกลุ่มจะรวมเป็น ${card.dataset.core} ถาวร`))] : []),
       ...(card.dataset.ultimate ? [box("★", "Final Form", tr(`A Final Form card (Gear, or a Gauge reward) can turn this into ${card.dataset.ultimate}. It keeps its bonuses and keywords.`, `การ์ด Final Form (Gear หรือรางวัลจาก Gauge) เปลี่ยนการ์ดนี้เป็นร่าง Final Form ${card.dataset.ultimate} ได้ บัฟและ keyword เดิมติดไปด้วย`))] : []),
       ...kws.map((k) => box(KEYWORD_ICON_OF(k), keywordName(k, (card.dataset.factions ?? "").split(",")), keywordText(k))),
+      // keywords it gives (to itself or others), explained too unless it already has them
+      ...grantedKeywords(content?.card(card.dataset.key))
+        .filter((k) => !kws.includes(k))
+        .map((k) => box(KEYWORD_ICON_OF(k), `${tr("Gives", "ให้")} ${keywordName(k, (card.dataset.factions ?? "").split(","))}`, keywordText(k))),
     ];
     // The cards it brings in (summons, adds to hand, its forms...) or points at, so a player sees them before choosing.
     const ix = content;

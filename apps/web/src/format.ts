@@ -93,6 +93,13 @@ export const keywordText = (k: string): string => {
   return kw ? tr(kw.text, kw.textTh) : "";
 };
 
+/** Keywords a card hands out through its effects (GIVE_KEYWORD), in order, without repeats. */
+export function grantedKeywords(def: Pick<CardDef, "effects"> | undefined): string[] {
+  const out: string[] = [];
+  for (const e of def?.effects ?? []) for (const a of e.actions) if (a.type === "GIVE_KEYWORD" && !out.includes(a.keyword)) out.push(a.keyword);
+  return out;
+}
+
 /** A keyword's printed name. Power Strike is called Rider Kick on a card of the Rider faction. */
 export const keywordName = (k: string, factions?: readonly string[]): string =>
   k === "RIDER_KICK" && factions?.includes("rider") ? "Rider Kick" : (KEYWORDS[k]?.name ?? k);

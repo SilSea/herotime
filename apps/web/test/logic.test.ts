@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatClock, ServerClock } from "../src/clock.js";
 import { ContentIndex } from "../src/content-index.js";
-import { boardLabel, describeCombat, KEYWORDS, keywordName, ordinal, stars } from "../src/format.js";
+import { boardLabel, describeCombat, grantedKeywords, KEYWORDS, keywordName, ordinal, stars } from "../src/format.js";
 import type { CombatRecord, ContentSnapshot } from "../src/protocol.js";
 
 describe("ServerClock", () => {
@@ -264,5 +264,20 @@ describe("gearTargetSlots", async () => {
   });
   it("is null for gear that needs no unit", () => {
     expect(gearTargetSlots(def({ kind: "GEAR", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", actions: [{ type: "DISCOVER_UNIT", faction: "rider" }] }] }), board)).toBeNull();
+  });
+});
+
+describe("grantedKeywords", () => {
+  it("lists the keywords a card gives through its effects, once each, in order", () => {
+    const fx = (actions: unknown[]) => ({ scope: "UNIT", trigger: "ON_PLAY", actions });
+    const def = {
+      effects: [
+        fx([{ type: "GIVE_KEYWORD", keyword: "RAPID" }, { type: "BUFF", atk: 1, hp: 1 }]),
+        fx([{ type: "GIVE_KEYWORD", keyword: "GUARD" }, { type: "GIVE_KEYWORD", keyword: "RAPID" }]),
+      ],
+    } as never;
+    expect(grantedKeywords(def)).toEqual(["RAPID", "GUARD"]);
+    expect(grantedKeywords({ effects: [] } as never)).toEqual([]);
+    expect(grantedKeywords(undefined)).toEqual([]);
   });
 });
