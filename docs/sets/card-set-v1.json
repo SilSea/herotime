@@ -3,37 +3,51 @@
   {
    "key": "rider",
    "name": "Kamen Rider",
-   "color": "#F54927"
+   "color": "#F54927",
+   "text": "Fight against the organization and oppose its agenda of global domination or the extermination of humanity.\nPlaystyle: grow one Rider — Henshin over turns, Gear, then its Ultimate Form (Rider Gauge).",
+   "textTh": "ต่อสู้กับองค์กรชั่วร้ายและสัตว์ประหลาด เพื่อขัดขวางแผนการยึดครองโลกหรือการทำลายล้างมนุษย์\nแนวการเล่น: ปั้น Rider ตัวเดียวให้โต — Henshin ตามเทิร์น ใส่ Gear จนถึงร่าง Ultimate (Rider Gauge)"
   },
   {
    "key": "sentai",
    "name": "Super Sentai",
-   "color": "#0C04EC"
+   "color": "#0C04EC",
+   "text": "An international special forces unit or team of guardians working together to protect the world from catastrophic threats and alien civilizations.\nPlaystyle: a team of different colours — 3 colours trigger Roll Call, fill the Mecha Gauge and call a Giant Robo.",
+   "textTh": "กองกำลังรบพิเศษระดับสากลหรือกลุ่มผู้พิทักษ์ที่ทำงานเป็นทีม เพื่อปกป้องโลกจากการรุกรานของภัยพิบัติและอารยธรรมต่างดาว\nแนวการเล่น: ทีมหลายสี — ครบ 3 สีเกิด Roll Call เติม Mecha Gauge แล้วเรียก Giant Robo"
   },
   {
    "key": "mecha",
    "name": "Mecha",
-   "color": "#23CD2B"
+   "color": "#23CD2B",
+   "text": "A force of robots capable of combining to protect peace and tranquility.\nPlaystyle: line up Gattai parts, combine them into a big form, then keep upgrading it.",
+   "textTh": "กองกำลังหุ่นยนต์ที่สามารถรวมร่างเพื่อพิทักษ์สันติภาพและความสงบสุข\nแนวการเล่น: วางชิ้นส่วน Gattai ติดกัน รวมเป็นร่างใหญ่ แล้วอัปเกรดร่างต่อไปเรื่อยๆ"
   },
   {
    "key": "kaiju",
    "name": "Kaiju",
-   "color": "#B30FA2"
+   "color": "#B30FA2",
+   "text": "Monsters bent on destruction, possessing immense destructive power.\nPlaystyle: die and come back stronger — Last Stand, Kyodaika, Revive, Avenge, eating your own units.",
+   "textTh": "เหล่าสัตว์ประหลาดที่คอยจะจ้องทำลายล้างพลังทำลายล้างสูง\nแนวการเล่น: ตายแล้วกลับมาแรงกว่าเดิม — Last Stand, Kyodaika, Revive, Avenge และกินพวกตัวเองเพื่อพลัง"
   },
   {
    "key": "beast",
    "name": "Beast",
-   "color": "#ECE71D"
+   "color": "#ECE71D",
+   "text": "Unable to bear the oppression any longer, the creatures rose up to take revenge on their oppressors.\nPlaystyle: fill the board — every unit that enters gets stronger (Deploy, summons, ally summoned).",
+   "textTh": "เหล่าสรรพสัตว์ที่ทนไม่ไหวกับการกดขี่จึงออกมาแก้แค้นผู้ที่กดขี่มัน\nแนวการเล่น: ลงสนามเยอะ — ทุกตัวที่ลงสนามได้พลังเพิ่ม (Deploy, เรียกพวก, เมื่อเรียกยูนิตอื่นเข้าสนาม)"
   },
   {
    "key": "human",
    "name": "Human",
-   "color": "#18D8F2"
+   "color": "#18D8F2",
+   "text": "Humans who evolved to create a safe world for themselves, disregarding their surroundings.\nPlaystyle: training — hand out keywords (Guard, Barrier, Rapid, Lethal, Revive, Power Strike) to themselves and others; low stats of their own.",
+   "textTh": "เหล่ามนุษย์ที่พัฒนาเพื่อสร้างโลกที่ปลอดภัยเพื่อตัวเองโดยไม่สนสิ่งรอบข้าง\nแนวการเล่น: ฝึกฝน — แจก keyword (Guard, Barrier, Rapid, Lethal, Revive, Power Strike) ให้ตัวเองและพวกพ้อง แต่ค่าพลังตัวเองต่ำ"
   },
   {
    "key": "shonen",
    "name": "Shonen",
-   "color": "#DCA589"
+   "color": "#DCA589",
+   "text": "Characters from the world of anime\nPlaystyle: the more it is hit the stronger it gets — grows after surviving damage, avenges friends, one-time finishers.",
+   "textTh": "เหล่าตัวละครจากโลก Anime\nแนวการเล่น: ยิ่งโดนยิ่งแกร่ง — รอดจากดาเมจแล้วโตถาวร, แก้แค้นให้เพื่อน, ท่าไม้ตายครั้งเดียว"
   }
  ],
  "cards": [
@@ -3545,421 +3559,6 @@
    "series": "beastars"
   },
   {
-   "key": "street_vendor",
-   "name": "Street Vendor",
-   "rank": 1,
-   "atk": 1,
-   "hp": 3,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "GAIN_ENERGY",
-       "amount": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "intern_researcher",
-   "name": "Intern Researcher",
-   "rank": 1,
-   "atk": 2,
-   "hp": 2,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "RANDOM_CARD",
-       "cardKind": "GEAR"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "volunteer",
-   "name": "Volunteer",
-   "rank": 1,
-   "atk": 2,
-   "hp": 3,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_SELL",
-     "actions": [
-      {
-       "type": "GAIN_ENERGY",
-       "amount": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "shop_manager",
-   "name": "Shop Manager",
-   "rank": 2,
-   "atk": 2,
-   "hp": 3,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "BUFF_SHOP",
-       "atk": 1,
-       "hp": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "field_scout",
-   "name": "Field Scout",
-   "rank": 2,
-   "atk": 3,
-   "hp": 3,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "DISCOVER_UNIT"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "mechanic",
-   "name": "Mechanic",
-   "rank": 2,
-   "atk": 3,
-   "hp": 3,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "BUFF_GEAR",
-       "atk": 1,
-       "hp": 0
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "banker",
-   "name": "Banker",
-   "rank": 3,
-   "atk": 3,
-   "hp": 4,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_TURN_START",
-     "actions": [
-      {
-       "type": "GAIN_ENERGY",
-       "amount": 1
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "quartermaster",
-   "name": "Quartermaster",
-   "rank": 3,
-   "atk": 3,
-   "hp": 4,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "END_OF_TURN",
-     "actions": [
-      {
-       "type": "BUFF",
-       "atk": 2,
-       "hp": 2,
-       "permanent": false
-      }
-     ],
-     "target": {
-      "selector": "RANDOM_FRIENDLY"
-     },
-     "condition": {
-      "type": "ENERGY_GTE",
-      "value": 2
-     }
-    }
-   ]
-  },
-  {
-   "key": "recruiter",
-   "name": "Recruiter",
-   "rank": 3,
-   "atk": 3,
-   "hp": 3,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "RANDOM_CARD",
-       "cardKind": "UNIT"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "mayor",
-   "name": "Mayor",
-   "rank": 4,
-   "atk": 3,
-   "hp": 5,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "BUFF_SHOP",
-       "atk": 2,
-       "hp": 2
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "arms_dealer",
-   "name": "Arms Dealer",
-   "rank": 4,
-   "atk": 4,
-   "hp": 5,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "RANDOM_CARD",
-       "cardKind": "GEAR"
-      }
-     ],
-     "repeat": 2
-    }
-   ]
-  },
-  {
-   "key": "tycoon",
-   "name": "Tycoon",
-   "rank": 5,
-   "atk": 6,
-   "hp": 6,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "END_OF_TURN",
-     "actions": [
-      {
-       "type": "BUFF",
-       "atk": 1,
-       "hp": 1,
-       "permanent": false
-      }
-     ],
-     "target": {
-      "selector": "ALL_FRIENDLY"
-     },
-     "condition": {
-      "type": "ENERGY_GTE",
-      "value": 3
-     }
-    }
-   ]
-  },
-  {
-   "key": "defense_commander",
-   "name": "Defense Commander",
-   "rank": 5,
-   "atk": 5,
-   "hp": 6,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "BUFF",
-       "atk": 1,
-       "hp": 2,
-       "permanent": true
-      }
-     ],
-     "target": {
-      "selector": "ALL_FRIENDLY"
-     }
-    }
-   ]
-  },
-  {
-   "key": "president",
-   "name": "President",
-   "rank": 6,
-   "atk": 8,
-   "hp": 9,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "UNIT",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "GAIN_ENERGY",
-       "amount": 3
-      },
-      {
-       "type": "BUFF_SHOP",
-       "atk": 3,
-       "hp": 3
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "supply_crate",
-   "name": "Supply Crate",
-   "kind": "GEAR",
-   "rank": 1,
-   "atk": 0,
-   "hp": 1,
-   "cost": 1,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "PLAYER",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "GAIN_ENERGY",
-       "amount": 2
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "med_kit",
-   "name": "Med Kit",
-   "kind": "GEAR",
-   "rank": 2,
-   "atk": 0,
-   "hp": 1,
-   "cost": 2,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "PLAYER",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "BUFF",
-       "atk": 1,
-       "hp": 3,
-       "permanent": false
-      }
-     ],
-     "target": {
-      "selector": "CHOSEN_FRIENDLY"
-     }
-    }
-   ]
-  },
-  {
-   "key": "contract",
-   "name": "Contract",
-   "kind": "GEAR",
-   "rank": 3,
-   "atk": 0,
-   "hp": 1,
-   "cost": 2,
-   "factions": [
-    "human"
-   ],
-   "effects": [
-    {
-     "scope": "PLAYER",
-     "trigger": "ON_PLAY",
-     "actions": [
-      {
-       "type": "DISCOVER_UNIT"
-      }
-     ]
-    }
-   ]
-  },
-  {
    "key": "naruto",
    "name": "Naruto Uzumaki",
    "rank": 1,
@@ -4835,6 +4434,570 @@
     }
    ],
    "series": "naruto"
+  },
+  {
+   "key": "bank",
+   "name": "Bank",
+   "rank": 3,
+   "atk": 4,
+   "hp": 4,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "HENSHIN",
+     "target": {
+      "selector": "SELF"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "bank_the_gorilla"
+   }
+  },
+  {
+   "key": "bank_the_gorilla",
+   "name": "Bank The Gorilla",
+   "rank": 4,
+   "atk": 6,
+   "hp": 6,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "RAPID"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "jame_the_bully",
+   "name": "Jame The Bully",
+   "rank": 3,
+   "atk": 4,
+   "hp": 4,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "condition": {
+      "type": "HAS_CARD",
+      "cards": [
+       "bank",
+       "bank_the_gorilla"
+      ]
+     },
+     "target": {
+      "selector": "ADJACENT"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ],
+   "henshin": {
+    "afterTurns": 1,
+    "into": "jame_the_white_monkey"
+   }
+  },
+  {
+   "key": "jame_the_white_monkey",
+   "name": "Jame The White Monkey",
+   "rank": 5,
+   "atk": 5,
+   "hp": 5,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "GUARD"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "target": {
+      "selector": "ADJACENT",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "COPY",
+       "to": "BOARD",
+       "withBuffs": false
+      }
+     ]
+    }
+   ],
+   "token": true
+  },
+  {
+   "key": "tai_the_bully",
+   "name": "Tai The Bully",
+   "rank": 5,
+   "atk": 4,
+   "hp": 4,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "GUARD"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "condition": {
+      "type": "HAS_CARD",
+      "cards": [
+       "bank",
+       "bank_the_gorilla",
+       "jame_the_bully",
+       "jame_the_white_monkey"
+      ]
+     },
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 2,
+       "hp": 2,
+       "permanent": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "pleng_the_smiler",
+   "name": "Pleng The Smiler",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "DISCOVER_UNIT",
+       "faction": "human"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "earth_the_laugh",
+   "name": "Earth The Laugh",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "actions": [
+      {
+       "type": "RANDOM_CARD",
+       "cardKind": "GEAR",
+       "faction": "human"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "ja_the_broken_heart",
+   "name": "Ja The Broken Heart",
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "RAPID"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_SELL",
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "COPY",
+       "to": "HAND",
+       "withBuffs": false
+      }
+     ],
+     "repeat": 2
+    }
+   ]
+  },
+  {
+   "key": "ake_the_gay",
+   "name": "Ake The Gay",
+   "rank": 2,
+   "atk": 3,
+   "hp": 3,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "GUARD"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "LAST_STAND",
+     "condition": {
+      "type": "HAS_CARD",
+      "cards": [
+       "jame_the_bully",
+       "jame_the_white_monkey",
+       "tai_the_bully",
+       "ja_the_broken_heart"
+      ]
+     },
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     },
+     "actions": [
+      {
+       "type": "DAMAGE",
+       "amount": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bill_the_shrimp_bite_mic",
+   "name": "Bill The Shrimp Bite Mic",
+   "rank": 2,
+   "atk": 3,
+   "hp": 3,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "GUARD"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_TURN_START",
+     "actions": [
+      {
+       "type": "GAIN_ENERGY",
+       "amount": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "nip_the_fishing",
+   "name": "Nip The Fishing",
+   "rank": 2,
+   "atk": 3,
+   "hp": 3,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "condition": {
+      "type": "HAS_CARD",
+      "cards": [
+       "ja_the_broken_heart"
+      ]
+     },
+     "target": {
+      "selector": "SELF"
+     },
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "RIDER_KICK"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "ake_the_gay_master",
+   "name": "Ake The Gay Master",
+   "rank": 4,
+   "atk": 6,
+   "hp": 6,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "LETHAL",
+    "REVIVE"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_PLAY",
+     "condition": {
+      "type": "HAS_CARD",
+      "cards": [
+       "jame_the_bully",
+       "jame_the_white_monkey",
+       "tai_the_bully",
+       "ja_the_broken_heart"
+      ]
+     },
+     "target": {
+      "selector": "CHOSEN_FRIENDLY"
+     },
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "LETHAL"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "kachen_the_weak_element",
+   "name": "Kachen The Weak Element",
+   "rank": 4,
+   "atk": 1,
+   "hp": 1,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "BARRIER",
+    "REVIVE"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "AFTER_DAMAGED",
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "aum_the_bully",
+   "name": "Aum The Bully",
+   "rank": 5,
+   "atk": 7,
+   "hp": 7,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "LEGACY"
+   ],
+   "effects": []
+  },
+  {
+   "key": "captain_jame",
+   "name": "Captain Jame",
+   "rank": 6,
+   "atk": 8,
+   "hp": 8,
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "keywords": [
+    "RIDER_KICK"
+   ],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "friendship_bracelet",
+   "name": "Friendship Bracelet",
+   "rank": 1,
+   "atk": 1,
+   "hp": 1,
+   "kind": "GEAR",
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ],
+   "cost": 1
+  },
+  {
+   "key": "santa_bank",
+   "name": "Santa Bank",
+   "rank": 4,
+   "atk": 1,
+   "hp": 1,
+   "kind": "GEAR",
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "CHOSEN_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "GIVE_KEYWORD",
+       "keyword": "BARRIER"
+      },
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ],
+   "cost": 3
+  },
+  {
+   "key": "group_photo",
+   "name": "Group Photo",
+   "rank": 5,
+   "atk": 1,
+   "hp": 1,
+   "kind": "GEAR",
+   "series": "friends",
+   "factions": [
+    "human"
+   ],
+   "effects": [
+    {
+     "scope": "PLAYER",
+     "trigger": "ON_PLAY",
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "human"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": true
+      }
+     ]
+    }
+   ],
+   "cost": 4
   }
  ],
  "series": [
@@ -4885,6 +5048,12 @@
    "universe": "anime",
    "franchise": "naruto",
    "text": "นินจาแห่งหมู่บ้านโคโนฮะ Naruto Uzumaki เด็กที่มีจิ้งจอกเก้าหางสถิตอยู่ในร่าง มุ่งมั่นจะเป็นโฮคาเงะ พร้อมเพื่อนร่วมทีมและอาจารย์ที่ร่วมฝ่าฟันศึกนินจา"
+  },
+  {
+   "key": "friends",
+   "name": "Friends",
+   "text": "เหล่าเพื่อนๆ",
+   "bonds": []
   }
  ],
  "gauges": [
@@ -5511,6 +5680,7 @@
    "key": "h_merchant",
    "name": "Guild Merchant",
    "armor": 0,
+   "enabled": false,
    "power": {
     "mode": "PASSIVE",
     "cost": 0,
@@ -5531,70 +5701,73 @@
    }
   },
   {
-   "key": "h_mayor",
-   "name": "City Mayor",
+   "key": "captain_jame",
+   "name": "Captain Jame",
    "armor": 0,
+   "series": "friends",
    "power": {
     "mode": "ACTIVE",
-    "cost": 2,
+    "cost": 3,
     "effects": [
      {
       "scope": "PLAYER",
       "trigger": "ON_USE",
-      "actions": [
-       {
-        "type": "BUFF_SHOP",
-        "atk": 1,
-        "hp": 0
-       }
-      ]
-     }
-    ]
-   }
-  },
-  {
-   "key": "h_banker",
-   "name": "Central Banker",
-   "armor": 0,
-   "power": {
-    "mode": "ONCE",
-    "cost": 0,
-    "effects": [
-     {
-      "scope": "PLAYER",
-      "trigger": "ON_USE",
-      "actions": [
-       {
-        "type": "GAIN_ENERGY",
-        "amount": 3
-       }
-      ]
-     }
-    ]
-   }
-  },
-  {
-   "key": "h_general",
-   "name": "Defense General",
-   "armor": 5,
-   "power": {
-    "mode": "ACTIVE",
-    "cost": 2,
-    "effects": [
-     {
-      "scope": "PLAYER",
-      "trigger": "ON_USE",
+      "target": {
+       "selector": "ALL_FRIENDLY"
+      },
       "actions": [
        {
         "type": "BUFF",
-        "atk": 0,
+        "atk": 1,
         "hp": 1,
         "permanent": true
        }
-      ],
-      "target": {
-       "selector": "ALL_FRIENDLY"
-      }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "nut_the_older_of_babylon",
+   "name": "Nut The Older Of Babylon",
+   "armor": 0,
+   "series": "friends",
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 2,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "DISCOVER_UNIT",
+        "faction": "human"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "ja_the_broken_heart",
+   "name": "Ja The Broken Heart",
+   "armor": 5,
+   "series": "friends",
+   "power": {
+    "mode": "ACTIVE",
+    "cost": 1,
+    "effects": [
+     {
+      "scope": "PLAYER",
+      "trigger": "ON_USE",
+      "actions": [
+       {
+        "type": "RANDOM_CARD",
+        "cardKind": "GEAR",
+        "faction": "human"
+       }
+      ]
      }
     ]
    }
@@ -6123,8 +6296,8 @@
    "series": "beastars"
   },
   {
-   "key": "rl_savings_bond",
-   "name": "Savings Bond",
+   "key": "saving_friends",
+   "name": "Savings Friends",
    "tier": "LESSER",
    "cost": 0,
    "factions": [
@@ -6134,11 +6307,14 @@
    "effects": [
     {
      "scope": "PLAYER",
-     "trigger": "ON_TURN_START",
+     "trigger": "START_OF_COMBAT",
+     "target": {
+      "selector": "RANDOM_FRIENDLY"
+     },
      "actions": [
       {
-       "type": "GAIN_ENERGY",
-       "amount": 1
+       "type": "GIVE_KEYWORD",
+       "keyword": "BARRIER"
       }
      ]
     }
@@ -6156,34 +6332,11 @@
    "effects": [
     {
      "scope": "PLAYER",
-     "trigger": "ON_ACQUIRE",
+     "trigger": "ON_TURN_START",
      "actions": [
       {
        "type": "GAIN_ENERGY",
-       "amount": 4
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "key": "rl_city_grant",
-   "name": "City Grant",
-   "tier": "GREATER",
-   "cost": 3,
-   "factions": [
-    "human"
-   ],
-   "weight": 100,
-   "effects": [
-    {
-     "scope": "PLAYER",
-     "trigger": "ON_ACQUIRE",
-     "actions": [
-      {
-       "type": "BUFF_SHOP",
-       "atk": 2,
-       "hp": 2
+       "amount": 2
       }
      ]
     }

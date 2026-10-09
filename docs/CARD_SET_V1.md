@@ -1,6 +1,6 @@
 # ชุดการ์ด v1
 
-ชุดการ์ดที่ใช้อยู่ (**version 2** · ล้างประวัติเวอร์ชันเก่าแล้วเริ่มนับใหม่ 2026-10-09) · 7 เผ่าตามแนวใน `FACTIONS.md` · Human ปิดอยู่ · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
+ชุดการ์ดที่ใช้อยู่ (**version 3** · ล้างประวัติเวอร์ชันเก่าแล้วเริ่มนับใหม่ 2026-10-09) · 7 เผ่าตามแนวใน `FACTIONS.md` · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
@@ -9,10 +9,10 @@
 | Mecha | Genesis of Aquarion | 14 | 4 | 3 |
 | Kaiju | Godzilla | 14 | 5 | 3 |
 | Beast | Beastars | 15 | 3 | 3 |
-| Human | ออกแบบเอง (ไม่มีเรื่อง) | 14 | 0 | 3 |
+| Human | Friends (ออกแบบเอง) | 13 | 2 | 3 |
 | Shonen | Naruto | 14 | 2 | 3 |
 
-**ซีรีส์** (ช่อง `series` ของการ์ดและ Relic): Rider → `zeztz` · Sentai → `king_ohger` · Mecha → `aquarion` · Kaiju → `godzilla` (Mechagodzilla ด้วย) · Beast → `beastars` · Shonen → `naruto` · Human และการ์ด Final Form กลางไม่มีซีรีส์ · ยังไม่มี Series Bond (โบนัสเมื่อมีการ์ดซีรีส์เดียวกันครบ N ใบ)
+**ซีรีส์** (ช่อง `series` ของการ์ดและ Relic): Rider → `zeztz` · Sentai → `king_ohger` · Mecha → `aquarion` · Kaiju → `godzilla` (Mechagodzilla ด้วย) · Beast → `beastars` · Shonen → `naruto` · Human → `friends` · การ์ด Final Form กลางไม่มีซีรีส์ · ยังไม่มี Series Bond (โบนัสเมื่อมีการ์ดซีรีส์เดียวกันครบ N ใบ)
 
 **วิธีอ่าน**
 - `R` = Rank · `ATK/HP` · keyword ตัวเอียงในวงเล็บ เช่น *(Guard)*
@@ -268,33 +268,34 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 
 ---
 
-## 6. Human — ออกแบบเอง (เศรษฐกิจ)
+## 6. Human — Friends (ออกแบบเอง)
 
-**แนว**: ไม่มีเรื่องอ้างอิง เป็นคนธรรมดาในโลกเกม (กองกำลังป้องกัน, พ่อค้า, นักวิจัย) ได้ Energy การ์ด Gear และร้านแรงขึ้น ค่าพลังต่ำกว่าเกณฑ์ประมาณ 1 แต้ม
+**แนว**: กลุ่มเพื่อนที่ผู้ใช้ออกแบบเอง (version 3) · แจก keyword ให้ตัวเองและพวกพ้อง, Last Stand ที่ได้การ์ด, Henshin เร็ว (1 เทิร์น) · หลายใบแรงขึ้นเมื่อมีเพื่อนบางคนบนบอร์ด (เงื่อนไข `HAS_CARD`)
 
-| R | key | การ์ด | ATK/HP | ความสามารถ |
+| R | key | การ์ด | ATK/HP | ความสามารถ (ข้อความในเกม) |
 |---|---|---|---|---|
-| 1 | `street_vendor` | Street Vendor | 1/3 | Deploy: ได้ 1 Energy |
-| 1 | `intern_researcher` | Intern Researcher | 2/2 | Deploy: ได้ Gear แบบสุ่มเข้ามือ |
-| 1 | `volunteer` | Volunteer | 2/3 | เมื่อถูกขาย: ได้ 1 Energy |
-| 2 | `shop_manager` | Shop Manager | 2/3 | Deploy: ยูนิตในร้านได้ +1/+1 จนจบเกม |
-| 2 | `field_scout` | Field Scout | 3/3 | Deploy: เลือกรับยูนิต 1 จาก 3 |
-| 2 | `mechanic` | Mechanic | 3/3 | Deploy: เสริมพลัง Gear +1/+0 จนจบเกม |
-| 3 | `banker` | Banker | 3/4 | ต้นทุกเทิร์น: ได้ 1 Energy |
-| 3 | `quartermaster` | Quartermaster | 3/4 | จบเทิร์น: ถ้ามี Energy เหลือ ≥ 2 ให้พวกเราตัวอื่นแบบสุ่ม +2/+2 |
-| 3 | `recruiter` | Recruiter | 3/3 | Deploy: ได้ยูนิตแบบสุ่มเข้ามือ |
-| 4 | `mayor` | Mayor | 3/5 | Deploy: ยูนิตในร้านได้ +2/+2 จนจบเกม |
-| 4 | `arms_dealer` | Arms Dealer | 4/5 | Deploy: ได้ Gear แบบสุ่มเข้ามือ (2 ครั้ง) |
-| 5 | `tycoon` | Tycoon | 6/6 | จบเทิร์น: ถ้ามี Energy เหลือ ≥ 3 ให้พวกเราทุกตัว +1/+1 |
-| 5 | `defense_commander` | Defense Commander | 5/6 | Deploy: ให้พวกเราทุกตัว +1/+2 ถาวร |
-| 6 | `president` | President | 8/9 | Deploy: ได้ 3 Energy และยูนิตในร้านได้ +3/+3 จนจบเกม |
+| 1 | `pleng_the_smiler` | Pleng The Smiler | 2/2 | Last Stand: เลือกรับยูนิต Human 1 จาก 3 ในเทิร์นหน้า |
+| 1 | `earth_the_laugh` | Earth The Laugh | 2/2 | Last Stand: ได้ Gear Human แบบสุ่มเข้ามือ ในเทิร์นหน้า |
+| 1 | `ja_the_broken_heart` | Ja The Broken Heart | 2/2 *(Rapid)* | เมื่อถูกขาย: ได้สำเนาของยูนิต Human อื่นแบบสุ่ม 1 ตัวเข้ามือ (2 ครั้ง) |
+| 2 | `ake_the_gay` | Ake The Gay | 3/3 *(Guard)* | Last Stand: ถ้ามี Jame The Bully / Jame The White Monkey / Tai The Bully / Ja The Broken Heart ทำดาเมจ 2 ใส่ศัตรูแบบสุ่ม 1 ตัว |
+| 2 | `bill_the_shrimp_bite_mic` | Bill The Shrimp Bite Mic | 3/3 *(Guard)* | ต้นทุกเทิร์น: ได้ 1 Energy |
+| 2 | `nip_the_fishing` | Nip The Fishing | 3/3 | Deploy: ถ้ามี Ja The Broken Heart ให้ตัวนี้ได้ Power Strike |
+| 3 | `bank` | Bank | 4/4 | Henshin (1): แปลงร่างเป็น Bank The Gorilla · เมื่อแปลงร่าง: ตัวนี้ +1/+1 ถาวร |
+| 3 | `jame_the_bully` | Jame The Bully | 4/4 | Henshin (1): แปลงร่างเป็น Jame The White Monkey · Deploy: ถ้ามี Bank / Bank The Gorilla ให้ยูนิตข้างๆ +1/+1 ถาวร |
+| 4 | `ake_the_gay_master` | Ake The Gay Master | 6/6 *(Lethal, Revive)* | Deploy: ถ้ามี Jame The Bully / Jame The White Monkey / Tai The Bully / Ja The Broken Heart ให้พันธมิตรที่เลือกได้ Lethal (ยูนิตเลือกเป้าไม่ได้ = ตัวซ้ายสุด) |
+| 4 | `kachen_the_weak_element` | Kachen The Weak Element | 1/1 *(Barrier, Revive)* | เมื่อโดนดาเมจแล้วยังรอด: ให้ยูนิต Human อื่นแบบสุ่ม 1 ตัว +1/+1 ถาวร |
+| 5 | `tai_the_bully` | Tai The Bully | 4/4 *(Guard)* | เริ่มการต่อสู้: ถ้ามี Bank / Bank The Gorilla / Jame The Bully / Jame The White Monkey ให้ยูนิต Human อื่นแบบสุ่ม 1 ตัว +2/+2 ถาวร |
+| 5 | `aum_the_bully` | Aum The Bully | 7/7 *(Legacy)* | Legacy: Last Stand ของยูนิตอื่นฝ่ายเราทำงาน 2 ครั้ง |
+| 6 | `captain_jame` | Captain Jame | 8/8 *(Power Strike)* | เริ่มการต่อสู้: ให้ยูนิต Human ทุกตัว +1/+1 |
+
+**ร่าง (Token)**: `bank_the_gorilla` Bank The Gorilla R4 6/6 *(Rapid)* — เริ่มการต่อสู้: ตัวนี้ +1/+1 ถาวร · `jame_the_white_monkey` Jame The White Monkey R5 5/5 *(Guard)* — Last Stand: เรียกสำเนาของยูนิตที่อยู่ข้างๆ
 
 **Gear**
 | R | key | Gear | ราคา | ความสามารถ |
 |---|---|---|---|---|
-| 1 | `supply_crate` | Supply Crate | 1 | ได้ 2 Energy (ได้คืนสุทธิ 1) |
-| 2 | `med_kit` | Med Kit | 2 | ใช้กับยูนิตที่เลือก: +1/+3 |
-| 3 | `contract` | Contract | 2 | เลือกรับยูนิต 1 จาก 3 |
+| 1 | `friendship_bracelet` | Friendship Bracelet | 1 | ใช้กับ Human ที่เลือก: +1/+1 ถาวร |
+| 4 | `santa_bank` | Santa Bank | 3 | ใช้กับ Human ที่เลือก: ได้ Barrier และ +1/+1 ถาวร |
+| 5 | `group_photo` | Group Photo | 4 | Human ทุกตัว +1/+1 ถาวร |
 
 ---
 
@@ -340,7 +341,7 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 
 ## Hero (เผ่าละ 4 ตัว)
 
-คอลัมน์พลังเป็นข้อความภาษาไทยที่ผู้เล่นเห็นในเกม (ระบบสร้างจาก effect) · **Hero Power (N Energy, เทิร์นละครั้ง)** = กดใช้ได้เทิร์นละครั้ง ราคา N · **ครั้งเดียวต่อเกม** = ใช้ได้ครั้งเดียว · **Passive** = ทำงานเอง · Armor = เลือดเสริม · ซีรีส์ของ Hero = ซีรีส์ของเผ่านั้น (Human ไม่มี)
+คอลัมน์พลังเป็นข้อความภาษาไทยที่ผู้เล่นเห็นในเกม (ระบบสร้างจาก effect) · **Hero Power (N Energy, เทิร์นละครั้ง)** = กดใช้ได้เทิร์นละครั้ง ราคา N · **ครั้งเดียวต่อเกม** = ใช้ได้ครั้งเดียว · **Passive** = ทำงานเอง · Armor = เลือดเสริม · ซีรีส์ของ Hero = ซีรีส์ของเผ่านั้น
 
 | เผ่า | key | Hero | Armor | พลัง (ข้อความในเกม) | อ้างอิง |
 |---|---|---|---|---|---|
@@ -364,10 +365,10 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 | Beast | `h_haru` | Haru | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Beast แบบสุ่ม 1 ตัว +1/+2 ถาวร | กระต่ายขาว |
 | Beast | `h_louis` | Louis | 0 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): เรียก Shishigumi Lion 2 ตัว | หัวหน้ากลุ่มสิงโต |
 | Beast | `h_gohin` | Gohin | 5 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้ยูนิต Beast แบบสุ่ม 1 ตัวได้ Guard | หมอใต้ดิน |
-| Human | `h_merchant` | Guild Merchant | 0 | Passive: Refresh ฟรี 2 ครั้งต่อเทิร์น | ออกแบบเอง |
-| Human | `h_mayor` | City Mayor | 0 | Hero Power (2 Energy, เทิร์นละครั้ง): ยูนิตในร้านได้ +1/+0 จนจบเกม | ออกแบบเอง |
-| Human | `h_banker` | Central Banker | 0 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): ได้ 3 Energy | ออกแบบเอง |
-| Human | `h_general` | Defense General | 5 | Hero Power (2 Energy, เทิร์นละครั้ง): ให้พันธมิตรทุกตัว +0/+1 ถาวร | ออกแบบเอง |
+| Human | `captain_jame` | Captain Jame | 0 | Hero Power (3 Energy, เทิร์นละครั้ง): ให้พันธมิตรทุกตัว +1/+1 ถาวร | Friends |
+| Human | `nut_the_older_of_babylon` | Nut The Older Of Babylon | 0 | Hero Power (2 Energy, เทิร์นละครั้ง): เลือกรับยูนิต Human 1 จาก 3 | Friends |
+| Human | `ja_the_broken_heart` | Ja The Broken Heart | 5 | Hero Power (1 Energy, เทิร์นละครั้ง): ได้ Gear Human แบบสุ่มเข้ามือ | Friends |
+| Human | `h_merchant` | Guild Merchant | 0 | Passive: Refresh ฟรี 2 ครั้งต่อเทิร์น · **ปิดอยู่** | ออกแบบเอง |
 | Shonen | `h_minato` | Minato Namikaze | 0 | Hero Power (1 Energy, เทิร์นละครั้ง): ให้พันธมิตรซ้ายสุด +1/+0 ถาวร | โฮคาเงะรุ่นที่ 4 |
 | Shonen | `h_hiruzen` | Hiruzen Sarutobi | 0 | Passive: ต้นทุกเทิร์น: ให้ยูนิต Shonen แบบสุ่ม 1 ตัว +1/+1 ถาวร | โฮคาเงะรุ่นที่ 3 |
 | Shonen | `h_iruka` | Iruka Umino | 3 | Hero Power (0 Energy, ครั้งเดียวต่อเกม): เลือกรับยูนิต Shonen 1 จาก 3 | ครูของ Naruto |
@@ -394,9 +395,8 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 | Beast | `rl_drama_club` | Cherryton Drama Club | Lesser | 1 | เริ่มการต่อสู้: ให้ยูนิต Beast ทุกตัว +1/+0 |
 | Beast | `rl_black_market` | Black Market | Lesser | 2 | เมื่อได้รับ: เลือกรับยูนิต Beast 1 จาก 3 |
 | Beast | `rl_beastar` | Beastar Title | Greater | 4 | เริ่มการต่อสู้: ให้ยูนิต Beast ทุกตัว +2/+2 |
-| Human | `rl_savings_bond` | Savings Bond | Lesser | 0 | ต้นทุกเทิร์น: ได้ 1 Energy |
-| Human | `rl_coupon_book` | Coupon Book | Lesser | 0 | เมื่อได้รับ: ได้ 4 Energy |
-| Human | `rl_city_grant` | City Grant | Greater | 3 | เมื่อได้รับ: ยูนิตในร้านได้ +2/+2 จนจบเกม |
+| Human | `saving_friends` | Savings Friends | Lesser | 0 | เริ่มการต่อสู้: ให้พันธมิตรแบบสุ่ม 1 ตัวได้ Barrier |
+| Human | `rl_coupon_book` | Coupon Book | Lesser | 0 | ต้นทุกเทิร์น: ได้ 2 Energy |
 | Shonen | `rl_leaf_headband` | Leaf Headband | Lesser | 1 | เริ่มการต่อสู้: ให้ยูนิต Shonen ทุกตัว +0/+2 |
 | Shonen | `rl_ninja_scroll` | Ninja Scroll | Lesser | 2 | เมื่อได้รับ: เลือกรับยูนิต Shonen 1 จาก 3 |
 | Shonen | `rl_sage_training` | Sage Training | Greater | 4 | เริ่มการต่อสู้: ให้ยูนิต Shonen ทุกตัว +2/+1 |
@@ -407,8 +407,13 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 ---
 
-## สมดุลล่าสุด (Simulate version 2, 2,400 เกม, Human ปิด)
-อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5): Shonen 3.93 · Rider 4.05 · Mecha 4.20 · Sentai 4.30 · Kaiju 4.32 · Beast 4.50 · ห่างสุด 0.57
+## สมดุลล่าสุด (Simulate version 3, 2,400 เกม, 7 เผ่า)
+อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5) / ชนะ %: Human 4.01 / 17.9% · Mecha 4.07 / 12.6% · Kaiju 4.25 / 11.7% · Rider 4.25 / 16.5% · Shonen 4.27 / 13.7% · Sentai 4.56 / 11.8% · Beast 4.61 / 9.2% · ห่างสุด 0.60
+
+- version 3: เปิด Human ชุด Friends ของผู้ใช้ · ปรับจากชุดที่ส่งมา: Captain Jame (การ์ด) จาก +3/+3 ถาวรทุกตัว → +1/+1 เฉพาะ Human จนจบการสู้ (เดิมชนะ 82.7%), Hero Captain Jame ราคา 2 → 3, Coupon Book +4 → +2 ต่อเทิร์น, เพิ่ม Gear Human 3 ใบ (Earth และ Hero Ja จึงสุ่มได้ Gear)
+- Human ยังชนะบ่อยสุด (แรงช่วงท้าย) แต่อันดับเฉลี่ยใกล้เผ่าอื่น
+
+ก่อนหน้า (version 2, Human ปิด): Shonen 3.93 · Rider 4.05 · Mecha 4.20 · Sentai 4.30 · Kaiju 4.32 · Beast 4.50
 
 - version 2: Solar Aquarion บัฟ Mecha ทั้งทีม, Aquarion Mars โตเมื่อโจมตี (Mars ยังอ่อน อันดับ 5.06 — HP 3 ตายก่อนได้ตี)
 
