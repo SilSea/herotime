@@ -2,7 +2,7 @@
 
 Auto-battler (แนว Hearthstone Battlegrounds) เล่นผ่านเว็บ แบบ online multiplayer
 
-เอกสาร: [PLAN](docs/PLAN.md) (architecture, งานที่เหลือ) · [RULES](docs/RULES.md) (กฎเกม) · [FEATURES](docs/FEATURES.md) · [ADMIN_GUIDE](docs/ADMIN_GUIDE.md) (คู่มือ Admin) · [FACTIONS](docs/FACTIONS.md) (แนวเผ่า, สมดุล) · [CARD_SET_V1](docs/CARD_SET_V1.md) (ชุดการ์ดที่ใช้อยู่)
+เอกสาร: [PLAN](docs/PLAN.md) (architecture, งานที่เหลือ) · [RULES](docs/RULES.md) (กฎเกม) · [FEATURES](docs/FEATURES.md) · [ADMIN_GUIDE](docs/ADMIN_GUIDE.md) (คู่มือ Admin) · [FACTIONS](docs/FACTIONS.md) (แนวเผ่า, สมดุล) · [CARD_SET_V1](docs/CARD_SET_V1.md) (ชุดการ์ดที่ใช้อยู่) · [CARD_SET_V2](docs/CARD_SET_V2.md) (ซีรีส์ที่ 2 ร่าง)
 
 ## รันบนเครื่อง
 ต้องมี Node 22 หรือ 24 (LTS) และ pnpm

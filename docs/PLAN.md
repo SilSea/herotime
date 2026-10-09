@@ -4,7 +4,7 @@
 
 > ⚠️ **IP**: ชื่อตัวละครเป็นเครื่องหมายการค้าของเจ้าของ (Toei, Toho, Satelight, Akita Shoten, Shueisha) ใช้ได้กับโปรเจกต์เล่นกันเอง ถ้าจะเปิดสาธารณะหรือหารายได้ควรเปลี่ยนเป็นของ original — เนื้อหาอยู่ใน DB เปลี่ยนชื่อ/รูปได้โดยไม่แก้ code
 
-เอกสารอื่น: [RULES.md](RULES.md) กฎเกม · [FEATURES.md](FEATURES.md) รายการ feature · [ADMIN_GUIDE.md](ADMIN_GUIDE.md) คู่มือ Admin · [FACTIONS.md](FACTIONS.md) แนวเผ่า · [CARD_SET_V1.md](CARD_SET_V1.md) ชุดการ์ดที่ใช้อยู่
+เอกสารอื่น: [RULES.md](RULES.md) กฎเกม · [FEATURES.md](FEATURES.md) รายการ feature · [ADMIN_GUIDE.md](ADMIN_GUIDE.md) คู่มือ Admin · [FACTIONS.md](FACTIONS.md) แนวเผ่า · [CARD_SET_V1.md](CARD_SET_V1.md) ชุดการ์ดที่ใช้อยู่ · [CARD_SET_V2.md](CARD_SET_V2.md) ซีรีส์ที่ 2 (ร่าง)
 
 ## Stack
 | ส่วน | เทคโนโลยี |
