@@ -1,6 +1,6 @@
 # ชุดการ์ด v1
 
-ชุดการ์ดที่ใช้อยู่ (**version 1** — ล้างประวัติเวอร์ชันเก่าแล้วเริ่มนับใหม่จากชุดนี้ 2026-10-09) · 7 เผ่าตามแนวใน `FACTIONS.md` · Human ปิดอยู่ · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
+ชุดการ์ดที่ใช้อยู่ (**version 2** · ล้างประวัติเวอร์ชันเก่าแล้วเริ่มนับใหม่ 2026-10-09) · 7 เผ่าตามแนวใน `FACTIONS.md` · Human ปิดอยู่ · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
@@ -179,9 +179,9 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 **ร่างรวม (token)** — ค่าพลังร่างรวม = ค่าในตาราง + ผลรวมชิ้นส่วน
 | key | ร่าง | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|
-| `solar_aquarion` | Solar Aquarion | 4/4 *(Power Strike)* | Final Form → `solar_aquarion_wings` | สมดุล ถนัดระยะประชิด ร่างจริงของ Aquarion |
+| `solar_aquarion` | Solar Aquarion | 4/4 *(Power Strike)* | เริ่มการต่อสู้: ให้ Mecha ตัวอื่นทุกตัว +1/+1 (จนจบการสู้) · Final Form → `solar_aquarion_wings` | สมดุล ถนัดระยะประชิด ร่างจริงของ Aquarion |
 | `aquarion_luna` | Aquarion Luna | 3/4 | เริ่มการต่อสู้: ทำดาเมจ 1 ใส่ศัตรูทุกตัว | ระยะไกล คันธนู |
-| `aquarion_mars` | Aquarion Mars | 4/3 *(Rapid)* | — | เน้นความเร็ว |
+| `aquarion_mars` | Aquarion Mars | 4/3 *(Rapid)* | เมื่อโจมตี: ตัวนี้ +1/+0 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น) | เน้นความเร็ว |
 | `solar_aquarion_wings` | Solar Aquarion — Solar Wings (Final Form) | 12/12 *(Power Strike, Rapid)* | เริ่มการต่อสู้: ทำดาเมจ 3 ใส่ศัตรูซ้ายสุด (Infinity Punch) | ปีกสุริยะ, Infinity Punch |
 
 **Gear**
@@ -407,8 +407,10 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 ---
 
-## สมดุลล่าสุด (Simulate version 1, 2,400 เกม, Human ปิด)
-อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5): Shonen 3.94 · Rider 4.05 · Mecha 4.26 · Sentai 4.28 · Kaiju 4.33 · Beast 4.49 · ห่างสุด 0.55
+## สมดุลล่าสุด (Simulate version 2, 2,400 เกม, Human ปิด)
+อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5): Shonen 3.93 · Rider 4.05 · Mecha 4.20 · Sentai 4.30 · Kaiju 4.32 · Beast 4.50 · ห่างสุด 0.57
+
+- version 2: Solar Aquarion บัฟ Mecha ทั้งทีม, Aquarion Mars โตเมื่อโจมตี (Mars ยังอ่อน อันดับ 5.06 — HP 3 ตายก่อนได้ตี)
 
 - บัฟล่าสุด: Shonen (เดิมอันดับกลางแต่ชนะน้อยสุด 9.9% → 13.3%) และ Beast (4.64 → 4.49)
 - ตัวเลขจากบอท (เล่น Gattai / สี Sentai แย่กว่าคน) ต้องดูจาก Stats ของเกมจริงประกอบ

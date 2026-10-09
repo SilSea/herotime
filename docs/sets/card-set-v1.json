@@ -2467,7 +2467,24 @@
    "factions": [
     "mecha"
    ],
-   "effects": [],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "START_OF_COMBAT",
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "mecha"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 1,
+       "permanent": false
+      }
+     ]
+    }
+   ],
    "token": true,
    "keywords": [
     "RIDER_KICK"
@@ -2511,7 +2528,27 @@
    "factions": [
     "mecha"
    ],
-   "effects": [],
+   "effects": [
+    {
+     "scope": "UNIT",
+     "trigger": "ON_ATTACK",
+     "target": {
+      "selector": "SELF"
+     },
+     "actions": [
+      {
+       "type": "BUFF",
+       "atk": 1,
+       "hp": 0,
+       "permanent": true
+      }
+     ],
+     "limit": {
+      "times": 2,
+      "per": "TURN"
+     }
+    }
+   ],
    "token": true,
    "keywords": [
     "RAPID"
