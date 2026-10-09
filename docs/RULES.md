@@ -53,7 +53,7 @@
    - **Final Blow**: ตีครั้งแรก ×2 และ ×2 อีกชั้นใส่ตัวใหญ่ (หุ่น/Kyodaika) รวม ×4
 4. **Gauge 6** → Super Gattai: การสู้ที่บอร์ดมี Extra Ranger หุ่น +4/+4 และได้ keyword ของ Extra Ranger · ชุดปัจจุบันได้การ์ด Final Form ด้วย ใช้กับหุ่นที่มีร่างอัปเกรด (`ultimateInto`) ได้ → เช่น King-Ohger → God King-Ohger
 
-Gauge อื่นใช้ระบบเดียวกัน (`sources` + `thresholds`) เช่น **Rider Gauge**: +1 ทุก Henshin ทุก 3 แต้มได้การ์ด Final Form
+Gauge อื่นใช้ระบบเดียวกัน (`sources` + `thresholds`) เช่น **Rider Gauge**: +1 ทุก Henshin ทุก 3 แต้มได้การ์ด Final Form · **มือเต็ม 10 ใบตอนได้รางวัล = การ์ดรางวัลหาย** (รางวัลครั้งเดียวต่อเกมจะไม่ได้อีก) ผู้เล่นต้องเว้นที่ในมือเอง
 
 ## 6. Keywords
 | Keyword | เทียบ HS | ผล |
