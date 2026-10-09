@@ -2,9 +2,9 @@ import { ContentIndex } from "../content-index.js";
 import { ApiError } from "../net.js";
 import type { AdminDraft, AuditEntry, ContentSnapshot, SimRow, SimulationReport, VersionMeta, GameStats, StatRow } from "../protocol.js";
 import { ENTITIES, entityInfo, KEYWORDS, RULE_DEFAULTS, RULE_ROWS, TRIGGERS, type EntityKind, type RefKind } from "./admin-schema.js";
-import { byName } from "../format.js";
+import { byName, grantedKeywords } from "../format.js";
 import { artBox } from "./art.js";
-import { cardEl } from "./card.js";
+import { cardEl, keywordBoxes } from "./card.js";
 import { artCropTools } from "./art-crop.js";
 import { wizardPanel } from "./card-wizard.js";
 import { CUES, MUSIC_SLOTS, play, preview, SOUND_SLOTS } from "../sound.js";
@@ -797,7 +797,11 @@ function updatePreview(): void {
         setDirty();
         redraw(); // the form's "picture framing" numbers follow
       });
-    return mount(previewEl, h("h3", { text: "Preview" }), cards, framing, note);
+    // What its keywords, and the keywords it gives, mean: the same boxes players see when they point at the card.
+    const def = ix.card(String(entity.key));
+    const kwInfo = def ? keywordBoxes(def.keywords, grantedKeywords(def), def.factions) : [];
+    const kwEl = kwInfo.length > 0 ? h("div", { class: "kw-boxes admin-kw-boxes" }, ...kwInfo) : null;
+    return mount(previewEl, h("h3", { text: "Preview" }), cards, kwEl, framing, note);
   }
   // A hero or relic picture is framed like a card's: on the big picture, with the small ones following.
   const framed = (pics: HTMLElement, extra: HTMLElement | false): void => {

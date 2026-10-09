@@ -1,5 +1,5 @@
 import type { ContentIndex } from "../content-index.js";
-import { keywordName, keywordText, SENTAI_COLORS, stars } from "../format.js";
+import { grantedKeywords, keywordName, keywordText, SENTAI_COLORS, stars } from "../format.js";
 import { tr } from "../i18n.js";
 import { artStyle } from "./art.js";
 import { h } from "./dom.js";
@@ -91,6 +91,18 @@ export function triggerInfo(trigger: string): { icon: string; name: string; text
 
 export const KEYWORD_ICON_OF = (k: string): string => KEYWORD_ICON[k] ?? "•";
 
+/** One explanation box (Battlegrounds-style, next to a big card). */
+export const infoBox = (icon: string, title: string, text: string): HTMLElement =>
+  h("div", { class: "kw-box" }, h("div", { class: "kw-box-title" }, h("span", { class: "pi-icon", text: icon }), title), h("div", { class: "kw-box-text", text }));
+
+/** Boxes explaining a card's own keywords, then the ones it gives ("Gives Barrier") that it does not have itself. */
+export function keywordBoxes(own: readonly string[], grants: readonly string[], factions: readonly string[]): HTMLElement[] {
+  return [
+    ...own.map((k) => infoBox(KEYWORD_ICON_OF(k), keywordName(k, factions), keywordText(k))),
+    ...grants.filter((k) => !own.includes(k)).map((k) => infoBox(KEYWORD_ICON_OF(k), `${tr("Gives", "ให้")} ${keywordName(k, factions)}`, keywordText(k))),
+  ];
+}
+
 /** One card, drawn the same way everywhere (shop, hand, board, offers, replay, library). */
 export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
   const def = ix.card(o.key);
@@ -125,7 +137,7 @@ export function cardEl(ix: ContentIndex, o: CardOpts): HTMLElement {
 
   return h(
     "div",
-    { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip, kws: keywords.join(","), factions: (def?.factions ?? []).join(","), triggers: [...new Set((def?.effects ?? []).map((e) => e.trigger))].join(","), henshin: def?.henshin ? `${def.henshin.afterTurns}|${ix.cardName(def.henshin.into)}` : "", core: def?.gattaiInto ? ix.cardName(def.gattaiInto) : "", ultimate: def?.ultimateInto ? ix.cardName(def.ultimateInto) : "" }, on: o.onClick ? { click: o.onClick } : {} },
+    { class: classes.filter(Boolean).join(" "), style: `--c:${ix.cardColor(o.key)}`, data: { key: o.key, tip: tooltip, kws: keywords.join(","), grants: grantedKeywords(def).join(","), factions: (def?.factions ?? []).join(","), triggers: [...new Set((def?.effects ?? []).map((e) => e.trigger))].join(","), henshin: def?.henshin ? `${def.henshin.afterTurns}|${ix.cardName(def.henshin.into)}` : "", core: def?.gattaiInto ? ix.cardName(def.gattaiInto) : "", ultimate: def?.ultimateInto ? ix.cardName(def.ultimateInto) : "" }, on: o.onClick ? { click: o.onClick } : {} },
     o.note && h("div", { class: "card-note", text: o.note.text, title: o.note.title }),
     o.cost !== undefined && h("div", { class: `cost ${o.costHealth ? "health" : ""}`, text: String(o.cost), title: o.costHealth ? tr("Health cost: paid from your hero's Health", "ราคาเป็นเลือด: จ่ายจาก HP ของ Hero") : tr("Energy cost", "ราคา Energy") }),
     h("div", { class: "art" }, art ? h("div", { class: "art-img", style: artStyle(art, ix.artCrop(o.key)) }) : h("span", { text: ix.initials(o.key) })),

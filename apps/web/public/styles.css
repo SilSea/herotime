@@ -702,6 +702,7 @@ body.dragging .drop-marker.show { display: block; }
 /* ---- hover explanations: one box per keyword or ability (like Battlegrounds tooltips) */
 .kw-boxes { display: flex; flex-direction: column; gap: 6px; width: 250px; }
 .kw-boxes:empty { display: none; }
+.admin-kw-boxes { width: auto; max-width: 320px; margin: 10px 0; }
 .related-cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; animation: pop .14s ease-out; }
 .related-card { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .related-label { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan); background: #08102af0; border: 1px solid var(--cyan-dim); padding: 2px 8px; }
