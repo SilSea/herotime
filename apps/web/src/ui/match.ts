@@ -1,5 +1,5 @@
 import { formatClock } from "../clock.js";
-import { boardLabel, byName, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars } from "../format.js";
+import { boardLabel, byName, gaugeText, gearTargetSlots, KEYWORDS, keywordName, ordinal, phaseLabel, stars, type GearSlot } from "../format.js";
 import { tr } from "../i18n.js";
 import { play, slotForPlace } from "../sound.js";
 import { langToggle, muteToggle } from "./lang.js";
@@ -807,8 +807,13 @@ function gearUsableHere(ctx: Ctx, view: View, handIndex: number): boolean {
 }
 
 /** Slots the hand gear at `handIndex` can go on (null: it needs no unit). */
-const gearSlots = (ctx: Ctx, view: View, handIndex: number): number[] | null =>
-  gearTargetSlots(ctx.ix.card(view.me.state.hand[handIndex]?.key ?? ""), view.me.state.board.map((u) => ctx.ix.card(u.key)), ctx.ix.lineage);
+const gearSlots = (ctx: Ctx, view: View, handIndex: number): GearSlot[] | null =>
+  gearTargetSlots(
+    ctx.ix.card(view.me.state.hand[handIndex]?.key ?? ""),
+    view.me.state.board.map((u) => ctx.ix.card(u.key)),
+    ctx.ix.lineage,
+    view.me.state.giant ? ctx.ix.card(view.me.state.giant.key) : undefined,
+  );
 
 /** The hand gear being aimed at a unit, if any (it must still be a gear in that slot). */
 function aimedGear(ctx: Ctx, view: View): number | undefined {
@@ -817,7 +822,7 @@ function aimedGear(ctx: Ctx, view: View): number | undefined {
 }
 
 /** Use a hand gear: straight away if it needs no unit or only one fits, otherwise wait for a click on a unit. */
-function useGearFromHand(ctx: Ctx, view: View, handIndex: number, target?: number): void {
+function useGearFromHand(ctx: Ctx, view: View, handIndex: number, target?: GearSlot): void {
   const slots = gearSlots(ctx, view, handIndex);
   if (target === undefined && slots && slots.length > 1) {
     ctx.store.set({ selected: { zone: "hand", index: handIndex } });
@@ -935,10 +940,40 @@ function sellZone(ctx: Ctx, view: View): HTMLElement {
 
 function giantSlot(ctx: Ctx, view: View): HTMLElement {
   const g = view.me.state.giant;
+  // A Final Form card in hand can upgrade the Giant: click it while aiming, or drop the card on it.
+  const aim = aimedGear(ctx, view);
+  const aimable = aim !== undefined && (gearSlots(ctx, view, aim) ?? []).includes("GIANT");
+  const target = (handIndex: number | undefined): void => {
+    if (handIndex !== undefined && (gearSlots(ctx, view, handIndex) ?? []).includes("GIANT")) useGearFromHand(ctx, view, handIndex, "GIANT");
+  };
+  const giantEl =
+    g &&
+    h(
+      "div",
+      {
+        class: `slot giant-target ${aim === undefined ? "" : aimable ? "aim-ok" : "aim-no"}`,
+        on: {
+          click: (e) => {
+            if (!aimable) return;
+            e.stopPropagation();
+            target(aim);
+          },
+          dragover: allowDrop,
+          drop: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const d = readDrag(e);
+            endDrag();
+            if (d?.zone === "hand" && view.phase === "RECRUIT" && view.me.alive && isGear(ctx, view, d.index)) target(d.index);
+          },
+        },
+      },
+      giantCard(ctx, g),
+    );
   const sg = view.me.state.superGattai;
   const extraOnBoard = view.me.state.board.some((u) => ctx.ix.card(u.key)?.colors.includes("EXTRA"));
   return h("div", { class: `giant-slot ${sg && extraOnBoard ? "super" : ""}` }, h("div", { class: "muted small", text: "Giant Robo" }),
-    sg && h("div", { class: `super-tag ${extraOnBoard ? "on" : ""}`, title: tr(`Super Gattai: +${sg.atk}/+${sg.hp} and the Extra Ranger's keywords in fights with an Extra Ranger on your board`, `Super Gattai: +${sg.atk}/+${sg.hp} และ keyword ของ Extra Ranger ในการต่อสู้ที่มี Extra Ranger บนบอร์ด`), text: extraOnBoard ? "SUPER GATTAI" : tr("Super Gattai: needs an Extra Ranger", "Super Gattai: ต้องมี Extra Ranger") }), g ? giantCard(ctx, g) : h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
+    sg && h("div", { class: `super-tag ${extraOnBoard ? "on" : ""}`, title: tr(`Super Gattai: +${sg.atk}/+${sg.hp} and the Extra Ranger's keywords in fights with an Extra Ranger on your board`, `Super Gattai: +${sg.atk}/+${sg.hp} และ keyword ของ Extra Ranger ในการต่อสู้ที่มี Extra Ranger บนบอร์ด`), text: extraOnBoard ? "SUPER GATTAI" : tr("Super Gattai: needs an Extra Ranger", "Super Gattai: ต้องมี Extra Ranger") }), giantEl || h("div", { class: "empty-giant", text: tr("empty", "ว่าง") }));
 }
 
 /** The Giant in the slot with what it has picked up: permanent buffs (stats and who gave them) and granted keywords. */

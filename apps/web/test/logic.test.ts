@@ -241,6 +241,13 @@ describe("gearTargetSlots", async () => {
     expect(gearTargetSlots(onChosen({ faction: "rider" }), board)).toEqual([0, 2]);
     expect(gearTargetSlots(onChosen({ series: "w" }), board)).toEqual([2]);
   });
+  it("a Final Form card can also go on a Giant Robo that has an upgraded form", () => {
+    const finalCard = def({ kind: "GEAR", effects: [{ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "ULTIMATE_FORM" }] }] });
+    const rider = def({ ultimateInto: "rider_ff" });
+    expect(gearTargetSlots(finalCard, [rider, board[1]], undefined, def({ kind: "GIANT", ultimateInto: "robo_mk2" }))).toEqual([0, "GIANT"]);
+    expect(gearTargetSlots(finalCard, [rider], undefined, def({ kind: "GIANT" }))).toEqual([0]); // already upgraded
+    expect(gearTargetSlots(onChosen({}), [rider], undefined, def({ kind: "GIANT", ultimateInto: "robo_mk2" }))).toEqual([0]); // a plain buff is for units
+  });
   it("honours a named-card filter, later forms included", () => {
     const zeztz = def({ key: "zeztz" });
     const form = def({ key: "zeztz_form" });

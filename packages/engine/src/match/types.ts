@@ -1,3 +1,4 @@
+import type { GearTarget } from "../game/session.js";
 import type { PlayerState } from "../shop/economy.js";
 import type { CombatResult, CombatSideExtras, CombatUnitInput } from "../types.js";
 
@@ -15,7 +16,7 @@ export type Intent =
   | { type: "REFRESH" }
   | { type: "FREEZE" }
   | { type: "UPGRADE" }
-  | { type: "USE_GEAR"; handIndex: number; target?: number }
+  | { type: "USE_GEAR"; handIndex: number; target?: GearTarget }
   | { type: "HERO_POWER" }
   | { type: "PICK_DISCOVER"; index: number }
   | { type: "CHOOSE_RELIC"; index: number }

@@ -122,7 +122,10 @@ export function buyGear(player: PlayerState, env: GameEnv, payHealth?: (amount: 
  * Board slots a gear can be used on, or null when it targets nobody in particular (no CHOSEN_FRIENDLY effect).
  * A unit qualifies when it passes the filter of every chosen-target effect.
  */
-export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv): number[] | null {
+/** Where a gear goes: a board slot, or "GIANT" for the Giant Robo in the Giant Slot. */
+export type GearTarget = number | "GIANT";
+
+export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv): GearTarget[] | null {
   const effects = env.content.card(gearKey).effects;
   const chosen = effects.filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some(needsTargets));
   if (chosen.length === 0) {
@@ -133,16 +136,19 @@ export function gearTargets(player: PlayerState, gearKey: string, env: GameEnv):
   // A Final Form card only fits a unit that has a Final Form: on any other it would be used up for nothing.
   const finalForm = chosen.some((e) => e.actions.some((a) => a.type === "ULTIMATE_FORM"));
   // A unit fits when any of the gear's parts can go on it; the parts that do not fit it are skipped.
-  return player.board.flatMap((u, i) =>
-    chosen.some((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) && (!finalForm || env.content.card(u.key).ultimateInto !== undefined) ? [i] : [],
-  );
+  const fits = (u: Unit): boolean =>
+    chosen.some((e) => matchesTarget(env, u, e.target ?? { selector: "SELF" })) && (!finalForm || env.content.card(u.key).ultimateInto !== undefined);
+  const slots: GearTarget[] = player.board.flatMap((u, i) => (fits(u) ? [i] : []));
+  // A Final Form card can also upgrade the Giant Robo in the Giant Slot, when it has an upgraded form.
+  if (finalForm && player.giant && fits(player.giant)) slots.push("GIANT");
+  return slots;
 }
 
 /**
  * Use a Gear card from hand: its player-scope ON_PLAY effects run, then it is spent. A gear that goes on a
  * chosen unit needs `target` (a board slot) unless only one unit qualifies; with none it cannot be used.
  */
-export function useGear(player: PlayerState, handIndex: number, env: GameEnv, target?: number): void {
+export function useGear(player: PlayerState, handIndex: number, env: GameEnv, target?: GearTarget): void {
   const card = player.hand[handIndex];
   if (card === undefined) throw new RuleError(`no hand slot ${handIndex}`);
   const def = env.content.card(card.key);
@@ -154,7 +160,7 @@ export function useGear(player: PlayerState, handIndex: number, env: GameEnv, ta
     const slot = target ?? (valid.length === 1 ? valid[0] : undefined);
     if (slot === undefined) throw new RuleError(`choose a unit for ${def.name}`);
     if (!valid.includes(slot)) throw new RuleError(`${def.name} cannot go on that unit`);
-    chosen = player.board[slot];
+    chosen = slot === "GIANT" ? player.giant : player.board[slot];
   }
   player.hand.splice(handIndex, 1);
   runTrigger(def.effects, "ON_PLAY", "PLAYER", null, player, env, { kind: "gear", key: card.key }, chosen);

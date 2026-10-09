@@ -13,6 +13,7 @@ import {
   playUnit,
   sellUnit,
   gearTargets,
+  type GearTarget,
   gearUsable,
   useGear,
   useHeroPower,
@@ -37,8 +38,8 @@ function useGearWell(p: PlayerState, handIndex: number, env: GameEnv): void {
   const key = p.hand[handIndex]?.key;
   const valid = key === undefined ? null : gearTargets(p, key, env);
   if (!valid || valid.length === 0) return useGear(p, handIndex, env);
-  const power = (i: number): number => {
-    const u = p.board[i];
+  const power = (i: GearTarget): number => {
+    const u = i === "GIANT" ? p.giant : p.board[i];
     if (!u) return 0;
     const d = env.content.card(u.key);
     return (d.atk + (u.bonusAtk ?? 0) + d.hp + (u.bonusHp ?? 0)) * (u.golden ? 2 : 1);

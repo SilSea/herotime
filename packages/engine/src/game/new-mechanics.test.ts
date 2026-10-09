@@ -6,7 +6,7 @@ import { Pool } from "../shop/pool.js";
 import { card, content, effect, fighter } from "../testing.js";
 import { runEffect } from "./effects.js";
 import { makeEnv } from "./env.js";
-import { playUnit, prepareCombat, sellUnit, useGear } from "./session.js";
+import { gearTargets, playUnit, prepareCombat, sellUnit, useGear } from "./session.js";
 
 const fx = (o: Record<string, unknown>) => effect({ scope: "PLAYER", trigger: "ON_TURN_START", ...o });
 const world = content({
@@ -20,6 +20,7 @@ const world = content({
     card("robo_mk2", { kind: "GIANT", rank: 6, atk: 12, hp: 12, token: true }),
     card("upgrade_kit_shop", { kind: "GEAR", rank: 1, cost: 1, effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "GIANT_SLOT" }, actions: [{ type: "ULTIMATE_FORM" }] })] }),
     card("upgrade_kit", { kind: "GEAR", rank: 1, cost: 1, token: true, effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "GIANT_SLOT" }, actions: [{ type: "ULTIMATE_FORM" }] })] }),
+    card("final_card", { kind: "GEAR", rank: 1, cost: 1, token: true, effects: [effect({ scope: "PLAYER", trigger: "ON_PLAY", target: { selector: "CHOSEN_FRIENDLY" }, actions: [{ type: "ULTIMATE_FORM" }] })] }),
     card("echo", { rank: 1, atk: 1, hp: 1, keywords: ["ECHO"] }),
     card("cheer", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "ON_PLAY", target: { selector: "SELF" }, actions: [{ type: "BUFF", atk: 1, hp: 0 }] })] }),
     card("seller", { rank: 1, atk: 1, hp: 1, effects: [effect({ trigger: "ON_SELL", repeat: 2, actions: [{ type: "GAIN_ENERGY", amount: 1 }] })] }),
@@ -35,6 +36,21 @@ const env = () =>
   });
 
 describe("new mechanics", () => {
+  it("a Final Form card can upgrade the Giant Robo as well as a unit that has a Final Form", () => {
+    const e = env();
+    const p = newPlayer();
+    p.board = [{ key: "rider", golden: false }, { key: "bear", golden: false }];
+    expect(gearTargets(p, "final_card", e)).toEqual([0]); // no Giant yet
+    p.giant = { key: "robo", golden: false, bonusAtk: 2 };
+    expect(gearTargets(p, "final_card", e)).toEqual([0, "GIANT"]);
+    p.hand = [{ key: "final_card", golden: false }];
+    useGear(p, 0, e, "GIANT");
+    expect(p.giant).toMatchObject({ key: "robo_mk2", bonusAtk: 2 });
+    expect(p.board[0]?.key).toBe("rider"); // the unit is left alone
+    // An upgraded Giant has no further form, so the card no longer fits it.
+    expect(gearTargets(p, "final_card", e)).toEqual([0]);
+  });
+
   it("RANDOM_CARD gives a random tavern gear (or a pool unit of a faction) into the hand", () => {
     const e = env();
     const p = newPlayer();

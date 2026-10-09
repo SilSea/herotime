@@ -3,11 +3,19 @@ import type { CardDef, CombatRecord } from "./protocol.js";
 
 const TARGETED_ACTIONS = new Set(["BUFF", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "ULTIMATE_FORM", "DEVOUR_SHOP", "CONSUME_ALLIES", "COPY"]);
 
+/** Where a gear goes: a board slot, or "GIANT" for the Giant Robo in the Giant Slot. */
+export type GearSlot = number | "GIANT";
+
 /**
- * Board slots a gear can be used on, or null when it goes on nobody in particular. Same rule as the
- * engine: a unit qualifies when it passes the faction / series filter of every chosen-target effect.
+ * Board slots a gear can be used on (plus "GIANT" when a Final Form card can upgrade the Giant Robo), or null
+ * when it goes on nobody in particular. Same rule as the engine: a unit qualifies when any chosen-target part fits it.
  */
-export function gearTargetSlots(gear: CardDef | undefined, board: readonly (CardDef | undefined)[], lineage: (key: string) => readonly string[] = (k) => [k]): number[] | null {
+export function gearTargetSlots(
+  gear: CardDef | undefined,
+  board: readonly (CardDef | undefined)[],
+  lineage: (key: string) => readonly string[] = (k) => [k],
+  giant?: CardDef,
+): GearSlot[] | null {
   const chosen = (gear?.effects ?? []).filter((e) => e.target?.selector === "CHOSEN_FRIENDLY" && e.actions.some((a) => TARGETED_ACTIONS.has(a.type)));
   if (chosen.length === 0) return null;
   const fits = (d: CardDef | undefined): boolean =>
@@ -20,7 +28,9 @@ export function gearTargetSlots(gear: CardDef | undefined, board: readonly (Card
         // a Final Form card only fits a unit that has a Final Form (same rule as the engine)
         (!e.actions.some((a) => a.type === "ULTIMATE_FORM") || d.ultimateInto !== undefined),
     );
-  return board.flatMap((d, i) => (fits(d) ? [i] : []));
+  const slots: GearSlot[] = board.flatMap((d, i) => (fits(d) ? [i] : []));
+  if (giant && chosen.some((e) => e.actions.some((a) => a.type === "ULTIMATE_FORM")) && fits(giant)) slots.push("GIANT");
+  return slots;
 }
 
 /**

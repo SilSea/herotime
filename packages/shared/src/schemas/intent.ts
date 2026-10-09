@@ -19,7 +19,8 @@ export const IntentSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("FREEZE") }).strict(),
   z.object({ type: z.literal("UPGRADE") }).strict(),
   /** target: the board slot of the unit a CHOSEN_FRIENDLY gear goes on. */
-  z.object({ type: z.literal("USE_GEAR"), handIndex: slot, target: slot.optional() }).strict(),
+  // target: a board slot, or "GIANT" for the Giant Robo in the Giant Slot (a Final Form card can upgrade it).
+  z.object({ type: z.literal("USE_GEAR"), handIndex: slot, target: z.union([slot, z.literal("GIANT")]).optional() }).strict(),
   z.object({ type: z.literal("HERO_POWER") }).strict(),
   z.object({ type: z.literal("PICK_DISCOVER"), index: slot }).strict(),
   z.object({ type: z.literal("CHOOSE_RELIC"), index: slot }).strict(),

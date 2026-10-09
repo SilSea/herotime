@@ -58,7 +58,7 @@ function select(
       return mine;
     case "CHOSEN_FRIENDLY":
       // A picked unit this part does not fit gets nothing from it (never someone else instead).
-      if (chosen) return mine.includes(chosen) ? [chosen] : [];
+      if (chosen) return mine.includes(chosen) || (chosen === player.giant && matchesTarget(env, chosen, t)) ? [chosen] : [];
       return mine.slice(0, 1);
     case "GIANT_SLOT":
       return player.giant ? [player.giant] : [];

@@ -7,7 +7,7 @@
 const SVG = "http://www.w3.org/2000/svg";
 let layer: SVGSVGElement | undefined;
 let from = { x: 0, y: 0 };
-let valid: number[] = [];
+let valid: (number | "GIANT")[] = [];
 let stop: (() => void) | undefined;
 let mode: "drag" | "click" | undefined;
 /** Where the pointer was last seen, so a redrawn click-aim starts where the player is pointing. */
@@ -27,14 +27,20 @@ const svg = <K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string,
 };
 
 const boardSlots = (): HTMLElement[] => [...document.querySelectorAll<HTMLElement>(".board-cards > .slot")];
+/** Everything a gear can be aimed at: the board slots by index, and the Giant Robo as "GIANT". */
+const aimTargets = (): [number | "GIANT", HTMLElement][] => {
+  const out: [number | "GIANT", HTMLElement][] = boardSlots().map((s, i) => [i, s]);
+  const giant = document.querySelector<HTMLElement>(".giant-slot > .giant-target");
+  if (giant) out.push(["GIANT", giant]);
+  return out;
+};
 
-/** The board slot under a point, by position (works during a drag, when the event target may be the overlay). */
-function slotAt(x: number, y: number): number | undefined {
-  const i = boardSlots().findIndex((s) => {
+/** The target under a point, by position (works during a drag, when the event target may be the overlay). */
+function slotAt(x: number, y: number): number | "GIANT" | undefined {
+  return aimTargets().find(([, s]) => {
     const r = s.getBoundingClientRect();
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-  });
-  return i >= 0 ? i : undefined;
+  })?.[0];
 }
 
 function draw(x: number, y: number): void {
@@ -47,7 +53,7 @@ function draw(x: number, y: number): void {
   let tx = x;
   let ty = y;
   if (locked) {
-    const r = (boardSlots()[over] as HTMLElement).getBoundingClientRect();
+    const r = (aimTargets().find(([k]) => k === over)?.[1] as HTMLElement).getBoundingClientRect();
     tx = r.left + r.width / 2;
     ty = r.top + r.height / 2;
   }
@@ -57,11 +63,11 @@ function draw(x: number, y: number): void {
   layer.querySelector(".aim-path")?.setAttribute("d", `M ${from.x} ${from.y} Q ${mx} ${my} ${tx} ${ty}`);
   layer.querySelector(".aim-reticle")?.setAttribute("transform", `translate(${tx} ${ty})`);
   layer.classList.toggle("locked", locked);
-  for (const [i, s] of boardSlots().entries()) s.classList.toggle("aim-hot", locked && i === over);
+  for (const [k, s] of aimTargets()) s.classList.toggle("aim-hot", locked && k === over);
 }
 
 /** Start aiming from `source` (the gear card) at the board slots in `targets`. */
-export function startAim(source: HTMLElement, targets: number[], how: "drag" | "click"): void {
+export function startAim(source: HTMLElement, targets: (number | "GIANT")[], how: "drag" | "click"): void {
   stopAim();
   valid = targets;
   const r = source.getBoundingClientRect();
@@ -71,7 +77,7 @@ export function startAim(source: HTMLElement, targets: number[], how: "drag" | "
   ret.append(svg("circle", { r: "22" }), svg("circle", { r: "6", class: "aim-dot" }), svg("path", { d: "M -34 0 H -14 M 14 0 H 34 M 0 -34 V -14 M 0 14 V 34" }));
   layer.append(svg("path", { class: "aim-path" }), ret);
   document.body.append(layer);
-  for (const [i, s] of boardSlots().entries()) s.classList.add(targets.includes(i) ? "aim-ok" : "aim-no");
+  for (const [k, s] of aimTargets()) s.classList.add(targets.includes(k) ? "aim-ok" : "aim-no");
   document.body.classList.add("aiming");
   mode = how;
   if (how === "click" && last) draw(last.x, last.y);
@@ -95,7 +101,7 @@ export function stopAim(): void {
   layer?.remove();
   layer = undefined;
   document.body.classList.remove("aiming");
-  for (const s of boardSlots()) s.classList.remove("aim-ok", "aim-no", "aim-hot");
+  for (const [, s] of aimTargets()) s.classList.remove("aim-ok", "aim-no", "aim-hot");
 }
 
 /** How the current aim was started, if one is on screen. */

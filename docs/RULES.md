@@ -47,11 +47,11 @@
 
 ## 5. Giant Robo (Mecha Gauge)
 1. **Roll Call** — เริ่มการต่อสู้ ถ้ามี Sentai สีไม่ซ้ำครบ `rollCallColors` (ชุดปัจจุบัน 3, Extra = wildcard) → Sentai ทุกตัว +1/+1 ในการสู้นั้น และ Mecha Gauge +1 · ชนะการสู้นั้น +1 อีก
-2. **Gauge 3** → การ์ด **Kyodai Gattai!** → Discover หุ่น 1 จาก 3 (หุ่นของซีรีส์ที่มีบนบอร์ดมากสุดออกแน่นอน) → อยู่ใน **Giant Slot** ถาวร
+2. **Gauge 3** → การ์ด **Kyodai Gattai!** → Discover หุ่น 1 จาก 3 (หุ่นของซีรีส์ที่มีบนบอร์ดมากสุดออกแน่นอน · ไม่มีร่างอัปเกรด) → อยู่ใน **Giant Slot** ถาวร
 3. **ตอนสู้** หุ่นลงสนามครั้งเดียว เมื่อยูนิตเราเหลือ ≤ `giantEntryThreshold` (2) หรือศัตรูเกิด Kyodaika
    - Stat = base + `giantSentaiScale` × ATK/HP รวมของ Sentai บนบอร์ดตอนเริ่มสู้ (ชุดปัจจุบัน 0.5)
    - **Final Blow**: ตีครั้งแรก ×2 และ ×2 อีกชั้นใส่ตัวใหญ่ (หุ่น/Kyodaika) รวม ×4
-4. **Gauge 6** → Super Gattai: การสู้ที่บอร์ดมี Extra Ranger หุ่น +4/+4 และได้ keyword ของ Extra Ranger · ชุดปัจจุบันได้การ์ด Final Form ด้วย
+4. **Gauge 6** → Super Gattai: การสู้ที่บอร์ดมี Extra Ranger หุ่น +4/+4 และได้ keyword ของ Extra Ranger · ชุดปัจจุบันได้การ์ด Final Form ด้วย ใช้กับหุ่นที่มีร่างอัปเกรด (`ultimateInto`) ได้ → เช่น King-Ohger → God King-Ohger
 
 Gauge อื่นใช้ระบบเดียวกัน (`sources` + `thresholds`) เช่น **Rider Gauge**: +1 ทุก Henshin ทุก 3 แต้มได้การ์ด Final Form
 
@@ -77,7 +77,7 @@ Gauge อื่นใช้ระบบเดียวกัน (`sources` + `th
 - ร้านมี Gear 1 ใบเสมอ: สุ่มจาก Gear rank ≤ rank ร้าน ของเผ่าในล็อบบี้หรือไม่มีเผ่า · ไม่อยู่ใน pool (หลายคนได้ใบเดียวกันได้)
 - ราคาของแต่ละใบ: `ENERGY` หรือ `HEALTH` (จ่ายจาก HP, ต้องเหลือ ≥ 1, เกราะไม่ช่วย)
 - ซื้อแล้วเข้ามือ กด **Use** (ผลช่วงซื้อของจึงถาวร) · ขายได้เฉพาะตอนที่ยังใช้ไม่ได้
-- **เลือกเป้าหมาย** (`CHOSEN_FRIENDLY`): ลากไปวางบนยูนิต หรือ Use แล้วคลิก · มีตัวเดียวที่ใช้ได้ = เลือกให้ · Gear หลายผลใช้กับยูนิตที่เข้า**ผลใดผลหนึ่ง** ผลที่ไม่เข้าถูกข้าม (เช่น Capsem: Rider ทุกตัวได้บัฟ แปลงร่างเฉพาะ Zeztz) · นอก Gear `CHOSEN_FRIENDLY` = ซ้ายสุด
+- **เลือกเป้าหมาย** (`CHOSEN_FRIENDLY`): ลากไปวางบนยูนิต หรือ Use แล้วคลิก · มีตัวเดียวที่ใช้ได้ = เลือกให้ · Gear หลายผลใช้กับยูนิตที่เข้า**ผลใดผลหนึ่ง** ผลที่ไม่เข้าถูกข้าม (เช่น Capsem: Rider ทุกตัวได้บัฟ แปลงร่างเฉพาะ Zeztz) · การ์ด Final Form (`ULTIMATE_FORM`) เลือกหุ่นในช่อง Giant ได้ด้วย (ลากไปวางหรือคลิกที่หุ่น) · นอก Gear `CHOSEN_FRIENDLY` = ซ้ายสุด
 - Gear จาก Gauge (Kyodai Gattai!) ไม่ขายในร้าน
 
 ## 8. Relic
