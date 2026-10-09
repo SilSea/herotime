@@ -14,6 +14,7 @@ const KEYWORD: Record<KeywordKey, string> = {
   KYODAIKA: "Kyodaika",
   GATTAI: "Gattai",
   ECHO: "Echo",
+  LEGACY: "Legacy",
 };
 
 const TRIGGER: Record<Trigger, string> = {
@@ -111,6 +112,7 @@ function action(a: Action, target: Target | undefined, names: Names, player = fa
     case "GIVE_KEYWORD": return `give ${t} ${keywordName(a.keyword, target, owner)}`;
     case "TRANSFORM": return `transform ${t} into ${names(a.into)}`;
     case "DESTROY": return `destroy ${t}`;
+    case "TRIGGER_LAST_STAND": return `trigger the Last Stand of ${t}`;
     case "GAIN_ENERGY": return `gain ${a.amount} Energy`;
     case "GAUGE_ADD": {
       const name = names(`gauge:${a.gauge}`);
@@ -215,6 +217,7 @@ export function cardText(c: CardDef, names: Names): string {
   if (c.gattaiInto) lines.push(`Gattai core: leading a Gattai group, it becomes ${names(c.gattaiInto)}.`);
   // The Final Form (ultimateInto) is not rules text: the client explains it in a box beside the card, like a keyword.
   if (c.keywords.includes("ECHO")) lines.push("Echo: your Deploy effects happen twice.");
+  if (c.keywords.includes("LEGACY")) lines.push("Legacy: your other units' Last Stand effects happen twice.");
   // Gear is used from the hand, so its ON_PLAY reads "Use:" rather than the units' "Deploy:".
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectText(e, names, c.factions).replace(/^Deploy: /, "Use: ") : effectText(e, names, c.factions));
   return lines.join(" ");

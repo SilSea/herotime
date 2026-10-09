@@ -156,6 +156,7 @@ export class Content {
     // Some actions and targets only make sense in one phase; the engine refuses them in the other at run time.
     const FIGHT = new Set(["START_OF_COMBAT", "ON_ATTACK", "AFTER_DAMAGED", "LAST_STAND", "AVENGE"]);
     // GAIN_ENERGY, ADD_TO_HAND, RANDOM_CARD, DISCOVER_UNIT, GAUGE_ADD, BUFF_SHOP and BUFF_GEAR work in fights too: they arrive next turn.
+    const FIGHT_ONLY = new Set(["DAMAGE", "TRIGGER_LAST_STAND"]);
     const RECRUIT_ONLY = new Set(["MODIFY_RULE", "DISCOVER_GIANT", "SUPER_GATTAI", "ULTIMATE_FORM", "DEVOUR_SHOP", "DISCARD"]);
     // Triggers only the player gets (relic picked, hero power used, Roll Call): a unit effect on them never runs.
     const PLAYER_ONLY = new Set(["ON_ACQUIRE", "ON_USE", "ON_ROLL_CALL", "ON_ROLL_CALL_WIN"]);
@@ -166,14 +167,14 @@ export class Content {
       if (e.target?.selector === "SUMMONED" && e.trigger !== "ALLY_SUMMONED") problems.push(`${from}: target SUMMONED only works with ALLY_SUMMONED`);
       // A summon can happen in either phase, so its reactions must work in both.
       if (e.trigger === "ALLY_SUMMONED") {
-        for (const a of e.actions) if (RECRUIT_ONLY.has(a.type) || a.type === "DAMAGE") problems.push(`${from}: ${a.type} cannot be used on ALLY_SUMMONED (summons happen in fights too)`);
+        for (const a of e.actions) if (RECRUIT_ONLY.has(a.type) || FIGHT_ONLY.has(a.type)) problems.push(`${from}: ${a.type} cannot be used on ALLY_SUMMONED (summons happen in fights too)`);
         if (e.target?.selector.endsWith("_ENEMY")) problems.push(`${from}: ALLY_SUMMONED cannot target enemies`);
         return;
       }
       const fight = FIGHT.has(e.trigger);
       for (const a of e.actions) {
         if (fight && RECRUIT_ONLY.has(a.type)) problems.push(`${from}: ${a.type} only works in the recruit phase, not on ${e.trigger}`);
-        if (!fight && a.type === "DAMAGE") problems.push(`${from}: DAMAGE only works in a fight, not on ${e.trigger}`);
+        if (!fight && FIGHT_ONLY.has(a.type)) problems.push(`${from}: ${a.type} only works in a fight, not on ${e.trigger}`);
       }
       if (!fight && e.target?.selector.endsWith("_ENEMY") && e.actions.some((a) => a.type === "BUFF" || a.type === "GIVE_KEYWORD" || a.type === "TRANSFORM" || a.type === "DESTROY" || a.type === "COPY")) {
         problems.push(`${from}: enemies can only be targeted in a fight, not on ${e.trigger}`);

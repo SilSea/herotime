@@ -50,6 +50,7 @@ export const DO: DoOption[] = [
   { key: "CONSUME_ALLIES", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Destroy all your other units, give their total stats", "ทำลายยูนิตอื่นของเราทั้งหมด แล้วมอบค่าพลังรวม") },
   { key: "TRANSFORM", phases: ["recruit", "fight", "both"], targeted: true, label: () => tr("Transform into another card", "แปลงร่างเป็นการ์ดอื่น") },
   { key: "DAMAGE", phases: ["fight"], targeted: true, label: () => tr("Deal damage", "ทำดาเมจ") },
+  { key: "TRIGGER_LAST_STAND", phases: ["fight"], targeted: true, label: () => tr("Trigger a unit's Last Stand (it does not die)", "สั่ง Last Stand ของยูนิตให้ทำงาน (ไม่ตาย)") },
   { key: "GAIN_ENERGY", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Gain Energy", "ได้ Energy") },
   { key: "ADD_TO_HAND", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Add a card to your hand", "ได้การ์ดเข้ามือ") },
   { key: "DISCOVER_UNIT", phases: ["recruit", "fight", "both"], targeted: false, label: () => tr("Discover a unit (1 of 3)", "เลือกรับยูนิต 1 จาก 3") },
@@ -350,6 +351,7 @@ export function describeRecipe(r: Recipe, cardName: (key: string) => string, fac
       : a.do === "SUMMON" ? tr(`summon ${a.count > 1 ? `${a.count} × ` : ""}${cardName(a.cardKey)}`, `เรียก ${cardName(a.cardKey)}${a.count > 1 ? ` ${a.count} ตัว` : ""}`)
       : a.do === "TRANSFORM" ? tr(`transform ${who} into ${cardName(a.cardKey)}`, `แปลง${who}เป็น ${cardName(a.cardKey)}`)
       : a.do === "DESTROY" ? tr(`destroy ${who}`, `ทำลาย${who}`)
+      : a.do === "TRIGGER_LAST_STAND" ? tr(`trigger the Last Stand of ${who}`, `สั่ง Last Stand ของ${who}ให้ทำงาน`)
       : a.do === "DAMAGE" ? tr(`deal ${a.amount} damage to ${who}`, `ทำดาเมจ ${a.amount} ใส่${who}`)
       : a.do === "GAIN_ENERGY" ? tr(`gain ${a.amount} Energy`, `ได้ ${a.amount} Energy`)
       : a.do === "ADD_TO_HAND" ? tr(`add ${cardName(a.cardKey)} to your hand`, `ได้ ${cardName(a.cardKey)} เข้ามือ`)

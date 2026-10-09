@@ -378,6 +378,8 @@ function runAction(action: Action, mult: number, source: Unit | null, targets: U
     }
     case "DAMAGE":
       throw new Error("action DAMAGE is only valid during combat");
+    case "TRIGGER_LAST_STAND":
+      throw new Error("action TRIGGER_LAST_STAND is only valid during combat");
   }
 }
 

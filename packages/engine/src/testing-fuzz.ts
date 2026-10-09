@@ -7,7 +7,7 @@ import type { CombatSideExtras, CombatUnitInput } from "./types.js";
  * Random boards with random effects, for fuzzing combat. Used by the engine's own fuzz test and by
  * the web client's replay test (which checks that replaying events reproduces the real result).
  */
-const KEYWORDS: KeywordKey[] = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI"];
+const KEYWORDS: KeywordKey[] = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI", "LEGACY"];
 const FACTIONS = ["sentai", "mecha", "rider", "grunt"];
 const COLORS: SentaiColor[] = ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "EXTRA"];
 const TRIGGERS = ["START_OF_COMBAT", "LAST_STAND", "ON_ATTACK", "AFTER_DAMAGED", "AVENGE"] as const;
@@ -17,7 +17,8 @@ export const fuzzWorld = content({ cards: [card("tok", { atk: 1, hp: 1, token: t
 
 function randomEffect(rng: Rng): Effect {
   const pickAction = (): object => {
-    switch (rng.int(10)) {
+    switch (rng.int(11)) {
+      case 10: return { type: "TRIGGER_LAST_STAND" };
       case 9: return { type: "COPY", to: rng.int(3) === 0 ? "HAND" : "BOARD", withBuffs: rng.int(2) === 0 };
       case 7: return { type: "BUFF", atk: 0, hp: 0, fromSelf: true, permanent: rng.int(2) === 0 };
       case 8: return { type: "CONSUME_ALLIES", permanent: rng.int(2) === 0 };

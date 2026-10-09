@@ -20,7 +20,7 @@
 
 ## F2. Faction & Keyword
 - [x] **F2.1** Faction เก็บใน content สุ่ม 5 ต่อล็อบบี้ (เฉพาะเผ่าที่เปิดและมีการ์ดในร้าน) · ชุดปัจจุบัน 7 เผ่า ดู [FACTIONS.md](FACTIONS.md)
-- [x] **F2.2** Keyword มาตรฐาน: Guard, Barrier, Last Stand, Deploy, Rapid, Lethal, Revive, Echo, Start of Combat, End of Turn, Avenge(N)
+- [x] **F2.2** Keyword มาตรฐาน: Guard, Barrier, Last Stand, Deploy, Rapid, Lethal, Revive, Echo, Legacy (Last Stand ×2), Start of Combat, End of Turn, Avenge(N)
 - [x] **F2.3** Keyword ธีม: Henshin(N), Team-Up(k), Gattai, Kyodaika, Power Strike (บน Rider = Rider Kick), Final Blow
 - [x] **F2.4** สี Sentai 11 สี + Extra = wildcard
 
@@ -69,7 +69,7 @@
 - [~] **F6.7** Rollback + Audit log ทำแล้ว · Diff ยังไม่ทำ
 - [x] **F6.8** Stats จากเกมจริง + แนะนำ weight Relic
 - [x] **F6.9** เปิด/ปิดเผ่า / Hero / Relic
-- [x] **F6.10** กลไก DSL: COPY, CONSUME_ALLIES, BUFF_GEAR, BUFF_SHOP, DEVOUR_SHOP, DISCARD, RANDOM_CARD, ULTIMATE_FORM, SUMMON_FROM_HAND, รางวัลหลังสู้, `limit`, `repeat`, กรองชื่อการ์ด / `formOf`
+- [x] **F6.10** กลไก DSL: COPY, CONSUME_ALLIES, BUFF_GEAR, BUFF_SHOP, DEVOUR_SHOP, DISCARD, RANDOM_CARD, ULTIMATE_FORM, SUMMON_FROM_HAND, TRIGGER_LAST_STAND, รางวัลหลังสู้, `limit`, `repeat`, กรองชื่อการ์ด / `formOf`
 
 ## F7. Relic
 - [x] **F7.1** เลือก Lesser เทิร์น 5, Greater เทิร์น 9 (1 จาก 4, มีตัวราคา 0, หมดเวลาได้ตัวฟรี)

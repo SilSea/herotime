@@ -17,6 +17,7 @@ const KEYWORD: Record<KeywordKey, string> = {
   KYODAIKA: "Kyodaika",
   GATTAI: "Gattai",
   ECHO: "Echo",
+  LEGACY: "Legacy",
 };
 
 const TRIGGER: Record<Trigger, string> = {
@@ -100,6 +101,7 @@ function action(a: Action, target: Target | undefined, names: Names, player = fa
     case "GIVE_KEYWORD": return `ให้${t}ได้ ${keywordName(a.keyword, target, owner)}`;
     case "TRANSFORM": return `เปลี่ยน${t}เป็น ${names(a.into)}`;
     case "DESTROY": return `ทำลาย${t}`;
+    case "TRIGGER_LAST_STAND": return `สั่ง Last Stand ของ${t}ให้ทำงาน`;
     case "GAIN_ENERGY": return `ได้ ${a.amount} Energy`;
     case "GAUGE_ADD": {
       const name = names(`gauge:${a.gauge}`);
@@ -197,6 +199,7 @@ export function cardTextTh(c: CardDef, names: Names): string {
   if (c.gattaiInto) lines.push(`Gattai core: เป็นตัวนำกลุ่ม Gattai แล้วกด Combine จะรวมเป็น ${names(c.gattaiInto)}`);
   // ร่าง Final Form (ultimateInto) ไม่อยู่ในข้อความการ์ด: หน้าเว็บอธิบายในกล่องข้างการ์ดแบบ keyword
   if (c.keywords.includes("ECHO")) lines.push("Echo: Deploy ของเราทำงาน 2 ครั้ง");
+  if (c.keywords.includes("LEGACY")) lines.push("Legacy: Last Stand ของยูนิตอื่นฝ่ายเราทำงาน 2 ครั้ง");
   for (const e of c.effects) lines.push(c.kind === "GEAR" && e.trigger === "ON_PLAY" ? effectTextTh(e, names, c.factions).replace(/^Deploy: /, "ใช้: ") : effectTextTh(e, names, c.factions));
   return lines.join(" · ");
 }

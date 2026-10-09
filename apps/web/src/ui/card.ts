@@ -68,6 +68,7 @@ const KEYWORD_ICON: Record<string, string> = {
   KYODAIKA: "▲",
   GATTAI: "⚙",
   ECHO: "⟳",
+  LEGACY: "✝",
 };
 const TRIGGERS: Record<string, { icon: string; name: [string, string]; text: [string, string] }> = {
   LAST_STAND: { icon: "💀", name: ["Last Stand", "Last Stand"], text: ["Does something when this unit dies.", "ทำงานเมื่อยูนิตนี้ตาย"] },

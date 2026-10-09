@@ -65,6 +65,63 @@ describe("LAST_STAND", () => {
   });
 });
 
+describe("LEGACY", () => {
+  const world = { content: content({ cards: [token] }), maxAttacksPerCombat: 1 };
+
+  it("doubles the Last Stands of the other friendly units", () => {
+    const r = simulateCombat([f("grunt", 1, 1, { effects: [fx.summon()] }), f("baron", 1, 50, { keywords: ["LEGACY"] })], [f("foe", 9, 100)], 1, world);
+    expect(types(r.events, "SUMMON")).toHaveLength(2);
+    expect(r.survivorsA.map((s) => s.cardKey)).toEqual(["token", "token", "baron"]);
+  });
+
+  it("does not double its own Last Stand, nor stack with a second one", () => {
+    const own = simulateCombat([f("baron", 1, 1, { keywords: ["LEGACY"], effects: [fx.summon()] })], [f("foe", 9, 100)], 1, world);
+    expect(types(own.events, "SUMMON")).toHaveLength(1);
+    const two = simulateCombat(
+      [f("grunt", 1, 1, { effects: [fx.summon()] }), f("b1", 1, 50, { keywords: ["LEGACY"] }), f("b2", 1, 50, { keywords: ["LEGACY"] })],
+      [f("foe", 9, 100)],
+      1,
+      world,
+    );
+    expect(types(two.events, "SUMMON")).toHaveLength(2);
+  });
+});
+
+describe("TRIGGER_LAST_STAND", () => {
+  const trigger = (selector: "ADJACENT" | "SELF" | "RANDOM_FRIENDLY", extra: object = {}) =>
+    effect({ trigger: "START_OF_COMBAT", target: { selector }, actions: [{ type: "TRIGGER_LAST_STAND" }], ...extra });
+  const world = { content: content({ cards: [token] }), ...PRE };
+
+  it("runs a living unit's Last Stand without killing it, summoning on its right", () => {
+    const r = simulateCombat([f("caller", 1, 5, { effects: [trigger("ADJACENT")] }), f("grunt", 1, 1, { effects: [fx.summon()] })], [f("foe", 1, 1)], 1, world);
+    expect(r.survivorsA.map((s) => s.cardKey)).toEqual(["caller", "grunt", "token"]);
+  });
+
+  it("only when its condition holds", () => {
+    const gated = trigger("ADJACENT", { condition: { type: "HAS_CARD", cards: ["missing"] } });
+    const r = simulateCombat([f("caller", 1, 5, { effects: [gated] }), f("grunt", 1, 1, { effects: [fx.summon()] })], [f("foe", 1, 1)], 1, world);
+    expect(types(r.events, "SUMMON")).toHaveLength(0);
+  });
+
+  it("is doubled by a Golden caller and by LEGACY", () => {
+    const golden = simulateCombat([f("caller", 1, 5, { golden: true, effects: [trigger("ADJACENT")] }), f("grunt", 1, 1, { effects: [fx.summon()] })], [f("foe", 1, 1)], 1, world);
+    expect(types(golden.events, "SUMMON")).toHaveLength(2);
+    const legacy = simulateCombat([f("caller", 1, 5, { keywords: ["LEGACY"], effects: [trigger("ADJACENT")] }), f("grunt", 1, 1, { effects: [fx.summon()] })], [f("foe", 1, 1)], 1, world);
+    expect(types(legacy.events, "SUMMON")).toHaveLength(2);
+  });
+
+  it("two units setting off each other's Last Stand forever end the fight as a draw", () => {
+    const loop = effect({ trigger: "LAST_STAND", target: { selector: "RANDOM_FRIENDLY" }, actions: [{ type: "TRIGGER_LAST_STAND" }] });
+    const r = simulateCombat(
+      [f("a", 1, 5, { effects: [trigger("RANDOM_FRIENDLY"), loop] }), f("b", 1, 5, { effects: [loop] })],
+      [f("foe", 1, 1)],
+      1,
+      { content: content({ cards: [token] }) },
+    );
+    expect(r.winner).toBe("DRAW");
+  });
+});
+
 describe("START_OF_COMBAT", () => {
   const teamUp = (n: number) =>
     effect({

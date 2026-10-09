@@ -25,12 +25,14 @@ describe("Content", () => {
         card("a", { effects: [effect({ trigger: "LAST_STAND", actions: [{ type: "DISCARD", count: 1 }] })] }),
         card("b", { effects: [effect({ trigger: "ON_PLAY", actions: [{ type: "DAMAGE", amount: 1 }] })] }),
         card("c", { effects: [effect({ trigger: "END_OF_TURN", target: { selector: "RANDOM_ENEMY" }, actions: [{ type: "BUFF", atk: 1, hp: 0 }] })] }),
+        card("d", { effects: [effect({ trigger: "END_OF_TURN", target: { selector: "ADJACENT" }, actions: [{ type: "TRIGGER_LAST_STAND" }] })] }),
         card("ok", { effects: [effect({ trigger: "START_OF_COMBAT", target: { selector: "RANDOM_ENEMY" }, actions: [{ type: "DAMAGE", amount: 1 }] })] }),
       ],
     });
     expect(problems).toMatch(/card "a": DISCARD only works in the recruit phase, not on LAST_STAND/);
     expect(problems).toMatch(/card "b": DAMAGE only works in a fight/);
     expect(problems).toMatch(/card "c": enemies can only be targeted in a fight/);
+    expect(problems).toMatch(/card "d": TRIGGER_LAST_STAND only works in a fight/);
     expect(problems).not.toMatch(/card "ok"/);
   });
 

@@ -120,7 +120,8 @@ const needsTargets = (a: Action): boolean =>
   a.type === "DAMAGE" ||
   a.type === "GIVE_KEYWORD" ||
   a.type === "TRANSFORM" ||
-  a.type === "DESTROY";
+  a.type === "DESTROY" ||
+  a.type === "TRIGGER_LAST_STAND";
 
 /**
  * Deterministic auto-battle. Same (boards, seed, content) always yields the same
@@ -140,6 +141,9 @@ export function simulateCombat(
   let spawned = 0;
   /** Units one fight may create at most (summons and copies that keep summoning each other). */
   const MAX_SPAWNS = 100;
+  let forced = 0;
+  /** Last Stands one fight may set off without a death (TRIGGER_LAST_STAND); past it the content is looping. */
+  const MAX_FORCED = 100;
 
   const mkSide = (id: Side, units: readonly CombatUnitInput[], extras: CombatSideExtras = {}): SideState => ({
     id,
@@ -396,6 +400,20 @@ export function simulateCombat(
         }
         return;
       }
+      case "TRIGGER_LAST_STAND": {
+        for (const t of targets) {
+          for (let n = 0; n < mult && alive(t); n++) {
+            if (forced >= MAX_FORCED) {
+              aborted = true;
+              return;
+            }
+            forced++;
+            const ts = sides[t.side];
+            lastStand(t, ts, rightOf(ts, t));
+          }
+        }
+        return;
+      }
       case "SUMMON_FROM_HAND": {
         const hand = s.extras.hand ?? [];
         for (let n = 0; n < action.count * mult && hand.length > 0 && friendly(s).length < boardLimit && canSpawn(); n++) {
@@ -454,6 +472,11 @@ export function simulateCombat(
       runEffect(e, f, s, at, subject);
     });
   }
+  /** A unit's Last Stand: twice while another living friendly unit has LEGACY. */
+  function lastStand(f: Fighter, s: SideState, at: () => number): void {
+    const times = friendly(s).some((m) => m !== f && m.keywords.has("LEGACY")) ? 2 : 1;
+    for (let n = 0; n < times; n++) fire("LAST_STAND", f, s, at);
+  }
   /** Uses of limited effects, per fighter, in this fight. */
   const fightUses = new Map<Fighter, Record<string, number>>();
 
@@ -504,7 +527,7 @@ export function simulateCombat(
     // A returning unit stays in the list as a ghost so Last Stand summons land on its right.
     if (!kyodaika && !revive) removeAt(s, idx);
     let slot = kyodaika || revive ? idx + 1 : idx;
-    fire("LAST_STAND", f, s, () => slot++);
+    lastStand(f, s, () => slot++);
 
     s.deaths++;
     for (const mate of friendly(s)) fire("AVENGE", mate, s, rightOf(s, mate), s.deaths);

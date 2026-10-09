@@ -13,6 +13,8 @@ export const KeywordKey = z.enum([
   "GATTAI",
   /** While this is on your board, your Deploy (ON_PLAY) effects happen twice. */
   "ECHO",
+  /** While this is on your board, your other units' Last Stand effects happen twice. */
+  "LEGACY",
 ]);
 export type KeywordKey = z.infer<typeof KeywordKey>;
 
@@ -169,6 +171,8 @@ export const Action = z.discriminatedUnion("type", [
    * Fight: a copy of a random unit card in your hand joins the fight (the card stays in hand).
    */
   z.object({ type: z.literal("SUMMON_FROM_HAND"), count: z.number().int().min(1).default(1) }),
+  /** Fight only: each target's Last Stand effects happen now, as if it died (it does not). */
+  z.object({ type: z.literal("TRIGGER_LAST_STAND") }),
 ]);
 export type Action = z.infer<typeof Action>;
 

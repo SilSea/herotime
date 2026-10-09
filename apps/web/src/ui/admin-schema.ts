@@ -29,7 +29,7 @@ export type Field =
   | { kind: "object"; rows: Row[]; make?: () => unknown }
   | { kind: "union"; tag: string; variants: Record<string, Row[]>; make: (tag: string) => Record<string, unknown> };
 
-export const KEYWORDS = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI", "ECHO"] as const;
+export const KEYWORDS = ["GUARD", "BARRIER", "RAPID", "LETHAL", "REVIVE", "RIDER_KICK", "FINAL_BLOW", "KYODAIKA", "GATTAI", "ECHO", "LEGACY"] as const;
 /* Same as @herotime/shared SentaiColor (a test keeps them equal). */
 export const COLORS = ["RED", "BLUE", "YELLOW", "GREEN", "PINK", "BLACK", "WHITE", "PURPLE", "SILVER", "GOLD", "ORANGE", "EXTRA"] as const;
 export const SCOPES = ["UNIT", "PLAYER"] as const;
@@ -53,7 +53,7 @@ export const TRIGGERS = [
 ] as const;
 export const SELECTORS = ["SELF", "ADJACENT", "LEFTMOST_FRIENDLY", "RIGHTMOST_FRIENDLY", "RANDOM_FRIENDLY", "ALL_FRIENDLY", "CHOSEN_FRIENDLY", "SUMMONED", "GIANT_SLOT", "LEFTMOST_ENEMY", "RANDOM_ENEMY", "ALL_ENEMY"] as const;
 export const CONDITION_TYPES = ["TEAM_UP_COLORS_GTE", "FACTION_COUNT_GTE", "SERIES_COUNT_GTE", "ENERGY_GTE", "HAS_CARD"] as const;
-export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "BUFF_GEAR", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD", "CONSUME_ALLIES", "COPY"] as const;
+export const ACTION_TYPES = ["BUFF", "SUMMON", "DAMAGE", "GIVE_KEYWORD", "TRANSFORM", "DESTROY", "GAIN_ENERGY", "GAUGE_ADD", "MODIFY_RULE", "ADD_TO_HAND", "DISCOVER_GIANT", "DISCOVER_UNIT", "SUPER_GATTAI", "RANDOM_CARD", "ULTIMATE_FORM", "BUFF_SHOP", "BUFF_GEAR", "DEVOUR_SHOP", "SUMMON_FROM_HAND", "DISCARD", "CONSUME_ALLIES", "COPY", "TRIGGER_LAST_STAND"] as const;
 export const CARD_KINDS = ["UNIT", "GEAR", "GIANT"] as const;
 export const GAUGE_SOURCES = ["ON_ROLL_CALL", "ON_ROLL_CALL_WIN", "HENSHIN"] as const;
 export const POWER_MODES = ["ACTIVE", "ONCE", "PASSIVE"] as const;
@@ -90,6 +90,7 @@ export const ACTION_FIELDS: Record<(typeof ACTION_TYPES)[number], Row[]> = {
   GIVE_KEYWORD: [{ key: "keyword", field: { kind: "enum", options: KEYWORDS } }],
   TRANSFORM: [{ key: "into", label: "into card", field: { kind: "ref", to: "cards" } }],
   DESTROY: [],
+  TRIGGER_LAST_STAND: [],
   GAIN_ENERGY: [{ key: "amount", field: int() }],
   GAUGE_ADD: [
     { key: "gauge", field: { kind: "ref", to: "gauges" } },
@@ -155,6 +156,7 @@ const ACTION_DEFAULTS: Record<(typeof ACTION_TYPES)[number], Record<string, unkn
   DEVOUR_SHOP: { choose: "RANDOM" },
   DISCARD: { count: 1, pick: "RANDOM", cardKind: "ANY" },
   SUMMON_FROM_HAND: { count: 1 },
+  TRIGGER_LAST_STAND: {},
 };
 
 export const ACTION: Field = {
