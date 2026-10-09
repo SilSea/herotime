@@ -262,6 +262,16 @@ describe("DISCOVER_GIANT", () => {
     runEffect(player({ actions: [{ type: "DISCOVER_GIANT" }] }), null, p, env);
     expect([...(p.discovers[0]?.options ?? [])].sort()).toEqual(["g1", "g2"]);
   });
+
+  it("never offers a giant's upgraded form: that comes later with ULTIMATE_FORM", () => {
+    const world = content({
+      cards: [card("g1", { kind: "GIANT", ultimateInto: "g1_mk2" }), card("g1_mk2", { kind: "GIANT" }), card("g2", { kind: "GIANT" })],
+    });
+    const env = makeEnv({ content: world, pool: new Pool([]), rng: new Rng(1) });
+    const p = newPlayer();
+    runEffect(player({ actions: [{ type: "DISCOVER_GIANT" }] }), null, p, env);
+    expect([...(p.discovers[0]?.options ?? [])].sort()).toEqual(["g1", "g2"]);
+  });
 });
 
 describe("gauges", () => {

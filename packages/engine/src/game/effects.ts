@@ -122,9 +122,11 @@ function removeFromBoard(player: PlayerState, unit: Unit, env: GameEnv): void {
 }
 
 function offerGiants(player: PlayerState, env: GameEnv): void {
-  // Only giants of series that can actually appear in this match.
+  // Only giants of series that can actually appear in this match, and never an upgraded form (another giant's
+  // ultimateInto): that one is earned later with ULTIMATE_FORM, not picked straight away.
+  const upgrades = new Set([...env.content.cards.values()].flatMap((c) => (c.kind === "GIANT" && c.ultimateInto ? [c.ultimateInto] : [])));
   const giants = [...env.content.cards.values()]
-    .filter((c) => c.kind === "GIANT" && (c.series === undefined || !env.activeSeries || env.activeSeries.has(c.series)))
+    .filter((c) => c.kind === "GIANT" && !upgrades.has(c.key) && (c.series === undefined || !env.activeSeries || env.activeSeries.has(c.series)))
     .sort((a, b) => a.key.localeCompare(b.key));
   if (giants.length === 0) return;
 
