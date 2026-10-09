@@ -1,5 +1,7 @@
 # Prompt สร้างภาพการ์ดที่ยังขาด
 
+ตอนนี้ขาดแค่เผ่า **Human** (ปิดอยู่) ใช้ตอนจะเปิดเผ่านี้
+
 ใช้กับ model สร้างภาพตัวไหนก็ได้ (Midjourney, SDXL, Flux, DALL·E ฯลฯ) · prompt เป็นภาษาอังกฤษเพราะ model ส่วนใหญ่เข้าใจดีกว่า
 ตั้งชื่อไฟล์ตาม key แล้ววางในโฟลเดอร์ภาพเดิม (`C:\Users\SilSea\Pictures\herotime\<เผ่า>\...`) จากนั้นอัปโหลดใน Admin แล้วปรับกรอบด้วย "ปรับภาพในการ์ด"
 
@@ -23,15 +25,7 @@ text, letters, words, logo, watermark, signature, card frame, border, blurry, lo
 
 ---
 
-## 1. เผ่าอื่น (ไม่ใช่ Human) — 3 ภาพ
-
-| key | การ์ด | Prompt |
-|---|---|---|
-| `final_form` | การ์ด Final Form (Gear กลาง) | `a glowing transformation device floating in the air, a crystal capsule core radiating golden light, energy rings and sparks spiraling around it, the moment of a hero's ultimate power-up, dark background with light rays` |
-| `sousei_gattai` | Sousei Gattai! (Gear Mecha) | `three sleek fighter jets, red, green and blue, flying in a spiral toward each other in the sky, beams of light linking them as they begin to combine into a giant robot, motion trails, sunset clouds` |
-| `harvest_beast` | Harvest Beast (token Mecha) | `a huge alien harvesting machine shaped like a floating organic beast, pale bone-white armor with glowing violet veins, tendrils hanging down over a ruined city, ominous and towering, seen from below` |
-
-## 2. Human (พักไว้ก่อน) — 24 ภาพ
+## Human — 24 ภาพ
 
 **การ์ด**
 | key | การ์ด | Prompt |
@@ -72,13 +66,3 @@ text, letters, words, logo, watermark, signature, card frame, border, blurry, lo
 | `relic_rl_savings_bond` | Savings Bond | `an ornate savings bond certificate with gold seal and ribbon, faint glow, plain dark background` |
 | `relic_rl_coupon_book` | Coupon Book | `a thick colorful coupon booklet with torn tickets fluttering out, plain dark background` |
 | `relic_rl_city_grant` | City Grant | `an official city grant document with a large city emblem stamp and a stack of coins, plain dark background` |
-
-## 3. Relic ทุกเผ่า — 5 ภาพ
-
-| key | Relic | Prompt |
-|---|---|---|
-| `relic_rl_final_form_belt` | Final Form Belt | `a futuristic transformation belt with a large glowing buckle, golden light bursting from the center, plain dark background` |
-| `relic_rl_lucky_coin` | Lucky Coin | `a single shining lucky gold coin with a four-leaf clover emblem, spinning, sparkles, plain dark background` |
-| `relic_rl_training_weights` | Training Weights | `a pair of heavy iron training weights and wrist weights with worn leather straps, dramatic light, plain dark background` |
-| `relic_rl_war_banner` | War Banner | `a tattered battle banner on a spear pole waving in the wind, embroidered with a golden star, plain dark background` |
-| `relic_rl_treasury` | Treasury | `an open treasure chest overflowing with glowing coins and gems, plain dark background` |

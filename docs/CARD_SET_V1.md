@@ -1,7 +1,6 @@
-# ชุดการ์ด v1 (ร่างแรก รอผู้ใช้ตรวจ)
+# ชุดการ์ด v1
 
-การ์ดของทั้ง 7 เผ่า ตามแนวใน `FACTIONS.md` และเรื่องที่กำหนด · **ใช้งานจริงแล้ว** (publish ล่าสุด version 11) · Human ปิดอยู่
-ออกแบบใหม่ทั้งหมด ไม่อิงการ์ดที่มีใน draft · Rider มีพระเอกและ**ไรเดอร์ฝ่ายร้าย** (ไม่มีสัตว์ประหลาด) ขายเป็นร่างคนแล้ว Henshin เป็นไรเดอร์ · Sentai มีแต่ฝ่ายเรนเจอร์
+ชุดการ์ดที่ใช้อยู่ (publish ล่าสุด **version 11**) · 7 เผ่าตามแนวใน `FACTIONS.md` · Human ปิดอยู่ · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
@@ -19,16 +18,12 @@
 - `R` = Rank · `ATK/HP` · keyword ตัวเอียงในวงเล็บ เช่น *(Guard)*
 - ความสามารถเขียนแบบ Card wizard: **จังหวะ: สิ่งที่ทำ** (ชื่อ trigger / action อยู่ใน `FACTIONS.md` และ `ADMIN_GUIDE.md` ข้อ 6)
 - "ถาวร" = `permanent` · "จนจบการสู้" = ไม่ใส่ permanent
-- key ตั้งเป็นภาษาอังกฤษตัวเล็ก ใช้ได้เลยตอนสร้างใน Admin
-- ค่าพลังคิดตามตารางข้อ 3 ใน `FACTIONS.md` เป็นค่าเริ่มต้น ต้อง Simulate แล้วปรับ
 
 ---
 
 ## 1. Rider — Kamen Rider ZEZTZ
 
 **แนว**: ในร้านขาย**ร่างคน** ซึ่ง Henshin เป็นร่างไรเดอร์ตอนจบเทิร์น (ร่างไรเดอร์เป็น token ไม่ขายในร้าน) · Zeztz ใช้ **Capsem** (Gear) เปลี่ยนร่างไปมา บัฟติดไปทุกร่าง · Henshin ทุกครั้งเติม **Rider Gauge** ครบ 3 ได้**การ์ด Final Form** (การ์ดกลาง ใช้ได้ทุกเรื่อง) → **Zeztz Exdream**
-
-> ชุดนี้ทดสอบแล้ว (ดู "ผลทดสอบ" ท้ายหัวข้อ) ข้อมูลการ์ดที่ใช้ทดสอบเป็น JSON อยู่ที่ `docs/sets/zeztz-rider.json` (`cards` + `riderGauge`) คัดลอกแต่ละใบไปวางในแท็บ JSON ของการ์ดใน Admin ได้
 
 **การ์ดในร้าน: ร่างคนและผู้ช่วย** (14 ใบ · ร่างคนมีค่าพลังน้อย เพราะแปลงร่างก่อนเข้าสู้)
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
@@ -104,22 +99,6 @@
 - ตัวกรอง "เฉพาะการ์ด" นับร่างจาก Henshin เอง ส่วนร่างจาก Capsem ตั้ง `formOf: zeztz` ไว้ ตัวกรองของ Capsem, Nem, Minami และ Hero Nem เลยใส่แค่ `zeztz` (คำอธิบายการ์ดสั้นลง)
 - "−1/−0" ใส่ศัตรู: ลดได้ต่ำสุด ATK 0 ไม่ทำให้ตาย และไม่ติดถาวร
 - ไม่ได้ใส่: สัตว์ประหลาด Nightmare / Gore Nightmare (ตามที่กำหนด), Lord Zero (มีแค่ในหนัง)
-
-**ผลทดสอบ (2026-10-08)**
-- เล่นทีละขั้นผ่าน engine จริง ผ่าน 18/18 ข้อ:
-  - Baku แปลงร่างเป็น Zeztz และ Gauge +1
-  - Nem บัฟ Zeztz ได้
-  - Capsem เปลี่ยนร่างแล้วบัฟติดไป
-  - Booster Capsem ใช้ได้เฉพาะกับ Plasma
-  - Minami แปลงร่างแล้วให้ Barrier กับ Zeztz
-  - Henshin ครบ 3 ครั้งได้ การ์ด Final Form
-  - Final Form ยังมีบัฟและ Barrier เดิม
-  - Nox Knight รอ 2 เทิร์นแล้วเป็น Nox
-  - Three แปลงร่างแล้วได้ Gear
-  - Mugen ทำลายศัตรูซ้ายสุด และ Lord Two ลด ATK ศัตรู
-- บอทเล่น 150 เกม (server ทดสอบ, ชุด prototype + ชุดนี้): ไม่มี error · ร่างจาก Capsem และ Exdream เกิดในเกมจริง · Rider อันดับเฉลี่ย 4.66
-- เล่นในเบราว์เซอร์: Baku แปลงร่างเป็น Zeztz ในเกมจริง · หนังสือการ์ดแท็บ "ร่างแปลง & พิเศษ" แสดงทุกร่างพร้อมบอกที่มา
-- **ข้อสังเกตเรื่องสมดุล** (จาก Simulate, บอทใช้ Capsem น้อย): Mugen (2.0), Lord Two (2.3), Nox Midnight (2.3) แรง · Zeztz ร่างพื้นฐาน (6.3), Nem (6.7), Nasuka (7.3) อ่อน — ปรับหลังลองเล่นจริง
 
 ---
 
@@ -355,7 +334,7 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 | 4 | `rasengan` | Rasengan | 3 | ใช้กับ Shonen ที่เลือก: ได้ Power Strike และ +2/+1 ถาวร |
 
 \* limit มีแค่ "ต่อเทิร์น" กับ "ต่อเกม" 1 เทิร์นมีการสู้ครั้งเดียว "ต่อเทิร์น" จึงเท่ากับต่อการสู้
-\*\* ค่าติดลบใส่ศัตรูหยุดที่ ATK 0 และไม่ทำให้ตาย (ดูข้อ 8)
+\*\* ค่าติดลบใส่ศัตรูหยุดที่ ATK 0 และไม่ทำให้ตาย
 
 ---
 
@@ -426,153 +405,11 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 | ทุกเผ่า | `rl_war_banner` | War Banner | Greater | 3 | เริ่มการต่อสู้: ให้พันธมิตรทุกตัว +1/+0 |
 | ทุกเผ่า | `rl_treasury` | Treasury | Greater | 3 | ต้นทุกเทิร์น: ได้ 1 Energy |
 
-**ผล Simulate (1,200 เกม, หลังปรับ 1 รอบ)**
-- Hero อยู่ในช่วงอันดับเฉลี่ย 2.9–5.4 · แรงสุด Jet Jaguar 2.94, Defense General 3.57 · อ่อนสุด Yanma Gast 5.43 (หุ่นยักษ์เกิดไม่บ่อย), Celiane 5.42, Lord Zero 5.15
-- Relic ที่แรง: Oxygen Destroyer 2.48 (ส่วนหนึ่งเพราะ Kaiju แรงอยู่แล้ว), Ohger Crown 3.20 · อ่อน: Savings Bond 5.45, Capsem Case 5.11
-- Relic ทุกเผ่า (Lucky Coin, War Banner, Treasury) แทบไม่ถูกเลือก เพราะบอทเลือก Relic ตรงเผ่าก่อน
-- ภาพ Hero และ Relic: อยู่ในโฟลเดอร์ภาพเดิม ชื่อ `hero_<key>` และ `relic_<key>` (Human และ Relic ทุกเผ่าไม่มีภาพ)
-
 ---
 
-## ผล Simulate ทั้งชุด (2026-10-08)
+## สมดุลล่าสุด (Simulate version 11, 2,400 เกม, Human ปิด)
+อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5): Mecha 4.04 · Kaiju 4.05 · Rider 4.23 · Sentai 4.31 · Shonen 4.37 · Beast 4.64 · ห่างสุด 0.60
 
-ทั้ง 7 เผ่าเป็นข้อมูลจริงที่ `docs/sets/card-set-v1.json` (รอบแรกๆ ใช้ Hero ทดสอบ 4 ตัวและไม่มี Relic · ตอนนี้ไฟล์มี Hero และ Relic ข้างบนแล้ว · Roll Call 3 สี) · บอทเล่น **1,200 เกม** บน server ทดสอบ ไม่มี error · เฉลี่ย 13.1 เทิร์น
-
-| เผ่า | รอบ 1: อันดับ / ชนะ | รอบสุดท้าย: อันดับ / ชนะ |
-|---|---|---|
-| Kaiju | **2.95** / 37.8% | **3.16** / 31.4% |
-| Mecha | 4.23 / 9.7% | 4.30 / 9.7% |
-| Shonen | 4.42 / 8.9% | 4.41 / 12.4% |
-| Rider | 4.84 / 8.1% | 4.81 / 7.8% |
-| Human | 4.89 / 8.6% | 4.83 / 11.5% |
-| Sentai | 4.71 / 8.6% | 4.97 / 8.7% |
-| Beast | **5.37** / 5.0% | **5.13** / 5.0% |
-
-อันดับเฉลี่ย 1 = ดีสุด, 8 = แย่สุด, กลาง 4.5 · รอบละ 1,200 เกม
-
-**ที่ปรับระหว่างรอบ** (ตารางการ์ดด้านบนเป็นค่าล่าสุดแล้ว)
-- engine: ลงการ์ดจากมือนับเป็น "เรียกยูนิตเข้าสนาม" (Beast)
-- การ์ด R1 ที่อ่อนเกิน +1 HP ทุกเผ่า
-- Kaiju: Shin Godzilla แปลงร่างช้าลง (3 เทิร์นต่อขั้น) ร่าง 4 เหลือ 7/7 ไม่มี Kyodaika · Godzilla 5/6 Avenge +2/+2 · Godzilla Junior Avenge (3) · Burning Godzilla 9/9 ไม่มี Kyodaika
-- Beast: token 2/2 และ 2/1 · Haru ให้ +1/+1 · Pina, Collot, Kibi แรงขึ้น
-
-**หลังปรับบอท (ระดับ A)** · 1,200 เกม · การ์ดชุดเดียวกับ "รอบสุดท้าย"
-| เผ่า | อันดับ / ชนะ |
-|---|---|
-| Kaiju | **3.13** / 36.0% |
-| Mecha | 3.81 / 14.0% |
-| Shonen | 4.49 / 10.1% |
-| Rider | 4.68 / 8.7% |
-| Sentai | 4.95 / 9.1% |
-| Human | 5.01 / 9.9% |
-| Beast | 5.01 / 6.1% |
-
-บอทเล่นตามแผนมากขึ้นมาก: ร่าง Zeztz จาก Capsem 55 → 479 ครั้ง · Aquarion รวมร่าง 129 → 537 · Solar Wings และ King Kuwagata เกิดครั้งแรก (32, 38) · การ์ด Final Form จาก Rider Gauge บอทใช้กับ Nox (Nox Midnight Shadow 525 ครั้ง) มากกว่า Zeztz
-
-**หลังเปลี่ยนเป็นการ์ด Final Form กลาง** (1,200 เกม): Kaiju 3.30 · Mecha 3.68 · Shonen 4.39 · Sentai 4.60 · Human 4.69 · Rider 4.94 · Beast 5.13 · ร่าง Final Form เกิดครบทุกเรื่อง: King Kuwagata 38 → 129 ครั้ง, Solar Wings 32 → 63, Zeztz Exdream 0 → 18, Nox Midnight 546
-
-**รอบล่าสุด (1,800 เกม, ชุดเต็ม: Hero + Relic + การ์ด Final Form กลาง)**
-| เผ่า | อันดับ / ชนะ |
-|---|---|
-| Kaiju | **3.29** / 28.3% |
-| Mecha | 3.69 / 14.3% |
-| Shonen | 4.38 / 13.5% |
-| Sentai | 4.60 / 9.8% |
-| Human | 4.68 / 16.6% |
-| Rider | 4.94 / 7.1% |
-| Beast | **5.12** / 5.2% |
-
-การ์ดที่ห่างจากค่าเฉลี่ยของ Rank เดียวกันมาก (ติดลบ = แรงกว่า): Godzilla Junior R3 −1.4, Hedorah R2 −0.8, Godzilla R5 −0.7, Destoroyah R4 −0.7, Haru R1 −0.6, Vector Mars R1 −0.5, Pina R2 −0.5 · อ่อนสุด: Intern Researcher +0.5, Mechanic +0.4, Eight +0.4
-
-**ปรับสมดุล 3 รอบ (2026-10-08, รอบละ 1,800 เกม)**
-| เผ่า | ก่อน | รอบ 1 | รอบ 2 | รอบ 3 (ปัจจุบัน) |
-|---|---|---|---|---|
-| Kaiju | 3.29 | 3.49 | 3.91 | **3.87** |
-| Mecha | 3.69 | 3.67 | 3.75 | **3.87** |
-| Shonen | 4.38 | 4.45 | 4.45 | **4.36** |
-| Sentai | 4.60 | 4.64 | 4.55 | **4.50** |
-| Human | 4.68 | 4.81 | 4.52 | **4.58** |
-| Rider | 4.94 | 4.91 | 4.81 | **4.82** |
-| Beast | 5.12 | 4.89 | 4.89 | **4.93** |
-
-ช่วงห่างระหว่างเผ่าแรงสุดกับอ่อนสุด 1.83 → 1.06 · ผลแต่ละรอบแกว่งได้ราว ±0.1 · ตารางการ์ด Hero และ Relic ด้านบนเป็นค่าหลังรอบ 3 แล้ว
-- รอบ 1: ลด Godzilla Junior (ตัด Avenge), Hedorah, Godzilla, Destoroyah, Vector Mars · เพิ่ม Beast (Legoshi, Louis, Juno, Els, สิงโต), Human ตัวเล็ก, Ohkuwagata, God Kumo, Eight, Nasuka, Zeztz, Lord Five · ปรับ Hero 8 ตัว และ Relic 7 ชิ้น
-- รอบ 2: Yanma แรงเกิน (ชาร์จ Mecha Gauge เร็ว) จึงลดลง · ลด Kaiju อีก (Destoroyah, Godzilla, Hedorah Spawn ไม่มี Lethal, Mechagodzilla) · เพิ่ม Human, DEAVA Hangar, Sasuke
-- รอบ 3: ลด Vector Mars, Godzilla, Defense Commander, War Banner · เพิ่ม Legoshi, Zeztz, Knight Seventeen, Nem
-- ยังห่างจากค่าเฉลี่ยของ Rank: Destoroyah −0.6, King Ghidorah −0.4 (แรง) · Arms Dealer +0.4, Neji +0.3 (อ่อน) · Hero: Defense General 3.49 แรง, Nem 5.25 อ่อน · Relic เศรษฐกิจ (Savings Bond, Capsem Case) ยังอ่อน เพราะบอทใช้ Energy ส่วนเกินไม่เก่ง
-
-**Kaiju ยังแรงเกิน**: ลองตัด Kyodaika ทั้งเผ่า หรือตัด Avenge ทั้งเผ่า ก็ยังอยู่ที่ 3.3 ความแรงกระจายอยู่ที่ Godzilla, King Ghidorah, Destoroyah (อันดับดีกว่าค่าเฉลี่ยของ Rank เดียวกันชัดเจน) ต้องปรับทีละใบในรอบหน้า
-
-อันดับรายการ์ดดูได้จากหน้า Admin → Simulate หลังใส่ชุดนี้ใน draft · การ์ด Rank สูงจะมีอันดับดีกว่าเสมอ เพราะอยู่บนบอร์ดของผู้ชนะตอนท้ายเกม ให้เทียบกับการ์ด Rank เดียวกัน
-
-## ทดลองบัฟ Rider / Beast (2026-10-08)
-
-ทดสอบบน test server ด้วย draft ปัจจุบัน (Human ปิดอยู่) รูปแบบละ 1,200 เกม · ตัวเลข = อันดับเฉลี่ย (ต่ำ = ดี)
-
-| ทดลอง | สิ่งที่เปลี่ยน | Rider | Beast | หมายเหตุ |
-|---|---|---|---|---|
-| ตั้งต้น | — | 4.88 | 5.11 → **4.86** เมื่อนับแบบใหม่ | Kaiju 3.77, Mecha 3.75 ยังนำ |
-| Rider A | Sieg r3→r4 (Dawn 6/6), Eight r3→r4 (4/5), Three r4→r5 (Lord Three 7/7) | **4.53** | — | ได้ผลซ้ำ 2 รอบ |
-| Rider B | Capsem ทุกใบ +1/+1 ถาวรก่อนเปลี่ยนร่าง | ช่วยนิดเดียว | — | Zeztz ยังไม่ค่อยอยู่ถึงท้ายเกม |
-| Beast บัฟถาวร | Haru/Juno/Bill บัฟถาวร, Durham 2/3, Dom 2/2 | — | 5.01 | ไม่ต่างจาก noise |
-| Beast A | Gosha r4→r5 (5/8), Louis r4→r5 (5/7), Bill r3→r4 (5/4) | — | 4.85 | การ์ดดีขึ้นเป็นใบๆ แต่ทั้งเผ่าไม่ขยับ |
-
-**นับเผ่าแบบใหม่ (C)**: ไม่นับ token ที่ถูกเรียก Beast ดีขึ้นจาก 5.11 เป็น 4.86 ส่วนหนึ่งของความ "อ่อน" มาจากวิธีวัด · ผลข้างเคียง: Rider แรงขึ้นแล้ว Shonen กับ Sentai ตก (Shonen 4.43 → 4.81)
-
-## Balance pass 1 (2026-10-08, publish ใน version 9)
-
-ตารางการ์ดข้างบนเป็นค่าหลังปรับแล้ว · ทดสอบชุดละ 2,400 เกม (Human ปิด) · อันดับเฉลี่ย ต่ำ = ดี
-
-| ชุด | Kaiju | Mecha | Rider | Sentai | Beast | Shonen | ห่างสุด |
-|---|---|---|---|---|---|---|---|
-| ก่อนปรับ | 3.78 | 3.77 | 4.89 | 4.37 | 4.83 | 4.43 | 1.12 |
-| เนิฟ Kaiju/Mecha | 4.06 | 3.92 | 4.98 | 4.20 | 4.75 | 4.27 | 1.06 |
-| + Rider A+B | 3.94 | 3.93 | 4.49 | 4.61 | 4.77 | 4.53 | 0.84 |
-| **+ บัฟ Beast (ที่ใส่)** | 4.03 | 4.04 | 4.51 | 4.56 | 4.60 | 4.70 | **0.67** |
-
-- **Kaiju**: Burning Godzilla 9/9 → 8/8 ดาเมจ 4 → 3 · Godzilla 5/5 → 4/4 · King Ghidorah 3 ครั้ง → 2 · Destoroyah Avenge +2/+2 → +1/+1 · Mechagodzilla 4/5 → 3/5 · Biollante 3/4 → 2/4 · Mothra 4/5 → 3/4
-- **Mecha**: Apollonius 8/8 → 7/7, +3/+3 → +2/+2 · Gen Fudo บัฟ Mecha +2/+2 → +1/+1 · Johannes 4/4 → 3/4 · Aquarion Luna ดาเมจ 2 → 1 · Cherubim Soldier 4/5 → 3/5 · Harvest Beast 2/6 → 2/4
-- **Rider**: Rider A (Sieg r4 → Dawn 6/6, Eight r4 4/5, Three r5 → Lord Three 7/7) + Capsem ทุกใบ +1/+1 ถาวรก่อนเปลี่ยนร่าง
-- **Beast**: Legoshi 7/8 → 8/9 · Yahya +2/+2 → +3/+3 · Sagwan 3/5 → 4/6 · Shishigumi Lion 3/2 → 4/3 · Bill, Haru, Juno บัฟถาวร · Tem Last Stand +1/+1 → +2/+2
-
-**ที่ยังต้องดู**: Shonen ตกเป็นอ่อนสุด (4.70) · Kaiju/Mecha ยังนำราว 0.5 · ตัวเลขมาจากบอท ต้องดูจากการเล่นจริงด้วย
-
-## Balance pass 2 (2026-10-08, publish ใน version 9–10)
-
-- ร้านสุ่มการ์ดของ Hero (ซีรีส์เดียวกัน / ที่ Hero Power ระบุ) บ่อยขึ้น 2 เท่า (`heroCardWeight`) → Sentai, Beast ดีขึ้น · Hero Zeztz แย่ลง (Rider 4.49 → 4.71)
-- **Capsem ใช้กับ Rider ทุกตัว**: +1/+1 ถาวร ส่วนการแปลงร่างยังเฉพาะ Zeztz → Rider 4.71 → **3.77** (2,400 เกม) · Mecha 3.77, Kaiju 4.28, Sentai 4.29, Beast 4.52, Shonen 4.63 (ห่างสุด 0.86)
-- ทางเลือกที่ทดลองแต่ไม่เลือก: ตัวที่ไม่ใช่ Zeztz ได้ +1/+0 (Rider 4.31) · Baku แปลงร่างแล้วได้ Capsem (ไม่ต่าง) · Capsem +2/+2 (Rider 4.60)
-- **Giant Robo ได้ stat Sentai 50%** (`giantSentaiScale` 0.5 จาก 1, version 10): เล่นจริงหุ่นแรงเกิน · Simulate เดิมไม่เห็นเพราะตารางเผ่านับแค่บอร์ด (บอทที่มีหุ่นอันดับเฉลี่ย 1.93, ชนะ 53%) → Sentai 4.29 → 4.46, คนมีหุ่น 1.93 → 2.29 · ไม่มีหุ่นเลย Sentai 5.16
-- **ต้องดูต่อ**: Rider อาจแรงเกินในเกมจริง · Shonen อ่อนสุด
-
-## Balance pass 3: Gear ของทุกเผ่า (2026-10-08, publish ใน version 11)
-
-ก่อนหน้านี้ Gear ในร้านเกือบทั้งหมดเป็น Capsem ของ Rider (ร้านมีช่อง Gear 1 ช่อง สุ่มจาก Gear ของเผ่าในล็อบบี้) → Rider ได้เปรียบ · เพิ่ม Gear เผ่าละ 3 ใบ (Mecha 2 ใบ + Sousei Gattai เดิม) รวม 14 ใบ ดูตารางในแต่ละเผ่า · ทุกใบมีซีรีส์ของเผ่า (ระบบการ์ดของ Hero นับด้วย) · มีรูปแล้ว (จาก wiki แฟนคลับ)
-
-| เผ่า | version 10 | + Gear ใหม่ |
-|---|---|---|
-| Rider | 3.74 | 4.23 |
-| Mecha | 3.74 | 4.04 |
-| Kaiju | 4.23 | 4.05 |
-| Sentai | 4.46 | 4.31 |
-| Shonen | 4.56 | 4.37 |
-| Beast | 4.53 | 4.64 |
-| ห่างสุด | 0.82 | **0.60** |
-
-Simulate 2,400 เกมต่อชุด · Capsem โผล่น้อยลงเพราะมี Gear เผ่าอื่นแทรก Rider จึงลงเอง · **ต้องดูต่อ**: Beast อ่อนสุด
-
-## 8. สิ่งที่ต้องรู้ก่อนสร้างจริง
-
-1. **บัคที่เจอระหว่างออกแบบ (แก้แล้ว)**: บัพค่าติดลบใส่ศัตรู (Shikamaru) เคยทำให้ ATK ติดลบได้ และถ้าตั้ง "ถาวร" จะติดไปกับยูนิตของผู้เล่นฝั่งตรงข้าม ตอนนี้หยุดที่ ATK 0 / HP 1 (ไม่ฆ่า) และ "ถาวร" มีผลกับยูนิตฝั่งตัวเองเท่านั้น
-2. ตัวกรองชื่อการ์ดไม่นับร่างจาก Capsem / TRANSFORM (ดูหมายเหตุ Rider)
-3. ทุกเผ่ามีการ์ดครบตามจำนวนขั้นต่ำใน `FACTIONS.md` แล้ว
-4. ชื่อตัวละครและท่าเป็นเครื่องหมายการค้าของเจ้าของ (Toei, Toho, Satelight, Akita Shoten, Shueisha) ใช้ได้กับโปรเจกต์เล่นกันเอง ถ้าจะเปิดสาธารณะควรเปลี่ยนเป็นของ original
-
-## แหล่งอ้างอิง
-- [List of Genesis of Aquarion characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Genesis_of_Aquarion_characters) · [Toma (Aquarion Wiki)](https://aquarion.fandom.com/wiki/Toma)
-- [List of Kamen Rider ZEZTZ characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Kamen_Rider_ZEZTZ_characters) · [Capsems (Kamen Rider Wiki)](https://kamenrider.fandom.com/wiki/Capsems)
-- [List of Ohsama Sentai King-Ohger characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Ohsama_Sentai_King-Ohger_characters)
-- [Genesis of Aquarion (Wikipedia)](https://en.wikipedia.org/wiki/Genesis_of_Aquarion) · [Road to SMP: Genesis of Aquarion](https://mechacatalogue.com/2022/05/22/road-to-smp-no-100-smp-shokugan-modeling-project-genesis-of-aquarion/)
-- [All Shin Godzilla Forms Explained (The Mary Sue)](https://www.themarysue.com/godzilla-all-shin-godzilla-forms-explained/) · [Wikizilla: Burning Millennium Godzilla](https://wikizilla.org/wiki/Burning_Millennium_Godzilla) · [10 Greatest Enemies of Godzilla (Listverse)](https://listverse.com/2012/12/23/10-greatest-enemies-of-godzilla/)
-- [List of Beastars characters (Wikipedia)](https://en.wikipedia.org/wiki/List_of_Beastars_characters)
-- [Top 20 Jutsu in the Naruto Series (WatchMojo)](https://www.watchmojo.com/articles/top-20-jutsu-in-the-naruto-series)
+- ตัวเลขจากบอท (เล่น Gattai / สี Sentai แย่กว่าคน) ต้องดูจาก Stats ของเกมจริงประกอบ
+- **ต้องดูต่อ**: Beast อ่อนสุด · Rider อาจแรงในเกมจริง
+- ประวัติการปรับ: Admin → Versions (โน้ตแต่ละเวอร์ชัน) และ git log ของเอกสารนี้

@@ -1,290 +1,105 @@
-# HeroTime — Game Rules v0.1
+# HeroTime — Game Rules
 
-ตัวเลขทุกค่าในเอกสารนี้เป็นค่าเริ่มต้น ปรับได้ผ่าน config / admin editor
+ตัวเลขเป็นค่าเริ่มต้นของ engine · หลายค่าเปลี่ยนได้ใน Admin → Rules (ดู [ADMIN_GUIDE.md](ADMIN_GUIDE.md) ข้อ 9) · ค่าจริงของการ์ดดูในหนังสือการ์ด หรือ [CARD_SET_V1.md](CARD_SET_V1.md)
 
 ## 1. ภาพรวม
-- ล็อบบี้มี 8 ผู้เล่น ถ้าคนไม่ครบให้ bot เติม
-- เลือก **Hero** 1 ตัวจากที่สุ่มมา **2 ตัว** ทุก Hero มี **HP 30** + **Armor** (0–10 ตาม Hero) และ **Hero Power**
-- แต่ละเทิร์นมี 2 phase: **Recruit** (ซื้อ/จัดทัพ) → **Battle** (สู้อัตโนมัติ)
-- HP ≤ 0 = ตกรอบ. อันดับตามลำดับที่ตกรอบ คนสุดท้ายที่รอดชนะ
+- ล็อบบี้ 8 คน ไม่ครบ bot เติม · เลือก **Hero** 1 จาก 2: HP 30 + Armor (ตาม Hero) + **Hero Power**
+- แต่ละเทิร์น: **Recruit** (ซื้อ/จัดทัพ) → **Battle** (สู้อัตโนมัติ)
+- HP ≤ 0 = ตกรอบ · อันดับตามลำดับที่ตกรอบ · คนสุดท้ายชนะ
+- ยอมแพ้ได้ทุก phase: ได้อันดับล่างสุดของคนที่ยังอยู่ · เกมจบเมื่อเหลือคนเดียวหรือไม่เหลือคนจริง
 
-### 1.1 Timer
 | ช่วง | เวลา |
 |---|---|
 | เลือก Hero | 30s |
-| Recruit เทิร์น 1 | 40s |
-| Recruit เทิร์น 2+ | +5s ทุกเทิร์น สูงสุด 75s (ถึง cap ราวเทิร์น 8) |
-| Battle | 20s: replay เล่นอัตโนมัติ ถ้า fight ยาวจะเร่งให้จบในเวลา (กดเร่ง ×2/×4 หรือ Skip เองได้) แล้วนับถอยหลังเข้าเทิร์นถัดไป |
-| จบ Recruit | **ไม่มีปุ่ม Ready**: ทุกเทิร์นใช้เวลาเต็ม เมื่อหมดเวลาจะเล่น replay และแสดงนับถอยหลัง "Next turn in" เพื่อเริ่มเทิร์นใหม่พร้อมกัน |
-| ยอมแพ้ | ปุ่ม Surrender ใช้ได้ทุก phase: ออกทันที ได้อันดับล่างสุดของคนที่ยังอยู่ เกมจบเมื่อเหลือคนเดียวหรือไม่เหลือคนจริง |
+| Recruit | เทิร์น 1 = 40s, +5s ต่อเทิร์น สูงสุด 75s · เทิร์นเลือก Relic +10s · ไม่มีปุ่ม Ready |
+| Battle | 20s: replay (fight ยาวเร่งให้จบในเวลา, กดเร่ง/Skip ได้) แล้วนับถอยหลังเข้าเทิร์นถัดไป |
 
-ประมาณเกมละ 20–30 นาที. **Quick Mode**: Recruit 35s ทุกเทิร์น (ไม่เพิ่ม), Hero เริ่ม HP 20 — มีคิวแยก ("คิว Quick Mode" ใน lobby) และเลือกได้ในโหมดฝึก; เกม Quick ไม่นับในตารางอันดับ
+**Quick Mode**: Recruit 35s ทุกเทิร์น, HP 20, คิวแยก, ไม่นับอันดับ
 
-## 2. Recruit Phase
+## 2. Recruit
 | รายการ | ค่า |
 |---|---|
-| Energy | เทิร์น 1 = 3, +1 ทุกเทิร์น สูงสุด 10 |
-| ซื้อยูนิต | 3 |
-| ขายยูนิต | ได้คืน 1 |
-| Refresh ร้าน | 1 |
-| Freeze ร้าน | 0 (เก็บร้านไว้เทิร์นหน้า) (การ์ดที่แช่ไว้อยู่ต่อ ช่องที่ซื้อไปแล้วเติมการ์ดใหม่ให้เต็มตอนเริ่มเทิร์น) |
-| อัป Base Rank 1→2→3→4→5→6 | 5 / 7 / 8 / 9 / 11 — ลดลง 1 ทุกเทิร์นที่ยังไม่อัป |
-| ขนาดร้านตาม Rank | 3 / 4 / 4 / 5 / 5 / 6 |
-| Board | 7 ช่อง (+ Giant Slot 1 ช่อง ดูข้อ 6) |
-| Hand | 10 ใบ |
+| Energy | เทิร์น 1 = 3, +1 ต่อเทิร์น สูงสุด 10 (ไม่สะสมข้ามเทิร์น) |
+| ซื้อ / ขาย / Refresh / Freeze | 3 / ได้คืน 1 / 1 / 0 |
+| อัป Base Rank 1→6 | 5 / 7 / 8 / 9 / 11 ลดลง 1 ทุกเทิร์นที่ยังไม่อัป |
+| ขนาดร้านตาม Rank | 3 / 4 / 4 / 5 / 5 / 6 ยูนิต + Gear 1 ช่อง |
+| Board / Hand | 7 (+ Giant Slot) / 10 |
 
-- **Shared pool** ต่อชนิดยูนิต: R1:16, R2:15, R3:13, R4:11, R5:9, R6:7 — ซื้อแล้ว pool ลด, ขายแล้วคืน pool (ตัวเลขนี้อยู่ใน engine ยังแก้จาก Admin ไม่ได้)
-- **การ์ดของ Hero**: การ์ดในร้านที่ซีรีส์เดียวกับ Hero ที่เลือก (หรือการ์ดที่ Hero Power ระบุชื่อ) สุ่มเจอบ่อยขึ้น `heroCardWeight` เท่าต่อใบ (ค่าเริ่ม 2, ตั้งใน Admin → Rules, 1 = ไม่เพิ่ม) · ไม่เพิ่มจำนวนใบใน pool แค่ถ่วงโอกาส
-- **Triple → Golden (ร่างทอง)**: (ชื่อ "Final Form" ใช้กับร่างสุดท้ายของ Rider ที่ได้จากการ์ด Final Form / `ultimateInto`)  ยูนิตเดียวกัน 3 ตัวรวมเป็นร่างทอง (stat ×2, effect ×2) + ได้ Discover ยูนิต Rank+1 1 ใบ (ถ้า pool ไม่มี Rank นั้น ใช้ Rank ที่ใกล้ที่สุดที่มีการ์ด เริ่มจาก Rank ที่ต่ำกว่า). รวมทันทีไม่ว่าใบที่ 3 มาทางไหน: ซื้อ, ลงการ์ด, Discover, Gear, Hero Power, Relic, ขาย (On Sell), ต้นเทิร์น, End of Turn/Henshin (รวมก่อนสู้)
-- ล็อบบี้สุ่มใช้ **5 จาก 7 Faction**
+- **Freeze**: การ์ดที่แช่อยู่ต่อ ช่องที่ซื้อไปเติมใหม่ตอนเริ่มเทิร์น
+- **Shared pool** ต่อชนิด: R1 16, R2 15, R3 13, R4 11, R5 9, R6 7 · ซื้อแล้วลด ขายแล้วคืน (แก้ใน Admin ไม่ได้)
+- **การ์ดของ Hero**: การ์ดซีรีส์เดียวกับ Hero หรือที่ Hero Power ระบุชื่อ สุ่มเจอบ่อยขึ้น `heroCardWeight` เท่า (ค่าเริ่ม 2) ไม่เพิ่มจำนวนใน pool
+- **Triple**: ยูนิตเดียวกัน 3 ตัว → ร่างทอง (stat ×2, effect ×2) + Discover ยูนิต Rank+1 · รวมทันทีไม่ว่าใบที่ 3 มาทางไหน
+- เผ่าในล็อบบี้: สุ่ม 5 เผ่าจากเผ่าที่เปิดและมียูนิตในร้าน
 
-## 3. Battle Phase
-- จับคู่สุ่ม ห้ามเจอคู่เดิมใน 3 รอบล่าสุด. ถ้าคนเหลือเป็นเลขคี่ คนที่เกินเจอ **Ghost** (บอร์ดล่าสุดของคนที่ตกรอบไปแล้ว)
-- จับคู่ตอน**เริ่ม Recruit** แล้วบอกทุกคนว่ารอบนี้เจอใคร ("vs ชื่อ" ข้างเวลา + กรอบในแถบผู้เล่น) · ถ้ามีคนออกก่อนสู้ (ยอมแพ้) จับคู่ใหม่
-- ฝ่ายที่มียูนิตมากกว่าตีก่อน ถ้าเท่ากันสุ่ม
-- ผลัดกันตีจากซ้ายไปขวา เลือกเป้าหมายสุ่ม แต่ต้องตี **Guard** ก่อน
-- ทั้งสองตัวเสีย HP เท่ากับ ATK ของอีกฝ่าย HP ≤ 0 = ตาย
-- จบเมื่อฝ่ายหนึ่งไม่เหลือยูนิต. ผู้ชนะทำดาเมจ = **Base Rank + ผลรวม Rank ยูนิตที่รอด** (cap 15 ในเทิร์น 1–8). เสมอ = ไม่มีดาเมจ
-- สนามรบใช้สำเนาบอร์ด ยูนิตที่ตายกลับมาครบในเทิร์นหน้า ยกเว้น effect ที่ระบุว่า "ถาวร"
-- ใช้ seeded RNG บน server, client เล่น replay จาก combat log
+## 3. Battle
+- จับคู่สุ่มตอน**เริ่ม Recruit** (บอกทุกคน) ห้ามเจอคู่เดิมใน 3 รอบล่าสุด · คนเหลือคี่ คนที่เกินเจอ **Ghost** (บอร์ดล่าสุดของคนที่ตกรอบ) · มีคนออกก่อนสู้ = จับคู่ใหม่
+- ฝ่ายที่มียูนิตมากกว่าตีก่อน (เท่ากันสุ่ม) · ผลัดกันตีจากซ้ายไปขวา เป้าสุ่ม แต่ต้องตี **Guard** ก่อน
+- ทั้งสองตัวเสีย HP เท่า ATK อีกฝ่าย · จบเมื่อฝ่ายหนึ่งไม่เหลือยูนิต
+- ผู้ชนะทำดาเมจ = **Base Rank + ผลรวม Rank ยูนิตที่รอด** (cap 15 ในเทิร์น 1–8) · เสมอ = ไม่มีดาเมจ
+- สนามรบใช้สำเนาบอร์ด ยูนิตที่ตายกลับมาเทิร์นหน้า ยกเว้นผลที่ระบุ "ถาวร"
+- seeded RNG บน server, client เล่น replay จาก log
 
-## 4. Faction
-| Faction | ธีม | กลไกเด่น |
-|---|---|---|
-| **Rider** | ไรเดอร์สวมเข็มขัด | **Henshin**: แปลงร่างเมื่อถึงเงื่อนไข, scaling ตัวเดียว |
-| **Sentai** | ทีมหลายสี | **Team-Up**: บัฟตามจำนวนสีไม่ซ้ำบนบอร์ด |
-| **Mecha** | หุ่นยนต์/ยาน | **Gattai**: วาง core ไว้ซ้ายสุดของ Mecha Gattai ≥3 ตัวที่ติดกัน แล้วกด Combine ช่วงซื้อของ → รวมเป็นการ์ดร่างของ core ถาวร |
-| **Kaijin** | สัตว์ประหลาด/ปีศาจ | **Kyodaika**: ตายครั้งแรกฟื้นเป็นร่างยักษ์ |
-| **Beast** | ฝูงสัตว์ | **เรียกพวก**: เรียกยูนิตเข้าสนามตอนโจมตี/ตอนตาย/เริ่มสู้ + จ่าฝูง (trigger `ALLY_SUMMONED`) บัฟทุกตัวที่ถูกเรียกเข้ามาใหม่ |
-| **Ally** | พลเรือน/ทีม support | economy และ support: ได้ Energy, เพิ่มการ์ดเข้ามือ, บัฟ ally ตอนจบเทิร์น (ลดราคา/บัฟการ์ดในมือ: ยังไม่มีการ์ดที่ทำ) |
-| **Dark Rider** | ไรเดอร์ฝ่ายร้าย | sacrifice: Deploy ทำลาย ally สุ่ม 1 ตัว แล้วตัวเองได้ stat ตายตัว (ขโมย stat/keyword ของตัวที่ทำลาย: ยังไม่มี action นี้ใน engine) |
+## 4. Faction และ Series
+- **Faction** = แกน gameplay (synergy) · ยูนิตมีได้หลายเผ่าหรือไม่มีเผ่า (มีทุกเกม) · แนวแต่ละเผ่าดู [FACTIONS.md](FACTIONS.md)
+- **Series** = แกนธีม: `Universe` (tokusatsu / anime) → `Franchise` → `Series`
+- **Series Bond**: โบนัสเมื่อมีการ์ดซีรีส์เดียวกันครบ N ใบ (ชุดปัจจุบันยังไม่มี)
+- **Featured Series**: franchise ที่มีเกิน 3 ซีรีส์ สุ่มใช้ 3 ต่อล็อบบี้
 
-ยูนิต 1 ตัวมีได้หลาย Faction หรือเป็น **Neutral**
+## 5. Giant Robo (Mecha Gauge)
+1. **Roll Call** — เริ่มการต่อสู้ ถ้ามี Sentai สีไม่ซ้ำครบ `rollCallColors` (ชุดปัจจุบัน 3, Extra = wildcard) → Sentai ทุกตัว +1/+1 ในการสู้นั้น และ Mecha Gauge +1 · ชนะการสู้นั้น +1 อีก
+2. **Gauge 3** → การ์ด **Kyodai Gattai!** → Discover หุ่น 1 จาก 3 (หุ่นของซีรีส์ที่มีบนบอร์ดมากสุดออกแน่นอน) → อยู่ใน **Giant Slot** ถาวร
+3. **ตอนสู้** หุ่นลงสนามครั้งเดียว เมื่อยูนิตเราเหลือ ≤ `giantEntryThreshold` (2) หรือศัตรูเกิด Kyodaika
+   - Stat = base + `giantSentaiScale` × ATK/HP รวมของ Sentai บนบอร์ดตอนเริ่มสู้ (ชุดปัจจุบัน 0.5)
+   - **Final Blow**: ตีครั้งแรก ×2 และ ×2 อีกชั้นใส่ตัวใหญ่ (หุ่น/Kyodaika) รวม ×4
+4. **Gauge 6** → Super Gattai: การสู้ที่บอร์ดมี Extra Ranger หุ่น +4/+4 และได้ keyword ของ Extra Ranger · ชุดปัจจุบันได้การ์ด Final Form ด้วย
 
-## 5. Universe → Franchise → Series
-มีสองแกนแยกกัน:
-- **Faction** = แกน gameplay (คำนวณ synergy)
-- **Origin** = แกนธีม: `Universe` (Tokusatsu, Anime) → `Franchise` (Kamen Rider, Super Sentai, …) → `Series` (เช่น Den-O, Gokaiger หรือขบวนการ original)
+Gauge อื่นใช้ระบบเดียวกัน (`sources` + `thresholds`) เช่น **Rider Gauge**: +1 ทุก Henshin ทุก 3 แต้มได้การ์ด Final Form
 
-เพิ่ม anime ทีหลัง = เพิ่ม Universe/Franchise/Series + faction ใหม่ถ้าต้องการ (เช่น Shonen, Magical Girl) และใช้ faction เดิมซ้ำได้ (anime หุ่นยนต์ → Mecha)
-
-### 5.1 Series Template
-| ช่อง | Sentai Squad | Rider Series |
-|---|---|---|
-| Core | 5 สีหลัก (กระจาย Rank 1–4) | Rider หลัก + ร่างย่อย (Henshin chain 2–3 ขั้น) |
-| Extra | 6th Ranger (Rank 4–5, wildcard สี) | Rider รอง/คู่หู 1–2 ตัว |
-| Mecha | Giant Robo ของขบวนการ (ไม่อยู่ในร้าน) | Machine/Bike (ยูนิต Mecha) |
-| Villain | Kaijin 1–2 ตัว | Dark Rider/ตัวร้าย 1–2 ตัว |
-| Series Bond | โบนัสเมื่อซีรีส์เดียวกัน ≥2 / ≥4 | เหมือนกัน |
-| Signature | กลไกเด่น 1 อย่าง (effect DSL) | เช่น Den-O = สิง (ยืม keyword), W = ยูนิตคู่ |
-
-- Series Bond เล็กกว่า Faction synergy — เล่นข้ามซีรีส์ได้ แต่สะสมซีรีส์เดียวกันได้ "รางวัลแฟน"
-- **Featured Series**: แต่ละล็อบบี้สุ่ม 3 ซีรีส์ต่อ franchise ทำให้ pool ไม่บวม
-- การ์ด Neutral/original ใช้เติมช่องว่างของ pool
-
-## 6. Giant Robo — Mecha Gauge
-โครงเดียวกับตอนในซีรีส์: **รวมทีม → ประกาศชื่อ → สัตว์ประหลาดขยายร่าง → เรียกหุ่น**
-
-1. **Roll Call** — Start of Combat ถ้ามี Sentai **3 สีไม่ซ้ำ** (ค่า `rollCallColors` ของชุด content; engine default 5) (Extra = wildcard) → Sentai ทุกตัว +1/+1 ในการสู้นั้น และ **Mecha Gauge +1**. ถ้าชนะการสู้นั้นได้อีก +1 (สูงสุด +2/เทิร์น)
-2. **Gauge ครบ 3** → ได้การ์ด Gear **"Kyodai Gattai!"** ใส่มือ
-3. **เล่นการ์ด** → Discover หุ่น 1 จาก 3 — หุ่นของขบวนการที่มีสมาชิกบนบอร์ดมากที่สุดออกแน่นอน 1 ตัวเลือก
-4. หุ่นอยู่ใน **Giant Slot** (นอกบอร์ด 7 ช่อง) ถาวร
-5. **ตอนสู้** หุ่นลงสนามเมื่อเกิดเหตุการณ์แรก: (ก) ยูนิตเราเหลือ ≤2 ตัว หรือ (ข) ศัตรูเกิด Kyodaika
-   - Stat = base หุ่น + ครึ่งหนึ่งของ ATK/HP รวมของ Sentai บนบอร์ดตอนเริ่มสู้
-   - **Final Blow**: ตีครั้งแรกดาเมจ ×2 และดาเมจ ×2 ใส่ยูนิตยักษ์/Kyodaika
-6. **Super Gattai**: Mecha Gauge ถึง 6 → ปลด Super Gattai ถาวร: ทุกการต่อสู้ที่บอร์ดมี Extra Ranger หุ่นใน Giant Slot ได้ +4/+4 และ keyword ทั้งหมดของ Extra Ranger บนบอร์ด (ได้ซ้ำ = บวกเพิ่ม)
-
-### 6.1 Gauge system กลาง
-Gauge นิยามใน DB: `{key, max, sources[] (trigger + condition + amount), thresholds[] (value → reward action)}`
-- Sentai → **Mecha Gauge** → Giant Robo
-- Rider → **Rider Gauge** (ได้แต้มตอน Henshin) → การ์ด **Final Form**
-- Anime (อนาคต) → เช่น **Power-Up Gauge** → ปลดร่าง/ท่าไม้ตาย
-
-## 7. Keywords
-| Keyword | เทียบใน HS | ผล |
+## 6. Keywords
+| Keyword | เทียบ HS | ผล |
 |---|---|---|
 | Guard | Taunt | ศัตรูต้องตีตัวนี้ก่อน |
-| Barrier | Divine Shield | กันดาเมจได้ 1 ครั้ง |
-| Last Stand | Deathrattle | ทำงานตอนตาย |
-| Deploy | Battlecry | ทำงานตอนวางจาก hand |
+| Barrier | Divine Shield | กันดาเมจ 1 ครั้ง |
+| Last Stand | Deathrattle | ทำงานตอนตาย (ทุกครั้งที่ตาย รวมก่อน Revive/Kyodaika) |
+| Deploy | Battlecry | ทำงานตอนลงจากมือ |
 | Rapid | Windfury | ตี 2 ครั้ง |
-| Lethal | Poisonous | ทำดาเมจโดน = ตายทันที |
+| Lethal | Poisonous | ทำดาเมจโดน = ตาย |
 | Revive | Reborn | ฟื้นครั้งเดียว HP 1 |
-| Power Strike (บน Rider เรียก **Rider Kick**) | — | การตีครั้งแรกของการสู้ดาเมจ ×2 · key ในข้อมูลยังเป็น `RIDER_KICK` ชื่อที่โชว์ขึ้นกับเผ่าของการ์ด: การ์ดเผ่า Rider (หรือ effect ที่ให้กับยูนิต Rider) เห็นเป็น Rider Kick ที่เหลือเป็น Power Strike |
-| Henshin(N) | — | อยู่บนบอร์ดครบ N เทิร์น/ถึงเงื่อนไข → แปลงเป็น `transformInto` |
-| Team-Up(k) | — | ทำงานเมื่อมีสี Sentai ไม่ซ้ำ ≥ k · สีที่มี: RED, BLUE, YELLOW, GREEN, PINK, BLACK, WHITE, PURPLE, SILVER, GOLD, ORANGE · EXTRA = นับแทนสีที่ขาดได้ 1 สี |
-| Gattai | — | เป็นชิ้นส่วนรวมร่างได้: core (การ์ดที่มี `gattaiInto`) อยู่ซ้ายสุด + Gattai ติดกันครบจำนวน → กด Combine ตอน recruit = รวมถาวรเป็นการ์ดร่าง (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด, effect ของร่าง) แล้วบัฟต่อได้. ไม่มีการรวมระหว่างสู้. ตัวที่รวมแล้วไม่ถูกรวมซ้ำ |
-| Kyodaika | — | ตายครั้งแรก ฟื้นด้วย stat ×2 แต่ไม่มี keyword อื่น |
-| Echo | Brann | ระหว่างอยู่บนบอร์ด Deploy ของการ์ดที่ลงทีหลังทำงาน 2 ครั้ง (มีหลายใบก็ 2 ครั้ง) |
-| Start of Combat / End of Turn / Avenge(N) | เหมือน HS | trigger มาตรฐาน |
+| Echo | Brann | ระหว่างอยู่บนบอร์ด Deploy ของการ์ดที่ลงทีหลังทำงาน 2 ครั้ง |
+| Power Strike | — | ตีครั้งแรกของการสู้ ×2 · บนการ์ด Rider แสดงเป็น **Rider Kick** (key `RIDER_KICK`) |
+| Henshin(N) | — | อยู่บนบอร์ดครบ N เทิร์น → แปลงเป็น `henshin.into` ตอนจบเทิร์น (บัฟติดไป) |
+| Team-Up(k) | — | ทำงานเมื่อมีสี Sentai ไม่ซ้ำ ≥ k · Extra นับแทนสีที่ขาดได้ 1 สี |
+| Gattai | — | core (`gattaiInto`) ซ้ายสุด + ชิ้น Gattai ติดกันครบ `gattaiSize` → กด Combine ช่วงซื้อของ รวมถาวร (stat ร่าง + ผลรวมชิ้นส่วน, keyword ทั้งหมด) รวมได้ชั้นเดียว |
+| Kyodaika | — | ตายครั้งแรก ฟื้นด้วย HP สูงสุด ×2 (`kyodaikaMultiplier`) ไม่มี keyword อื่น นับเป็นตัวใหญ่ |
+| Final Blow | — | ของ Giant Robo (ดูข้อ 5) |
 
-## 8. Hero (ตามที่อยู่ใน prototype set ตอนนี้)
-- **Time Traveler** — passive: Refresh ฟรี 1 ครั้งต่อเทิร์น
-- **Red Leader** — 2 Energy ต่อเทิร์น: ยูนิตซ้ายสุด +2/+2 (แผนเดิม "ให้ Sentai ได้สีเพิ่ม" ยังทำไม่ได้: ไม่มี action เพิ่มสี)
-- **Mecha Commander** — passive: Gattai ใช้แค่ 2 ตัว
-- **Kaijin General** — 1 Energy ต่อเทิร์น: ยูนิตซ้ายสุดได้ Kyodaika (ถาวร ไม่ใช่แค่สู้รอบถัดไป)
-- **Professor Belt** (original) — 0 Energy ครั้งเดียวต่อเกม: ได้ Street Guardian เข้ามือ (แผนเดิม "Discover Henshin Driver" ยังไม่มีการ์ดนี้)
-- **Shocker Boss** — passive: ต้นทุกเทิร์นได้ Recruit (1/1) บนบอร์ด (ถ้าบอร์ดยังไม่เต็ม)
-- **Cafe Master** — 1 Energy ต่อเทิร์น: Ally ทุกตัว +1/+1
-- **Iron Guard** — ไม่มี power, armor 6
+## 7. Gear
+- ร้านมี Gear 1 ใบเสมอ: สุ่มจาก Gear rank ≤ rank ร้าน ของเผ่าในล็อบบี้หรือไม่มีเผ่า · ไม่อยู่ใน pool (หลายคนได้ใบเดียวกันได้)
+- ราคาของแต่ละใบ: `ENERGY` หรือ `HEALTH` (จ่ายจาก HP, ต้องเหลือ ≥ 1, เกราะไม่ช่วย)
+- ซื้อแล้วเข้ามือ กด **Use** (ผลช่วงซื้อของจึงถาวร) · ขายได้เฉพาะตอนที่ยังใช้ไม่ได้
+- **เลือกเป้าหมาย** (`CHOSEN_FRIENDLY`): ลากไปวางบนยูนิต หรือ Use แล้วคลิก · มีตัวเดียวที่ใช้ได้ = เลือกให้ · Gear หลายผลใช้กับยูนิตที่เข้า**ผลใดผลหนึ่ง** ผลที่ไม่เข้าถูกข้าม (เช่น Capsem: Rider ทุกตัวได้บัฟ แปลงร่างเฉพาะ Zeztz) · นอก Gear `CHOSEN_FRIENDLY` = ซ้ายสุด
+- Gear จาก Gauge (Kyodai Gattai!) ไม่ขายในร้าน
 
-ชุด production มี hero ของตัวเอง (Captain Marvelous, Kyoryu Red, Philip, Ryotaro, Eiji Hino, Professor Belt, Himmapan Guardian, Shocker Boss, Iron Guard) ดูรายละเอียดในแท็บ Library
-
-## 9. Gear
-- ร้านมี **ช่อง Gear 1 ช่อง** ข้างยูนิต: สุ่มจาก Gear ที่ rank ≤ rank ร้านของเรา (และอยู่ใน faction ของแมตช์ หรือเป็น neutral)
-- ราคาเป็นของแต่ละชิ้น (ไม่ใช่ 3 เสมอ): ซื้อแล้วเข้ามือ กด **Use** เพื่อใช้ผล (บัฟ/ให้ keyword กับยูนิตที่เลือก หรือทุกตัว แบบถาวรเพราะใช้ช่วง recruit)
-- Refresh สุ่ม Gear ใหม่, Freeze เก็บไว้, ซื้อแล้วช่องว่างจน Refresh/เทิร์นหน้า
-- **ราคาเป็นทองหรือเลือด** (`costType`): `ENERGY` จ่าย Energy, `HEALTH` จ่ายจาก HP ของ Hero (เกราะไม่ช่วยจ่าย, ต้องเหลือ HP อย่างน้อย 1 ซื้อจนตายไม่ได้). ป้ายราคาสีแดง ♥ = จ่ายด้วยเลือด. ตัวอย่าง: Blood Oath (3 HP), Venom Edge (4 HP), Overclock Chip (5 HP). bot ซื้อของราคาเลือดเฉพาะตอน HP เหลือ ≥ 15 หลังจ่าย
-- Gear ไม่อยู่ใน shared pool: หลายคนได้ชิ้นเดียวกันได้. ขาย Gear ไม่ได้
-- Gear ที่ได้จาก Gauge (Kyodai Gattai!, Final Form) ไม่ขายในร้าน — ดูได้ใน Book แท็บ **ร่างแปลง & พิเศษ** (พร้อม Giant Robo)
-- ร้านมี Gear 1 ใบเสมอ: ทุก Refresh สุ่มใหม่; Freeze แล้วซื้อ Gear ไป เทิร์นหน้าเติมใหม่ให้
-- **เลือกเป้าหมาย**: Gear ที่ใช้ selector `CHOSEN_FRIENDLY` ต้องเลือกยูนิต — ลาก Gear ไปวางบนยูนิต หรือกด Use แล้วคลิกยูนิต (Esc ยกเลิก). มียูนิตเข้าเงื่อนไขตัวเดียว = เลือกให้เอง; ไม่มีเลย = ใช้ไม่ได้ (การ์ดยังอยู่ในมือ). Gear ที่มีหลายผล (หลาย effect) ใช้กับยูนิตที่เข้าเงื่อนไข**ผลใดผลหนึ่ง**ได้ ผลที่ไม่เข้ากับยูนิตนั้นถูกข้าม ไม่ไปลงตัวอื่นแทน (เช่น Capsem: Rider ทุกตัวได้บัฟ แต่แปลงร่างเฉพาะ Zeztz). นอกจาก Gear (เช่นในการต่อสู้) `CHOSEN_FRIENDLY` = ซ้ายสุดที่เข้าเงื่อนไข
-- **ให้ keyword**: Guard Shield (Guard), Barrier Emitter (Barrier), Venom Edge (Lethal), Overclock Chip (Rapid), Revive Chip (Revive)
-- **ได้การ์ดตามเผ่า**: `X Call` (action `DISCOVER_UNIT {faction}`) Discover ยูนิตเผ่านั้น 1 จาก 3 จาก pool ที่ rank ≤ ร้าน (มีเฉพาะเผ่าที่อยู่ในแมตช์)
-
-## 10. ตัวอย่างยูนิต Rank 1 (prototype set หลัง balance pass ล่าสุด)
-| ชื่อ | Faction | ATK/HP | Effect |
-|---|---|---|---|
-| Den Mother | Beast | 2/2 | Last Stand: เรียก Cub |
-| Red Cadet | Sentai (Red) | 1/3 | Team-Up(2): +2/+2 ตอนเริ่มสู้ |
-| Rookie Rider | Rider | 2/2 | Henshin(2) → Rider Form 4/4 Rider Kick |
-| Scout Drone | Mecha | 2/2 | Gattai |
-| Cafe Owner | Ally | 1/2 | End of Turn: ถ้าเหลือ Energy ≥1 ally สุ่ม +1/+1 |
-
-ค่าทั้งหมดอยู่ใน `packages/content/src/` หรือแก้ในแท็บ Admin. เอกสารนี้อาจตามไม่ทัน: ดูค่าจริงในแท็บ Library
-
-## 11. Launch Series (ชุดแรก)
-แต่ละซีรีส์มี Signature ไม่ซ้ำกัน ครอบคลุมกลไกหลักของ engine (copy, stack, keyword grant, merge, attach, combo)
-
-| Franchise | Series | Signature | กลไก |
-|---|---|---|---|
-| Sentai | **Gokaiger** | Gokai Change | Deploy: copy keyword 1 อย่างจาก Sentai ตัวอื่นบนบอร์ด |
-| Sentai | **Kyoryuger** | Brave | ตีแล้วศัตรูตาย = ได้ 1 stack, ครบ 3 ได้ +ATK ถาวร; Giant Robo เลือก keyword ตอนเรียก |
-| Sentai | **Shinkenger** | Mojikara | Deploy: ให้ยูนิตข้างเคียง 1 keyword (Guard / Barrier / Rapid) |
-| Rider | **W** | Pair | ยูนิต W 2 ตัวอยู่ติดกัน รวมเป็นตัวเดียวตอนเริ่มสู้ ได้ keyword ของทั้งสองครึ่ง |
-| Rider | **Den-O** | Imagin Possession | วาง Imagin ทับยูนิตอื่น ให้ stat + keyword (Imagin ไม่กินช่องบอร์ด) |
-| Rider | **OOO** | Medal Combo | สะสม Medal 3 สี, ครบ 3 เหรียญสีเดียวกัน → Combo Form + bonus ตามสี |
-| Original | **Himmapan Sentai** (ครุฑ, นาค, คชสีห์, กินรี, หงส์) | Mythic Bond | Last Stand: ส่งพลังให้หุ่นใน Giant Slot (+stat ถาวร) |
-
-- MVP: ~5 ยูนิตต่อซีรีส์ (≈35) + Neutral/Grunt/Kaijin เติม pool
-- Hero 6 ตัว, Giant Robo 4 ตัว (1 ต่อขบวนการ Sentai รวม Himmapan)
-- Himmapan Sentai ทำหน้าที่ทดสอบด้วยว่าเพิ่ม/เปลี่ยน IP ได้จาก DB โดยไม่แก้ code
-
----
-
-## 12. Ability DSL (data-driven)
-Effect เก็บเป็น JSON ใน DB, engine ตีความ — admin สร้างการ์ดใหม่ได้โดยไม่แก้ code. Schema จริงอยู่ที่ `packages/shared/src/schemas/effect.ts` (zod) ใช้ validate ทั้ง admin editor และ server
-
-```jsonc
-{
-  "scope": "UNIT",                       // UNIT (ผูกกับยูนิต) | PLAYER (Hero Power, Relic, Series Bond, Gear)
-  "trigger": "START_OF_COMBAT",
-  "condition": { "type": "TEAM_UP_COLORS_GTE", "value": 3 },
-  "target": { "selector": "SELF" },      // + faction / series / cards filter สำหรับ selector ฝั่งเรา
-  "actions": [
-    { "type": "BUFF", "atk": 2, "hp": 2, "permanent": false },
-    { "type": "SUMMON", "cardKey": "beast_cub", "count": 1 }
-  ],
-  "goldenMultiplier": 2
-}
-```
-
-### 12.1 Triggers
-| ระดับ | Trigger |
-|---|---|
-| ยูนิต | `ON_PLAY` (Deploy), `END_OF_TURN`, `HENSHIN`, `START_OF_COMBAT`, `ON_ATTACK`, `AFTER_DAMAGED`, `LAST_STAND`, `AVENGE` (+ `every`: ทุก N ตัวที่ตาย), `ALLY_SUMMONED` (มียูนิตตัวอื่นถูกเรียกเข้าฝั่งเรา ทั้งสองช่วง), `ON_SELL` (ถูกขาย), `ON_DISCARD` (ถูกการ์ดอื่นทิ้งจากมือ; Gear ก็มีได้) · `ALLY_SUMMONED` ทำงานทั้งตอนลงการ์ดจากมือ (ก่อน Deploy ของมัน) และตอนถูกเรียกด้วยความสามารถ |
-| ผู้เล่น | `ON_ACQUIRE` (เลือก Relic/Hero), `ON_TURN_START`, `ON_USE` (Hero Power), `START_OF_COMBAT` (Relic/Series Bond), `ON_PLAY` (Gear) |
-| แหล่ง Gauge | `ON_ROLL_CALL`, `ON_ROLL_CALL_WIN`, `HENSHIN` |
-
-### 12.2 Conditions / Selectors / Actions
-- **Conditions**: `TEAM_UP_COLORS_GTE`, `FACTION_COUNT_GTE`, `SERIES_COUNT_GTE`, `ENERGY_GTE` (ใน combat ไม่มี energy → ไม่ผ่าน), `HAS_CARD {cards}` (บนบอร์ดมีการ์ดใบใดใบหนึ่งในรายการ)
-- **กรองด้วยชื่อการ์ด**: `target.cards` = รายการ key ของการ์ด ยูนิตที่ตรงใบใดใบหนึ่งเท่านั้นที่โดน (แบบ "หรือ") เช่น Deploy: ให้ Agent Number 7 หรือ Kamen Rider Zeztz +2/+2. ทั้ง `target.cards` และ `HAS_CARD` **นับร่างที่แปลงแล้วด้วย** (ร่างที่ได้จาก `henshin.into` หรือ `ultimateInto` ของการ์ดในรายการ และการ์ดที่ตั้ง `formOf` เป็นการ์ดในรายการ ไล่ต่อกันได้หลายขั้น) ร่างจาก `TRANSFORM` นับเฉพาะเมื่อร่างนั้นตั้ง `formOf` ไว้ ไม่นับ Gattai
-- **Selectors**: `SELF`, `ADJACENT`, `LEFTMOST_FRIENDLY`, `RIGHTMOST_FRIENDLY`, `RANDOM_FRIENDLY` (**ไม่เลือกตัวเอง**), `ALL_FRIENDLY`, `CHOSEN_FRIENDLY` (ผู้เล่นเลือก ใช้กับ Gear; ที่อื่น = ซ้ายสุด), `SUMMONED` (ตัวที่เพิ่งถูกเรียก ใช้กับ `ALLY_SUMMONED`), `GIANT_SLOT` (หุ่นในช่อง Giant), `LEFTMOST_ENEMY`, `RANDOM_ENEMY`, `ALL_ENEMY` (selector ศัตรูใช้ได้เฉพาะใน combat)
-- **บัฟด้วยค่าพลังของตัวเอง** `BUFF.fromSelf`: เป้าหมาย (ยกเว้นตัวเอง) ได้ ATK/HP ปัจจุบันของยูนิตเจ้าของ effect เพิ่ม; ช่วงต่อสู้ถ้าตายแล้วใช้ maxHp
-- **`CONSUME_ALLIES {permanent}`**: ทำลายยูนิตฝั่งเราตัวอื่นทั้งหมด (ไม่รวมตัวเองและ Giant) แล้วเป้าหมายได้ ATK/HP รวม; ช่วงซื้อของ = ลบจากบอร์ดคืน pool + บัฟถาวร, ช่วงต่อสู้ = DESTROY ในการต่อสู้นั้น + บัฟ (ถาวรเมื่อ `permanent`)
-- **Trigger ของยูนิต**: `HENSHIN` รัน effect ของ**ใบที่แปลง** (ร่างก่อน) โดยทำกับยูนิตในร่างใหม่ — ร่างใหม่ไม่ได้รัน `HENSHIN` ของตัวเอง · `ON_TURN_START` ทำงานกับยูนิตบนบอร์ดด้วย (หลังเติม Energy, ก่อน Relic/Hero) · `ON_ACQUIRE`/`ON_USE`/`ON_ROLL_CALL`/`ON_ROLL_CALL_WIN` เป็นของ Relic/Hero/Gauge เท่านั้น ใส่ในการ์ดแล้วระบบเตือน
-- **เผ่าในแมตช์**: สุ่ม `factionsPerMatch` เผ่าจากเฉพาะเผ่าที่มียูนิตขายในร้าน (เผ่าที่ยังไม่มีการ์ดไม่ถูกเลือก ร้านไม่ว่าง)
-- **`COPY {to: BOARD|HAND, withBuffs}`**: สำเนาของเป้าหมาย; `Unit.unpooled` นับสำเนาที่ไม่ได้มาจาก pool (`copiesOf` หักออก) ทำให้ขาย/triple/แปลงร่างไม่คืน pool เกินจริง; ช่วงซื้อของ resolve triple ทันที; ช่วงต่อสู้ BOARD = summon (เป้าหมายศัตรูได้), HAND = รางวัลเทิร์นหน้า (การ์ดพื้นฐาน)
-- **กันเนื้อหาวนไม่รู้จบ**: ค่าพลังไม่เกิน 999,999 (`STAT_CAP`); การต่อสู้หนึ่งครั้งสร้างยูนิตได้ไม่เกิน 100 ตัว ถ้าเกิน = เนื้อหาวน → ยกเลิกการต่อสู้ เสมอ; ช่วงซื้อของ ปฏิกิริยา "เมื่อเรียกยูนิต" ซ้อนกันได้ลึกสุด 8 ชั้น
-- **เสริมพลัง Gear** `BUFF_GEAR {atk, hp}`: `PlayerState.gearBonus` สะสมจนจบเกม; `BUFF` ที่มาจาก Gear (origin `gear`) บวกโบนัสนี้กับทุกเป้าหมาย (ไม่คูณ golden ของ Gear) และบันทึกในประวัติบัฟเป็นของ Gear ใบนั้น; Gear ที่ไม่มี `BUFF` ไม่ได้ผล
-- **รางวัลหลังการต่อสู้**: `GAIN_ENERGY`, `ADD_TO_HAND`, `RANDOM_CARD`, `DISCOVER_UNIT`, `GAUGE_ADD`, `BUFF_SHOP`, `BUFF_GEAR` ใน trigger ช่วงต่อสู้ไม่ทำทันที แต่เก็บไว้ (`CombatResult.rewards`, event `REWARD`) แล้วให้ผู้เล่นตอนเริ่มเทิร์นหน้า หลังเติม Energy ก่อน `ON_TURN_START` · ใช้ golden multiplier ตามปกติ. action ช่วงซื้อของที่เหลือ (`MODIFY_RULE`, `DISCOVER_GIANT`, `SUPER_GATTAI`, `ULTIMATE_FORM`, `DEVOUR_SHOP`, `DISCARD`) ยังใช้ตอนต่อสู้ไม่ได้
-- **Actions**: `BUFF`, `SUMMON`, `DAMAGE` (combat เท่านั้น), `GIVE_KEYWORD`, `TRANSFORM`, `DESTROY`, `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`, `DISCOVER_UNIT` (เลือกรับยูนิต 1 จาก 3 กรองเผ่าได้), `SUPER_GATTAI`, `RANDOM_CARD` (Gear หรือยูนิตแบบสุ่มเข้ามือ), `ULTIMATE_FORM` (เปลี่ยนเป็น `ultimateInto` ของการ์ด บัฟเดิมติดไปด้วย), `BUFF_SHOP` (ยูนิตในร้าน +atk/+hp จนจบเกม), `DEVOUR_SHOP` (กินยูนิตในร้าน: สุ่ม/แรงสุด/อ่อนสุด กรองเผ่าได้ เป้าหมายได้ค่าพลังถาวร), `SUMMON_FROM_HAND` (ช่วงซื้อของ: การ์ดในมือลงบอร์ด ไม่ทำ Deploy / ตอนสู้: สำเนายูนิตในมือลงสนาม), `DISCARD` (ทิ้งการ์ดในมือ สุ่ม/ซ้าย/ขวา เฉพาะยูนิตหรือ Gear ได้).
-- **ทุก effect**: `repeat` (ทำงาน N ครั้งต่อการเกิด 1 ครั้ง, 1–5) และ `limit` (ไม่เกิน N ครั้งต่อเทิร์น/ต่อเกม นับแยกต่อยูนิต หรือต่อ Relic/Hero/Gear; ตอนสู้นับต่อการสู้; ครั้งที่เงื่อนไขไม่ผ่านไม่นับ) ยังไม่มี: `STEAL_STATS`, `MERGE`, `COPY_KEYWORD`, `DISCOVER` ทั่วไป (ซีรีส์ Gokaiger/Kyoryuger/W/Den-O/OOO ใช้ตอน content pass: เพิ่ม handler ตามต้องการ)
-- action ที่ใช้ได้เฉพาะตอน recruit: `GAIN_ENERGY`, `GAUGE_ADD`, `MODIFY_RULE`, `ADD_TO_HAND`, `DISCOVER_GIANT`, `DISCOVER_UNIT`, `SUPER_GATTAI`, `RANDOM_CARD`, `ULTIMATE_FORM`, `BUFF_SHOP`, `DEVOUR_SHOP`, `DISCARD` — content validation เตือนตั้งแต่ตอน Save ถ้าใส่ผิดช่วง (`ALLY_SUMMONED` เกิดได้ทั้งสองช่วง จึงใช้ได้แค่ action ที่ทำงานทั้งคู่)
-
-### 12.3 กฎที่ engine บังคับ (ได้จากการทำ + fuzz จริง)
-- **Golden**: ตัวเลข `BUFF`/`SUMMON count`/`DAMAGE`/`GAIN_ENERGY`/`GAUGE_ADD` คูณ `goldenMultiplier` (ค่าเริ่มต้น 2) เมื่อ *ยูนิตเจ้าของ* เป็น Final Form
-- **Last Stand ทำงานทุกครั้งที่ตาย** รวมครั้งที่ตามด้วย Revive/Kyodaika (ยูนิตที่ฟื้นกลับมา summon ไปทางขวาของตัวเอง; ยูนิตที่ตายจริงๆ summon ลงช่องของมัน). ยูนิตที่ฟื้นจึงมี event DEATH 2 ครั้ง
-- **Kyodaika** ใช้ HP สูงสุด ×ตัวคูณ (ไม่ใช่ HP ที่เหลือ), ล้าง keyword, เป็น "ตัวใหญ่" (FINAL_BLOW ตีแรงขึ้น ×2) และทำให้หุ่นฝั่งตรงข้ามลงสนาม
-- **FINAL_BLOW**: ตีครั้งแรก ×2 และ ×2 อีกชั้นเมื่อเป้าหมายเป็นตัวใหญ่ (หุ่น/Kyodaika) — ซ้อนกันเป็น ×4
-- **ลำดับตี**: ใช้ pointer ที่ปรับตามการเพิ่ม/ลบยูนิตทั้งสองฝั่ง ไม่มีตัวไหนถูกข้ามเมื่อยูนิตทางซ้ายตาย
-- **การ์ดที่ effect สร้างและอยู่ใน pool** (`ADD_TO_HAND`, `SUMMON`, `TRANSFORM`, Henshin) ดึง/สลับจาก pool จริง — ถ้า pool ไม่มีให้ ไม่เกิดผล (Henshin รอเทิร์นถัดไป). token/Gear/Giant ไม่อยู่ใน pool จึงไม่กระทบ
-- **combat ที่ effect วนไม่รู้จบ** (ตาย→summon→ตาย…) จบเป็นเสมอ ไม่ crash แมตช์
-- **Content validation** (ตอน publish): reference ที่ไม่มีอยู่, `MODIFY_RULE` ชื่อกฎที่ไม่มี, Series Bond ที่ไม่ใช่ player-scope `START_OF_COMBAT`, Gear ที่ effect ไม่ใช่ player-scope `ON_PLAY`, การ์ดยูนิตที่มี player-scope effect, รางวัล Gauge ที่ต้องมีเป้าหมาย, ปิด (`enabled: false`) ทุก Hero หรือทุกเผ่า, `formOf` / `series` ของ Hero ที่ชี้ไปยังของที่ไม่มี
-- **`MODIFY_RULE`**: กฎที่ปรับได้ = `startEnergy`, `energyPerTurn`, `maxEnergy`, `buyCost`, `sellValue`, `refreshCost`, `boardSize`, `handSize`, `maxRank`, `freeRefreshesPerTurn`, `rollCallColors`, `rollCallBuff`, `gattaiSize`, `giantEntryThreshold`, `giantSentaiScale`, `kyodaikaMultiplier`. Engine อ่านผ่านกฎของผู้เล่นเสมอ ห้าม hardcode
-- **Content versioning**: draft → Publish = snapshot ที่ไม่เปลี่ยน, ล็อบบี้ lock เวอร์ชันตอนเริ่มเกม
-
-### 12.4 Gauge / Gear / Giant
-- Gauge: `sources` (trigger+amount) + `thresholds` (`at`, `reward` = actions ที่ไม่ต้องมีเป้าหมาย). `once: true` จ่ายครั้งเดียวตอนข้าม; `once: false` จ่ายซ้ำและหัก `at` ทุกครั้ง
-- **Gear** = การ์ด `kind: "GEAR"` ในมือ ใช้ด้วย `useGear` (รัน player-scope `ON_PLAY`) ไม่อยู่ใน pool. **ขายได้เฉพาะตอนที่ยังใช้ไม่ได้** (เช่น Gear ที่ใช้กับหุ่นตอนยังไม่มีหุ่น หรือ Gear ที่ไม่มียูนิตให้ใส่) ได้ Energy เท่าการขายปกติ; Gear ที่ใช้ได้ขายไม่ได้ (bot ไม่ซื้อ Gear ที่ยังใช้ไม่ได้)
-- **Giant** = การ์ด `kind: "GIANT"` ไม่อยู่ใน pool; เลือกผ่าน `DISCOVER_GIANT` (3 ตัว, ตัวของซีรีส์ที่มียูนิตบนบอร์ดมากสุดออกแน่นอน) เข้า Giant Slot. ลงสนามเมื่อยูนิตเหลือ ≤ `giantEntryThreshold` หรือศัตรู Kyodaika; ลงได้ครั้งเดียวต่อการสู้
-
----
-
-## 13. Relic (ระบบสมบัติ)
-สมบัติติดตัวผู้เล่นแบบถาวร เลือกกลางเกม (แนว Trinket ของ HS BG)
-
-### 13.1 กฎ
+## 8. Relic
 | รายการ | ค่า |
 |---|---|
-| เทิร์น 5 | เลือก **Lesser Relic** 1 จาก 4 |
-| เทิร์น 9 | เลือก **Greater Relic** 1 จาก 4 |
-| ราคา | Lesser 0–4 Energy, Greater 0–6 Energy จ่ายตอนเลือก — มีตัวเลือกราคา 0 อย่างน้อย 1 อันเสมอ |
-| ถือได้ | สูงสุด 2 (Lesser 1 + Greater 1) ถาวรทั้งเกม ขายไม่ได้ |
-| เวลา | เทิร์นที่เลือก Relic, Recruit +10s |
-| เลือกไม่ทันเวลา | ได้ตัวเลือกราคา 0 อัตโนมัติ |
+| เทิร์น 5 / 9 | เลือก Lesser / Greater 1 จาก 4 |
+| ราคา | Energy จ่ายตอนเลือก มีตัวราคา 0 อย่างน้อย 1 อันเสมอ · หมดเวลาได้ตัวฟรี |
+| ถือได้ | Lesser 1 + Greater 1 ถาวร ขายไม่ได้ |
+| ตัวเลือก | 1 อันตรงเผ่าที่มีมากสุดบนบอร์ด, 1 อันตรงซีรีส์บนบอร์ด (ไม่มีก็สุ่ม), 2 อันสุ่ม · เฉพาะเผ่า/ซีรีส์ในล็อบบี้ · สุ่มตาม `weight` · หลายคนเลือกชิ้นเดียวกันได้ |
 
-**สุ่มตัวเลือก 4 อัน**
-1. 1 อันผูกกับ Faction ที่มีมากที่สุดบนบอร์ด
-2. 1 อันผูกกับ Series ที่มีบนบอร์ด (ไม่มีก็สุ่มทั่วไป)
-3. 2 อันสุ่มทั่วไป
+## 9. Ability DSL — กฎที่ engine บังคับ
+Effect เป็น JSON (`packages/shared/src/schemas/effect.ts`) = trigger + condition + target + actions · รายการ trigger / selector / action และวิธีตั้งดู [ADMIN_GUIDE.md](ADMIN_GUIDE.md) ข้อ 6
 
-กรองเฉพาะ Faction/Series ที่ล็อบบี้เปิดใช้. ผู้เล่นหลายคนได้รับเสนอและเลือก Relic ชิ้นเดียวกันได้ (ไม่มีการจองชิ้นต่อล็อบบี้). ผู้เล่นคนเดียวถือได้ tier ละ 1 อัน จึงไม่มีทางได้ซ้ำกับตัวเอง. น้ำหนักการสุ่มปรับได้ด้วย `weight`; หมดเวลาจะได้ตัวฟรี.
-
-### 13.2 ประเภท
-| ประเภท | ตัวอย่างผล |
-|---|---|
-| Economy | ได้ Energy, ลดราคา, Refresh ฟรี |
-| Shop | ยูนิตในร้าน +stat, การันตี Rank สูง |
-| Combat trigger | Start of Combat / Avenge / Last Stand ระดับผู้เล่น |
-| Mechanic boost | เสริม Henshin, Team-Up, Gattai, Kyodaika, Gauge |
-| Series | เสริม Signature ของซีรีส์ |
-
-### 13.3 Lesser Relic (ชุดแรก)
-| Relic | ผูกกับ | ราคา | ผล |
-|---|---|---|---|
-| Ranger Key | Gokaiger | 2 | Start of Combat: Sentai ซ้ายสุด copy keyword ของ Sentai ขวาสุด |
-| Core Medal Set | OOO | 1 | ได้ Medal ทุกสีอย่างละ 1 ทันที |
-| Gaia Memory | W | 2 | ยูนิตที่เกิดจาก Pair ได้ +2/+2 |
-| Rider Pass | Den-O | 0 | Imagin ราคาลด 1 |
-| Shodophone | Shinkenger | 2 | Mojikara ให้ Lethal เป็นตัวเลือกได้ด้วย |
-| Brave Battery | Kyoryuger | 1 | ยูนิต Kyoryuger ทุกตัวเริ่มด้วย Brave 1 stack |
-| Pack Horn | Beast | 2 | เริ่มการต่อสู้: เรียก Cub |
-| Base Café Coupon | Ally | 0 | ทุกๆ 3 เทิร์น +1 Energy |
-| Training Bracelet | ทั่วไป | 3 | ยูนิตในร้าน +1/+1 |
-
-### 13.4 Greater Relic (ชุดแรก)
-| Relic | ผูกกับ | ราคา | ผล |
-|---|---|---|---|
-| Prototype Driver | Rider | 4 | Henshin(N) ทำงานเร็วขึ้น 1 เทิร์น |
-| Mecha Gauge Core | Sentai/Mecha | 3 | Mecha Gauge +2 ทันที, Giant Robo ลงสนามเมื่อเหลือ ≤3 ตัว |
-| Garuda Feather | Himmapan | 4 | Giant Robo ได้ Revive |
-| Kaijin Cell | Kaijin | 3 | Kyodaika ฟื้นด้วย stat ×3 แทน ×2 |
-| Dark Contract | Dark Rider | 2 | Sacrifice แล้วได้ Energy +1 |
-| Universal Belt | ทั่วไป | 6 | ทุกครั้งที่ Refresh มียูนิต Rank เท่ากับ Base Rank ของเรา ≥1 ตัวในร้าน |
-| Team Spirit Banner | Sentai | 4 | Roll Call ใช้แค่ 2 สี |
-
-### 13.5 อื่นๆ
-- เขียนผลด้วย Ability DSL (owner scope `PLAYER`) — ส่วนใหญ่ใช้ `MODIFY_RULE` หรือ trigger ระดับผู้เล่น
-- Bot เลือก Relic ที่ตรง faction หลักก่อน ถ้า Energy ไม่พอเลือกตัวราคา 0
-- ผู้เล่นทุกคนเห็น Relic ของคนอื่นใน leaderboard
+- **Golden**: ตัวเลข BUFF / SUMMON count / DAMAGE / GAIN_ENERGY / GAUGE_ADD คูณ `goldenMultiplier` (2) เมื่อยูนิตเจ้าของเป็นร่างทอง
+- **รางวัลหลังสู้**: GAIN_ENERGY, ADD_TO_HAND, RANDOM_CARD, DISCOVER_UNIT, GAUGE_ADD, BUFF_SHOP, BUFF_GEAR ใน trigger ช่วงต่อสู้ ได้ตอนเริ่มเทิร์นหน้า (หลังเติม Energy ก่อน `ON_TURN_START`)
+- action ช่วงซื้อของที่เหลือ (MODIFY_RULE, DISCOVER_GIANT, SUPER_GATTAI, ULTIMATE_FORM, DEVOUR_SHOP, DISCARD) ใช้ตอนสู้ไม่ได้ · DAMAGE / เป้าศัตรูใช้ได้เฉพาะตอนสู้ · `ALLY_SUMMONED` เกิดทั้งสองช่วง ใช้ได้แค่ action ที่ทำงานทั้งคู่ — Save แล้วระบบเตือน
+- **HENSHIN** trigger รัน effect ของใบก่อนแปลงกับร่างใหม่ · ร่างใหม่ไม่รัน HENSHIN ของตัวเอง
+- **กรองชื่อการ์ด** (`target.cards`, `HAS_CARD`) นับร่างที่แปลงแล้ว (`henshin.into`, `ultimateInto`, `formOf` ไล่ต่อได้หลายขั้น) ไม่นับ Gattai
+- **ค่าติดลบใส่ศัตรู** หยุดที่ ATK 0 / HP 1 ไม่ฆ่า · "ถาวร" มีผลกับยูนิตฝั่งตัวเองเท่านั้น
+- **การ์ดที่ effect สร้างและอยู่ใน pool** (ADD_TO_HAND, SUMMON, TRANSFORM, Henshin) ดึงจาก pool จริง ไม่มีให้ = ไม่เกิดผล · token / Gear / Giant ไม่อยู่ใน pool · สำเนาจาก COPY ไม่ดึงจาก pool และขายแล้วไม่คืน
+- **ลำดับตี** ปรับตามการเพิ่ม/ลบยูนิต ไม่มีตัวถูกข้าม
+- **กันวนไม่รู้จบ**: ค่าพลังไม่เกิน 999,999 · การสู้สร้างยูนิตได้ ≤ 100 ตัว เกิน = เสมอ · ปฏิกิริยา "เมื่อเรียกยูนิต" ช่วงซื้อของซ้อนได้ 8 ชั้น
+- **`limit`** ต่อเทิร์น/ต่อเกม นับแยกต่อยูนิต (หรือต่อ Relic/Hero/Gear) ตอนสู้นับต่อการสู้ · **`repeat`** 1–5 ครั้งต่อการเกิด
+- **`MODIFY_RULE`** ใช้ได้กับ: startEnergy, energyPerTurn, maxEnergy, buyCost, sellValue, refreshCost, boardSize, handSize, maxRank, freeRefreshesPerTurn, rollCallColors, rollCallBuff, gattaiSize, giantEntryThreshold, giantSentaiScale, kyodaikaMultiplier · engine อ่านกฎผ่านผู้เล่นเสมอ
+- **Content validation** ตอน Save/Publish: reference ที่ไม่มีอยู่, ชื่อกฎผิด, scope/trigger ผิดชนิด (Gear = PLAYER `ON_PLAY`, Bond = PLAYER `START_OF_COMBAT`), รางวัล Gauge ที่ต้องมีเป้า, ปิดทุก Hero / ทุกเผ่า
