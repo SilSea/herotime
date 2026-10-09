@@ -3129,7 +3129,7 @@
    "name": "Collot",
    "rank": 2,
    "atk": 3,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "beast"
    ],
@@ -3189,17 +3189,17 @@
     {
      "scope": "UNIT",
      "trigger": "ON_PLAY",
+     "target": {
+      "selector": "ADJACENT"
+     },
      "actions": [
       {
        "type": "BUFF",
        "atk": 2,
-       "hp": 1,
+       "hp": 2,
        "permanent": false
       }
-     ],
-     "target": {
-      "selector": "ADJACENT"
-     }
+     ]
     }
    ],
    "series": "beastars"
@@ -3209,7 +3209,7 @@
    "name": "Kibi",
    "rank": 2,
    "atk": 3,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "beast"
    ],
@@ -3269,18 +3269,18 @@
     {
      "scope": "UNIT",
      "trigger": "ON_PLAY",
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "faction": "beast"
+     },
      "actions": [
       {
        "type": "BUFF",
        "atk": 1,
-       "hp": 0,
+       "hp": 1,
        "permanent": true
       }
-     ],
-     "target": {
-      "selector": "ALL_FRIENDLY",
-      "faction": "beast"
-     }
+     ]
     }
    ],
    "series": "beastars"
@@ -3289,8 +3289,8 @@
    "key": "gohin",
    "name": "Gohin",
    "rank": 3,
-   "atk": 3,
-   "hp": 5,
+   "atk": 4,
+   "hp": 6,
    "factions": [
     "beast"
    ],
@@ -3298,6 +3298,12 @@
     {
      "scope": "UNIT",
      "trigger": "ON_PLAY",
+     "target": {
+      "selector": "ALL_FRIENDLY",
+      "cards": [
+       "legoshi"
+      ]
+     },
      "actions": [
       {
        "type": "BUFF",
@@ -3309,13 +3315,7 @@
        "type": "GIVE_KEYWORD",
        "keyword": "BARRIER"
       }
-     ],
-     "target": {
-      "selector": "ALL_FRIENDLY",
-      "cards": [
-       "legoshi"
-      ]
-     }
+     ]
     }
    ],
    "keywords": [
@@ -3472,8 +3472,8 @@
    "key": "durham",
    "name": "Durham",
    "rank": 1,
-   "atk": 2,
-   "hp": 2,
+   "atk": 3,
+   "hp": 3,
    "factions": [
     "beast"
    ],
@@ -3485,8 +3485,8 @@
    "key": "dom",
    "name": "Dom",
    "rank": 1,
-   "atk": 2,
-   "hp": 1,
+   "atk": 3,
+   "hp": 2,
    "factions": [
     "beast"
    ],
@@ -3966,21 +3966,18 @@
     {
      "scope": "UNIT",
      "trigger": "END_OF_TURN",
+     "target": {
+      "selector": "RANDOM_FRIENDLY",
+      "faction": "shonen"
+     },
      "actions": [
       {
        "type": "BUFF",
-       "atk": 0,
-       "hp": 2,
+       "atk": 1,
+       "hp": 1,
        "permanent": true
       }
-     ],
-     "target": {
-      "selector": "RANDOM_FRIENDLY",
-      "cards": [
-       "naruto",
-       "sasuke"
-      ]
-     }
+     ]
     }
    ],
    "series": "naruto"
@@ -4013,17 +4010,17 @@
     {
      "scope": "UNIT",
      "trigger": "AFTER_DAMAGED",
+     "target": {
+      "selector": "SELF"
+     },
      "actions": [
       {
        "type": "BUFF",
        "atk": 2,
-       "hp": 0,
+       "hp": 1,
        "permanent": true
       }
      ],
-     "target": {
-      "selector": "SELF"
-     },
      "limit": {
       "times": 2,
       "per": "TURN"
@@ -4037,7 +4034,7 @@
    "name": "Neji Hyuga",
    "rank": 2,
    "atk": 3,
-   "hp": 2,
+   "hp": 3,
    "factions": [
     "shonen"
    ],
@@ -4045,15 +4042,15 @@
     {
      "scope": "UNIT",
      "trigger": "ON_ATTACK",
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     },
      "actions": [
       {
        "type": "DAMAGE",
        "amount": 1
       }
-     ],
-     "target": {
-      "selector": "RANDOM_ENEMY"
-     }
+     ]
     }
    ],
    "series": "naruto"
@@ -4063,7 +4060,7 @@
    "name": "Shikamaru Nara",
    "rank": 2,
    "atk": 2,
-   "hp": 3,
+   "hp": 4,
    "factions": [
     "shonen"
    ],
@@ -4071,6 +4068,9 @@
     {
      "scope": "UNIT",
      "trigger": "START_OF_COMBAT",
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     },
      "actions": [
       {
        "type": "BUFF",
@@ -4078,10 +4078,7 @@
        "hp": 0,
        "permanent": false
       }
-     ],
-     "target": {
-      "selector": "LEFTMOST_ENEMY"
-     }
+     ]
     }
    ],
    "series": "naruto"
@@ -4099,18 +4096,18 @@
     {
      "scope": "UNIT",
      "trigger": "AVENGE",
+     "every": 2,
+     "target": {
+      "selector": "SELF"
+     },
      "actions": [
       {
        "type": "BUFF",
        "atk": 2,
-       "hp": 0,
+       "hp": 1,
        "permanent": true
       }
-     ],
-     "target": {
-      "selector": "SELF"
-     },
-     "every": 2
+     ]
     }
    ],
    "keywords": [
@@ -4197,17 +4194,17 @@
     {
      "scope": "UNIT",
      "trigger": "AFTER_DAMAGED",
+     "target": {
+      "selector": "ALL_FRIENDLY"
+     },
      "actions": [
       {
        "type": "BUFF",
        "atk": 0,
        "hp": 1,
-       "permanent": false
+       "permanent": true
       }
      ],
-     "target": {
-      "selector": "ALL_FRIENDLY"
-     },
      "limit": {
       "times": 2,
       "per": "TURN"
@@ -4220,8 +4217,8 @@
    "key": "might_guy",
    "name": "Might Guy",
    "rank": 5,
-   "atk": 5,
-   "hp": 6,
+   "atk": 6,
+   "hp": 7,
    "factions": [
     "shonen"
    ],
@@ -4229,6 +4226,9 @@
     {
      "scope": "UNIT",
      "trigger": "AFTER_DAMAGED",
+     "target": {
+      "selector": "SELF"
+     },
      "actions": [
       {
        "type": "BUFF",
@@ -4237,9 +4237,6 @@
        "permanent": false
       }
      ],
-     "target": {
-      "selector": "SELF"
-     },
      "limit": {
       "times": 1,
       "per": "GAME"
@@ -4252,8 +4249,8 @@
    "key": "itachi",
    "name": "Itachi Uchiha",
    "rank": 5,
-   "atk": 6,
-   "hp": 5,
+   "atk": 7,
+   "hp": 6,
    "factions": [
     "shonen"
    ],
@@ -4261,6 +4258,9 @@
     {
      "scope": "UNIT",
      "trigger": "START_OF_COMBAT",
+     "target": {
+      "selector": "LEFTMOST_ENEMY"
+     },
      "actions": [
       {
        "type": "BUFF",
@@ -4268,10 +4268,7 @@
        "hp": 0,
        "permanent": false
       }
-     ],
-     "target": {
-      "selector": "LEFTMOST_ENEMY"
-     }
+     ]
     }
    ],
    "series": "naruto"
@@ -4313,8 +4310,8 @@
    "key": "naruto_sage",
    "name": "Naruto (Sage Mode)",
    "rank": 4,
-   "atk": 5,
-   "hp": 5,
+   "atk": 6,
+   "hp": 6,
    "factions": [
     "shonen"
    ],
@@ -4322,15 +4319,15 @@
     {
      "scope": "UNIT",
      "trigger": "ON_ATTACK",
+     "target": {
+      "selector": "RANDOM_ENEMY"
+     },
      "actions": [
       {
        "type": "DAMAGE",
        "amount": 2
       }
-     ],
-     "target": {
-      "selector": "RANDOM_ENEMY"
-     }
+     ]
     }
    ],
    "token": true,
@@ -4340,8 +4337,8 @@
    "key": "gamabunta",
    "name": "Gamabunta",
    "rank": 4,
-   "atk": 5,
-   "hp": 5,
+   "atk": 6,
+   "hp": 6,
    "factions": [
     "shonen"
    ],
@@ -4664,7 +4661,7 @@
       {
        "type": "SUMMON",
        "cardKey": "shishigumi_lion",
-       "count": 1
+       "count": 2
       }
      ]
     }

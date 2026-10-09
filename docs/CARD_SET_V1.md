@@ -1,6 +1,6 @@
 # ชุดการ์ด v1
 
-ชุดการ์ดที่ใช้อยู่ (publish ล่าสุด **version 11**) · 7 เผ่าตามแนวใน `FACTIONS.md` · Human ปิดอยู่ · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
+ชุดการ์ดที่ใช้อยู่ (publish ล่าสุด **version 12**) · 7 เผ่าตามแนวใน `FACTIONS.md` · Human ปิดอยู่ · ข้อมูลเต็มเป็น JSON ที่ `docs/sets/card-set-v1.json`
 
 | เผ่า | เรื่อง | การ์ดในร้าน | ร่าง / Token | Gear |
 |---|---|---|---|---|
@@ -242,20 +242,20 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 | 1 | `haru` | Haru | 1/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +1/+1 ถาวร | กระต่ายขาว ชมรมจัดสวน |
 | 1 | `jack` | Jack | 2/3 | Deploy: ถ้ามี Legoshi บนบอร์ด ตัวนี้ +2/+2 ถาวร | ลาบราดอร์ เพื่อนสนิทของ Legoshi |
 | 1 | `tem` | Tem | 1/3 | Last Stand: ให้ Beast แบบสุ่ม +2/+2 ถาวร | อัลปากา สมาชิกชมรมการละคร |
-| 2 | `collot` | Collot | 3/2 | Deploy: เรียก Durham 2/2 | Old English Sheepdog เพื่อนร่วมหอ |
+| 2 | `collot` | Collot | 3/3 | Deploy: เรียก Durham 3/3 | Old English Sheepdog เพื่อนร่วมหอ |
 | 2 | `pina` | Pina | 3/3 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | แกะ Dall ปีหนึ่ง ชมรมการละคร |
-| 2 | `els` | Els | 2/3 | Deploy: ให้ตัวที่อยู่ข้างๆ +2/+1 | แพะแองโกรา |
-| 2 | `kibi` | Kibi | 3/3 | Deploy: เรียก Dom 2/1 | ตัวกินมด ทีมเวที |
+| 2 | `els` | Els | 2/3 | Deploy: ให้ตัวที่อยู่ข้างๆ +2/+2 | แพะแองโกรา |
+| 2 | `kibi` | Kibi | 3/4 | Deploy: เรียก Dom 3/2 | ตัวกินมด ทีมเวที |
 | 3 | `juno` | Juno | 3/4 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ให้ตัวนั้น +2/+1 ถาวร | หมาป่าเทา ปีหนึ่ง |
-| 3 | `bill` | Bill | 4/3 | Deploy: ให้ Beast ทุกตัว +1/+0 ถาวร | เสือเบงกอล อยากเป็น Beastar |
-| 3 | `gohin` | Gohin | 3/5 *(Guard)* | Deploy: ให้ Legoshi +2/+2 ถาวร และ Barrier | แพนด้า หมอใต้ดิน อาจารย์ของ Legoshi |
+| 3 | `bill` | Bill | 4/3 | Deploy: ให้ Beast ทุกตัว +1/+1 ถาวร | เสือเบงกอล อยากเป็น Beastar |
+| 3 | `gohin` | Gohin | 4/6 *(Guard)* | Deploy: ให้ Legoshi +2/+2 ถาวร และ Barrier | แพนด้า หมอใต้ดิน อาจารย์ของ Legoshi |
 | 4 | `louis` | Louis | 4/6 | Deploy: เรียก Shishigumi Lion 2/2 ×2 | กวางแดง ดาวชมรมการละคร เคยนำกลุ่มสิงโต |
 | 4 | `gosha` | Gosha | 4/6 | Deploy: ให้ Legoshi ได้ Lethal | มังกรโคโมโด ปู่ของ Legoshi |
 | 4 | `sagwan` | Sagwan | 4/6 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ได้ +1/+1 ถาวร (ไม่เกิน 3 ครั้งต่อเทิร์น) | แมวน้ำ เพื่อนบ้านที่ Beast Apartments |
 | 5 | `legoshi` | Legoshi | 8/9 | เมื่อเรียกยูนิตอื่นเข้าสนาม: ตัวนี้ +1/+1 ถาวร | หมาป่าเทา ตัวเอก |
 | 6 | `yahya` | Yahya | 8/9 *(Echo)* | Deploy: ให้ Beast ทุกตัว +3/+3 ถาวร | ม้า Beastar คนปัจจุบัน |
 
-**Token**: `durham` Durham 2/2 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 2/1 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 4/3
+**Token**: `durham` Durham 3/3 (หมาโคโยตี้ เพื่อนร่วมหอ), `dom` Dom 3/2 (นกยูง หัวหน้าทีมเวที), `shishigumi_lion` Shishigumi Lion 4/3
 - ไม่ได้ใส่ (ตัวร้าย): Riz, Melon, Ibuki — Louis เรียก "Shishigumi Lion" เป็น token ทั่วไปแทน
 - Durham และ Dom เป็นตัวละครที่มีในเรื่อง แต่ทำเป็น token เพื่อให้เป็นการ์ดที่ถูกเรียก
 
@@ -263,7 +263,7 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 | R | key | Gear | ราคา | ความสามารถ |
 |---|---|---|---|---|
 | 1 | `black_market_meal` | Black Market Meal | 1 | ใช้กับ Beast ที่เลือก: +2/+1 ถาวร |
-| 3 | `shishigumi_call` | Shishigumi Call | 2 | เรียก Shishigumi Lion (4/3) ลงบอร์ด |
+| 3 | `shishigumi_call` | Shishigumi Call | 2 | เรียก Shishigumi Lion (4/3) ลงบอร์ด 2 ตัว |
 | 4 | `beastar_badge` | Beastar Badge | 3 | ใช้กับ Beast ที่เลือก: ได้ Guard และ +3/+3 ถาวร |
 
 ---
@@ -305,25 +305,25 @@ Mecha Gauge (Roll Call +1, ชนะตอน Roll Call +1): ครบ 3 ได�
 | R | key | การ์ด | ATK/HP | ความสามารถ | อ้างอิง |
 |---|---|---|---|---|---|
 | 1 | `naruto` | Naruto Uzumaki | 1/4 | เริ่มการต่อสู้: เรียกสำเนาของตัวนี้ (การ์ดพื้นฐาน) · Henshin (3) → Naruto (Sage Mode) | Shadow Clone |
-| 1 | `sakura` | Sakura Haruno | 1/4 | จบเทิร์น: ให้ Naruto หรือ Sasuke +0/+2 ถาวร | นินจาแพทย์ |
+| 1 | `sakura` | Sakura Haruno | 1/4 | จบเทิร์น: ให้ Shonen ตัวอื่นแบบสุ่ม +1/+1 ถาวร | นินจาแพทย์ |
 | 1 | `hinata` | Hinata Hyuga | 2/3 *(Guard)* | — | ปกป้อง Naruto |
-| 2 | `rock_lee` | Rock Lee | 2/3 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +2/+0 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น*) | Eight Gates (เปิดได้บางประตู) |
-| 2 | `neji` | Neji Hyuga | 3/2 | เมื่อโจมตี: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | หมัดอ่อน |
-| 2 | `shikamaru` | Shikamaru Nara | 2/3 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/+0 (จนจบการสู้)** | Shadow Possession |
-| 3 | `sasuke` | Sasuke Uchiha | 4/4 *(Power Strike)* | Avenge (2): ตัวนี้ +2/+0 ถาวร | Chidori — แทงเร็ว |
+| 2 | `rock_lee` | Rock Lee | 2/3 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +2/+1 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น*) | Eight Gates (เปิดได้บางประตู) |
+| 2 | `neji` | Neji Hyuga | 3/3 | เมื่อโจมตี: ทำดาเมจ 1 ใส่ศัตรูแบบสุ่ม | หมัดอ่อน |
+| 2 | `shikamaru` | Shikamaru Nara | 2/4 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −2/+0 (จนจบการสู้)** | Shadow Possession |
+| 3 | `sasuke` | Sasuke Uchiha | 4/4 *(Power Strike)* | Avenge (2): ตัวนี้ +2/+1 ถาวร | Chidori — แทงเร็ว |
 | 3 | `kakashi` | Kakashi Hatake | 3/4 | เริ่มการต่อสู้: เรียกสำเนาของศัตรูซ้ายสุด | Copy Ninja, Sharingan |
 | 3 | `gaara` | Gaara | 2/4 *(Guard, Barrier)* | — | โล่ทราย |
-| 4 | `jiraiya` | Jiraiya | 4/5 | เริ่มการต่อสู้: เรียก Gamabunta 5/5 | อัญเชิญคางคก |
-| 4 | `tsunade` | Tsunade | 3/6 | เมื่อโดนดาเมจแล้วยังรอด: ให้พวกเราทุกตัว +0/+1 (ไม่เกิน 2 ครั้งต่อเทิร์น*) | ฟื้นฟูด้วย Katsuyu |
-| 5 | `might_guy` | Might Guy | 5/6 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +8/+0 (จนจบการสู้, **ไม่เกิน 1 ครั้งต่อเกม** — Night Guy) | Eight Gates ครบ 8 ประตู |
-| 5 | `itachi` | Itachi Uchiha | 6/5 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −4/−0 (จนจบการสู้) | Sharingan, Tsukuyomi (ภาพลวง) |
+| 4 | `jiraiya` | Jiraiya | 4/5 | เริ่มการต่อสู้: เรียก Gamabunta 6/6 | อัญเชิญคางคก |
+| 4 | `tsunade` | Tsunade | 3/6 | เมื่อโดนดาเมจแล้วยังรอด: ให้พวกเราทุกตัว +0/+1 ถาวร (ไม่เกิน 2 ครั้งต่อเทิร์น*) | ฟื้นฟูด้วย Katsuyu |
+| 5 | `might_guy` | Might Guy | 6/7 | เมื่อโดนดาเมจแล้วยังรอด: ตัวนี้ +8/+0 (จนจบการสู้, **ไม่เกิน 1 ครั้งต่อเกม** — Night Guy) | Eight Gates ครบ 8 ประตู |
+| 5 | `itachi` | Itachi Uchiha | 7/6 | เริ่มการต่อสู้: ให้ศัตรูซ้ายสุด −4/−0 (จนจบการสู้) | Sharingan, Tsukuyomi (ภาพลวง) |
 | 6 | `naruto_kurama` | Naruto (Kurama Chakra Mode) | 9/9 *(Rapid, Power Strike)* | Avenge (2): ตัวนี้ +2/+2 ถาวร | พลังเก้าหาง |
 
 **ร่าง / Token**
 | key | ร่าง | ATK/HP | ความสามารถ |
 |---|---|---|---|
-| `naruto_sage` | Naruto (Sage Mode) | 5/5 | เมื่อโจมตี: ทำดาเมจ 2 ใส่ศัตรูแบบสุ่ม (Rasenshuriken) |
-| `gamabunta` | Gamabunta | 5/5 | — |
+| `naruto_sage` | Naruto (Sage Mode) | 6/6 | เมื่อโจมตี: ทำดาเมจ 2 ใส่ศัตรูแบบสุ่ม (Rasenshuriken) |
+| `gamabunta` | Gamabunta | 6/6 | — |
 | (สำเนาของ Naruto) | ใช้ action COPY ไม่ต้องสร้างการ์ด | | |
 
 **Gear**
@@ -407,9 +407,10 @@ Lesser = เลือกเทิร์น 5 · Greater = เลือกเท�
 
 ---
 
-## สมดุลล่าสุด (Simulate version 11, 2,400 เกม, Human ปิด)
-อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5): Mecha 4.04 · Kaiju 4.05 · Rider 4.23 · Sentai 4.31 · Shonen 4.37 · Beast 4.64 · ห่างสุด 0.60
+## สมดุลล่าสุด (Simulate version 12, 2,400 เกม, Human ปิด)
+อันดับเฉลี่ย (ต่ำ = ดี, กลาง 4.5): Shonen 3.94 · Rider 4.05 · Mecha 4.26 · Sentai 4.28 · Kaiju 4.33 · Beast 4.49 · ห่างสุด 0.55
 
+- version 12: บัฟ Shonen (เดิมอันดับกลางแต่ชนะน้อยสุด 9.9% → 13.3%) และ Beast (4.64 → 4.49)
 - ตัวเลขจากบอท (เล่น Gattai / สี Sentai แย่กว่าคน) ต้องดูจาก Stats ของเกมจริงประกอบ
-- **ต้องดูต่อ**: Beast อ่อนสุด · Rider อาจแรงในเกมจริง
+- **ต้องดูต่อ**: Beast ยังอ่อนสุด · Shonen อาจแรงเกินในเกมจริง
 - ประวัติการปรับ: Admin → Versions (โน้ตแต่ละเวอร์ชัน) และ git log ของเอกสารนี้
